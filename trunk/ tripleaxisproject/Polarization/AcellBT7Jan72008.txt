@@ -1,0 +1,8 @@
+He3CELL: name        tEmpty-1.77A tEmptySlope Lcm Dcm Rcurv-cm nsL0-2.359A nsL0err
+         Syrah      0.86         0       10  10   50      1.74824	   0.0
+He3CELLpol: PHe  PHeErr   hr0 T      Terr    startSecs      startDateTime
+            0.76   0.038   0  40      0       1199728800  Mon-Jan-7-13:00:00-EST-2008
+He3exp: wavelength waveRelWidth angleVwidth angleHwidth usedRadius
+           2.359     0.0          0.0          0.0       0.0
+efficiency: transportEff terr flipperEff ferr
+                0.97         0       1      0
