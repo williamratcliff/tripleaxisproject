@@ -1,0 +1,6 @@
+EXPORTS
+    Dn @1 DATA
+    PBcorrectData @2
+    PBreadflags @3
+    PBsim @4
+    TWOPI @5 DATA
