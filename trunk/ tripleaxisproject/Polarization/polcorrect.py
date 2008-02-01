@@ -1,11 +1,12 @@
 import numpy as N
 import pylab
 import math
-import readncnr
+import readncnr2 as readncnr
 import writebt7
 import copy
 import ctypes
 import cstruct
+import os, sys
 from ctypes import c_void_p, c_int, c_long, c_char, c_char_p,c_double,c_ulong
 from ctypes import byref as _ref
 c_void_pp = ctypes.POINTER(c_void_p)
@@ -16,8 +17,8 @@ c_double_p=ctypes.POINTER(c_double)
 c_ulong_p=ctypes.POINTER(c_ulong)
 #cellP="PcellBT7Jan072008.txt"
 #cellA="AcellBT7Jan72008.txt"
-cellP="PcellBT7Jan92008.txt"
-cellA="AcellBT7Jan92008.txt"
+#cellP="PcellBT7Jan92008.txt"
+#cellA="AcellBT7Jan92008.txt"
 
 
 #CTYPES STUFF
@@ -92,14 +93,14 @@ PBflags=cstruct.cstruct(('MonitorCorrect',N.intc),
                     ('Debug',N.intc),
                     ('SimFlux',N.intc),
                     ('SimDeviate',N.intc),
-                    ('CountsEnable',int,(1,4)),
-                    ('CountsAdd1',int,(1,4)),
-                    ('CountsAdd2',int,(1,4)),
-                    ('Sconstrain',int,(1,4)),
-                    ('Spp','float64',(1,4)),
-                    ('Smm','float64',(1,4)),
-                    ('Spm','float64',(1,4)),
-                    ('Smp','float64',(1,4))
+                    ('CountsEnable',int,(4,)),
+                    ('CountsAdd1',int,(4,)),
+                    ('CountsAdd2',int,(4,)),
+                    ('Sconstrain',int,(4,)),
+                    ('Spp','float64',(4,)),
+                    ('Smm','float64',(4,)),
+                    ('Spm','float64',(4,)),
+                    ('Smp','float64',(4,))
                     )
                     
                     
@@ -154,7 +155,7 @@ def calc_energy(angle,dspace):
     return energy
 
 class polarization_correct:
-    def __init__(self,files):
+    def __init__(self,files,cellP,cellA):
         self.mydata={}
         self.counts={}
         self.errors={}
@@ -162,17 +163,19 @@ class polarization_correct:
         ef=[]
         self.timestamp={}
         self.files=files
+        self.cellP=cellP
+        self.cellA=cellA
         for key,myfilestr in files.iteritems():
             mydatareader=readncnr.datareader()
             self.mydata[key]=mydatareader.readbuffer(myfilestr)
             #print mydata[key].metadata
-            self.counts[key]=N.array(self.mydata[key].data[self.mydata[key].metadata['signal']])
+            self.counts[key]=N.array(self.mydata[key].data[self.mydata[key].metadata['count_info']['signal']])
             self.errors[key]=N.sqrt(self.counts[key])
             self.timestamp[key]=N.array(self.mydata[key].data['timestamp'])
             #TODO currently, we assume that the files are taken at the same points--is this safe?
             self.length=self.counts[key].shape[0]
             a2=N.array(self.mydata[key].data['a2'])
-            if self.mydata[key].metadata['analyzerdetectormode'].lower()=='diffdet':
+            if self.mydata[key].metadata['count_info']['analyzerdetectormode'].lower()=='diffdet':
                 #a6=N.array(mydata[key].data['A5'])*2.0
                 a6=a2
             else:
@@ -241,6 +244,7 @@ class polarization_correct:
                     print 't0 ',mytemp_pm[0]
                     pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
                     pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
+                    print 'shape ',self.counts[key].shape
                 if key=='mp':
                     mytemp_mp=self.timestamp[key].astype('uint32')
                     pbinput.tmp=mytemp_mp.ctypes.data_as(c_ulong_p)
@@ -290,7 +294,7 @@ class polarization_correct:
                     pbinput.Emp=dummyEmp.ctypes.data_as(c_double_p)
                
             
-
+        print 'mylength ',self.length
         Spp=N.empty((1,self.length),'float64')
         Smm=N.empty((1,self.length),'float64')
         Spm=N.empty((1,self.length),'float64')
@@ -300,8 +304,6 @@ class polarization_correct:
         pboutput.Smm=Smm.ctypes.data_as(c_double_p)
         pboutput.Spm=Spm.ctypes.data_as(c_double_p)
         pboutput.Smp=Smp.ctypes.data_as(c_double_p)
-
-
 
         Epp=N.empty((1,self.length),'float64')
         Emm=N.empty((1,self.length),'float64')
@@ -313,26 +315,17 @@ class polarization_correct:
         pboutput.Epm=Epm.ctypes.data_as(c_double_p)
         pboutput.Emp=Emp.ctypes.data_as(c_double_p)
            
-        
         pbflags=PBflags()
 
         fMonitorCorrect=0
         fPolMonitorCorrect=0
-        if self.mydata[key].metadata['reference'][1]=='monitor':
-            fPolMonitorCorrect=0
+        if self.mydata[key].metadata['count_info']['count_type'][1]=='monitor':
+            fPolMonitorCorrect=1
             print 'monitor'
         fDebug=0
         fSimFlux=0
         fSimDeviate=0
         #-- ++ +- -+ #TODO Check with Ross on the order
-        fCountsEnable=N.ascontiguousarray(N.array([0,0,1,1],int))
-        fCountsAdd1=N.ascontiguousarray(N.array([0,0,0,0],'int32'))
-        fCountsAdd2=N.ascontiguousarray(N.array([0,0,0,0],'int32'))
-        fSconstrain=N.ascontiguousarray(N.array([1,1,0,0],'int32'))
-        fSpp=N.ascontiguousarray(N.array([0,0,0,0],'float64'))
-        fSmm=N.ascontiguousarray(N.array([0,0,0,0],'float64'))
-        fSpm=N.ascontiguousarray(N.array([0,0,0,0],'float64'))
-        fSmp=N.ascontiguousarray(N.array([0,0,0,0],'float64'))
 
 
 ##        pbflags.MonitorCorrect=fMonitorCorrect
@@ -350,21 +343,22 @@ class polarization_correct:
 ##        pbflags.Smp=fSmp.ctypes.data_as(c_double_p)
 ##        mypolcorrect.PBcorrectData(cellP,cellA,ctypes.byref(pbflags),self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
  
-        pbflags.MonitorCorrect=fMonitorCorrect
+        pbflags.MonitorCorrect=0#fMonitorCorrect
         pbflags.PolMonitorCorrect=fPolMonitorCorrect
-        pbflags.Debug=fDebug
-        pbflags.SimFlux=fSimFlux
-        pbflags.SimDeviate=fSimDeviate
-        pbflags.CountsEnable=fCountsEnable
-        pbflags.CountsAdd1=fCountsAdd1
-        pbflags.CountsAdd2=fCountsAdd2
-        pbflags.Sconstrain=fSconstrain
-        pbflags.Spp=fSpp
-        pbflags.Smm=fSmm
-        pbflags.Spm=fSpm
-        pbflags.Smp=fSmp
+        pbflags.Debug=0#fDebug
+        pbflags.SimFlux=0#fSimFlux
+        pbflags.SimDeviate=0#fSimDeviate
+        pbflags.CountsEnable=[0,0,1,1]
+        pbflags.CountsAdd1=[0,0,0,0]
+        pbflags.CountsAdd2=[0,0,0,0]
+        pbflags.Sconstrain=[1,1,0,0]
+        pbflags.Spp=[0,0,0,0]
+        pbflags.Smm=[0,0,0,0]
+        bob=N.empty((1,3),'int32')
+        pbflags.Spm=[0,0,0,0]
+        pbflags.Smp=[0,0,0,0]
    
-        mypolcorrect.PBcorrectData(cellP,cellA,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
+        mypolcorrect.PBcorrectData(self.cellP,self.cellA,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
 #int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
 #		  int npts, PBindata *in, PBoutdata *out) ;
         #print pboutput.Spm
@@ -390,9 +384,9 @@ class polarization_correct:
             if self.counts.has_key(key):
                 self.outdata[key]=copy.deepcopy(self.mydata[key])
                 #self.mydata[key].data[self.mydata[key].metadata['signal']]
-                newfield=self.mydata[key].metadata['signal']+'_corrected'
+                newfield=self.mydata[key].metadata['count_info']['signal']+'_corrected'
                 self.outdata[key].data[newfield]=corrected_counts['S'+key]
-                newfield=self.mydata[key].metadata['signal']+'_errs_corrected'
+                newfield=self.mydata[key].metadata['count_info']['signal']+'_errs_corrected'
                 self.outdata[key].data[newfield]=corrected_counts['E'+key]
             
         #print Epm[0]
@@ -400,14 +394,109 @@ class polarization_correct:
         return corrected_counts
 
 
-
+def readscript(myfilestr):
+    myfile = open(myfilestr, 'r')
+    #myfile.close()
+    #exit()
+    #myfile = open(myfilestr, 'r')
+    returnline=['']
+    catalog=[]
+    acellfiles=[]
+    pcellfiles=[]
+    absolute=True
+    inblock=False
+    while 1:
+        lineStr = myfile.readline()
+        if not(lineStr):
+            break
+        strippedLine=lineStr.rstrip().lower()
+        tokenized=strippedLine.split()
+        #print 'tokenized ', tokenized
+        if tokenized[0]==[]:
+            pass
+        elif tokenized[0]=='#absolute':
+            #print 'absolute'
+            absolute=True
+            mydirectory=os.curdir
+        elif tokenized[0]=='#directory':
+            #print 'directory'
+            if os.path.isdir(mydirectory):
+                mydirectory=tokenized[1]
+            else:
+                print '%s is not an existing directory!!!'%(tokenized[1],)
+                break
+        elif tokenized[0]=='#begin':
+            inblock=True
+            #print 'begin '
+            files={}
+        elif tokenized[0]=='#end':
+            #print 'end'
+            catalog.append(files)
+            print 'correcting %s using Pcellfile %s  Acellfile %s'%(files,pcellfile,acellfile)
+            mypolcor=polarization_correct(files,pcellfile,acellfile)
+            corrected_counts=mypolcor.correct()
+            mypolcor.savefiles()
+            print 'corrected'
+            inblock=False
+        elif inblock==True:
+            #print 'inblock'
+            toksplit=tokenized[0].split('=')
+            #check to make sure that there actually is a file specified!
+            if len(toksplit)==2:
+                filetok=os.path.join(mydirectory,toksplit[1])
+                if os.path.isfile(filetok):
+                    files[toksplit[0]]=filetok
+                else:
+                    print filetok+' does not exist!!!'
+                    break
+            else:
+                pass
+        elif tokenized[0]=='#Acell'.lower():
+            #print 'acellfile'
+            acellfile=os.path.join(mydirectory,tokenized[1])
+            if os.path.isfile(acellfile):
+                acellfiles.append(acellfile)
+            else:
+                print '%s does not exist!'%(acellfile,)
+                break
+        elif tokenized[0]=='#Pcell'.lower():
+            #print 'pcellfile'
+            pcellfile=os.path.join(mydirectory,tokenized[1])
+            if os.path.isfile(pcellfile):
+                pcellfiles.append(pcellfile)
+            else:
+                print '%s does not exist!'%(acellfile,)
+                break
+    print 'done'
+    myfile.close()
+    print 'closed'
 
 if __name__=="__main__":
 #    myfilestr_on_off=r'c:\bifeo3xtal\jan8_2008\9175\fieldscansplusminus53566.bt7'
 #    myfilestr_off_on=r'c:\bifeo3xtal\jan8_2008\9175\fieldscanminusplus53567.bt7'
     myfilestr_on_off=r'c:\bifeo3xtal\jan8_2008\9175\fieldscansplusminusreset53630.bt7'
     myfilestr_off_on=r'c:\bifeo3xtal\jan8_2008\9175\fieldscanminusplusreset53631.bt7'
+    myscriptstr=r'c:\tripleaxisproject\bifeo3.polcor'
 
+    if len(sys.argv)!=2:
+        print 'the usage of this program is polcorrect scriptfile'
+        print 'scriptfiles consist of directives set with a #'
+        print '#absolute on a line tells me that you will use absolute paths for files'
+        print 'if you do not specify a path, it will default to the current working directory'
+        print '#directory directory_name tells me that you will use directory_name for your files'
+        print '#Acell cell_file name gives me the name of the cell file for the analyzer'
+        print '#Pcell cell_file name gives me the name of the cell file for the polarizer'
+        print '#begin tells me that you are about to give a list of files that should be grouped together for reduction'
+        print 'within this block, you can use pm=filename on a single line'
+        print 'the valid channels are pp,pm,mp,mm  with polarizer in being denoted by p and out denoted by m--given in stream order'
+        print '#end tells me that the block is finished.  Do not forget this directive!'
+        exit()
+    myscriptstr=sys.argv[1]
+    if os.path.isfile(myscriptstr):
+        readscript(myscriptstr)
+    else:
+        print 'The file you called me with (%s) does not exist'%(myscriptstr,)
+    exit()
     files={}
     #files['on_on']=myfilestr_on_on
     files['pm']=myfilestr_on_off
@@ -445,4 +534,3 @@ if __name__=="__main__":
                     marker='s',mfc='red',linestyle='None')     
     
     pylab.show()
-    
