@@ -1,6 +1,6 @@
 import numpy as N
-import math
 import pylab
+import math
 import unittest
 from matplotlib.patches import Ellipse
 eps=1e-3
