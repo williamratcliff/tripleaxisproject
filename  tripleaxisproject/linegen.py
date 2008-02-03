@@ -57,6 +57,7 @@ class line_interp:
         self.myline=linegen(point1,point2)
         self.line_x,self.line_y=self.myline.gen_line(divisions=50)
         self.slope=self.myline.slope
+        self.intercept=self.myline.intercept
         return
     def set_divisions(self,divisions=50):
         self.line_x,self.line_y=myline.gen_line(divisions=50)
@@ -97,4 +98,3 @@ if __name__=="__main__":
     pylab.plot(xout,zout,'s')
     pylab.show()
     
-   
