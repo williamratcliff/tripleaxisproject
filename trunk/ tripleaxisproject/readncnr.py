@@ -29,7 +29,7 @@ class datareader:
                 
         self.metadata['file_info']={}
         self.metadata['file_info']['filename']=None#tokenized[0].strip("'")
-        self.metadata['file_info']['filebase']=self.metadata['file_info']['filename'][0:5]
+        self.metadata['file_info']['filebase']=None#self.metadata['file_info']['filename'][0:5]
         self.metadata['file_info']['scantype']=None#tokenized[5].strip("'").lower()
         self.metadata['file_info']['instrument']=None#self.metadata['file_info']['filename'].split('.')[1].lower()
         self.metadata['file_info']['comment']=None #myfile.readline().rstrip()
