@@ -2,7 +2,7 @@ import numpy as N
 import pylab
 import scriptutil as SU
 import re
-import readncnr
+import readncnr2 as readncnr
 import simple_combine
 #import scipy
 from scipy.optimize import leastsq  
@@ -100,4 +100,3 @@ if __name__=='__main__':
         pylab.arrow(90,200,0,50,fc='black',ec='black',width=.5)
         pylab.arrow(60,200,0,50,fc='black',ec='black',width=.5)
         pylab.show()
-    
