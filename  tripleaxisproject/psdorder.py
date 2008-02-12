@@ -27,6 +27,7 @@ psd_channel_efficiency=N.array([3.9918,	2.4668,	2.7027,	2.5016,	2.2414,	2.2440,	
                                 1.0109,	1.0164,	0.9770,	0.9357,	1.0383,	1.0691,	0.9457,\
                                 0.9757,	0.9992,	1.0464,	0.9587,	0.9375,	0.9888,	0.9721,\
                                 0.9391,	0.9335,	0.9982,	0.8798,	0.9205])
+psd_channel_efficiency=N.reshape(psd_channel_efficiency,(psd_channel_efficiency.shape[0],1))
 
 def read_order_files(flist):
 #    myfilebaseglob=myfilebase+'*.'+myend
@@ -60,6 +61,9 @@ def read_order_files(flist):
             a4_center.append(a4)
         #print 'loop done'
         psd_arr=N.array(psd_arr,'float64')
+        #print 'psdarr shape ',psd_arr.shape
+        #print 'new shape ',N.tile(psd_channel_efficiency,(1,psd_arr.shape[1])).shape
+        psd_arr=psd_arr*N.tile(psd_channel_efficiency,(1,psd_arr.shape[1]))
         a4_center_arr=N.array(a4_center)
         #print psd_arr.shape
         #print a4_center_arr.shape
@@ -120,12 +124,30 @@ if __name__=='__main__':
         for myfileseq in range(54504,54527,1):
             myfilestr=mydirectory+'\\'+myfilebase+str(myfileseq)+'.'+myend
             flist.append(myfilestr)
-        print flist
+        #print flist
         H,I,Ierr,monlist,a4=read_order_files(flist)
         print I.shape
         print H.shape
+        print monlist.shape
         print a4.shape
-        
+        #order is file, field
+        peak1={}
+        peak1['H']=H[:,0]
+        peak1['I']=I[:,:,0]
+        peak1['Ierr']=Ierr[:,:,0]
+        peak1['a4']=a4[:,:,0]
+        peak2={}
+        peak2['H']=H[:,1]
+        peak2['I']=I[:,:,1]
+        peak2['Ierr']=Ierr[:,:,1]
+        peak2['a4']=a4[:,:,1]
+        pylab.subplot(2,1,1)
+        n=15
+        #pylab.errorbar(peak1['a4'][n,:],peak1['I'][n,:],peak1['Ierr'][n,:],linestyle='None',marker='s')
+        #pylab.subplot(2,1,2)
+        #pylab.errorbar(peak2['a4'][n,:],peak2['I'][n,:],peak2['Ierr'][n,:],linestyle='None',marker='s')
+        pylab.errorbar(peak2['H'],peak2['I'][:,22],peak2['Ierr'][:,22],linestyle='None',marker='s')
+        pylab.show()
     if 0:
         mydirectory=r'c:\camn2sb2\bt9\Feb5_2008'
         myfilebase='order*'
