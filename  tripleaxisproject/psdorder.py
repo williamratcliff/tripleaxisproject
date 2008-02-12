@@ -40,6 +40,7 @@ def read_order_files(flist):
     monlist=[]
     count=0
     mon0=5.0e4
+    a4list=[]
     for currfile in flist:
         #print currfile
         mydata=mydatareader.readbuffer(currfile)
@@ -57,29 +58,23 @@ def read_order_files(flist):
         for psd in psd_detectors:
             psd_arr.append(N.array(mydata.data[psd],'float64'))
             a4_center.append(a4)
-        print 'loop done'
+        #print 'loop done'
         psd_arr=N.array(psd_arr,'float64')
         a4_center_arr=N.array(a4_center)
-        print psd_arr.shape
-        print a4_center_arr.shape
+        #print psd_arr.shape
+        #print a4_center_arr.shape
         #print psd_a4_offset
-        print N.tile(psd_a4_offset,(1,a4.shape[0])).shape
+        #print N.tile(psd_a4_offset,(1,a4.shape[0])).shape
         a4_corrected=a4_center_arr+N.tile(psd_a4_offset,(1,a4.shape[0]))
-        print a4_corrected
-        It=N.array(N.array(mydata.data['detector']),'float64')
-        Iterr=N.sqrt(It)
-        #It=It*mon0/mon
+        #print a4_corrected
+        a4list.append(a4_corrected)
+        #It=N.array(N.array(mydata.data['detector']),'float64')
+        #Iterr=N.sqrt(It)
         monlist.append(mon)
-        I.append(It)
-        Ierr.append(Iterr)
-        #Iterr=Iterr*mon0/mon
-        #I=N.concatenate((I,It))
-        #Ierr=N.concatenate((Ierr,Iterr))
-        #print I
-        #print Iterr
-    #xa,ya,za=prep_data2(Qx,Qy,Counts);
+        I.append(psd_arr)
+        Ierr.append(N.sqrt(psd_arr))
         count=count+1
-    return H,I,Ierr,monlist,a4
+    return N.array(H),N.array(I),N.array(Ierr),N.array(monlist),N.array(a4list)
 
 
 def orderparameter(p,T):
@@ -117,14 +112,19 @@ if __name__=='__main__':
         pylab.plot(x,y,linewidth=0,marker='s')
         pylab.show()
     if 1:
-        mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
+        #mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
+        mydirectory=r'C:\ca3comno6\Feb4_2008\data'
         myfilebase='peak'
-        myfileseq=54504
         myend='bt7'
-        myfilestr=mydirectory+'\\'+myfilebase+str(myfileseq)+'.'+myend
-        flist=[myfilestr]
-        H,I,Ierr,monlist=read_order_files(flist)
-        
+        flist=[]
+        for myfileseq in range(54504,54527,1):
+            myfilestr=mydirectory+'\\'+myfilebase+str(myfileseq)+'.'+myend
+            flist.append(myfilestr)
+        print flist
+        H,I,Ierr,monlist,a4=read_order_files(flist)
+        print I.shape
+        print H.shape
+        print a4.shape
         
     if 0:
         mydirectory=r'c:\camn2sb2\bt9\Feb5_2008'

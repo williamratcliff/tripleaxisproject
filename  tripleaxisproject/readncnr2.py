@@ -498,11 +498,11 @@ class datareader:
                 self.metadata['file_info']['fixed_devices']=tokenized[1:]
             elif tokenized[0].lower()=="#Filename".lower():
                 self.metadata['file_info']['filename']=tokenized[1]
-                print 'filename ', tokenized[1]
+                #print 'filename ', tokenized[1]
                 pattern = re.compile('^(?P<base>[^.]*?)(?P<seq>[0-9]*)(?P<ext>[.].*)?$')
                 match = pattern.match(tokenized[1]+'.bt7')
                 dict((a,match.group(a)+"") for a in ['base','seq','ext'])
-                print 'filebase ',match.group('base')
+                #print 'filebase ',match.group('base')
                 self.metadata['file_info']['filebase']=match.group('base')
                 self.metadata['file_info']['fileseq_number']=match.group('seq')
             elif tokenized[0].lower()=="#Comment".lower():
