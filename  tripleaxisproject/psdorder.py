@@ -121,8 +121,8 @@ if __name__=='__main__':
         pylab.plot(x,y,linewidth=0,marker='s')
         pylab.show()
     if 1:
-        #mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
-        mydirectory=r'C:\ca3comno6\Feb4_2008\data'
+        mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
+        #mydirectory=r'C:\ca3comno6\Feb4_2008\data'
         myfilebase='peak'
         myend='bt7'
         flist=[]
@@ -190,9 +190,13 @@ if __name__=='__main__':
         peak5.monlist=monlist
 
         if 1:
-            n=10
-            pylab.errorbar(peak5.a4[n,:],peak5.I[n,:],peak5.Ierr[n,:],linestyle='None',marker='s',mfc='blue')
-
+            n=0
+            #pylab.errorbar(peak5.a4[n,:],peak5.I[n,:],peak5.Ierr[n,:],linestyle='None',marker='s',mfc='blue')
+            for n in range(peak5.H.shape[0]):
+                pylab.subplot(4,3,n+1)
+                pylab.errorbar(peak5.a4[n,:],peak5.I[n,:],peak5.Ierr[n,:],linestyle='None',marker='s',mfc='blue')
+                pylab.ylim((250,950))
+                pylab.title(peak5.H[n])
         if 0:
             pylab.subplot(2,3,1)
 
@@ -231,7 +235,8 @@ if __name__=='__main__':
             pylab.title('31.0')
             pylab.xlabel(xlabel)
             #pylab.ylabel(ylabel)
-
+        if 1:
+            pylab.subplots_adjust(hspace=0.5)
         pylab.show()
     if 0:
         mydirectory=r'c:\camn2sb2\bt9\Feb5_2008'
