@@ -131,10 +131,10 @@ if __name__=='__main__':
             flist.append(myfilestr)
         #print flist
         H,I,Ierr,monlist,a4=read_order_files(flist)
-        print I.shape
-        print H.shape
-        print monlist.shape
-        print a4.shape
+        #print I.shape
+        #print H.shape
+        #print monlist.shape
+        #print a4.shape
         #order is file, field
         peak1=peak()
         peak1.H=H[:,0]
@@ -181,41 +181,57 @@ if __name__=='__main__':
         peak4.Ierr=Ierr[:,:,1]
         peak4.a4=a4[:,:,1]
         peak4.monlist=monlist
-
-
-
-        pylab.subplot(2,2,1)
-        n=15
-        ylabel='Intensity (Counts/Monitor)'
-        xlabel='H (Tesla)'
-        #pylab.errorbar(peak1['a4'][n,:],peak1['I'][n,:],peak1['Ierr'][n,:],linestyle='None',marker='s')
-        #pylab.subplot(2,1,2)
-        #pylab.errorbar(peak2['a4'][n,:],peak2['I'][n,:],peak2['Ierr'][n,:],linestyle='None',marker='s')
-        pylab.errorbar(peak1.H,peak1.I[:,22],peak1.Ierr[:,22],linestyle='None',marker='s',mfc='red')
-        pylab.title('17')
-        #pylab.xlabel(xlabel)
-        pylab.ylabel(ylabel)
-
-        pylab.subplot(2,2,2)
-        pylab.errorbar(peak2.H,peak2.I[:,22],peak2.Ierr[:,22],linestyle='None',marker='s',mfc='red')
-        pylab.errorbar(peak2d.H,peak2d.I[:,22],peak2d.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
-        pylab.title('21.5')
-        #pylab.xlabel(xlabel)
-        #pylab.ylabel(ylabel)
-
-        pylab.subplot(2,2,3)
-        pylab.errorbar(peak3.H,peak3.I[:,22],peak3.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
-        pylab.title('25.8')
-        pylab.xlabel(xlabel)
-        pylab.ylabel(ylabel)
-
         
-        pylab.subplot(2,2,4)
-        pylab.errorbar(peak4.H,peak4.I[:,22],peak4.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
-        pylab.title('37.2')
-        pylab.xlabel(xlabel)
-        #pylab.ylabel(ylabel)
-        
+        peak5=peak()
+        peak5.H=H[:,0]
+        peak5.I=I[:,:,0]
+        peak5.Ierr=Ierr[:,:,0]
+        peak5.a4=a4[:,:,0]
+        peak5.monlist=monlist
+
+        if 1:
+            n=10
+            pylab.errorbar(peak5.a4[n,:],peak5.I[n,:],peak5.Ierr[n,:],linestyle='None',marker='s',mfc='blue')
+
+        if 0:
+            pylab.subplot(2,3,1)
+
+            ylabel='Intensity (Counts/Monitor)'
+            xlabel='H (Tesla)'
+            #pylab.errorbar(peak1['a4'][n,:],peak1['I'][n,:],peak1['Ierr'][n,:],linestyle='None',marker='s')
+            #pylab.subplot(2,1,2)
+            #pylab.errorbar(peak2['a4'][n,:],peak2['I'][n,:],peak2['Ierr'][n,:],linestyle='None',marker='s')
+            pylab.errorbar(peak1.H,peak1.I[:,22],peak1.Ierr[:,22],linestyle='None',marker='s',mfc='red')
+            pylab.title('17')
+            #pylab.xlabel(xlabel)
+            pylab.ylabel(ylabel)
+
+            pylab.subplot(2,3,2)
+            pylab.errorbar(peak2.H,peak2.I[:,22],peak2.Ierr[:,22],linestyle='None',marker='s',mfc='red')
+            pylab.errorbar(peak2d.H,peak2d.I[:,22],peak2d.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
+            pylab.title('21.5')
+            #pylab.xlabel(xlabel)
+            #pylab.ylabel(ylabel)
+
+            pylab.subplot(2,3,3)
+            pylab.errorbar(peak3.H,peak3.I[:,22],peak3.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
+            pylab.title('25.8')
+            #pylab.xlabel(xlabel)
+            #pylab.ylabel(ylabel)
+
+
+            pylab.subplot(2,3,4)
+            pylab.errorbar(peak4.H,peak4.I[:,22],peak4.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
+            pylab.title('37.2')
+            pylab.xlabel(xlabel)
+            pylab.ylabel(ylabel)
+
+            pylab.subplot(2,3,5)
+            pylab.errorbar(peak5.H,peak5.I[:,27],peak5.Ierr[:,27],linestyle='None',marker='s',mfc='blue')
+            pylab.title('31.0')
+            pylab.xlabel(xlabel)
+            #pylab.ylabel(ylabel)
+
         pylab.show()
     if 0:
         mydirectory=r'c:\camn2sb2\bt9\Feb5_2008'
