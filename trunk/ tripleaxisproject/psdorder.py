@@ -108,6 +108,11 @@ def residuals(p,x,I,Ierr):
     residual=(I-Icalc)/Ierr
     return residual
 
+class peak():
+    def __init__(self):
+        pass
+
+
 if __name__=='__main__':
     if 0:
         x=N.arange(-2,2,.25)
@@ -131,22 +136,86 @@ if __name__=='__main__':
         print monlist.shape
         print a4.shape
         #order is file, field
-        peak1={}
-        peak1['H']=H[:,0]
-        peak1['I']=I[:,:,0]
-        peak1['Ierr']=Ierr[:,:,0]
-        peak1['a4']=a4[:,:,0]
-        peak2={}
-        peak2['H']=H[:,1]
-        peak2['I']=I[:,:,1]
-        peak2['Ierr']=Ierr[:,:,1]
-        peak2['a4']=a4[:,:,1]
-        pylab.subplot(2,1,1)
+        peak1=peak()
+        peak1.H=H[:,0]
+        peak1.I=I[:,:,0]
+        peak1.Ierr=Ierr[:,:,0]
+        peak1.a4=a4[:,:,0]
+        peak1.monlist=monlist
+        peak2=peak()
+        peak2.H=H[:,1]
+        peak2.I=I[:,:,1]
+        peak2.Ierr=Ierr[:,:,1]
+        peak2.a4=a4[:,:,1]
+        peak2.monlist=monlist
+
+        myfilebase='peaka'
+        myfilebaseglob=myfilebase+'*.'+myend
+#    print myfilebaseglob
+        flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
+        #SU.printr(flist)
+        H,I,Ierr,monlist,a4=read_order_files(flist)
+        peak2d=peak()
+        peak2d.H=H[:,0]
+        peak2d.I=I[:,:,0]
+        peak2d.Ierr=Ierr[:,:,0]
+        peak2d.a4=a4[:,:,0]
+        peak2d.monlist=monlist
+
+        peak3=peak()
+        peak3.H=H[:,1]
+        peak3.I=I[:,:,1]
+        peak3.Ierr=Ierr[:,:,1]
+        peak3.a4=a4[:,:,1]
+        peak3.monlist=monlist
+
+        myfilebase='peakb'
+        myfilebaseglob=myfilebase+'*.'+myend
+#    print myfilebaseglob
+        flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
+        #SU.printr(flist)
+        H,I,Ierr,monlist,a4=read_order_files(flist)
+        peak4=peak()
+        peak4.H=H[:,1]
+        peak4.I=I[:,:,1]
+        peak4.Ierr=Ierr[:,:,1]
+        peak4.a4=a4[:,:,1]
+        peak4.monlist=monlist
+
+
+
+        pylab.subplot(2,2,1)
         n=15
+        ylabel='Intensity (Counts/Monitor)'
+        xlabel='H (Tesla)'
         #pylab.errorbar(peak1['a4'][n,:],peak1['I'][n,:],peak1['Ierr'][n,:],linestyle='None',marker='s')
         #pylab.subplot(2,1,2)
         #pylab.errorbar(peak2['a4'][n,:],peak2['I'][n,:],peak2['Ierr'][n,:],linestyle='None',marker='s')
-        pylab.errorbar(peak2['H'],peak2['I'][:,22],peak2['Ierr'][:,22],linestyle='None',marker='s')
+        pylab.errorbar(peak1.H,peak1.I[:,22],peak1.Ierr[:,22],linestyle='None',marker='s',mfc='red')
+        pylab.title('17')
+        #pylab.xlabel(xlabel)
+        pylab.ylabel(ylabel)
+
+        pylab.subplot(2,2,2)
+        pylab.errorbar(peak2.H,peak2.I[:,22],peak2.Ierr[:,22],linestyle='None',marker='s',mfc='red')
+        pylab.errorbar(peak2d.H,peak2d.I[:,22],peak2d.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
+        pylab.title('21.5')
+        #pylab.xlabel(xlabel)
+        #pylab.ylabel(ylabel)
+
+        pylab.subplot(2,2,3)
+        pylab.errorbar(peak3.H,peak3.I[:,22],peak3.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
+        pylab.title('25.8')
+        pylab.xlabel(xlabel)
+        pylab.ylabel(ylabel)
+
+        
+        pylab.subplot(2,2,4)
+        pylab.errorbar(peak4.H,peak4.I[:,22],peak4.Ierr[:,22],linestyle='None',marker='s',mfc='blue')
+        pylab.title('37.2')
+        pylab.xlabel(xlabel)
+        #pylab.ylabel(ylabel)
+        
         pylab.show()
     if 0:
         mydirectory=r'c:\camn2sb2\bt9\Feb5_2008'
