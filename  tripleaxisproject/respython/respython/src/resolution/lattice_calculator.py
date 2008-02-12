@@ -55,6 +55,7 @@ def blkdiag(g):
 def similarity_transform(A,B):
     G=N.dot(B,A.transpose())
     G2=N.dot(A,G)
+    #
     return G2
 
 class instrument:
