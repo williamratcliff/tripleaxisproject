@@ -99,7 +99,7 @@ if __name__=='__main__':
         pylab.xlabel('T (K)')
         pylab.ylabel('Counts (arb. units)')
         pylab.ylim((3000*0,7000))
-        pylab.xlim((tmin,tmax))
+        pylab.xlim((10,tmax))
         pylab.arrow(tmax,2000,0,500,fc='black',ec='black',width=.5)
         pylab.arrow(tmin,2000,0,500,fc='black',ec='black',width=.5)
         pylab.show()

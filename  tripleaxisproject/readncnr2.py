@@ -1,8 +1,9 @@
 import numpy as N
-import  pylab
+import pylab
 import datetime
 import mx.DateTime
 import writebt7
+import re
 
 
 months={'jan':1,'feb':2,'mar':3,'apr':4,'may':5,'jun':6,'jul':7,'aug':8,'sep':9,'oct':10,'nov':11,'dec':12}
@@ -34,6 +35,10 @@ class datareader:
         self.metadata['count_info']['signal']=None  #for example, 'detector'
         self.metadata['count_info']['analyzerdetectormode']=None
         self.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]=None
+        self.metadata['count_info']['AnalyzerDDGroup'.lower()]=None
+        self.metadata['count_info']['AnalyzerPSDGroup'.lower()]=None
+        self.metadata['count_info']['AnalyzerSDGroup'.lower()]=None
+        self.metadata['count_info']['AnalyzerDoorDetectorGroup'.lower()]=None
         self.metadata['count_info']['analyzerfocusmode']=None
         self.metadata['count_info']['monovertifocus']=None
         self.metadata['count_info']['monohorizfocus']=None
@@ -42,6 +47,7 @@ class datareader:
         self.metadata['file_info']={}
         self.metadata['file_info']['filename']=None#tokenized[0].strip("'")
         self.metadata['file_info']['filebase']=None#self.metadata['file_info']['filename'][0:5]
+        self.metadata['file_info']['fileseq_number']=None
         self.metadata['file_info']['scantype']=None#tokenized[5].strip("'").lower()
         self.metadata['file_info']['instrument']=None#self.metadata['file_info']['filename'].split('.')[1].lower()
         self.metadata['file_info']['comment']=None #myfile.readline().rstrip()
@@ -492,7 +498,13 @@ class datareader:
                 self.metadata['file_info']['fixed_devices']=tokenized[1:]
             elif tokenized[0].lower()=="#Filename".lower():
                 self.metadata['file_info']['filename']=tokenized[1]
-                #self.metadata['file_info']['filebase']=
+                print 'filename ', tokenized[1]
+                pattern = re.compile('^(?P<base>[^.]*?)(?P<seq>[0-9]*)(?P<ext>[.].*)?$')
+                match = pattern.match(tokenized[1]+'.bt7')
+                dict((a,match.group(a)+"") for a in ['base','seq','ext'])
+                print 'filebase ',match.group('base')
+                self.metadata['file_info']['filebase']=match.group('base')
+                self.metadata['file_info']['fileseq_number']=match.group('seq')
             elif tokenized[0].lower()=="#Comment".lower():
                 mycomment=''
                 for i in range(1,len(tokenized)):
@@ -526,6 +538,14 @@ class datareader:
                 self.metadata['count_info']['signal']=tokenized[2].lower()
             elif tokenized[0].lower()=="#AnalyzerDetectorDevicesOfInterest".lower():
                 self.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]=tokenized[1:]
+            elif tokenized[0].lower()=="#AnalyzerDDGroup".lower():
+                self.metadata['count_info']['AnalyzerDDGroup'.lower()]=tokenized[1:]
+            elif tokenized[0].lower()=="#AnalyzerDoorDetectorGroup".lower():
+                self.metadata['count_info']['AnalyzerDoorDetectorGroup'.lower()]=tokenized[1:]
+            elif tokenized[0].lower()=="#AnalyzerSDGroup".lower():
+                self.metadata['count_info']['AnalyzerSDGroup'.lower()]=tokenized[1:]
+            elif tokenized[0].lower()=="#AnalyzerPSDGroup".lower():
+                self.metadata['count_info']['AnalyzerPSDGroup'.lower()]=tokenized[1:]
             elif tokenized[0].lower()=="#AnalyzerFocusMode".lower():
                 self.metadata['count_info']['analyzerfocusmode'.lower()]=tokenized[1]
             elif tokenized[0].lower()=="#MonoVertiFocus".lower():
@@ -533,8 +553,14 @@ class datareader:
             elif tokenized[0].lower()=="#MonoHorizFocus".lower():
                 self.metadata['count_info']['monohorizfocus'.lower()]=tokenized[1]
             elif tokenized[0].lower()=="#FixedE".lower():
-                self.metadata['energy_info']['efixed'.lower()]=tokenized[1]
-                self.metadata['energy_info']['ef'.lower()]=float(tokenized[2])
+                try:
+                    self.metadata['energy_info']['efixed'.lower()]=tokenized[1]
+                except IndexError:
+                    pass
+                try:
+                    self.metadata['energy_info']['ef'.lower()]=float(tokenized[2])
+                except IndexError:
+                    pass
             elif tokenized[0].lower()=="#ScanDescr".lower():
                 scanstr=''
                 for i in range(1,len(tokenized)):
@@ -730,19 +756,19 @@ def num2string(num):
 
 if __name__=='__main__':
 
-    if 1:
+    if 0:
         #ibuff
         myfilestr=r'c:\summerschool2007\\qCdCr014.ng5'
-    if 0:
+    if 1:
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7'
         #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
         mydatareader=datareader()
         mydata=mydatareader.readbuffer(myfilestr,lines=91)
         myoutfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7.out'
-        mywriter=writebt7.datawriter()
-        mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata) 
+        #mywriter=writebt7.datawriter()
+        #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
         print 'done'          
-        mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
+        #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
         #print N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])
         #print len(mydata.data['timestamp'])
         #print mydata.data['Qy']
@@ -754,13 +780,13 @@ if __name__=='__main__':
         #qbuff
         myfilestr=r'c:\sqltest\\mnl1p004.ng5'
 
-    if 1:
+    if 0:
         mydatareader=datareader()
         mydata=mydatareader.readbuffer(myfilestr,lines=91)
 
     if 1:
         print 'metadata'
-        print mydata.metadata
+        print mydata.metadata['file_info']
     if 0:
         print 'additional metadata'
         print mydata.additional_metadata
