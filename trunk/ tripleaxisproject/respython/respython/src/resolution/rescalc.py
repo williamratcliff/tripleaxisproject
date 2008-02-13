@@ -713,7 +713,28 @@ class rescalculator:
         sec[1,0,:]=mat[j,i,:]
         sec[1,1,:]=mat[j,j,:]
         return proj,sec
-            
+    
+    def calc_correction(self,H,K,L,W,EXP):
+        "Returns the correction factor such that I_int=F^2*correction"
+        Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
+        R0,RM=self.ResMat(Q,W,EXP)
+        print 'RM shape ',RM.shape
+        print 'RM ', RM[0:3,0:3,0]
+        print 'Q ',Q
+        th_correction=[]
+        tth_correction=[]
+        q_correction=[]
+        for i in range(RM.shape[2]):
+            Myy=RM[1,1,i]
+            Mxx=RM[0,0,i]
+            Mxy=RM[0,1,i]
+            th_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Myy)/Q[i])
+            tth_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Mxx)/Q[i])
+            #q_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Mxx*Qx[i]**2+2*Mxy*Qx[i]*Qy[i]+Myy*Qy[i]**2))
+        corrections={}
+        corrections['th_correction']=th_correction
+        corrections['tth_correction']=tth_correction
+        return corrections
 
        
 class TestLattice(unittest.TestCase):
@@ -776,7 +797,7 @@ class TestLattice(unittest.TestCase):
 #        
 
 if __name__=="__main__":
-    if 1:
+    if 0:
         a=N.array([2*pi],'d')
         b=N.array([2*pi],'d')
         c=N.array([2*pi],'d')
@@ -807,9 +828,10 @@ if __name__=="__main__":
         setup=[EXP]  
         myrescal=rescalculator(mylattice)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-        myrescal.ResPlot(H, K, L, W, setup)
+        #myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
+        print myrescal.calc_correction(H,K,L,W,setup)
 #        mylattice.StandardSystem()
 ##    x1=N.array([1.0, 1.0], 'd'); y1=N.array([1.0, 1.0], 'd'); z1=N.array([1.0, 1.0], 'd'); x2=x1; y2=y1; z2=z1;
 ##    print 'scalar ', mylattice.scalar(x1,y1,z1,x2,y2,z2,'lattice')
@@ -817,3 +839,40 @@ if __name__=="__main__":
 ##    myinstrument=instrument();
 ##    print myinstrument.get_tau('pg(004)')
 #    unittest.main()
+
+
+    if 1:
+        a=N.array([5.72],'d')
+        b=N.array([5.72],'d')
+        c=N.array([9.24],'d')
+        alpha=N.array([90],'d')
+        beta=N.array([90],'d')
+        gamma=N.array([90],'d')
+ #       orient1=N.array([[0,1,1]],'d')
+        orient1=N.array([[1,0,0]],'d')
+        orient2=N.array([[0,1,0]],'d')
+        mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                               orient1=orient1,orient2=orient2)
+        H=N.array([3.47],'d');K=N.array([1],'d');L=N.array([0],'d');W=N.array([0],'d')
+        EXP={}
+        EXP['ana']={}
+        EXP['ana']['tau']='pg(002)'
+        EXP['mono']={}
+        EXP['mono']['tau']='pg(002)';
+        EXP['ana']['mosaic']=60
+        EXP['mono']['mosaic']=60
+        EXP['sample']={}
+        EXP['sample']['mosaic']=60
+        EXP['sample']['vmosaic']=60
+        EXP['hcol']=N.array([40, 47, 40, 999],'d')
+        EXP['vcol']=N.array([240, 240, 240, 240],'d')
+        EXP['infix']=-1 #positive for fixed incident energy
+        EXP['efixed']=35
+        EXP['method']=0
+        setup=[EXP]
+        myrescal=rescalculator(mylattice)
+        R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+        #myrescal.ResPlot(H, K, L, W, setup)
+        print 'RMS'
+        print RMS.transpose()[0]
+        print myrescal.calc_correction(H,K,L,W,setup)
