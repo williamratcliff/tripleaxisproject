@@ -720,7 +720,7 @@ class rescalculator:
         y=self.lattice_calculator.y
         z=self.lattice_calculator.z
         Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
-        uq=N.zeros((3,self.lattice_calculator.npts),'d')
+        uq=N.zeros((3,self.lattice_calculator.npts),'Float64')
         uq[0,:]=H/Q;  #% Unit vector along Q
         uq[1,:]=K/Q;
         uq[2,:]=L/Q;
@@ -741,31 +741,23 @@ class rescalculator:
         "Returns the correction factor such that I_int=F^2*correction"
         Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
         R0,RM=self.ResMat(Q,W,EXP)
-        print 'RM shape ',RM.shape
-        print 'RM ', RM[0:3,0:3,0]
-        print 'Q ',Q
-        print 'H ',H
         th_correction=[]
         tth_correction=[]
         if qscan != None:
-            tmat=self.cooper_nathans_crystal_transform(H,K,L)
             qx=[]
             qy=[]
             qmod=[]
-            for i in range(tmat.shape[2]):
-                qcooper=N.dot((tmat[0:3,0:3,i]).transpose(),N.array(qscan[i],'Float64'))
-                print 'qscan ',qscan[i][0]
+            for i in range(H.shape[0]):
                 qh=N.array([qscan[i][0]],'Float64')
                 qk=N.array([qscan[i][1]],'Float64')
                 ql=N.array([qscan[i][2]],'Float64')
+                tmat=(self.cooper_nathans_crystal_transform(qh,qk,ql))
+                qcooper=N.matrix(tmat[0:3,0:3,i])*N.matrix(qscan[i],'Float64').T
                 qscan_mod=self.lattice_calculator.modvec(qh,qk,ql,'latticestar')
-                print 'qscan_mod ',qscan_mod
                 qx.append(qcooper[0]/qscan_mod)
-                qy.append(qcooper[0]/qscan_mod)
+                qy.append(qcooper[1]/qscan_mod)
                 
         q_correction=[]
-        print qx
-        print qy
         for i in range(RM.shape[2]):
             Myy=RM[1,1,i]
             Mxx=RM[0,0,i]
