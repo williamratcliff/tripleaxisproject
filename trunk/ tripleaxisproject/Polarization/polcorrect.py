@@ -64,7 +64,8 @@ class PBoutdata(ctypes.Structure):
             ("Epp",c_double_p),
             ("Emm",c_double_p),
             ("Epm",c_double_p),
-            ("Emp",c_double_p)
+            ("Emp",c_double_p),
+            ("R",c_double_p)
             ]
 
 #typedef struct {
@@ -90,9 +91,12 @@ class PBoutdata(ctypes.Structure):
 
 PBflags=cstruct.cstruct(('MonitorCorrect',N.intc),
                     ('PolMonitorCorrect',N.intc),
+                    ('MonoSelect',N.intc),
                     ('Debug',N.intc),
                     ('SimFlux',N.intc),
                     ('SimDeviate',N.intc),
+                    ('NoNegativeCS',N.intc),
+                    ('HalfPolarized',N.intc),
                     ('CountsEnable',int,(4,)),
                     ('CountsAdd1',int,(4,)),
                     ('CountsAdd2',int,(4,)),
@@ -155,7 +159,7 @@ def calc_energy(angle,dspace):
     return energy
 
 class polarization_correct:
-    def __init__(self,files,cellP,cellA):
+    def __init__(self,files,cell):
         self.mydata={}
         self.counts={}
         self.errors={}
@@ -163,8 +167,7 @@ class polarization_correct:
         ef=[]
         self.timestamp={}
         self.files=files
-        self.cellP=cellP
-        self.cellA=cellA
+        self.cell=cell
         for key,myfilestr in files.iteritems():
             mydatareader=readncnr.datareader()
             self.mydata[key]=mydatareader.readbuffer(myfilestr)
@@ -309,12 +312,13 @@ class polarization_correct:
         Emm=N.empty((1,self.length),'float64')
         Epm=N.empty((1,self.length),'float64')
         Emp=N.empty((1,self.length),'float64')
+        R=N.empty((1,self.length),'float64')
                     
         pboutput.Epp=Epp.ctypes.data_as(c_double_p)
         pboutput.Emm=Emm.ctypes.data_as(c_double_p)
         pboutput.Epm=Epm.ctypes.data_as(c_double_p)
         pboutput.Emp=Emp.ctypes.data_as(c_double_p)
-           
+        pboutput.R=R.ctypes.data_as(c_double_p)
         pbflags=PBflags()
 
         fMonitorCorrect=0
@@ -348,6 +352,8 @@ class polarization_correct:
         pbflags.Debug=0#fDebug
         pbflags.SimFlux=0#fSimFlux
         pbflags.SimDeviate=0#fSimDeviate
+        pbflags.NoNegativeCS=0
+        pbflags.HalfPolarized=0
         pbflags.CountsEnable=[0,0,1,1]
         pbflags.CountsAdd1=[0,0,0,0]
         pbflags.CountsAdd2=[0,0,0,0]
@@ -358,12 +364,12 @@ class polarization_correct:
         pbflags.Spm=[0,0,0,0]
         pbflags.Smp=[0,0,0,0]
    
-        mypolcorrect.PBcorrectData(self.cellP,self.cellA,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
+        mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
 #int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
 #		  int npts, PBindata *in, PBoutdata *out) ;
         #print pboutput.Spm
-        print Smp[0]
-        print Spm[0]
+        #print Smp[0]
+        #print Spm[0]
         corrected_counts={}
         corrected_counts['Spp']=Spp[0]
         corrected_counts['Epp']=Epp[0]
@@ -396,13 +402,13 @@ class polarization_correct:
 
 def readscript(myfilestr):
     myfile = open(myfilestr, 'r')
+    mycount=0
     #myfile.close()
     #exit()
     #myfile = open(myfilestr, 'r')
     returnline=['']
     catalog=[]
-    acellfiles=[]
-    pcellfiles=[]
+    cellfiles=[]
     absolute=True
     inblock=False
     while 1:
@@ -432,11 +438,33 @@ def readscript(myfilestr):
         elif tokenized[0]=='#end':
             #print 'end'
             catalog.append(files)
-            print 'correcting %s using Pcellfile %s  Acellfile %s'%(files,pcellfile,acellfile)
-            mypolcor=polarization_correct(files,pcellfile,acellfile)
+            print 'correcting %s using cellfile %s'%(files,cellfile)
+            mypolcor=polarization_correct(files,cellfile)
             corrected_counts=mypolcor.correct()
             mypolcor.savefiles()
             print 'corrected'
+            if 1:
+                key='pm'
+                pylab.subplot(2,2,1+mycount)
+                pylab.title(key)
+                mydatac=mypolcor.mydata
+                pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
+                    marker='s',mfc='blue',linestyle='None')
+                #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Spm'],corrected_counts['Epm'],
+                #                marker='s',mfc='red',linestyle='None')
+                print 'pm'
+                #print mypolcor.mydata[key].data['hsample']
+                key='mp'
+                pylab.subplot(2,2,2+mycount)
+                pylab.title(key)
+                print 'mp'
+                #print mypolcor.mydata[key].data['hsample']
+                #print mypolcor.mydata[key].metadata['reference']
+                pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
+                    marker='s',mfc='blue',linestyle='None')
+                pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Smp'],corrected_counts['Emp'],
+                                marker='s',mfc='red',linestyle='None')
+                mycount=mycount+2
             inblock=False
         elif inblock==True:
             #print 'inblock'
@@ -451,22 +479,22 @@ def readscript(myfilestr):
                     break
             else:
                 pass
-        elif tokenized[0]=='#Acell'.lower():
+        elif tokenized[0]=='#cell'.lower():
             #print 'acellfile'
-            acellfile=os.path.join(mydirectory,tokenized[1])
-            if os.path.isfile(acellfile):
-                acellfiles.append(acellfile)
+            cellfile=os.path.join(mydirectory,tokenized[1])
+            if os.path.isfile(cellfile):
+                cellfiles.append(cellfile)
             else:
-                print '%s does not exist!'%(acellfile,)
+                print '%s does not exist!'%(cellfile,)
                 break
-        elif tokenized[0]=='#Pcell'.lower():
-            #print 'pcellfile'
-            pcellfile=os.path.join(mydirectory,tokenized[1])
-            if os.path.isfile(pcellfile):
-                pcellfiles.append(pcellfile)
-            else:
-                print '%s does not exist!'%(acellfile,)
-                break
+        #elif tokenized[0]=='#Pcell'.lower():
+        #    #print 'pcellfile'
+        #    pcellfile=os.path.join(mydirectory,tokenized[1])
+        #    if os.path.isfile(pcellfile):
+        #        pcellfiles.append(pcellfile)
+        #    else:
+        #        print '%s does not exist!'%(acellfile,)
+        #        break
     print 'done'
     myfile.close()
     print 'closed'
@@ -476,7 +504,7 @@ if __name__=="__main__":
 #    myfilestr_off_on=r'c:\bifeo3xtal\jan8_2008\9175\fieldscanminusplus53567.bt7'
     myfilestr_on_off=r'c:\bifeo3xtal\jan8_2008\9175\fieldscansplusminusreset53630.bt7'
     myfilestr_off_on=r'c:\bifeo3xtal\jan8_2008\9175\fieldscanminusplusreset53631.bt7'
-    myscriptstr=r'c:\tripleaxisproject\bifeo3.polcor'
+    myscriptstr=r'c:\tripleaxisproject2\polcor\bifeo3.polcor'
 
     if len(sys.argv)!=2:
         print 'the usage of this program is polcorrect scriptfile'
@@ -496,6 +524,7 @@ if __name__=="__main__":
         readscript(myscriptstr)
     else:
         print 'The file you called me with (%s) does not exist'%(myscriptstr,)
+    pylab.show()
     exit()
     files={}
     #files['on_on']=myfilestr_on_on

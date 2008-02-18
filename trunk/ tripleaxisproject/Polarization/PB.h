@@ -32,14 +32,18 @@ typedef struct {
 typedef struct {
   double *Spp, *Smm, *Spm, *Smp ;
   double *Epp, *Emm, *Epm, *Emp ;
+  double *R ;
 } PBoutdata ;
 
 typedef struct {
   int MonitorCorrect ;
   int PolMonitorCorrect ;
+  int MonoSelect ;  /* 0 is unfiltered PG, 1 is 2cmPGfilter E=14.7 */
   int Debug ;
   int SimFlux ;
   int SimDeviate ;
+  int NoNegativeCS ;
+  int HalfPolarized ;
 
   int CountsEnable[4] ;
   int CountsAdd1[4] ;
@@ -51,9 +55,11 @@ typedef struct {
 
 /* entrypoints */
 
-int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
+int PBcorrectData(char *CellFile, PBflags *flgs,
 		  int npts, PBindata *in, PBoutdata *out) ;
 
 int PBsim(char *filename) ;
 
 int PBreadflags(char *filename) ;
+
+int PBreaddata(char *filename) ;
