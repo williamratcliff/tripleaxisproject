@@ -1,11 +1,14 @@
 /*
   C library for correcting polarized beam data using He-3 CELLS.
   Main entry is PBcorrectData.
+  Modified PB structures to hold multiple setups to accomodate
+  new philosophy of putting all He3 cell info for an experiment
+  into a single file with one CELL per line as grabbed from the
+  He3logger spreadsheet.
 */
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
 #include <math.h>
 
 #include "PB.h"
@@ -30,9 +33,11 @@
 
 typedef struct {
   unsigned long sec[4] ;
-  double Y[4], Yesq[4], lambI, lambF ;
+  double lambI, lambF ;
+  double Y[4], Yesq[4], Yr[4], Yresq[4] ;
   double C[4][4], Cesq[4][4] ;
   double S[4], Sesq[4];
+  double R ;
   int Nactive, activeEq[4];
   int Nfree, freeS[4];
 } PBdatapt;
@@ -71,18 +76,14 @@ typedef struct {
 } He3CELLpol;
 
 typedef struct {
-  double waveRelWidth;   /* std-dev-Lambda/Lambda */
-  double angleVwidth;    /* vertical angular resolution stnd dev */
-  double angleHwidth;    /* horizontal angular resolution stnd dev */
+  double xsigsq;         /* std-dev-Lambda/Lambda squared */
+  double vsigsq;         /* vertical angular resolution factor squared */
+  double hsigsq;         /* horizontal angular resolution factor squared */
+  double angcor;         /* part of linear tau correction coef */
+  double t1, t2;         /* linear and quadratic tau correction coefs */
+  double beamArea;
   double usedRadius;     /* eff beam radius in cm for cell */
 } expResol;
-
-typedef struct {
-  He3CELL cell;
-  He3CELLpol pol;
-  expResol res;
-} He3CELLexp;
-
 
 typedef struct {
   double teff;  /* transport efficiency */
@@ -92,11 +93,21 @@ typedef struct {
 } efficiency;
 
 typedef struct {
+  int PorA ;
+  He3CELL cell;
+  He3CELLpol pol;
+  expResol res;
+  efficiency eff;
+} He3CELLexp;
+
+typedef struct {
   He3CELLexp P;
   He3CELLexp A;
-  efficiency eP;
-  efficiency eA;
 } PBsetup;
+
+typedef struct {
+  int cells[2][4] ;
+} PBcells ;
 
 double Dn = 2.072141789 ;
 double TWOPI = 6.283185307 ;
@@ -104,14 +115,17 @@ double TWOPI = 6.283185307 ;
 static double correctionCoef(He3CELLexp *ex, double tau) ;
 static int transfac(He3CELLexp *ex, unsigned long secs, double lambda,
 	     double *tp, double *tm, double *tpesq, double *tmesq) ;
-static int PBcoef(PBdatapt *d, PBsetup *s) ;
+static int PBcoef(PBdatapt *d) ;
 static int PBcorrect(PBdatapt *d) ;
 static int PBcorrectDatapt(PBdatapt *d) ;
+static findcellsFORdatapt(PBdatapt *d, PBcells *c) ;
 static int applyConstraint(PBdatapt *d, ConstraintEq *eq) ;
 static int combineEqs(PBdatapt *d, int eq1, int eq2) ;
 static int deleteEq(PBdatapt *d, int eq) ;
 static int constrainResult(PBdatapt *d) ;
 static void constraintTOeqs() ;
+static int checkNegativeCS(PBdatapt *d) ;
+static int fixNegativeCS(int k, PBdatapt *d) ;
 static double poisson(int idum, double d1, double d2, double *distval,
 		      double min, double max) ;
 static double uniform(int idum, double d1, double d2, double *distval,
@@ -119,21 +133,30 @@ static double uniform(int idum, double d1, double d2, double *distval,
 static double gaussian(int idum, double ave, double sig, double *distval,
 		       double d1, double d2) ;
 
-static int monitorCorrectPG(PBdatapt *d) ;
-static int polmonitorCorrectPG(PBdatapt *d, He3CELLexp *pol) ;
-static int SIMmonitorCorrectPG(PBdatapt *d) ;
-static int SIMpolmonitorCorrectPG(PBdatapt *d, He3CELLexp *pol) ;
+static int monitorCorrect(PBdatapt *d) ;
+static int polmonitorCorrect(PBdatapt *d) ;
+static int SIMmonitorCorrect(PBdatapt *d) ;
+static int SIMpolmonitorCorrect(PBdatapt *d) ;
 
+/* monitor correction functions */
+static double monFuncBT4PG(double E) ;
+static double monFuncPG2cmfilter(double E) ;
+static double (*monCorFunc[])()= {
+  monFuncBT4PG, monFuncPG2cmfilter
+} ;
+static int NmonoCorFunc = 2 ;
 
-static int PBdefinePolarizer(char *filename) ;
-static int PBdefineAnalyzer(char *filename) ;
+static int PBdefineCells(char *filename) ;
 static int PBsetflags(PBflags *flgs) ;
 
-/* create one instance of a PB setup to store He3CELL info etc */
-static PBsetup s ;
+/* create a storage poll for CELL info read from file. 24 cells better suff */
+static int MAXCELLS = 24 ;
+static He3CELLexp expcells[24] ;
+static int Ncells = 0 ;  /* actual number of cells read */
+
 /* and a default flags structure */
 static PBflags flags = {
-  0, 0, 0, 100000, 0,
+  0, 0, 0, 0, 100000, 0, 0, 0,
   {1, 1, 1, 1},
   {0, 0, 0, 0},
   {0, 0, 0, 0},
@@ -144,7 +167,7 @@ static PBflags flags = {
   {0, 0, 0, 0}
 } ;
 static PBflags defltflags = {
-  0, 0, 0, 100000, 0,
+  0, 0, 0, 0, 100000, 0, 0, 0,
   {1, 1, 1, 1},
   {0, 0, 0, 0},
   {0, 0, 0, 0},
@@ -154,19 +177,20 @@ static PBflags defltflags = {
   {0, 0, 0, 0},
   {0, 0, 0, 0}
 } ;
+static PBflags flagsSave ;
 
 static ConstraintEq eqs[4] ;
 static int Nconstraint = 0 ;
+static ConstraintEq eqsS[4] ;
+static int NconstraintS = 0 ;
 
 static int *DBG = &(flags.Debug) ;
 
 
 
-
-
-
 /*
-  correct PB data passed in structure
+  main entrypoint: PBcorrectData
+  correct PB data passed in structure PBindata.
   Any of the passed structure pointers can be NULL
   except that if PBindata is not NULL then
   PBoutdata must be also non-NULL or error return (!=0).
@@ -177,40 +201,24 @@ static int *DBG = &(flags.Debug) ;
   that can hold up to npts.
 */
 
-int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
+int PBcorrectData(char *CellFile, PBflags *flgs,
 		  int npts, PBindata *in, PBoutdata *out)
 {
   /* storage for PB data */
   static PBdatapt d ;
 
-  int i, ierr, j ;
-  double temp ;
+  static char Cstrs[4][4] = {"Cpp","Cmm","Cpm","Cmp"} ;
+  static char Sstrs[4][4] = {"Spp","Smm","Spm","Smp"} ;
+
+  int i, ierr, j, k, ic, is ;
+  unsigned long secs ;
+  double temp, err ;
   FILE *fp ;
-  printf("reached\n");
-  printf("%s\n",PCellFile);
-  printf("%s\n",ACellFile);
-  printf("npts %d\n",npts);
-  printf("in\n");
-  //for (i=0; i <npts;i++){
-  //    printf("%d %f %f %f %f %u %f %f %u\n",i,in->Ei[i],in->Ef[i],in->Cpm[i],in->Epm[i],in->tpm[i],in->Cmp[i],in->Emp[i],in->tmp[i]);
-  //    }
-  printf("MonitorCorrect=%d\n",flgs->MonitorCorrect);
-  printf("PolMonitorCorrect=%d\n",flgs->PolMonitorCorrect);
-  printf("Debug=%d\n",flgs->Debug);
-  printf("SimFlux=%d\n",flgs->SimFlux);
-  printf("SimDeviate=%d\n",flgs->SimDeviate);
-  printf("CountsEnable=%d %d %d %d\n",flgs->CountsEnable[0],flgs->CountsEnable[1],flgs->CountsEnable[2],flgs->CountsEnable[3]);
-  printf("SConstrain=%d %d %d %d\n",flgs->Sconstrain[0],flgs->Sconstrain[1],flgs->Sconstrain[2],flgs->Sconstrain[3]);
-  printf("Smp=%f %f %f %f\n",flgs->Smp[0],flgs->Smp[1],flgs->Smp[2],flgs->Smp[3]);
-  printf("Spm=%f %f %f %f\n",flgs->Spm[0],flgs->Spm[1],flgs->Spm[2],flgs->Spm[3]);
-  printf("Spp=%f %f %f %f\n",flgs->Spp[0],flgs->Spp[1],flgs->Spp[2],flgs->Spp[3]);
-  printf("Smm=%f %f %f %f\n",flgs->Smm[0],flgs->Smm[1],flgs->Smm[2],flgs->Smm[3]);
-  
-  if( PCellFile != NULL ) if( PBdefinePolarizer(PCellFile) ) return 1 ;
-  if( ACellFile != NULL ) if( PBdefineAnalyzer(ACellFile) ) return 2 ;
-  
-  printf("Cells defined\n");
+
+  if( CellFile != NULL ) if( PBdefineCells(CellFile) || Ncells < 1 ) return 1 ;
+
   if( flgs != NULL ) PBsetflags(flgs) ;
+
   if( in == NULL || npts < 1 ) return 0 ;
   if( out == NULL ) return 3 ;
 
@@ -219,22 +227,75 @@ int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
   /*
     process each data point
   */
-  
   for( i=0 ; i<npts ; i++ ) {
     /* first just copy the input to the PBdatapt struct d */
-    d.Y[0] = in->Cpp[i] ;
-    d.Y[1] = in->Cmm[i] ;
-    d.Y[2] = in->Cpm[i] ;
-    d.Y[3] = in->Cmp[i] ;
-    d.Yesq[0] = in->Epp[i]*in->Epp[i] ;
-    d.Yesq[1] = in->Emm[i]*in->Emm[i] ;
-    d.Yesq[2] = in->Epm[i]*in->Epm[i] ;
-    d.Yesq[3] = in->Emp[i]*in->Emp[i] ;
+    if( in->Cpp == NULL ) {
+      if( flags.CountsEnable[0] ) {
+	if( *DBG ) printf("NULL Cpp disables that equation\n") ;
+	flags.CountsEnable[0] = 0 ;
+      }
+      d.Y[0] = d.Yr[0] = 0. ; d.Yesq[0] = d.Yresq[0] = 0. ;
+    } else {
+      if( in->tpp == NULL ) return 3 ;
+      secs = in->tpp[i] ;
+      d.Y[0] = d.Yr[0] = in->Cpp[i] ;
+      if( in->Epp == NULL )
+	if( d.Y[0] > 0. ) d.Yesq[0] = d.Yresq[0] = d.Y[0] ;
+	else d.Yesq[0] = d.Yresq[0] = 1. ;
+      else d.Yesq[0] = d.Yresq[0] = in->Epp[i]*in->Epp[i] ;
+    }
+    if( in->Cmm == NULL ) {
+      if( flags.CountsEnable[1] ) {
+	if( *DBG ) printf("NULL Cmm disables that equation\n") ;
+	flags.CountsEnable[1] = 0 ;
+      }
+      d.Y[1] = d.Yr[1] = 0. ; d.Yesq[1] = d.Yresq[1] = 0. ;
+    } else {
+      if( in->tmm == NULL ) return 3 ;
+      secs = in->tmm[i] ;
+      d.Y[1] = d.Yr[1] = in->Cpp[i] ;
+      if( in->Emm == NULL )
+	if( d.Y[1] > 0. ) d.Yesq[1] = d.Yresq[1] = d.Y[1] ;
+	else d.Yesq[1] = d.Yresq[1] = 1. ;
+      else d.Yesq[1] = d.Yresq[1] = in->Emm[i]*in->Emm[i] ;
+    }
+    if( in->Cpm == NULL ) {
+      if( flags.CountsEnable[2] ) {
+	if( *DBG ) printf("NULL Cpm disables that equation\n") ;
+	flags.CountsEnable[2] = 0 ;
+      }
+      d.Y[2] = d.Yr[2] = 0. ; d.Yesq[2] = d.Yresq[2] = 0. ;
+    } else {
+      if( in->tpm == NULL ) return 3 ;
+      secs = in->tpm[i] ;
+      d.Y[2] = d.Yr[2] = in->Cpm[i] ;
+      if( in->Epm == NULL )
+	if( d.Y[2] > 0. ) d.Yesq[2] = d.Yresq[2] = d.Y[2] ;
+	else d.Yesq[2] = d.Yresq[2] = 1. ;
+      else d.Yesq[2] = d.Yresq[2] = in->Epm[i]*in->Epm[i] ;
+    }
+    if( in->Cmp == NULL ) {
+      if( flags.CountsEnable[3] ) {
+	if( *DBG ) printf("NULL Cmp disables that equation\n") ;
+	flags.CountsEnable[3] = 0 ;
+      }
+      d.Y[3] = d.Yr[3] = 0. ; d.Yesq[3] = d.Yresq[3] = 0. ;
+    } else {
+      if( in->tmp == NULL ) return 3 ;
+      secs = in->tmp[i] ;
+      d.Y[3] = d.Yr[3] = in->Cmp[i] ;
+      if( in->Emp == NULL )
+	if( d.Y[3] > 0. ) d.Yesq[3] = d.Yresq[3] = d.Y[3] ;
+	else d.Yesq[3] = d.Yresq[3] = 1. ;
+      else d.Yesq[3] = d.Yresq[3] = in->Emp[i]*in->Emp[i] ;
+    }
 
-    d.sec[0] = in->tpp[i] ;
-    d.sec[1] = in->tmm[i] ;
-    d.sec[2] = in->tpm[i] ;
-    d.sec[3] = in->tmp[i] ;
+    if( in->Cpp == NULL ) d.sec[0] = secs ; else d.sec[0] = in->tpp[i] ;
+    if( in->Cmm == NULL ) d.sec[1] = secs ; else d.sec[1] = in->tmm[i] ;
+    if( in->Cpm == NULL ) d.sec[2] = secs ; else d.sec[2] = in->tpm[i] ;
+    if( in->Cmp == NULL ) d.sec[3] = secs ; else d.sec[3] = in->tmp[i] ;
+
+
     temp = in->Ei[i] ;
     if( temp <= 0. ) return 4 ;
     temp /= Dn ;
@@ -244,9 +305,36 @@ int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
     temp /= Dn ;
     d.lambF = TWOPI/sqrt(temp) ;
 
+
     if( (ierr = PBcorrectDatapt(&d)) ) {
-      printf("ERROR in PBcorrectDatapt = %d\n",ierr) ;
+      if( *DBG ) printf("ERROR in PBcorrectDatapt = %d\n",ierr) ;
     }
+
+    if( *DBG > 1 ) {
+      /* print the equations and soln for this datapt */
+      if( d.Nfree == d.Nactive ) {
+	for( j=0 ; j<d.Nactive ; j++ ) {
+	  ic = d.activeEq[j] ;
+	  err = 0. ;
+	  if( d.Yesq[ic] > 0. ) err = sqrt(d.Yesq[ic]) ;
+	  printf("%3s(%10g %10g) = ",Cstrs[ic],d.Y[ic],err);
+	  for( k=0 ; k<d.Nfree ; k++ ) {
+	    is = d.freeS[k] ;
+	    err = 0. ;
+	    if( d.Cesq[ic][is] > 0. ) err = sqrt(d.Cesq[ic][is]) ;
+	    if( k > 0 ) printf(" + ") ;
+	    printf("(%10g %10g)*%3s",d.C[ic][is],err,Sstrs[is]) ;
+	  }
+	  is = d.freeS[j] ;
+	  err = 0. ;
+	  if( d.Sesq[is] > 0. ) err = sqrt(d.Sesq[is]) ;
+	  printf("   %s(%10g %10g)\n",Sstrs[is],d.S[is],err) ;
+	}
+      } else {
+	printf("Nfree NOT equal Nactive\n") ;
+      }
+    }
+
     /* transfer the corrected S to the PBoutdata struct */
     for( j=0 ; j<4 ; j++ ) {
       if( j == 0 ) {
@@ -263,7 +351,7 @@ int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
 	if(d.Sesq[3]>0.) out->Emp[i] = sqrt(d.Sesq[3]) ; else out->Emp[i]=0. ;
       }
     }
-
+    out->R[i] = d.R ;
   }
   return 0 ;
 }
@@ -271,11 +359,7 @@ int PBcorrectData(char *PCellFile, char *ACellFile, PBflags *flgs,
 static int PBcorrectDatapt(PBdatapt *d)
 {
   int j, k, ierr ;
-  if( flags.MonitorCorrect ) {
-    monitorCorrectPG(d) ;
-  } else if ( flags.PolMonitorCorrect ) {
-    polmonitorCorrectPG(d, &(s.P));
-  }
+
   
   /* intial all 4 equations active and all S(cross-sections) free unknowns */
   d->Nactive = 4 ;
@@ -285,16 +369,16 @@ static int PBcorrectDatapt(PBdatapt *d)
     d->freeS[j] = j ;
   }
   
-  /* calc the correction coeficients */
-  if( (ierr = PBcoef(d, &s)) > 0 ) {
-    printf("error in PBcoef = %d\n", ierr) ;
+  /* calc the correction coeficients. this is also where monitor correct */
+  if( (ierr = PBcoef(d)) > 0 ) {
+    if( *DBG ) printf("error in PBcoef = %d\n", ierr) ;
     return 6 ;
   }
   
   /* apply any constraints on the S */
   for( j=0 ; j<Nconstraint ; j++ ) {
     if( applyConstraint(d, eqs+j) > 0 )
-      printf("constraint %d failed\n",j) ;
+      if( *DBG ) printf("constraint %d failed\n",j) ;
   }
 
   /*
@@ -306,14 +390,14 @@ static int PBcorrectDatapt(PBdatapt *d)
     if( flags.CountsAdd1[j] ) {
       for( k=j+2 ; k<4 ; k++ ) {
 	if( flags.CountsAdd1[k] ) {
-	  if( combineEqs(d, j, k) ) printf("combineEqs failed\n") ;
+	  if( combineEqs(d, j, k) ) if( *DBG ) printf("combineEqs failed\n") ;
 	}
       }
     }
     if( flags.CountsAdd2[j] ) {
       for( k=j+2 ; k<4 ; k++ ) {
 	if( flags.CountsAdd2[k] ) {
-	  if( combineEqs(d, j, k) ) printf("combineEqs failed\n") ;
+	  if( combineEqs(d, j, k) ) if( *DBG ) printf("combineEqs failed\n") ;
 	}
       }
     }
@@ -324,30 +408,100 @@ static int PBcorrectDatapt(PBdatapt *d)
     
   /* check that Nactive equations == Nfree Unknowns */
   if( d->Nactive != d->Nfree ) {
-    printf("Nactive != Nfree\n") ;
+    if( *DBG ) printf("Nactive != Nfree\n") ;
+    return 7 ;
+  }
+  if( d->Nactive < 1 ) {
+    if( *DBG ) printf("NO remaining degrees of freedom\n") ;
     return 7 ;
   }
   
   if( *DBG ) {
-    printf("after CTRLS activeEqindices and freeSindices are\n") ;
-    for( j=0 ; j<d->Nactive ; j++ ) printf("%1d ",d->activeEq[j]) ;
-    printf("\n") ;
-    for( j=0 ; j<d->Nfree ; j++ ) printf("%1d ",d->freeS[j]) ;
-    printf("\n\n") ;
+    printf("after CTRLS activeEqindices and freeSindices are ( ") ;
+    for( j=0 ; j<d->Nactive ; j++ ) printf("%1d ",d->activeEq[j]+1) ;
+    printf(")  ( ") ;
+    for( j=0 ; j<d->Nfree ; j++ ) printf("%1d ",d->freeS[j]+1) ;
+    printf(")\n") ;
   }
   
   /* call PBcorrect to solve for the cross-sections by Gaussian elim */
   if( (ierr = PBcorrect(d)) > 0 ) {
     if( ierr == 2 ) {
-      printf("invalid Nactive equations or Nactive != Nfree\n") ;
+      if( *DBG ) printf("invalid Nactive equations or Nactive != Nfree\n") ;
       return 8 ;
     }
-    printf("error in PBcorrect = %d\n", ierr) ;
+    if( *DBG ) printf("error in PBcorrect = %d\n", ierr) ;
     return 9 ;
   }
   
   /* apply any constraints to the final result */
   constrainResult(d) ;
+
+  /*
+    Suppose some of the results come back with negative CS solutions
+    Use a flag to require constraining negative values to zero?
+    When we do this we have to throw out an equation. The logical choice
+    is to throw out the equation for the counts corresponding to the
+    CS value that we are now going to constrain.
+    Note that this may only leave one equation in one unknown.
+  */
+
+  if( d->Nactive > 1 && flags.NoNegativeCS && checkNegativeCS(d) > 0 ) {
+    /* save the global constraint etc info */
+    flagsSave = flags ;
+    NconstraintS = Nconstraint ;
+    for( j=0 ; j<Nconstraint ; j++ ) eqsS[j] = eqs[j] ;
+
+    while(d->Nactive > 1 && flags.NoNegativeCS && (k=checkNegativeCS(d)) > 0 )
+      fixNegativeCS(k,d) ;
+
+    flags = flagsSave ;
+    Nconstraint = NconstraintS ;
+    for( j=0 ; j<Nconstraint ; j++ ) eqs[j] = eqsS[j] ;
+  }
+
+  return 0 ;
+}
+
+static int checkNegativeCS(PBdatapt *d)
+{
+  /*
+    called only if d->Nactive > 1 so we can add a constraint
+    and throw away an equation
+  */
+
+  int i ;
+  for( i=0 ; i<4 ; i++ ) {
+    if( ! flags.Sconstrain[i] && flags.CountsEnable[i] && d->S[i] < 0 )
+      return i+1 ;
+  }
+  return 0 ;
+}
+static int fixNegativeCS(int k, PBdatapt *d)
+{
+  int i, j, ierr ;
+
+  i = k - 1 ;
+
+  flags.Sconstrain[i] = 1 ;
+  if( i==0 ) {
+    for( j=0 ; j<4 ; j++ ) flags.Spp[j] = 0. ;
+  } else if( i==1 ) {
+    for( j=0 ; j<4 ; j++ ) flags.Smm[j] = 0. ;
+  } else if( i==2 ) {
+    for( j=0 ; j<4 ; j++ ) flags.Spm[j] = 0. ;
+  } else if( i==3 ) {
+    for( j=0 ; j<4 ; j++ ) flags.Smp[j] = 0. ;
+  }
+  flags.CountsEnable[i] = 0 ;
+
+  constraintTOeqs() ;
+
+  if( (ierr = PBcorrectDatapt(d)) ) {
+    if( *DBG ) printf("ERROR in PBcorrectDatapt = %d\n",ierr) ;
+    return ierr ;
+  }
+
   return 0 ;
 }
 
@@ -426,13 +580,13 @@ static int transfac(He3CELLexp *ex, unsigned long secs, double lambda,
 
 
   if( ex == NULL | tp == NULL || tm == NULL || tpesq == NULL || tmesq == NULL )
-    return 1 ;
+    return 11 ;
 
   cell = &(ex->cell) ;
   pol = &(ex->pol) ;
   res = &(ex->res) ;
 
-  if( fabs(pol->T) <= 0. ) return 2 ;
+  if( fabs(pol->T) <= 0. ) return 12 ;
 
   lamfac = lambda/1.77 ;
   nsL = cell->nsL * lamfac ;
@@ -472,9 +626,76 @@ static int transfac(He3CELLexp *ex, unsigned long secs, double lambda,
   return 0 ;
 }
 
-static int PBcoef(PBdatapt *d, PBsetup *s)
+static findcellsFORdatapt(PBdatapt *d, PBcells *c)
 {
-  int i, j, ierr ;
+  int i, j, k, ic ;
+
+  if( d == NULL || c == NULL ) return 1;
+
+  for( i=0 ; i<4 ; i++ ) {
+
+    /*
+      find the cells for the 4 CS of datapt based on the datapt timestamp
+    */
+    c->cells[0][i] = c->cells[1][i] = -1 ;
+    if( ! flags.CountsEnable[i] ) continue ;
+    for( j=Ncells-1 ; j>=0 ; j-- ) {
+      if( expcells[j].pol.startSecs <= d->sec[i] ) {
+	/* ic=PorA==0 means found a Polarizer */
+	ic = expcells[j].PorA ;
+	c->cells[ic][i] = j ;
+	/* look for a second cell even if half-polarized */
+
+	for( k=j-1 ; k>= 0 ; k-- ) {
+	  if(expcells[k].pol.startSecs <= d->sec[i] && expcells[k].PorA != ic) {
+	    c->cells[1-ic][i] = k ;
+	    break ;  /* break the k cells loop */
+	  }
+	}
+	break ; /* done so break the j cells loop */
+      }
+    } /* ends j cells loop */
+    if( c->cells[0][i] < 0 || c->cells[1][i] < 0 ) {
+      if( *DBG ) printf("Couldnt find cells for CS %d at datapt.\n", i) ;
+      return 2 ;
+    }
+    /* cell decay constants must be > 0 */
+    if(expcells[c->cells[0][i]].pol.T <= 0. ||
+       expcells[c->cells[1][i]].pol.T <= 0.) {
+      if( *DBG ) printf("zero time constant for a cell\n") ;
+      return 2 ;
+    }
+
+  }   /* ends i CS loop */
+  return 0 ;
+}
+
+static int PBcoef(PBdatapt *d)
+{
+
+  /*
+    Feb 2008 RWE
+    PBcoef has been changed to go thru the expcells to find the
+    cells that were active for the UNIXtime of each datapt CS
+    this could be up to four different pairs of cells
+    Must find both Pol and Anal although one of these may be NOCELL
+    handled by zero nsL for half-polarized beam.
+
+    Also, any data correction for counting against monitor is done here
+  */
+
+  /*
+    indices in expcells for each datapt CS
+    row 1 for P
+    row 2 for A
+    indicate missing cell with index < 0
+  */
+
+  static PBsetup setup ;
+  static PBsetup *s = &setup ;
+  static PBcells c ;
+
+  int i, j, k, ierr, ic, NRsum ;
 
   /* index order is ++ -- +- -+ */
   static double alpmu[4] = { 1., -1.,  1., -1. } ;
@@ -495,10 +716,12 @@ static int PBcoef(PBdatapt *d, PBsetup *s)
   double tpA, tmA, tpAesq, tmAesq, tpP, tmP, tpPesq, tmPesq ;
   double tsA, taA, tAesq, tsP, taP, tPesq ;
 
-  if( d == NULL || s == NULL ) return 1;
-  if( fabs(s->P.pol.T) <= 0. || fabs(s->A.pol.T) <= 0. ) return 2;
+  double tp, tm, teff, feff, Rsum ;
+  double R[4] ;
 
-  /* cell decay constants must be > 0 */
+  if( d == NULL ) return 1;
+
+  if( ierr = findcellsFORdatapt(d, &c) ) return ierr ;
 
   /*
     first calc the cell He3 polarizations at datapt time with errs
@@ -510,50 +733,69 @@ static int PBcoef(PBdatapt *d, PBsetup *s)
 
     finally can calculate transmission factors and errors
     and then coefs and errors
+
+    Jan 29 2008 added calculation of average flipping ratio R
+    for the times of the 4 CS msrmnts
   */
 
+  /* apply monitor correction if requested */
+  if( flags.MonitorCorrect ) monitorCorrect(d) ;
+  else if( flags.PolMonitorCorrect ) polmonitorCorrect(d) ;
 
-  /* efficiency stuff */
-  etPsq = s->eP.teff ;
-  etPsq *= etPsq ;
-  etPesq = s->eP.terr ;
-  etPesq *= etPesq ;
-  efP = s->eP.feff ;
-  efPesq = s->eP.ferr ;
-  efPesq *= efPesq ;
+  /* Now redo loop over CS loading the correct cells into s */
 
-  etAsq = s->eA.teff ;
-  etAsq *= etAsq ;
-  etAesq = s->eA.terr ;
-  etAesq *= etAesq ;
-  efA = s->eA.feff ;
-  efAesq = s->eA.ferr ;
-  efAesq *= efAesq ;
-
-  /*
-    Now set up loop to calculate the coefs and errsq
-                    Pol  Ana
-    index 0  + +    OFF  OFF
-    index 1  - -    ON   ON
-    index 2  + -    ON   OFF
-    index 3  - +    OFF  ON
-    but first compute the transport factors, eAalp, ePbet
-  */
-
+  NRsum = 0 ;
+  Rsum = 0. ;
   for( i=0 ; i<4 ; i++ ) {
+    if( c.cells[0][i] < 0 || c.cells[1][i] < 0 ) continue ;
+    s->P = expcells[c.cells[0][i]] ;
+    s->A = expcells[c.cells[1][i]] ;
+
+    /* efficiency stuff */
+    etPsq = s->P.eff.teff ;
+    etPsq *= etPsq ;
+    etPesq = s->P.eff.terr ;
+    etPesq *= etPesq ;
+    efP = s->P.eff.feff ;
+    efPesq = s->P.eff.ferr ;
+    efPesq *= efPesq ;
+
+    etAsq = s->A.eff.teff ;
+    etAsq *= etAsq ;
+    etAesq = s->A.eff.terr ;
+    etAesq *= etAesq ;
+    efA = s->A.eff.feff ;
+    efAesq = s->A.eff.ferr ;
+    efAesq *= efAesq ;
+
+    /* for calc R need product of P and A transport efficiencies and avg feff */
+    teff = s->P.eff.teff * s->A.eff.teff ;
+    feff = (s->P.eff.feff + s->A.eff.feff)/2. ;
+
+    /*
+      Now  calculate the coefs and errsq
+      Pol  Ana
+      index 0  + +    OFF  OFF
+      index 1  - -    ON   ON
+      index 2  + -    ON   OFF
+      index 3  - +    OFF  ON
+      but first compute the transport factors, eAalp, ePbet
+    */
+
+
     /* i is row index so compute alp and bet for i */
     alp = alpmu[i] ;
     alp1sq = (1.- alp)*(1.- alp) ;
-    eAFalp = (1.- alp)*s->eA.feff - 1. ;
+    eAFalp = (1.- alp)*s->A.eff.feff - 1. ;
     eAFalpsq = eAFalp*eAFalp ;
-    eAalp = s->eA.teff*eAFalp ;
+    eAalp = s->A.eff.teff*eAFalp ;
     eAalpsq = eAalp*eAalp ;
 
     bet = betnu[i] ;
     bet1sq = (1.- bet)*(1.- bet) ;
-    ePFbet = (1.- bet)*s->eP.feff - 1. ;
+    ePFbet = (1.- bet)*s->P.eff.feff - 1. ;
     ePFbetsq = ePFbet*ePFbet ;
-    ePbet = s->eP.teff*ePFbet ;
+    ePbet = s->P.eff.teff*ePFbet ;
     ePbetsq = ePbet*ePbet ;
 
     /* use the dataPt time for each measurement (row) */
@@ -576,6 +818,11 @@ static int PBcoef(PBdatapt *d, PBsetup *s)
     taP = tpP - tmP ;
     tsP = tpP + tmP ;
     tPesq = tpPesq + tmPesq ;
+
+    tp = tsA*tsP ;
+    tm = taA*taP ;
+    Rsum += (tp + teff*tm)/(tp - teff*(2*feff-1)*tm) ;
+    NRsum++ ;
 
     /*
       the only error factors that depend on mu nu
@@ -602,31 +849,18 @@ static int PBcoef(PBdatapt *d, PBsetup *s)
       d->Cesq[i][j] = (cAsq*etermA + cPsq*etermP)/64. ;
     }
   }
+  d->R = 0. ;
+  if( NRsum > 0 ) d->R = Rsum/NRsum ;
 
   return 0;
 }
 
 static double correctionCoef(He3CELLexp *ex, double tau)
 {
-  
-  He3CELL *cell ;
   expResol *res ;
-  double L, R, r ;
-  double sw, sV, sH ;
-
   if( ex == NULL ) return 1.;
-  cell = &(ex->cell) ;
   res = &(ex->res) ;
-  L = cell->L ;
-  if( L <= 0. ) return 1.;
-  R = cell->R ;
-  if( R <= 0. ) R = 1.e12 ;
-  r = res->usedRadius ;
-  sw = res->waveRelWidth ;
-  sV = res->angleVwidth ;
-  sH = res->angleHwidth ;
-  return
-    1. + tau*tau*sw*sw/2. - tau*(1 - L/R/2. + r*r/(R*R)/2.)*(sV*sV + sH*sH)/2.;
+  return (1. + res->t2*tau*tau - res->t1*tau) ;
 }
 
 /*
@@ -654,11 +888,60 @@ static double correctionCoef(He3CELLexp *ex, double tau)
 
 static int PBcorrect(PBdatapt *d)
 {
+  /*
+    RWE Feb 14 2008
+    NOT happy with error results using the Gaussian elimination and propagating
+    errors for every mathematical operation.
+    This is likely overestimating errors
+    and in fact the results compared to exact solution confirm this.
+    I now have the exact algebraic solution for 2 equations along with the err
+    orig equ for counts: Cu +-sigu = (Auv +- siguv) Sv
+    D = A11*A22 - A12*A21
+    solution: Su = (Buv/D) Cv
+    where Buv = (-1)^(u+v) Avbar,ubar    cofactors of transpose of A
+    then errors are
+    sigSw^2 = SUMuv (dSw/dAuv)^2 siguv^2 + SUMu (dSw/dCu)^2 sigu^2
+    or
+    D^2 sigSw^2 = Sw^2 SUMuv Aubarvbar^2 siguv^2
+                  + Cb(Cb - 2*Sw*Abw)sigawbar^2
+                  + Ca(Ca - 2*Sw*Aaw)sigbwbar^2
+		  + Abwbar^2 siga^2 + Aawbar^2 sigb^2
+    where indices are a=1 b=2
+
+    We also have the exact solution for 4 equations when the spin-flipper
+    efficiency is perfect.
+    In that case Aab,uv = Aabarb,ubarv = Aabbar,ubarv = Aabarbbar,ubarvbar
+    In terms of 2x2 matrices, cn and cf,
+    and 2-vectors Cn, Cf, Sn and Sf the orig equations are then
+    Cn = (N/2) (cn cf) Sn
+    Cf         (cf cn) Sf
+    where cn = (c++ c--)  cf = (c+- c-+)
+               (c-- c++)       (c-+ c+-)
+    
+    Cn = (C++)    Cf = (C+-)  and similar for Sn and Sf
+         (C--)         (C-+)
+
+    Because the matrices cn and cf are symmetric the inversion solution is
+    ( cn -cf) (Cn) = N/2 ( cn^2-cf^2     0     ) (Sn)
+    (-cf  cn) (Cf)       (     0     cn^2-cf^2 ) (Sf)
+    where cn^2 - cf^2 = cd is also symmetric.
+    The final soln is then:
+    ( cd^-1 cn   -cd^-1 cf ) (Cn) = N/2 (Sn)
+    (-cd^-1 cf    cd^-1 cn ) (Cf)       (Sf)
+
+    cd = (e f)    e = c++^2 + c--^2 - c+-^2 - c-+^2
+         (f e)    f = 2c++c-- - 2c+-c-+
+    
+    cd^-1 = ( e -f)/(e^2 - f^2)
+            (-f  e)
+  */
+
   PBdatapt D;
 
   int N, m, row, col, i, im, j, jm, itemp;
   int indx[4];
   double Amax, temp, tempsq, temp1, temp2, sigsq;
+  double deter, sumsiguv ;
 
   if( d == NULL ) return 1;
 
@@ -681,6 +964,36 @@ static int PBcorrect(PBdatapt *d)
     }
   }
   N = d->Nactive;
+
+  /*
+    Apply the exact soln if there are 2 equations
+  */
+
+  if( N == 2 ) {
+    deter = D.C[0][0]*D.C[1][1] - D.C[0][1]*D.C[1][0] ;
+    if( fabs(deter) <= 0. ) return 3 ;
+    sumsiguv = 0. ;
+    for( i=0 ; i<2 ; i++ ) {
+      for( j=0 ; j<2 ; j++ )
+	sumsiguv += D.C[1-i][1-j]*D.C[1-i][1-j]*D.Cesq[i][j] ;
+    }
+    for( i=0 ; i<2 ; i++ ) {
+      D.S[i] = D.C[1-i][1-i]*D.Y[i] - D.C[i][1-i]*D.Y[1-i] ;
+      D.S[i] /= deter ;
+      D.Sesq[i] = D.S[i]*D.S[i]*sumsiguv + 
+	D.Y[0]*(D.Y[0]-2*D.S[i]*D.C[0][i])*D.Cesq[1][1-i] +
+	D.Y[1]*(D.Y[1]-2*D.S[i]*D.C[1][i])*D.Cesq[0][1-i] +
+	D.C[0][1-i]*D.C[0][1-i]*D.Yesq[1] +
+	D.C[1][1-i]*D.C[1][1-i]*D.Yesq[0] ;
+      D.Sesq[i] /= (deter*deter) ;
+    }
+    /* move solutions into freeS indices */
+    for( row=0 ; row<N ; row++ ) {
+      d->S[d->freeS[row]] = D.S[row];
+      d->Sesq[d->freeS[row]] = D.Sesq[row];
+    }
+    return 0 ;
+  }
 
   for( col=0 ; col<N ; col++ ) indx[col] = col ;
 
@@ -950,8 +1263,14 @@ static double monFuncBT4PG(double E)
     mygauss(E, 0.7087,  8.6305, 5.2114) + 
     mygauss(E, 0.40319,12.488, 22.381) ;
 }
+static double monFuncPG2cmfilter(double E)
+{
+  /* meant for elastic condition with 2percent lambda/2 */
+  return (0.98 + 0.02/2)/0.98 ;
+}
 
-static int monitorCorrect(PBdatapt *d, double (*monFunc)())
+
+static int monitorCorrect(PBdatapt *d)
 {
   /*
     The monFunc returns the correction factor
@@ -964,15 +1283,17 @@ static int monitorCorrect(PBdatapt *d, double (*monFunc)())
   int i ;
   double EI, kI, cor, corsq ;
 
-  if( d == NULL || monFunc == NULL ) return 1 ;
+  if( d == NULL ) return 1 ;
   kI = (TWOPI/d->lambI) ;
   EI = Dn*kI*kI ;
-  cor = monFunc(EI) ;
+  cor = monCorFunc[flags.MonoSelect](EI) ;
   corsq = cor*cor ;
-  for( i=0 ; i<4 ; i++ ) { d->Y[i] *= cor ; d->Yesq[i] *= corsq ; }
+  for( i=0 ; i<4 ; i++ ) {
+    d->Y[i] = cor*d->Yr[i] ; d->Yesq[i] = corsq*d->Yresq[i] ;
+  }
   return 0 ;
 }
-static int SIMmonitorCorrect(PBdatapt *d, double (*monFunc)())
+static int SIMmonitorCorrect(PBdatapt *d)
 {
   /*
     The monFunc returns the correction factor
@@ -987,26 +1308,19 @@ static int SIMmonitorCorrect(PBdatapt *d, double (*monFunc)())
   int i ;
   double EI, kI, cor, corsq ;
 
-  if( d == NULL || monFunc == NULL ) return 1 ;
+  if( d == NULL ) return 1 ;
   kI = (TWOPI/d->lambI) ;
   EI = Dn*kI*kI ;
-  cor = monFunc(EI) ;
+  cor = monCorFunc[flags.MonoSelect](EI) ;
   corsq = cor*cor ;
-  for( i=0 ; i<4 ; i++ ) { d->Y[i] /= cor ; d->Yesq[i] /= corsq ; }
+  for( i=0 ; i<4 ; i++ ) {
+    d->Y[i] = d->Yr[i]/cor ; d->Yesq[i] = d->Yresq[i]/corsq ;
+  }
   return 0 ;
 }
 
 
-static int monitorCorrectPG(PBdatapt *d)
-{
-  return monitorCorrect(d, monFuncBT4PG) ;
-}
-static int SIMmonitorCorrectPG(PBdatapt *d)
-{
-  return SIMmonitorCorrect(d, monFuncBT4PG) ;
-}
-
-static int polmonitorCorrect(PBdatapt *d, He3CELLexp *pol, double (*monFunc)())
+static int polmonitorCorrect(PBdatapt *d)
 {
   /*
     This calcs the counts correction factor when using a beam monitor
@@ -1018,33 +1332,41 @@ static int polmonitorCorrect(PBdatapt *d, He3CELLexp *pol, double (*monFunc)())
     from the monochromator.
   */
 
-  int i ;
+  int i, ierr ;
+  static PBcells c ;
+
   double EI, kI, lamb, lamb2, cor ;
   double a1, a2 ;
   double tp, tm, tpesq, tmesq, t1, t2 ;
 
-  if( d == NULL || monFunc == NULL ) return 1 ;
+  if( d == NULL ) return 1 ;
+  if( ierr = findcellsFORdatapt(d, &c) ) return ierr ;
+
   lamb = d->lambI ;
   lamb2 = lamb/2. ;
   kI = (TWOPI/lamb) ;
   EI = Dn*kI*kI ;
-  cor = monFunc(EI) ;
+  cor = monCorFunc[flags.MonoSelect](EI) ;
   /* extract the order fractions from the standard corfac */
   a1 = 1./(2*cor - 1) ;
   a2 = 1 - a1 ;
-  /* correct each of the four cross-section counts */
+  if( a2 < 0. ) a2 = 0. ;
+  /* correct cross-section counts */
   for( i=0 ; i<4 ; i++ ) {
-    if( ! transfac(pol, d->sec[i], lamb, &tp, &tm, &tpesq, &tmesq) ) return 1 ;
+    if( c.cells[0][i] < 0 || c.cells[1][i] < 0 ) continue ;
+    if( ierr = transfac(&expcells[c.cells[0][i]],
+		   d->sec[i], lamb, &tp, &tm, &tpesq, &tmesq) ) return ierr ;
     t1 = (tp + tm)/2. ;
-    if( ! transfac(pol, d->sec[i], lamb2, &tp, &tm, &tpesq, &tmesq) ) return 1 ;
+    if( ierr = transfac(&expcells[c.cells[0][i]],
+		   d->sec[i], lamb2, &tp, &tm, &tpesq, &tmesq) ) return ierr ;
     t2 = (tp + tm)/2. ;
-    cor = a1*t1 + a2*t2/2. ;
-    d->Y[i] *= cor ;
-    d->Yesq[i] *= cor*cor ;
+    cor = 1. + 0.5*(a2/a1)*(t2/t1) ;
+    d->Y[i] = cor*d->Yr[i] ;
+    d->Yesq[i] = cor*cor*d->Yresq[i] ;
   }
   return 0 ;
 }
-static int SIMpolmonitorCorrect(PBdatapt *d, He3CELLexp *pol, double (*monFunc)())
+static int SIMpolmonitorCorrect(PBdatapt *d)
 {
   /*
     This calcs the counts correction factor when using a beam monitor
@@ -1057,41 +1379,40 @@ static int SIMpolmonitorCorrect(PBdatapt *d, He3CELLexp *pol, double (*monFunc)(
     Correct SIM data to lower value when counting against monitor
   */
 
-  int i ;
+  int i, ierr ;
   double EI, kI, lamb, lamb2, cor ;
   double a1, a2 ;
   double tp, tm, tpesq, tmesq, t1, t2 ;
+  static PBcells c ;
 
-  if( d == NULL || monFunc == NULL ) return 1 ;
+  if( d == NULL ) return 1 ;
+  if( ierr = findcellsFORdatapt(d, &c) ) return ierr ;
+
   lamb = d->lambI ;
   lamb2 = lamb/2. ;
   kI = (TWOPI/lamb) ;
   EI = Dn*kI*kI ;
-  cor = monFunc(EI) ;
+  cor = monCorFunc[flags.MonoSelect](EI) ;
   /* extract the order fractions from the standard corfac */
   a1 = 1./(2*cor - 1) ;
   a2 = 1 - a1 ;
+  if( a2 < 0. ) a2 = 0. ;
   /* correct each of the four cross-section counts */
   for( i=0 ; i<4 ; i++ ) {
-    if( ! transfac(pol, d->sec[i], lamb, &tp, &tm, &tpesq, &tmesq) ) return 1 ;
+    if( c.cells[0][i] < 0 || c.cells[1][i] < 0 ) continue ;
+    if( ierr = transfac(&expcells[c.cells[0][i]],
+		   d->sec[i], lamb, &tp, &tm, &tpesq, &tmesq) ) return ierr ;
     t1 = (tp + tm)/2. ;
-    if( ! transfac(pol, d->sec[i], lamb2, &tp, &tm, &tpesq, &tmesq) ) return 1 ;
+    if( ierr =  transfac(&expcells[c.cells[0][i]],
+		   d->sec[i], lamb2, &tp, &tm, &tpesq, &tmesq) ) return ierr ;
     t2 = (tp + tm)/2. ;
-    cor = a1*t1 + a2*t2/2. ;
-    d->Y[i] /= cor ;
-    d->Yesq[i] /= cor*cor ;
+    cor = 1 + 0.5*(a2/a1)*(t2/t1) ;
+    d->Y[i] = d->Yr[i]/cor ;
+    d->Yesq[i] = d->Yresq[i]/cor/cor ;
   }
   return 0 ;
 }
 
-static int polmonitorCorrectPG(PBdatapt *d, He3CELLexp *pol)
-{
-  return polmonitorCorrect(d, pol, monFuncBT4PG) ;
-}
-static int SIMpolmonitorCorrectPG(PBdatapt *d, He3CELLexp *pol)
-{
-  return SIMpolmonitorCorrect(d, pol, monFuncBT4PG) ;
-}
 
 /*
 
@@ -1101,31 +1422,34 @@ static int SIMpolmonitorCorrectPG(PBdatapt *d, He3CELLexp *pol)
   The data are input from a columnar data file where
   and the PBcorrection requires columns for
   EI EF CountsOFF timestampOFFOFF CountsONON timestampONON CountsONOFF ...
-  We will assume the time stamps are in UTC seconds.
-  the first column is the time-stamp value in hours,
-  and the next 4 columns are ++ +- -+ -- data per datapoint.
+  We will assume the time stamps are in UTC (UNIX time) seconds.
   This program then writes the calculated CS and err to stdout.
 
-  Read in PBsetup info from 2 files one for polarizer and one for analyzer
-  The files contain 8 lines each which are 4 header lines each followed
-  by a data line
-  line1 is    He3CELL: name tEmpty tEmpSlope Lcm Dcm Rcrv-cm nsL0-1.77A nsL0err
-  line2 data for these entires
-  line3 is He3CELLpol: PHe  PHeErr hrsBeam T  Terr startTimeSecs  startTimeString
-  line4 is data for these
-  line5 is     He3exp: waveRelWidth angleVwidth angleHwidth usedRadius
-  line6 is data for these
-  line7 is efficiency: transportEff terr flipperEff ferr
-  line8 is data for these
+  Read in PBsetup info from cell def file
+  The files contain 1 line per cell used with the following data:
+  cellName	PorA	iDate	iTime	iUNIXtime	E(meV)	lambda	iPol
+  iPolErr	T(hr)	Terr(hr)	A(cm2)	nsL	nsLerr	trans	tErr
+  flip	fErr	tEmpty	tESlope	Pbar	Lcm	Diacm	rCRVcm	volcc	nsL0
+  nsL0err	nsLE	nsLEerr	resolName	Hmos'	Vmos'	dspA	Hcols'
+  Hcol2'	VcolsDeg	Vcol2Deg	omRad	Hsig^2	Vsig^2	Xsig^2
+  curvCor	angCor
 
-  NB startTimeString should be converted to startTimeSecs under UNIX with cmnd
+  NB that some of these values are recalc in this software. This is just a line
+  from the He3logger spreadsheet which keeps track of cells used during an
+  experiment.
+  Required fields are;
+  cellName PorA iDate iTime iUNIXtime E(meV)ORlambda iPol iPolErr T Terr
+  nsL nsLerr trans tErr flip fErr tEmpty
+
+
+
+  NB startTimeString should be converted to startTimeSecs UTC UNIX time
+  under UNIX with cmnd
   date --date="startTimeString" +%s
+  or otherwise calculated
 
   reader calculates nsL corrected and nsLerr putting them into PBsetup
-  so program input is 3 filenames  on cmnd line:
-  Pcellfile Acellfile DATAfile [flag1 [flag2]]
-  If there is a lambdaFlag(L) the init and final Energies are wavelengths in
-  Angstroms instead of the default meV
+
   There may also be a flag indicating that counts were obtained using
   a normalizing monitor place after the polarizer cell.
   This is not very good since such a monitor will also count lambda/2.
@@ -1136,119 +1460,150 @@ static int SIMpolmonitorCorrectPG(PBdatapt *d, He3CELLexp *pol)
 */
 
 
+/*
+  PBdefineCells reads file for the cell definitions used during an experiment
+  These are stored in global expcells ordered by install time so that for
+  any dataPt the correct cells to use can be found.
+*/
 
-
-static int PBdefineCell(char *filename, He3CELLexp *cellexp, efficiency *eff)
+static int PBdefineCells(char *filename)
 {
-  int i, nscan ;
+  int i, j, nscan ;
   double cellfac ;
   FILE *fp ;
-  char buf[512] ;
+  char *cp ;
+  char buf[2048] ;
+  char PorA[4] ;
+  char date[32] ;
+  char time[32] ;
+  char resName[64] ;
+
+  double curvCor, Energy, lambda, beamArea, Pbar, volcc, nsL0, nsL0err ;
+  double nsLE, nsLEerr, Hmos, Vmos, dspA, Hcols, Hcol2, VcolsDeg, Vcol2Deg ;
+  double omRad, hsigsq, vsigsq ;
 
   He3CELL *cell ;
   He3CELLpol *pol ;
   expResol *exper ;
+  efficiency *eff ;
+
+  He3CELLexp swap ;
 
   if( (fp = fopen(filename, "r")) == NULL ) {
-    printf("failed to open %s\n", filename) ;
+    if( *DBG ) printf("failed to open %s\n", filename) ;
     return 1 ;
   }
-  for( i=0 ; i<4 ; i++ ) {
-    if( (fgets(buf, 511, fp)) == NULL ) {
-      printf("failed to read from %s\n", filename) ;
-      fclose(fp) ;
-      return 2 ;
-    }
-    if( (fgets(buf, 511, fp)) == NULL ) {
-      printf("failed to read from %s\n", filename) ;
-      fclose(fp) ;
-      return 2 ;
-    }
-    if( i == 0 ) {
-      cell = &(cellexp->cell) ;
-      if( sscanf(buf,"%s %lf %lf %lf %lf %lf %lf %lf",
-		 cell->name,&(cell->tEmpty),&(cell->tEmptySlope),
-		 &(cell->L),&(cell->D),&(cell->R),
-		 &(cell->nsL0),&(cell->nsL0err)) < 8 ) {
-	printf("failed to read cell data from %s\n", filename) ;
-	fclose(fp) ;
-	return 3 ;
-      }
-    } else if( i == 1 ) {
-      pol = &(cellexp->pol) ;
-      nscan = sscanf(buf,"%lf %lf %lf %lf %lf %ul",
-		     &(pol->PHe),&(pol->PHeErr),&(pol->hrsBeam),
-		     &(pol->T),&(pol->Terr),&(pol->startSecs)) ;
-      if( nscan < 6 ) {
-	if( nscan < 5 ) printf("failed to read cell data from %s\n", filename) ;
-	else printf("failed to read CELL startSecs from %s\n", filename) ;
-	fclose(fp) ;
-	return 3 ;
-      }
-      /*
-	convert the startDate to seconds since Jan 1 1971
-	replace - with space and pass the string to system call
-	date --date="startDate" +%s
-	to return the time in seconds
-	This date command syntax is probably Unix specific
-	NB unsigned long max value is about 4294967295
-	Jan 1 2008 is                       1199163600
-	difference is                       3095803695
-	so run out of data space in about 100 years
-	ICE may add fraction of second to the time stamp but
-	the ul format will strip that fraction.
-      */
-    } else if( i == 2 ) {
-      exper = &(cellexp->res) ;
-      if( sscanf(buf,"%lf %lf %lf %lf",
-		 &(exper->waveRelWidth),
-		 &(exper->angleVwidth),&(exper->angleHwidth),
-		 &(exper->usedRadius)) < 4 ) {
-	printf("failed to read cell data from %s\n", filename) ;
-	fclose(fp) ;
-	return 3 ;
-      }
-    } else if( i == 3 ) {
-      if( sscanf(buf,"%lf %lf %lf %lf",
-		 &(eff->teff),&(eff->terr),
-		 &(eff->feff),&(eff->ferr)) < 4 ) {
-	printf("failed to read cell data from %s\n", filename) ;
-	fclose(fp) ;
-	return 3 ;
+
+  /* init the number of cells defined to zero */
+  Ncells = 0 ;
+
+
+  while( (fgets(buf, 2047, fp)) != NULL ) {
+    if( buf[0] == 'c' && buf[1] == 'e' && buf[2] == 'l' ) continue ;
+
+    cell = &(expcells[Ncells].cell) ;
+    pol = &(expcells[Ncells].pol) ;
+    exper = &(expcells[Ncells].res) ;
+    eff = &(expcells[Ncells].eff) ;
+
+    curvCor = 1. ;
+    exper->angcor = 1. ;
+    exper->t1 = exper->t2 = 0. ;
+    exper->hsigsq = exper->vsigsq = exper->xsigsq = 0. ;
+    cell->tEmptySlope = 0. ;
+
+    /*
+      sscanf is choking on a tab delimiter after the %ul read of startSecs
+      I think, so change all tabs to space
+      NOT SO maybe its the ul format should be lu
+    */
+    /* while( (cp = strchr(buf, '\t')) ) *cp = ' ' ; */
+
+    nscan = sscanf(buf,"%s %s %s %s %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %s %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		   cell->name,PorA,date,time,
+		   &(pol->startSecs),
+		   &Energy,&lambda,&(pol->PHe),&(pol->PHeErr),
+		   &(pol->T),&(pol->Terr),
+		   &beamArea,
+		   &(cell->nsL),&(cell->nsLerr),
+		   &(eff->teff),&(eff->terr),&(eff->feff),&(eff->ferr),
+		   &(cell->tEmpty),&(cell->tEmptySlope),
+		   &Pbar,&(cell->L),&(cell->D),&(cell->R),
+		   &volcc,&nsL0,&nsL0err,&nsLE,&nsLEerr,
+		   resName,&Hmos,&Vmos,&dspA,&Hcols,&Hcol2,&VcolsDeg,&Vcol2Deg,
+		   &omRad,
+		   &(exper->hsigsq),&(exper->vsigsq),&(exper->xsigsq),
+		   &curvCor,&(exper->angcor)) ;
+
+
+    if( nscan < 19 && *DBG )
+      printf("failed read complete cell data %d from %s\n", Ncells,filename) ;
+
+
+    /*
+      convert the startDate to seconds since Jan 1 1971
+      replace - with space and pass the string to system call
+      date --date="startDate" +%s
+      to return the time in seconds
+      This date command syntax is probably Unix specific
+      NB unsigned long max value is about 4294967295
+      Jan 1 2008 is                       1199163600
+      difference is                       3095803695
+      so run out of data space in about 100 years
+      ICE may add fraction of second to the time stamp but
+      the lu format will strip that fraction.
+    */
+
+    /*
+      nsL already has been corrected for cell curvature in spreadsheet
+      but need to compute t1 and t2 coefs for correction coef
+    */
+
+    if( PorA[0] == 'P' ) expcells[Ncells].PorA = 0 ;
+    else expcells[Ncells].PorA = 1 ;
+
+    exper->t1 = -0.5*exper->angcor*(hsigsq + vsigsq) ;
+    exper->t2 =  0.5*exper->xsigsq ;
+
+    Ncells++ ;
+    if( Ncells >= MAXCELLS && *DBG )
+      printf("read maximum number of experiment cells = %d\n", MAXCELLS) ;
+
+  }
+  fclose(fp) ;
+
+  /*
+    order the cells by install UNIXtime
+  */
+
+  for( i=0 ; i<Ncells-1 ; i++ ) {
+    for( j=i ; j<Ncells ; j++ ) {
+      if( expcells[j].pol.startSecs < expcells[i].pol.startSecs ) {
+	swap = expcells[j] ;
+	expcells[j] = expcells[i] ;
+	expcells[i] = swap ;
       }
     }
   }
-  fclose(fp) ;
-  /* compute curvature corrected nsL and nsLerr */
-  cellfac = 1. ;
-  if( cell->R > 0. && cell->L > 0. )
-    cellfac *= (1. - exper->usedRadius*exper->usedRadius/cell->R/cell->L) ;
-  cell->nsL = cellfac*cell->nsL0 ;
-  cell->nsLerr = cellfac*cell->nsL0err ;
+
   return 0 ;
 }
-static int PBdefinePolarizer(char *filename)
-{
-  return PBdefineCell(filename, &(s.P), &(s.eP)) ;
-}
-static int PBdefineAnalyzer(char *filename)
-{
-  return PBdefineCell(filename, &(s.A), &(s.eA)) ;
-}
+
 
 
 
 static int PBsetflags(PBflags *flgs)
 {
   /* set the global flag structure from the called one */
+  if( flgs->MonoSelect >= NmonoCorFunc ) flgs->MonoSelect = 0 ;
   flags = *flgs ;
   return 0 ;
 }
 
 
 /*
-  PBsim assumes Pcell and Acell data have already been read into
-  global by using PBcorrectData(Pcell, Acell, ...)
+  PBsim assumes all cells data have already been read into
+  global by using PBcorrectData(cellFile, ...)
 
   PBsim first reads EI EF and cross-section values from filename
   then calculates SIM count-rates.
@@ -1272,7 +1627,7 @@ int PBsim(char *filename)
   double hrsecs, HrStep ;
   double EI, EF, EIstart, EIstep, EFstart, EFstep ;
 
-  unsigned long ulhrs ;
+  unsigned long ulhrs, ulsecs ;
   FILE *fp, *fpout, *fpcorrect ;
 
   if( filename == NULL ) return 1 ;
@@ -1323,8 +1678,8 @@ int PBsim(char *filename)
 	return 3 ;
       }
     } else if( n == 1 ) {
-      if( sscanf(buf,"%s %lf", labl, &HrStep) < 2 ) {
-	printf("failed to read HrStep from %s\n", filename);
+      if( sscanf(buf,"%s %lu %lf", labl, &ulsecs, &HrStep) < 3 ) {
+	printf("failed to read startSecs HrStep from %s\n", filename);
 	fclose(fp) ;
 	return 3 ;
       }
@@ -1386,10 +1741,11 @@ int PBsim(char *filename)
     hrsecs = n*HrStep*3600. ;
     ulhrs = hrsecs ;
     for( i=0 ; i< 4 ; i++ ) {
-      d.sec[i] = s.P.pol.startSecs + ulhrs ;
+      d.sec[i] = ulsecs + ulhrs ;
     }
 
-    if( (ierr = PBcoef(&d, &s)) > 0 ) {
+    /* here just use PBcoef to get the equation coefs, any mon cor irrelevant */
+    if( (ierr = PBcoef(&d)) > 0 ) {
       printf("error in PBcoef = %d for point index= %d\n", ierr, i) ;
       fclose(fp) ;
       fclose(fpout) ;
@@ -1404,11 +1760,17 @@ int PBsim(char *filename)
       }
       d.Y[j] *= fabs(flags.SimFlux) ; /* put the factor of 1/2 into coefs */
       d.Yesq[j] = d.Y[j] ;
+
+
       err[j] = 1. ;
       if( d.Yesq[j] > 0 ) err[j] = sqrt(d.Yesq[j]) ;
       if( flags.SimDeviate ) d.Y[j] = poisson(0, d.Y[j], err[j], &dval, d1, d2) ;
-      if( flags.MonitorCorrect ) SIMmonitorCorrectPG(&d) ;
-      else if( flags.PolMonitorCorrect ) SIMpolmonitorCorrectPG(&d, &(s.P)) ;
+      d.Yr[j] = d.Y[j] ;
+      d.Yresq[j] = d.Yesq[j] ;
+
+      /* do the reverse monitor correction */
+      if( flags.MonitorCorrect ) SIMmonitorCorrect(&d) ;
+      else if( flags.PolMonitorCorrect ) SIMpolmonitorCorrect(&d) ;
     }
 
     fprintf(fpout, "%9g %9g  ", EI,EF) ;
@@ -1454,10 +1816,10 @@ int PBsim(char *filename)
     hrsecs = i*HrStep*3600. ;
     ulhrs = hrsecs ;
     for( j=0 ; j< 4 ; j++ ) {
-      d.sec[j] = s.P.pol.startSecs + ulhrs ;
+      d.sec[j] = ulsecs + ulhrs ;
     }
 
-    if( (ierr = PBcoef(&d, &s)) > 0 ) {
+    if( (ierr = PBcoef(&d)) > 0 ) {
       printf("error in PBcoef = %d for point index= %d\n", ierr, i) ;
       fclose(fpout) ;
       return 4 ;
@@ -1474,8 +1836,11 @@ int PBsim(char *filename)
       err[j] = 1. ;
       if( d.Yesq[j] > 0 ) err[j] = sqrt(d.Yesq[j]) ;
       if( flags.SimDeviate ) d.Y[j] = poisson(0, d.Y[j], err[j], &dval, d1, d2) ;
-      if( flags.MonitorCorrect ) SIMmonitorCorrectPG(&d) ;
-      else if( flags.PolMonitorCorrect ) SIMpolmonitorCorrectPG(&d, &(s.P)) ;
+      d.Yr[j] = d.Y[j] ;
+      d.Yresq[j] = d.Yesq[j] ;
+
+      if( flags.MonitorCorrect ) SIMmonitorCorrect(&d) ;
+      else if( flags.PolMonitorCorrect ) SIMpolmonitorCorrect(&d) ;
     }
 
     fprintf(fpout, "%9g %9g  ", EI,EF) ;
@@ -1635,7 +2000,7 @@ int PBreadflags(char *filename)
 {
   /*
     process cmnds from filename to update the global flags
-    R = reset to default flags
+    I = reset to default flags
     C index  dpp dmm dpm dmp    Sindex = 0 + dpp*Spp + dmm*Smm + dpm*Spm + dmp*Smp
        NB the Sxx corresponding to Sindex is assumed to have dxx=0
        constrain a cross-section
@@ -1645,12 +2010,14 @@ int PBreadflags(char *filename)
     C -index
     A Cindex1 Cindex2    add two Counts equations
     B Cindex1 Cindex2    add two other Counts equations
-    D Cindex1 Cindex2 ...  delete Count equations         deflt all equations enable
-    D -Cindex1 ...  to undelete Count equations
+    E Cindex1 Cindex2 ...  delete Count equations         deflt all equations enable
+    E -Cindex1 ...  to undelete Count equations
     M intflag   flag for monitorCorrection                deflt OFF
     P intflag   flag for monitorafterPolarizerCorrection  deflt OFF
+    S intflag   flag for selecting a monochromatorFunction used in monitorCorrect
+    D debug flag
     F int       set simFlux        deflt 100000
-    E int       flag sim deviates  deflt OFF
+    R int       flag sim deviates  deflt OFF
   */
 
   int k, nr, si, ic[4] ;
@@ -1719,7 +2086,7 @@ int PBreadflags(char *filename)
       flags.CountsAdd2[ic[0]-1] = 1 ;
       flags.CountsAdd2[ic[1]-1] = 1 ;
       
-    } else if( buf[0] == 'D' || buf[0] == 'd' ) {
+    } else if( buf[0] == 'E' || buf[0] == 'e' ) {
       if( (nr = sscanf(buf+1,"%d %d %d", ic, ic+1, ic+2)) < 1 ) continue;
       for( k=0 ; k<nr ; k++ ) {
 	if( abs(ic[k]) < 1 || abs(ic[k]) > 4 ) {
@@ -1739,14 +2106,20 @@ int PBreadflags(char *filename)
       if( (nr = sscanf(buf+1,"%d", ic)) < 1 ) continue;	
       if( ic[0] ) flags.PolMonitorCorrect = 1 ;
       else flags.PolMonitorCorrect = 0 ;
+    } else if( buf[0] == 'S' || buf[0] == 's' ) {
+      if( (nr = sscanf(buf+1,"%d", ic)) < 1 ) continue;	
+      if( ic[0] < NmonoCorFunc && ic[0] >= 0 ) flags.MonoSelect = ic[0] ;
     } else if( buf[0] == 'D' || buf[0] == 'd' ) {
       if( (nr = sscanf(buf+1,"%d", ic)) < 1 ) continue;	
-      if( ic[0] ) flags.Debug = 1 ;
+      if( ic[0] ) flags.Debug = abs(ic[0]) ;
       else flags.Debug = 0 ;
+    } else if( buf[0] == 'I' || buf[0] == 'i' ) {
+      if( (nr = sscanf(buf+1,"%d", ic)) < 1 ) continue;	
+      if( ic[0] ) flags = defltflags ;
     } else if( buf[0] == 'F' || buf[0] == 'f' ) {
       if( (nr = sscanf(buf+1,"%d", ic)) < 1 ) continue;	
       if( ic[0] > 0 ) flags.SimFlux = ic[0] ;
-    } else if( buf[0] == 'E' || buf[0] == 'e' ) {
+    } else if( buf[0] == 'R' || buf[0] == 'r' ) {
       if( (nr = sscanf(buf+1,"%d", ic)) < 1 ) continue;	
       if( ic[0] ) flags.SimDeviate = 1 ;
       else flags.SimDeviate = 0 ;
@@ -1754,5 +2127,197 @@ int PBreadflags(char *filename)
   }
   
   fclose(fp) ;
+  return 0 ;
+}
+
+int PBreaddata(char *filename)
+{
+
+  /*
+    functionally similar to PBcorrectData but reads from file
+    instead of passed data structures
+    and reads control flags etc from file.CTRL
+
+    read lines
+    Ei Ef Cpp tpp Cmm tmm Cpm tmm Cpm tpm Cmp tmp CppErr CmmErr CpmErr CmpErr
+    from file and
+    automatically disable any missing counts and constrain the
+    corresponding CS to zero.
+    Then call PBcorrectDatapt
+  */
+
+  PBdatapt d ;
+
+  static char Cstrs[4][4] = {"Cpp","Cmm","Cpm","Cmp"} ;
+  static char Sstrs[4][4] = {"Spp","Smm","Spm","Smp"} ;
+
+  int i, ierr, j, k, n, is, ic, nw ;
+  char *cp ;
+  char buf[512], labl[64] ;
+  char outfile[512] ;
+  double S[4] ;
+  double dbl ;
+  double iout, fout, err ;
+  double hrsecs, HrStep ;
+  double EI, EF, EIstart, EIstep, EFstart, EFstep ;
+
+  unsigned long ulhrs ;
+  FILE *fp, *fpout, *fpcorrect ;
+
+
+  if( filename == NULL ) return 1 ;
+
+  flags = defltflags ;
+
+  strcpy(outfile, filename) ;
+  strcat(outfile, ".CTRL") ;
+  ierr = PBreadflags(outfile) ;
+  if( ierr == 1 ) {
+    printf("NO .CTRL file\n") ;
+  } else if( ierr > 1 ) {
+    printf("ERROR in PBreadflags = %d\n", ierr) ;
+    return 2 ;
+  }
+
+  /* make sure flags are applied to constraints */
+  constraintTOeqs() ;
+
+  if( (fp = fopen(filename, "r")) == NULL ) {
+    printf("failed to open %s\n", filename) ;
+    return 2 ;
+  }
+  strcpy(outfile, filename) ;
+  strcat(outfile, ".out") ;
+  if( (fpout = fopen(outfile, "w")) == NULL ) {
+    printf("failed to open %s\n", outfile) ;
+    return 2 ;
+  }
+  fprintf(fpout,"# ") ;
+  for( j=0 ; j<4 ; j++ ) {
+    if( flags.Sconstrain[j] ) continue ;
+    fprintf(fpout, "%6s       %3sERR    ", Sstrs[j],Sstrs[j]) ;
+  }
+  fprintf(fpout,"     NSFflipRatio\n") ;
+
+  n = 0 ;
+
+  while( fgets(buf, 511, fp) ) {
+    /* find up to 14 words in buf and try to read each as double */
+    cp = buf ;
+    if( *cp == '#' ) continue ;
+    nw = 0 ;
+
+    while(nw < 14 && *cp != '\n' && *cp != '\0') {
+      /* skip white space */
+      while( *cp == ' ' || *cp == '\t' ) cp++ ;
+      /* break if end of line */
+      if( *cp == '\n' || *cp == '\0' ) break ;
+      /* try to scan this word as a double */
+
+
+      if( sscanf(cp, "%lf", &dbl)<1 ) {
+	if( nw < 2 ) {
+	  printf("failed to read lambdaI or lambdaF at data pt # %d\n",n+1) ;
+	  fclose(fp) ; fclose(fpout) ;
+	  return 3 ;
+	} else if( nw < 10 ) {
+	  if( flags.CountsEnable[nw/2 - 1] ) {
+	    printf("failed to read required counts %d\n",nw/2-1) ;
+	    fclose(fp) ; fclose(fpout) ;
+	    return 4 ;
+	  }
+	} else {
+	  d.Yresq[nw-10] = d.Yesq[nw-10] = d.Y[nw-10] ;
+	}
+      } else {
+	if( dbl <= 0. ) {
+	  printf("read negative value\n") ;
+	  fclose(fp) ; fclose(fpout) ;
+	  return 4 ;
+	}
+	if( nw < 2 ) {
+	  dbl /= Dn ;
+	  dbl = TWOPI/sqrt(dbl) ;
+	}
+	if( nw == 0 ) {
+	  EI = dbl ;
+	  d.lambI = dbl ;
+	} else if( nw == 1 ) {
+	  EF = dbl ;
+	  d.lambF = dbl ;
+	} else if( nw < 10 && nw%2 == 0 ) {
+	  d.Y[nw/2-1] = d.Yr[nw/2-1] = dbl ;
+	  d.Yesq[nw/2-1] = d.Yresq[nw/2-1] = dbl ;
+	} else if( nw < 10 && sscanf(cp, "%lu",&(d.sec[nw/2-1])) < 1 ) {
+	  printf("failed to read time stamp as unsigned long pt # %d\n",n+1);
+	  fclose(fp) ; fclose(fpout) ;
+	  return 3 ;
+	} else if( nw >= 10 && nw < 14 ) {
+	  d.Yesq[nw-10] = d.Yresq[nw-10] = dbl ;
+	}
+      }
+      /* go to just past this word */
+      while( *cp != ' ' && *cp != '\t' && *cp != '\n' && *cp != '\0' ) cp++ ;
+      nw++ ;
+      if( *cp == '\n' || *cp == '\0' ) break ;
+    }
+
+
+    /*
+      if( flags.MonitorCorrect ) {
+      monitorCorrect(&d) ;
+      } else if ( flags.PolMonitorCorrect ) {
+      polmonitorCorrect(&d);
+      }
+
+      monitor corrections now in PBcoef
+    */
+
+    if( (ierr = PBcorrectDatapt(&d)) ) {
+      if( *DBG ) printf("ERROR in PBcorrectDatapt = %d\n",ierr) ;
+    }
+
+    /* write the output */
+
+    for( j=0 ; j<d.Nfree ; j++ ) {
+      is = d.freeS[j] ;
+      err = 0. ;
+      if( d.Sesq[is] > 0. ) err = sqrt(d.Sesq[is]) ;
+      fprintf(fpout,"%10g %10g  ",d.S[is],err) ;
+    }
+    fprintf(fpout,"    %10g\n",d.R) ;
+
+    if( *DBG > 1 ) {
+      /* print the equations and soln for this datapt */
+      if( d.Nfree == d.Nactive ) {
+	for( j=0 ; j<d.Nactive ; j++ ) {
+	  ic = d.activeEq[j] ;
+	  err = 0. ;
+	  if( d.Yesq[ic] > 0. ) err = sqrt(d.Yesq[ic]) ;
+	  printf("%3s(%10g %10g) = ",Cstrs[ic],d.Y[ic],err);
+	  for( k=0 ; k<d.Nfree ; k++ ) {
+	    is = d.freeS[k] ;
+	    err = 0. ;
+	    if( d.Cesq[ic][is] > 0. ) err = sqrt(d.Cesq[ic][is]) ;
+	    if( k > 0 ) printf(" + ") ;
+	    printf("(%10g %10g)*%3s",d.C[ic][is],err,Sstrs[is]) ;
+	  }
+	  is = d.freeS[j] ;
+	  err = 0. ;
+	  if( d.Sesq[is] > 0. ) err = sqrt(d.Sesq[is]) ;
+	  printf("   %s(%10g %10g)\n",Sstrs[is],d.S[is],err) ;
+	}
+      } else {
+	printf("Nfree NOT equal Nactive\n") ;
+      }
+    }
+
+    n++ ;
+  }
+
+  if( *DBG ) printf("%d data points read and corrected\n",n) ;
+  fclose(fp) ;
+
+
   return 0 ;
 }

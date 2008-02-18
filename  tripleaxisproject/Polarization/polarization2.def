@@ -1,6 +1,7 @@
 EXPORTS
     Dn @1 DATA
     PBcorrectData @2
-    PBreadflags @3
-    PBsim @4
-    TWOPI @5 DATA
+    PBreaddata @3
+    PBreadflags @4
+    PBsim @5
+    TWOPI @6 DATA
