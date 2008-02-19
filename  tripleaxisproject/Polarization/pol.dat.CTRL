@@ -1,0 +1,11 @@
+# constrain Spp and Smm to zero
+C 1 0 0 0 0
+C 2 0 0 0 0
+# remove equations 1 2 for Cpp and Cmm
+E 1 2
+# turn on debug level 2
+D 2
+# select 2cm PG filter incident
+S 1
+# use following to turn on monitor correction after polarizer
+P 1
