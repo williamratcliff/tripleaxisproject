@@ -1,5 +1,5 @@
 import numpy as N
-import pylab
+#import pylab
 import math
 import readncnr2 as readncnr
 import writebt7
@@ -244,10 +244,10 @@ class polarization_correct:
                 if key=='pm':
                     mytemp_pm=self.timestamp[key].astype('uint32')
                     pbinput.tpm=mytemp_pm.ctypes.data_as(c_ulong_p)
-                    print 't0 ',mytemp_pm[0]
+                    #print 't0 ',mytemp_pm[0]
                     pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
                     pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
-                    print 'shape ',self.counts[key].shape
+                    #print 'shape ',self.counts[key].shape
                 if key=='mp':
                     mytemp_mp=self.timestamp[key].astype('uint32')
                     pbinput.tmp=mytemp_mp.ctypes.data_as(c_ulong_p)
@@ -297,7 +297,7 @@ class polarization_correct:
                     pbinput.Emp=dummyEmp.ctypes.data_as(c_double_p)
                
             
-        print 'mylength ',self.length
+        #print 'mylength ',self.length
         Spp=N.empty((1,self.length),'float64')
         Smm=N.empty((1,self.length),'float64')
         Spm=N.empty((1,self.length),'float64')
@@ -325,7 +325,7 @@ class polarization_correct:
         fPolMonitorCorrect=0
         if self.mydata[key].metadata['count_info']['count_type']=='monitor':
             fPolMonitorCorrect=1
-            print 'monitor'
+            #print 'monitor'
         fDebug=0
         fSimFlux=0
         fSimDeviate=0
@@ -446,28 +446,23 @@ def readscript(myfilestr):
             corrected_counts=mypolcor.correct()
             mypolcor.savefiles()
             print 'corrected'
-            if 1:
+            if 0:
                 key='pm'
-                pylab.subplot(2,2,1+mycount)
-                pylab.title(key)
+                #pylab.subplot(2,2,1+mycount)
+                #pylab.title(key)
                 mydatac=mypolcor.mydata
-                pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
-                    marker='s',mfc='blue',linestyle='None')
+                #pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
+                #    marker='s',mfc='blue',linestyle='None')
                 #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Spm'],corrected_counts['Epm'], marker='s',mfc='red',linestyle='None')
-                print 'pm'
-                print corrected_counts['Spm']
-                #print mydatac[key].data['detector']
-                #print mypolcor.mydata[key].data['hsample']
+                #print 'pm'
+                #print corrected_counts['Spm']
                 key='mp'
-                pylab.subplot(2,2,2+mycount)
-                pylab.title(key)
-                print 'mp'
-                print corrected_counts['Smp']
-                #print mydatac[key].data['detector']
-                #print mypolcor.mydata[key].data['hsample']
-                #print mypolcor.mydata[key].metadata['reference']
-                pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
-                    marker='s',mfc='blue',linestyle='None')
+                #pylab.subplot(2,2,2+mycount)
+                #pylab.title(key)
+                #print 'mp'
+                #print corrected_counts['Smp']
+                #pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
+                #    marker='s',mfc='blue',linestyle='None')
                 #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Smp'],corrected_counts['Emp'], marker='s',mfc='red',linestyle='None')
                 mycount=mycount+2
             inblock=False
@@ -517,8 +512,7 @@ if __name__=="__main__":
         print '#absolute on a line tells me that you will use absolute paths for files'
         print 'if you do not specify a path, it will default to the current working directory'
         print '#directory directory_name tells me that you will use directory_name for your files'
-        print '#Acell cell_file name gives me the name of the cell file for the analyzer'
-        print '#Pcell cell_file name gives me the name of the cell file for the polarizer'
+        print '#cell cell_file name gives me the name of the cell file'
         print '#begin tells me that you are about to give a list of files that should be grouped together for reduction'
         print 'within this block, you can use pm=filename on a single line'
         print 'the valid channels are pp,pm,mp,mm  with polarizer in being denoted by p and out denoted by m--given in stream order'
@@ -529,42 +523,5 @@ if __name__=="__main__":
         readscript(myscriptstr)
     else:
         print 'The file you called me with (%s) does not exist'%(myscriptstr,)
-    pylab.show()
+    #pylab.show()
     exit()
-    files={}
-    #files['on_on']=myfilestr_on_on
-    files['pm']=myfilestr_on_off
-    files['mp']=myfilestr_off_on
-    #files['off_off']=myfilestr_off_off    
-    mypolcor=polarization_correct(files)
-    outstr=r'c:\Polarization\pol2.txt'
-    mypolcor.output(outstr)
-    corrected_counts=mypolcor.correct()
-    mypolcor.savefiles()
-    #check result
-    mydatac={}
-    for key,myfilestr in files.iteritems():
-        mydatareader=readncnr.datareader()
-        mydatac[key]=mydatareader.readbuffer(myfilestr+'.out')
-    
-    key='pm'
-    pylab.subplot(1,2,1)
-    pylab.title(key)
-    pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],mydatac[key].data['detector_errs_corrected'],
-                    marker='s',mfc='blue',linestyle='None')     
-    pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector_corrected'],N.sqrt(mydatac[key].data['detector']),
-                    marker='s',mfc='red',linestyle='None')     
-    print 'pm'
-    #print mypolcor.mydata[key].data['hsample']    
-    key='mp'
-    pylab.subplot(1,2,2)
-    pylab.title(key)
-    print 'mp'
-    #print mypolcor.mydata[key].data['hsample']
-    print mypolcor.mydata[key].metadata['reference']
-    pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],mydatac[key].data['detector_errs_corrected'],
-                    marker='s',mfc='blue',linestyle='None')     
-    pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector_corrected'],N.sqrt(mydatac[key].data['detector']),
-                    marker='s',mfc='red',linestyle='None')     
-    
-    pylab.show()

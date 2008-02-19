@@ -1,7 +1,8 @@
 import numpy as N
-import pylab
+#import pylab
 import datetime
-import mx.DateTime
+from time import mktime
+#import mx.DateTime
 import writebt7
 import re
 
@@ -487,7 +488,10 @@ class datareader:
             elif tokenized[0].lower()=="#Epoch".lower(): 
                 #timeobj=date.datatetime(year,month,day,hour,minute,second)
                 Epoch=float(tokenized[1])
-                timeobj=mx.DateTime.DateTimeFromTicks(ticks=Epoch)
+                #timeobj=mx.DateTime.DateTimeFromTicks(ticks=Epoch) #what I originally used
+                timeobj=datetime.datetime.fromtimestamp(Epoch)
+                #print 'timeobj ',timeobj
+                #print 'Epoch ', Epoch
                 self.metadata['timestamp']['epoch']=Epoch#timeobj
                 #print self.metadata['timestamp']
             elif tokenized[0].lower()=="#InstrName".lower():
@@ -593,8 +597,11 @@ class datareader:
                             field=self.columnlist[i]
                             try:
                                 if field.lower()=='time':
-                                    timedelta=mx.DateTime.DateTimeDelta(0,0,0,float(tokenized[i]))
-                                    self.columndict['timestamp'].append((timeobj+timedelta).ticks())
+                                    #timedelta=mx.DateTime.DateTimeDelta(0,0,0,float(tokenized[i])) #orig
+                                    #self.columndict['timestamp'].append((timeobj+timedelta).ticks()) #orig
+                                    timedelta=datetime.timedelta(seconds=float(tokenized[i]))
+                                    self.columndict['timestamp'].append(mktime((timeobj+timedelta).timetuple()))
+                                    timeobj=timeobj+timedelta
                                 self.columndict[field].append(float(tokenized[i]))
                             except ValueError:
                                 self.columndict[field].append((tokenized[i]))
@@ -767,6 +774,7 @@ if __name__=='__main__':
         myoutfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7.out'
         #mywriter=writebt7.datawriter()
         #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
+        print mydata.data['timestamp']
         print 'done'          
         #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
         #print N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])
