@@ -323,7 +323,7 @@ class polarization_correct:
 
         fMonitorCorrect=0
         fPolMonitorCorrect=0
-        if self.mydata[key].metadata['count_info']['count_type'][1]=='monitor':
+        if self.mydata[key].metadata['count_info']['count_type']=='monitor':
             fPolMonitorCorrect=1
             print 'monitor'
         fDebug=0
@@ -349,6 +349,9 @@ class polarization_correct:
  
         pbflags.MonitorCorrect=0#fMonitorCorrect
         pbflags.PolMonitorCorrect=fPolMonitorCorrect
+        #print 'count type ',self.mydata[key].metadata['count_info']['count_type']
+        #print fPolMonitorCorrect
+        pbflags.MonoSelect=1
         pbflags.Debug=0#fDebug
         pbflags.SimFlux=0#fSimFlux
         pbflags.SimDeviate=0#fSimDeviate
@@ -450,20 +453,22 @@ def readscript(myfilestr):
                 mydatac=mypolcor.mydata
                 pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
                     marker='s',mfc='blue',linestyle='None')
-                #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Spm'],corrected_counts['Epm'],
-                #                marker='s',mfc='red',linestyle='None')
+                #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Spm'],corrected_counts['Epm'], marker='s',mfc='red',linestyle='None')
                 print 'pm'
+                print corrected_counts['Spm']
+                #print mydatac[key].data['detector']
                 #print mypolcor.mydata[key].data['hsample']
                 key='mp'
                 pylab.subplot(2,2,2+mycount)
                 pylab.title(key)
                 print 'mp'
+                print corrected_counts['Smp']
+                #print mydatac[key].data['detector']
                 #print mypolcor.mydata[key].data['hsample']
                 #print mypolcor.mydata[key].metadata['reference']
                 pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
                     marker='s',mfc='blue',linestyle='None')
-                pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Smp'],corrected_counts['Emp'],
-                                marker='s',mfc='red',linestyle='None')
+                #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Smp'],corrected_counts['Emp'], marker='s',mfc='red',linestyle='None')
                 mycount=mycount+2
             inblock=False
         elif inblock==True:
