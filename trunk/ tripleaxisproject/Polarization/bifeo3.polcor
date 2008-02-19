@@ -1,5 +1,5 @@
 #absolute
-#cell c:\tripleaxisproject2\polarization\cells.txt
+#cell c:\mytripleaxisproject\polarization\cells.txt
 #directory c:\bifeo3xtal\jan8_2008\9175\data
 #begin
 mp=fieldscanminusplusreset53631.bt7

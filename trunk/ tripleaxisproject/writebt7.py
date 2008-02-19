@@ -16,13 +16,13 @@ class datawriter:
             myoutfile.write(s)
         s='#Columns '
         for key in mydata.data.keys():
-            s=s+key+'\t'
+            s=s+key+' '
         s=s+'\n'
         myoutfile.write(s)
         s=''
         for i in range(len(mydata.data[key])):
             for ckey in mydata.data:
-                s=s+str(mydata.data[ckey][i])+'\t'
+                s=s+str(mydata.data[ckey][i])+' '
             s=s+'\n'
             myoutfile.write(s)
         myoutfile.close()
