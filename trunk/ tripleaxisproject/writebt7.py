@@ -10,10 +10,28 @@ class datawriter:
             mydata=self.mydata
         if myoutfilestr==None:
             myoutfilestr=self.myoutfilestr  
+        count=1
+        #mydata.additional_metadata['parsed_scandescription'] #TODO choose correct field based on this
+        for key in mydata.data.keys():
+            if key=='detector':
+                detectorpos=count
+                print 'detectorpos ',detectorpos
+            if key=='qx':
+                scanpos=count
+            count=count+1
         myoutfile=open(myoutfilestr,'wt')
         for i in range(len(mydata.header)):
             s=mydata.header[i]+'\n'
-            myoutfile.write(s)
+            tokenized=s.rstrip().lower().split()
+            if tokenized[0]=='#signal'.lower():
+                s='#signal'+' '+str(detectorpos)+' '+'detector\n'
+            if tokenized[0]=='#scan'.lower():
+                s='#scan'+' '+str(scanpos)+' '+'qx\n'
+
+
+                    
+                    
+            myoutfile.write(s.lower())
         s='#Columns '
         for key in mydata.data.keys():
             s=s+key+' '

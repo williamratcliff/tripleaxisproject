@@ -332,20 +332,20 @@ class polarization_correct:
         #-- ++ +- -+ #TODO Check with Ross on the order
 
 
-##        pbflags.MonitorCorrect=fMonitorCorrect
-##        pbflags.PolMonitorCorrect=fPolMonitorCorrect
-##        pbflags.Debug=fDebug
-##        pbflags.SimFlux=fSimFlux
-##        pbflags.SimDeviate=fSimDeviate
-##        pbflags.CountsEnable=fCountsEnable.ctypes.data_as(c_int_p)
-##        pbflags.CountsAdd1=fCountsAdd1.ctypes.data_as(c_int_p)
-##        pbflags.CountsAdd2=fCountsAdd2.ctypes.data_as(c_int_p)
-##        pbflags.Sconstrain=fSconstrain.ctypes.data_as(c_int_p)
-##        pbflags.Spp=fSpp.ctypes.data_as(c_double_p)
-##        pbflags.Smm=fSmm.ctypes.data_as(c_double_p)
-##        pbflags.Spm=fSpm.ctypes.data_as(c_double_p)
-##        pbflags.Smp=fSmp.ctypes.data_as(c_double_p)
-##        mypolcorrect.PBcorrectData(cellP,cellA,ctypes.byref(pbflags),self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
+        pbflags.MonitorCorrect=fMonitorCorrect
+        pbflags.PolMonitorCorrect=fPolMonitorCorrect
+        pbflags.Debug=fDebug
+        pbflags.SimFlux=fSimFlux
+        pbflags.SimDeviate=fSimDeviate
+        pbflags.CountsEnable=fCountsEnable.ctypes.data_as(c_int_p)
+        pbflags.CountsAdd1=fCountsAdd1.ctypes.data_as(c_int_p)
+        pbflags.CountsAdd2=fCountsAdd2.ctypes.data_as(c_int_p)
+        pbflags.Sconstrain=fSconstrain.ctypes.data_as(c_int_p)
+        pbflags.Spp=fSpp.ctypes.data_as(c_double_p)
+        pbflags.Smm=fSmm.ctypes.data_as(c_double_p)
+        pbflags.Spm=fSpm.ctypes.data_as(c_double_p)
+        pbflags.Smp=fSmp.ctypes.data_as(c_double_p)
+        mypolcorrect.PBcorrectData(cellP,cellA,ctypes.byref(pbflags),self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
  
         pbflags.MonitorCorrect=0#fMonitorCorrect
         pbflags.PolMonitorCorrect=fPolMonitorCorrect
