@@ -1,0 +1,4 @@
+#SharedLibrary('Pb.dll', ['Pb.c'])
+#SharedLibrary('polarization.dll', ['PBcoef.c','PBcorrect.c','polcorrectTest.c'])
+SharedLibrary('polarization2.so', ['libPB.c']) #good
+#SharedLibrary('mylong.dll', ['mylong.c']) #good

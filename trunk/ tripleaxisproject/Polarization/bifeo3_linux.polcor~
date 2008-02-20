@@ -1,0 +1,16 @@
+#absolute
+#cell /home/ylem/bifeo3xtal/9175/data/cells.txt
+#directory /home/ylem/bifeo3xtal/9175/data
+#CountsEnable 0 0 1 1
+#Sconstrain 1 1 0 0
+#begin
+mp=fieldscanminusplusreset53631.bt7
+pm=fieldscansplusminusreset53630.bt7
+#end
+#absolute
+#directory /home/ylem/bifeo3xtal/9175/data
+#begin
+#PolMonitorCorrect 1
+pm=fieldscansplusminus53566.bt7
+mp=fieldscanminusplus53567.bt7
+#end
