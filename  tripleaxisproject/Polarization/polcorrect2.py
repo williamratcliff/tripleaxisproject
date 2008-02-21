@@ -131,7 +131,7 @@ PBflags=cstruct.cstruct(('MonitorCorrect',N.intc),
 #int PBsim(char *filename) ;
 #int PBreadflags(char *filename) ;
 
-mypolcorrect = N.ctypeslib.load_library('polarization2.dll', '.')
+mypolcorrect = N.ctypeslib.load_library('polarization2.dll', 'c:\dist')
 
 
 
@@ -601,11 +601,11 @@ if __name__=="__main__":
         print 'within this block, you can use pm=filename on a single line'
         print 'the valid channels are pp,pm,mp,mm  with polarizer in being denoted by p and out denoted by m--given in stream order'
         print '#end tells me that the block is finished.  Do not forget this directive!'
-        exit()
+        sys.exit()
     myscriptstr=sys.argv[1]
     if os.path.isfile(myscriptstr):
         readscript(myscriptstr)
     else:
         print 'The file you called me with (%s) does not exist'%(myscriptstr,)
     #pylab.show()
-    exit()
+    sys.exit()
