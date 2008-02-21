@@ -131,9 +131,12 @@ PBflags=cstruct.cstruct(('MonitorCorrect',N.intc),
 #int PBsim(char *filename) ;
 #int PBreadflags(char *filename) ;
 
-mypolcorrect = N.ctypeslib.load_library('polarization2.dll', 'c:\dist')
-
-
+if sys.platform=='win32':
+    mypolcorrect = N.ctypeslib.load_library('polarization2.dll', 'c:\polcorrecter')
+elif sys.platform=='mac':
+    mypolcorrect = N.ctypeslib.load_library('libpolarization2.so', '.')
+else:
+    mypolcorrect = N.ctypeslib.load_library('libpolarization2.so', '.') #linux
 
 
 def autovectorized(f):

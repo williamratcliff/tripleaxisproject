@@ -1,4 +1,12 @@
+import sys
 #SharedLibrary('Pb.dll', ['Pb.c'])
 #SharedLibrary('polarization.dll', ['PBcoef.c','PBcorrect.c','polcorrectTest.c'])
-SharedLibrary('polarization2.so', ['libPB.c']) #good
+if sys.platform=='win32':
+	print 'building on windows'
+	SharedLibrary('polarization2.dll', ['libPB.c']) #good
+elif sys.playform=='mac':
+	print 'I do not know how to build on Macs yet'
+else:
+	print 'building on linux'
+	SharedLibrary('polarization2.so', ['libPB.c']) #good
 #SharedLibrary('mylong.dll', ['mylong.c']) #good
