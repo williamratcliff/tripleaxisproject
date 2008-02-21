@@ -1,5 +1,5 @@
 #absolute
-#cell c:\mytripleaxisproject\polarization\cells.txt
+#cell c:\tripleaxisproject2\polarization\cells.txt
 #directory c:\bifeo3xtal\jan8_2008\9175\data
 #CountsEnable 0 0 1 1
 #Sconstrain 1 1 0 0
