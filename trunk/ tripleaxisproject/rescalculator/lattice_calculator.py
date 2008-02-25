@@ -21,6 +21,9 @@ def autovectorized(f):
 def myradians(x):
     return math.radians(x)
 
+@autovectorized
+def mydegrees(x):
+    return math.degrees(x)
 #vecradians = N.vectorize(myradians, otypes=[double]) 
 
 def sign(x):
@@ -344,7 +347,73 @@ class lattice:
         L=qx*orienta[2]+qy*orientb[2]
         return H,K,L,E,Q,Ei,Ef
 
-       
+
+    def SpecGoTo(self,H,K,L,E,EXP):
+        """Calculate shaft angles given momentum transfer H, K, L, energy transfer E, and
+          spectrometer and smaple parameters in EXP."""
+
+        CONVERT2=2.072
+        #mono=[EXP['mono']]
+        taum=N.empty(H.shape,'float64')
+        taua=N.empty(H.shape,'float64')
+        infin=-1*N.ones((self.npts,1),'float64')
+        dir1=N.ones((self.npts,1),'float64')
+        dir2=N.ones((self.npts,1),'float64')
+        mondir=N.ones((self.npts,1),'float64')
+        efixed=N.empty((self.npts,1),'float64')
+        for ind in range(self.npts):
+            taum[ind]=self.instrument.get_tau(EXP[ind]['mono']['tau'])
+            taua[ind]=self.instrument.get_tau(EXP[ind]['ana']['tau'])
+            if ('infin' in EXP[ind]):
+                infin[ind]=EXP[ind]['infin']
+            if ('dir1' in EXP[ind]):
+                dir1[ind]=EXP[ind]['dir1']
+            if ('dir2' in EXP):
+                dir2[ind]=EXP[ind]['dir2']
+            if ('mondir' in EXP):
+                mondir[ind]=EXP[ind]['mondir']
+            efixed[ind]=EXP[ind]['efixed']
+
+        qx,qy,qz,Q=self.R2S(H,K,L)
+        dir=N.zeros((3,self.npts),'float64')
+        dir[0,:]=mondir
+        dir[1,:]=-dir[0,:]*dir1
+        dir[2,:]=-dir[1,:]*dir2
+
+        ei=efixed+E
+        ef=efixed
+        change=N.where(infin>0)
+        if N.size(change)!=0:
+            ef[change]=efixed[change]-E[change]
+            ei[change]=efixed[change]
+
+        ki = N.sqrt(ei/CONVERT2)
+        kf = N.sqrt(ef/CONVERT2)
+
+        M1=N.arcsin(taum/(2*ki))#.*sign(dir(1,:));
+        M2=2*M1
+        A1=N.arcsin(taua/(2*kf))#.*sign(dir(3,:));
+        A2=2*A1
+        S2=N.arccos((ki**2+kf**2-Q**2)/(2*ki*kf))#.*sign(dir(2,:));
+        delta=N.absolute(N.arccos( (Q**2+ki**2-kf**2)/(2*ki*Q)))
+        #psi=S1+delta-pi/2 #Angle from first orienting vector to to Q
+        psi=N.arctan2(qy,qx)
+        S1=psi-delta+pi/2
+##
+##        phi=atan2(-kf.*sin(S2), ki-kf.*cos(S2));
+##        psi=atan2(qy,qx);
+##        S1=-psi+phi;
+##
+##
+##        bad=find(ei<0 | ef<0 | abs(taum./(2.*ki))>1 | abs(taua./(2.*kf))>1 | abs ( (ki.^2+kf.^2-Q.^2)./(2*ki.*kf))>1);
+##        M1(bad)=NaN;
+##        M2(bad)=NaN;
+##        S1(bad)=NaN;
+##        S2(bad)=NaN;
+##        A1(bad)=NaN;
+##        A2(bad)=NaN;
+        return M1,M2,S1,S2,A1,A2
+
 class TestLattice(unittest.TestCase):
 
     def setUp(self):
@@ -445,9 +514,12 @@ if __name__=="__main__":
         print 'Q ',Q
         print 'Ei ',Ei
         print 'Ef ',Ef
-##        print 'M2 ',M2
-##        print 'A2 ',A2
-##        print 'S1 ',S1
-##        print 'S2 ',S2
+        M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H,K,L,E,setup)
+        print 'M2 ',mydegrees(M2)
+        print 'A2 ',mydegrees(A2)
+        print 'M1 ',mydegrees(M1)
+        print 'A1 ',mydegrees(A1)
+        print 'S1 ',mydegrees(S1)
+        print 'S2 ',mydegrees(S2)
 
 #    unittest.main()
