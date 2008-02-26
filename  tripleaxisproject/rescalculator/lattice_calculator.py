@@ -399,12 +399,7 @@ class lattice:
         #psi=S1+delta-pi/2 #Angle from first orienting vector to to Q
         psi=N.arctan2(qy,qx)
         S1=psi-delta+pi/2
-##
-##        phi=atan2(-kf.*sin(S2), ki-kf.*cos(S2));
-##        psi=atan2(qy,qx);
-##        S1=-psi+phi;
-##
-##
+        #TODO:  Add checks to make sure that the scattering triangle closed
 ##        bad=find(ei<0 | ef<0 | abs(taum./(2.*ki))>1 | abs(taua./(2.*kf))>1 | abs ( (ki.^2+kf.^2-Q.^2)./(2*ki.*kf))>1);
 ##        M1(bad)=NaN;
 ##        M2(bad)=NaN;
