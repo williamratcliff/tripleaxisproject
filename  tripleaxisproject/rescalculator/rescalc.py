@@ -773,6 +773,100 @@ class rescalculator:
             corrections['q_correction']=q_correction
         return corrections
 
+    def CalcWidths(self,H,K,L,W,EXP):
+        """Calculates the full width of Bragg Peaks"""
+        Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
+        center=N.round(H.shape[0]/2)
+        if center<1:
+             center=0
+        if center>H.shape[0]:
+             center=H.shape[0]
+        EXP=[EXP[center]]
+
+        [R0c,RMc]=self.ResMat(Q,W,EXP)
+        [R0,RMS]=self.ResMatS(H,K,L,W,EXP)
+        self.lattice_calculator.StandardSystem()
+        qx=self.lattice_calculator.scalar(self.lattice_calculator.x[0,:],self.lattice_calculator.x[1,:],self.lattice_calculator.x[2,:],H,K,L,'latticestar')
+        qy=self.lattice_calculator.scalar(self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],H,K,L,'latticestar')
+        qw=W;
+
+        #========================================================================================================
+        #find reciprocal-space directions of X and Y axes
+
+        o1=self.lattice_calculator.orient1 #EXP['orient1']
+        o2=self.lattice_calculator.orient2 #EXP['orient2']
+        pr=self.lattice_calculator.scalar(o2[0],o2[1],o2[2],self.lattice_calculator.y[0],self.lattice_calculator.y[1],self.lattice_calculator.y[2],'latticestar')
+        o2[0]=self.lattice_calculator.y[0]*pr
+        o2[1]=self.lattice_calculator.y[1]*pr
+        o2[2]=self.lattice_calculator.y[2]*pr
+
+        if N.abs(o2[0])<1e-5:
+             o2[0]=0.0
+        if N.absolute(o2[1])<1e-5:
+             o2[1]=0.0
+        if N.absolute(o2[2])<1e-5:
+             o2[2]=0.0
+
+        if N.abs(o1[0])<1e-5:
+             o1[0]=0.0
+        if N.absolute(o2[1])<1e-5:
+             o1[1]=0.0
+        if N.absolute(o2[2])<1e-5:
+             o1[2]=0.0
+
+        #%========================================================================================================
+        #%determine the plot range
+        XWidth=max(self.fproject(RMS,0))
+        YWidth=max(self.fproject(RMS,1))
+        WWidth=max(self.fproject(RMS,2))
+
+
+
+        proj,sec=self.project(RMS,1);
+        (a,b,c)=N.shape(proj)
+        mat=N.copy(proj)
+        for i in range(c):
+            matm=N.matrix(mat[:,:,i])
+            w,v=N.linalg.eig(matm)
+            vm=N.matrix(v)
+            vmt=vm.T
+            mat_diag=vmt*matm*vm
+        a1=1.0/N.sqrt(mat_diag[0,0])
+        b1=1.0/N.sqrt(mat_diag[1,1])
+        thetar=N.arccos(vm[0,0])
+        theta=math.degrees(thetar)
+        XWidth=2*self.fproject(RMS,0)
+        YWidth=2*self.fproject(RMS,1)
+        WWidth=2*self.fproject(RMS,2)
+        ZWidth=2*N.sqrt(2*N.log(2))/N.sqrt(RMS[3,3,:])
+        XBWidth=2*N.sqrt(2*N.log(2))/N.sqrt(RMS[0,0,:])
+        YBWidth=2*N.sqrt(2*N.log(2))/N.sqrt(RMS[1,1,:])
+        WBWidth=2*N.sqrt(2*N.log(2))/N.sqrt(RMS[2,2,:])
+
+        XWidthc=1*self.fproject(RMc,0)
+        YWidthc=1*self.fproject(RMc,1)
+        ZWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[3,3,:])
+        XBWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[0,0,:])
+        YBWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[1,1,:])
+
+        M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+Xwidth,K,L,W,EXP)
+        
+##        XWidth=fproject (RMS,1);
+##        YWidth=fproject (RMS,2);
+##        WWidth=fproject (RMS,3);
+##        ZWidth=sqrt(2*log(2))./sqrt(RMS(4,4,:));
+##
+##        XBWidth=sqrt(2*log(2))./sqrt(RMS(1,1,:));
+##        YBWidth=sqrt(2*log(2))./sqrt(RMS(2,2,:));
+##        WBWidth=sqrt(2*log(2))./sqrt(RMS(3,3,:));
+##
+##
+##        ResVol=(2*pi)^2/sqrt(det(RMS(:,:,center)));
+
+
+
+        return XWidth, YWidth, ZWidth,WWidth, XBWidth,YBWidth, WBWidth
+
        
 class TestLattice(unittest.TestCase):
 
@@ -913,3 +1007,4 @@ if __name__=="__main__":
         print 'RMS'
         print RMS.transpose()[0]
         print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0]])
+        print myrescal.CalcWidths(H,K,L,W,setup)
