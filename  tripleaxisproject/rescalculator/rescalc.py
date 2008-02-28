@@ -828,6 +828,8 @@ class rescalculator:
     def CalcWidths(self,H,K,L,W,EXP):
         """Calculates the full width of Bragg Peaks"""
         Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
+        print 'Q ',Q
+        npts=self.lattice_calculator.npts
         center=N.round(H.shape[0]/2)
         if center<1:
              center=0
@@ -901,35 +903,66 @@ class rescalculator:
         XBWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[0,0,:])
         YBWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[1,1,:])
 
-        #M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+XWidth,K,L,W,EXP)
-        uq=N.zeros((3,self.lattice_calculator.npts),'Float64')
-        uq[0,:]=H/Q  #% Unit vector along Q
-        uq[1,:]=K/Q
-        uq[2,:]=L/Q
-        #projection
-        Hup=uq[0,:]*XWidthc
-        Kup=uq[1,:]*XWidthc
-        Lup=uq[2,:]*XWidthc
-        M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+Hup,K+Kup,L+Lup,W,EXP)
-        M1c,M2c,S1c,S2c,A1c,A2c=mylattice.SpecGoTo(H,K,L,W,EXP)
-        tthwidth_proj=N.absolute(S2-S2c)*2
-        #cross section
-        Hup=uq[0,:]*XBWidthc
-        Kup=uq[1,:]*XBWidthc
-        Lup=uq[2,:]*XBWidthc
-        print 'Hup ', Hup
-        print 'Hadded ', H+Hup
-        print 'Kup ', Kup
-        print 'Kadded ', K+Kup
-        print 'Lup ', Lup
-        print 'Ladded ', L+Lup
+        CONVERT1=0.4246609*N.pi/60/180;
+        CONVERT2=2.072;
+        for ind in range(npts):
+            infin=-1
+            if 'infin' in EXP[ind]:
+                infin = EXP[ind]['infin']
+            efixed=EXP[ind]['efixed']
+            w=W[ind]
+            q=Q[ind]
+            ei=efixed
+            ef=efixed
+            if infin>0:
+                 ef=efixed-w
+            else:
+                 ei=efixed+w;
+            ki = N.sqrt(ei/CONVERT2)
+            kf = N.sqrt(ef/CONVERT2)
+        S2=N.arccos((ki**2+kf**2-Q**2)/(2*ki*kf))
+		#			todeg=1./reselpsq/!dtor
+		#			; Q^2 = ki^2 + kf^2 + 2 ki kf cos(A4)
+		#			; 2 Q dQ = 2 ki kf (-)sin(a4) d A4
+		#			; d a4 = -Q dQ / ( ki kf sin(A4) )
+		#			todega4=(reselpsq/ki/kf/sin(a4*!dtor))/!dtor
 
-        M1,M2,S1,S2,A1,A2=self.lattice_calculator.SpecGoTo(H+Hup,K+Kup,L+Lup,W,EXP)
-        M1c,M2c,S1c,S2c,A1c,A2c=self.lattice_calculator.SpecGoTo(H,K,L,W,EXP)
-        tthwidth_sec=N.absolute(S2-S2c)*2
-        print 'S2 ',S2
-        print 'S2c ',S2c
-        print 'tthwidth_sec ',tthwidth_sec
+        tthwidth_sec=XBWidthc*2*Q/ki/kf/N.sin(S2)
+        tthwidth_proj=XWidthc*2*Q/ki/kf/N.sin(S2)
+        thwidth_sec=(YBWidthc*2)/Q  # recall for small theta, arc=r*theta
+        thwidth_proj=(YWidthc*2)/Q
+
+
+##        #M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+XWidth,K,L,W,EXP)
+##        uq=N.zeros((3,self.lattice_calculator.npts),'Float64')
+##        #Ql=N.sqrt(H**2+K**2+L**2)
+##        uq[0,:]=H/Q  #% Unit vector along Q
+##        uq[1,:]=K/Q
+##        uq[2,:]=L/Q
+##        #projection
+##        Hup=uq[0,:]*XWidthc
+##        Kup=uq[1,:]*XWidthc
+##        Lup=uq[2,:]*XWidthc
+##        M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+Hup,K+Kup,L+Lup,W,EXP)
+##        M1c,M2c,S1c,S2c,A1c,A2c=mylattice.SpecGoTo(H,K,L,W,EXP)
+##        tthwidth_proj=N.absolute(S2-S2c)*2
+##        #cross section
+##        Hup=uq[0,:]*XBWidthc
+##        Kup=uq[1,:]*XBWidthc
+##        Lup=uq[2,:]*XBWidthc
+##        print 'Hup ', Hup
+##        print 'Hadded ', H+Hup
+##        print 'Kup ', Kup
+##        print 'Kadded ', K+Kup
+##        print 'Lup ', Lup
+##        print 'Ladded ', L+Lup
+##
+##        M1,M2,S1,S2,A1,A2=self.lattice_calculator.SpecGoTo(H+Hup,K+Kup,L+Lup,W,EXP)
+##        M1c,M2c,S1c,S2c,A1c,A2c=self.lattice_calculator.SpecGoTo(H,K,L,W,EXP)
+##        tthwidth_sec=N.absolute(S2-S2c)*2
+##        print 'S2 ',math.degrees(S2)
+##        print 'S2c ',math.degrees(S2c)
+##        print 'tthwidth_sec ',tthwidth_sec
 
 ##        XWidth=fproject (RMS,1);
 ##        YWidth=fproject (RMS,2);
@@ -954,6 +987,8 @@ class rescalculator:
         Widths['WBWidth']=WBWidth
         Widths['tthwidth_proj']=lattice_calculator.mydegrees(tthwidth_proj)
         Widths['tthwidth_sec']=lattice_calculator.mydegrees(tthwidth_sec)
+        Widths['thwidth_proj']=lattice_calculator.mydegrees(thwidth_proj)
+        Widths['thwidth_sec']=lattice_calculator.mydegrees(thwidth_sec)
         return Widths
 
 
@@ -1079,15 +1114,15 @@ if __name__=="__main__":
         EXP['ana']['tau']='pg(002)'
         EXP['mono']={}
         EXP['mono']['tau']='pg(002)';
-        EXP['ana']['mosaic']=60
-        EXP['mono']['mosaic']=60
+        EXP['ana']['mosaic']=25
+        EXP['mono']['mosaic']=25
         EXP['sample']={}
-        EXP['sample']['mosaic']=60
-        EXP['sample']['vmosaic']=60
-        EXP['hcol']=N.array([40, 47, 40, 999],'d')
-        EXP['vcol']=N.array([240, 240, 240, 240],'d')
+        EXP['sample']['mosaic']=25
+        EXP['sample']['vmosaic']=25
+        EXP['hcol']=N.array([40, 40, 40, 40],'d')
+        EXP['vcol']=N.array([120, 120, 120, 120],'d')
         EXP['infix']=-1 #positive for fixed incident energy
-        EXP['efixed']=35
+        EXP['efixed']=14.7
         EXP['method']=0
         setup=[EXP]
         myrescal=rescalculator(mylattice)
