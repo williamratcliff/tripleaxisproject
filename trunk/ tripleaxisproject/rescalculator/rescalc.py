@@ -3,6 +3,10 @@ import pylab
 import math
 import unittest
 from matplotlib.patches import Ellipse
+from matplotlib.ticker import NullFormatter, MultipleLocator
+from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import MaxNLocator
+
 import lattice_calculator
 eps=1e-3
 pi=N.pi
@@ -606,7 +610,11 @@ class rescalculator:
         YMin=(min(qy)-YWidth*1.5)
         WMax=(max(qw)+WWidth*1.5)
         WMin=(min(qw)-WWidth*1.5)
-           
+
+        #print 'qx ',qx
+        #print 'qy ',qy
+        #print 'XWidth ',XWidth
+        #print 'YWidth ',YWidth
         
         #%========================================================================================================
         #% plot XE projection
@@ -618,9 +626,10 @@ class rescalculator:
 #        olab=['Qx ( units of [' num2str(o1(1)) ' ' num2str(o1(2)) ' ' num2str(o1(3)) '] )'];
 #        axis([omin omax WMin WMax]); xlabel(olab);
 #        axes(XEAxes); xlabel('Qx (\AA-1)'); ylabel('E (meV)');
-        proj,sec=self.project(RMS,1);   
+        proj,sec=self.project(RMS,2);
         (a,b,c)=N.shape(proj)
         mat=N.copy(proj)
+        #print 'proj ', proj
         for i in range(c):
             matm=N.matrix(mat[:,:,i])
             w,v=N.linalg.eig(matm)
@@ -629,22 +638,57 @@ class rescalculator:
             mat_diag=vmt*matm*vm
         a1=1.0/N.sqrt(mat_diag[0,0])
         b1=1.0/N.sqrt(mat_diag[1,1])
-        thetar=N.arccos(vm[0,0])
+        thetar=-N.arccos(vm[0,0])
         theta=math.degrees(thetar)
-        print a1
-        print b1
-        print theta
-        print mat_diag
-        x0y0=N.array([1.0,0.0])
+        rsample='latticestar'
+        oxmax=XMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+        oxmin=XMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+        oymax=YMax/self.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+        oymin=YMin/self.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+        #print 'a1 ',a1
+        #print 'b1 ',b1
+        #print 'theta ',theta
+        #print 'mat_diag ',mat_diag
+        #x0y0=N.array([1.0,0.0])
+        x0y0=N.array([qx,qy])
         e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
         fig=pylab.figure()
-        ax = fig.add_subplot(111)
-        ax.add_artist(e)
-        e.set_clip_box(ax.bbox)
-        e.set_alpha(0.5)
-        e.set_facecolor('red')
-        ax.set_xlim(x0y0[0]-.01, x0y0[0]+.01)
-        ax.set_ylim(x0y0[1]-.5, x0y0[1]+.5)
+        #make right y-axis
+        ax2 = fig.add_subplot(111)
+        #ax2.set_xlim(oxmin, oxmax)
+        ax2.set_ylim(oymin, oymax)
+        ax2.yaxis.tick_right()
+        ax2.yaxis.set_label_position('right')
+        ax2.xaxis.set_major_formatter(pylab.NullFormatter())
+        ax2.xaxis.set_major_locator(pylab.NullLocator())
+        #ax2.set_zorder(3)
+        #make top x-axis
+        if 1:
+            ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-y top')
+            ax3.xaxis.tick_top()
+            ax3.xaxis.set_label_position('top')
+            ax3.set_xlim(oxmin, oxmax)
+            ax3.yaxis.set_major_formatter(NullFormatter())
+            ax3.yaxis.set_major_locator(pylab.NullLocator())
+            #ax3.set_zorder(2)
+
+        #make bottom x-axis, left y-axis
+        if 1:
+            ax = fig.add_axes(ax2.get_position(), frameon=False,label='x-y')
+            ax.yaxis.tick_left()
+            ax.yaxis.set_label_position('left')
+            ax.xaxis.tick_bottom()
+            #ax.xaxis.set_label_position('bottom')
+            
+            ax.add_artist(e)
+            e.set_clip_box(ax.bbox)
+            e.set_alpha(0.5)
+            e.set_facecolor('red')
+            ax.set_xlim(XMin, XMax)
+            ax.set_ylim(YMin, YMax)
+            #ax.set_zorder(1)
+
+        
         pylab.show()
         
         
@@ -849,7 +893,7 @@ class rescalculator:
         XBWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[0,0,:])
         YBWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[1,1,:])
 
-        M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+Xwidth,K,L,W,EXP)
+        #M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+XWidth,K,L,W,EXP)
         
 ##        XWidth=fproject (RMS,1);
 ##        YWidth=fproject (RMS,2);
@@ -864,8 +908,15 @@ class rescalculator:
 ##        ResVol=(2*pi)^2/sqrt(det(RMS(:,:,center)));
 
 
-
-        return XWidth, YWidth, ZWidth,WWidth, XBWidth,YBWidth, WBWidth
+        Widths={}
+        Widths['XWidth']=XWidth
+        Widths['YWidth']=YWidth
+        Widths['ZWidth']=ZWidth
+        Widths['WWidth']=WWidth
+        Widths['XBWidth']=XBWidth
+        Widths['YBWidth']=YBWidth
+        Widths['WBWidth']=WBWidth
+        return Widths
 
        
 class TestLattice(unittest.TestCase):
@@ -1003,7 +1054,7 @@ if __name__=="__main__":
         setup=[EXP]
         myrescal=rescalculator(mylattice)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-        #myrescal.ResPlot(H, K, L, W, setup)
+        myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
         print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0]])
