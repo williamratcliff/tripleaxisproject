@@ -578,12 +578,12 @@ class rescalculator:
         #========================================================================================================
         #find reciprocal-space directions of X and Y axes
         
-        o1=self.lattice_calculator.orient1 #EXP['orient1']
-        o2=self.lattice_calculator.orient2 #EXP['orient2']
-        pr=self.lattice_calculator.scalar(o2[0],o2[1],o2[2],self.lattice_calculator.y[0],self.lattice_calculator.y[1],self.lattice_calculator.y[2],'latticestar')
-        o2[0]=self.lattice_calculator.y[0]*pr
-        o2[1]=self.lattice_calculator.y[1]*pr
-        o2[2]=self.lattice_calculator.y[2]*pr
+        o1=self.lattice_calculator.orient1[:,0] #EXP['orient1']
+        o2=self.lattice_calculator.orient2[:,0] #EXP['orient2']
+        pr=self.lattice_calculator.scalar(o2[0],o2[1],o2[2],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
+        o2[0]=self.lattice_calculator.y[0,:]*pr
+        o2[1]=self.lattice_calculator.y[1,:]*pr
+        o2[2]=self.lattice_calculator.y[2,:]*pr
         
         if N.abs(o2[0])<1e-5:
              o2[0]=0.0
@@ -661,6 +661,8 @@ class rescalculator:
         ax2.yaxis.set_label_position('right')
         ax2.xaxis.set_major_formatter(pylab.NullFormatter())
         ax2.xaxis.set_major_locator(pylab.NullLocator())
+        ylabel=r'Q$_y$' +'(units of ['+str(o2[0])+' '+str(o2[1])+' '+str(o2[2])+'])'
+        ax2.set_ylabel(ylabel)
         #ax2.set_zorder(3)
         #make top x-axis
         if 1:
@@ -670,6 +672,8 @@ class rescalculator:
             ax3.set_xlim(oxmin, oxmax)
             ax3.yaxis.set_major_formatter(NullFormatter())
             ax3.yaxis.set_major_locator(pylab.NullLocator())
+            xlabel=r'Q$_x$' +'(units of ['+str(o1[0])+' '+str(o1[1])+' '+str(o1[2])+'])'
+            ax3.set_xlabel(xlabel)
             #ax3.set_zorder(2)
 
         #make bottom x-axis, left y-axis
@@ -686,6 +690,10 @@ class rescalculator:
             e.set_facecolor('red')
             ax.set_xlim(XMin, XMax)
             ax.set_ylim(YMin, YMax)
+            xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
+            ax.set_xlabel(xlabel)
+            ylabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
+            ax.set_ylabel(ylabel)
             #ax.set_zorder(1)
 
         
