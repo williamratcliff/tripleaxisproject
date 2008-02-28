@@ -902,7 +902,35 @@ class rescalculator:
         YBWidthc=1*N.sqrt(2*N.log(2))/N.sqrt(RMc[1,1,:])
 
         #M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+XWidth,K,L,W,EXP)
-        
+        uq=N.zeros((3,self.lattice_calculator.npts),'Float64')
+        uq[0,:]=H/Q  #% Unit vector along Q
+        uq[1,:]=K/Q
+        uq[2,:]=L/Q
+        #projection
+        Hup=uq[0,:]*XWidthc
+        Kup=uq[1,:]*XWidthc
+        Lup=uq[2,:]*XWidthc
+        M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H+Hup,K+Kup,L+Lup,W,EXP)
+        M1c,M2c,S1c,S2c,A1c,A2c=mylattice.SpecGoTo(H,K,L,W,EXP)
+        tthwidth_proj=N.absolute(S2-S2c)*2
+        #cross section
+        Hup=uq[0,:]*XBWidthc
+        Kup=uq[1,:]*XBWidthc
+        Lup=uq[2,:]*XBWidthc
+        print 'Hup ', Hup
+        print 'Hadded ', H+Hup
+        print 'Kup ', Kup
+        print 'Kadded ', K+Kup
+        print 'Lup ', Lup
+        print 'Ladded ', L+Lup
+
+        M1,M2,S1,S2,A1,A2=self.lattice_calculator.SpecGoTo(H+Hup,K+Kup,L+Lup,W,EXP)
+        M1c,M2c,S1c,S2c,A1c,A2c=self.lattice_calculator.SpecGoTo(H,K,L,W,EXP)
+        tthwidth_sec=N.absolute(S2-S2c)*2
+        print 'S2 ',S2
+        print 'S2c ',S2c
+        print 'tthwidth_sec ',tthwidth_sec
+
 ##        XWidth=fproject (RMS,1);
 ##        YWidth=fproject (RMS,2);
 ##        WWidth=fproject (RMS,3);
@@ -924,9 +952,11 @@ class rescalculator:
         Widths['XBWidth']=XBWidth
         Widths['YBWidth']=YBWidth
         Widths['WBWidth']=WBWidth
+        Widths['tthwidth_proj']=lattice_calculator.mydegrees(tthwidth_proj)
+        Widths['tthwidth_sec']=lattice_calculator.mydegrees(tthwidth_sec)
         return Widths
 
-       
+
 class TestLattice(unittest.TestCase):
 
     def setUp(self):
@@ -1062,7 +1092,7 @@ if __name__=="__main__":
         setup=[EXP]
         myrescal=rescalculator(mylattice)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-        myrescal.ResPlot(H, K, L, W, setup)
+        #myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
         print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0]])
