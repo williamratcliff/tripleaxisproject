@@ -775,6 +775,7 @@ class rescalculator:
         ax2.yaxis.set_label_position('right')
         ax2.xaxis.set_major_formatter(pylab.NullFormatter())
         ax2.xaxis.set_major_locator(pylab.NullLocator())
+        ax2.yaxis.set_major_locator(pylab.NullLocator())
         ylabel=r'E' +'(meV)'
         #ax2.set_ylabel(ylabel)
         #ax2.set_zorder(3)
@@ -914,7 +915,7 @@ class rescalculator:
             ax.set_xlabel(xlabel)
             #ylabel=r'E (meV)'
             #ax.set_ylabel(ylabel)
-            ax.yaxis.set_major_formatter(NullFormatter())
+            #ax.yaxis.set_major_formatter(NullFormatter())
             ax.yaxis.set_major_locator(pylab.NullLocator())
 
             #ax.set_zorder(1)
