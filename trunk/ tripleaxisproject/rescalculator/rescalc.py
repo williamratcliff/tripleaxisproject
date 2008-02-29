@@ -630,10 +630,34 @@ class rescalculator:
             vm=N.matrix(v)
             vmt=vm.T
             mat_diag=vmt*matm*vm
+
         a1=1.0/N.sqrt(mat_diag[0,0])
         b1=1.0/N.sqrt(mat_diag[1,1])
         thetar=N.arccos(vm[0,0])
         theta=math.degrees(thetar)
+
+        mat_sec=N.copy(sec)
+        #print 'proj ', proj
+        (a,b,c)=N.shape(sec)
+        for i in range(c):
+            matm_sec=N.matrix(mat_sec[:,:,i])
+            w_sec,v_sec=N.linalg.eig(matm_sec)
+            vm_sec=N.matrix(v)
+            vmt_sec=vm_sec.T
+            mat_diag_sec=vmt_sec*matm_sec*vm_sec
+
+        a1_sec=1.0/N.sqrt(mat_diag_sec[0,0])
+        b1_sec=1.0/N.sqrt(mat_diag_sec[1,1])
+        thetar_sec=N.arccos(vm_sec[0,0])
+        theta_sec=math.degrees(thetar_sec)
+        #print 'a1_sec ',a1_sec
+        #print 'b1_sec ',b1_sec
+        #print 'theta_sec ',theta_sec
+        #print 'mat_diag_sec ',mat_diag_sec
+
+
+
+
         rsample='latticestar'
         oxmax=XMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
         oxmin=XMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
@@ -646,8 +670,10 @@ class rescalculator:
         #x0y0=N.array([1.0,0.0])
         x0y0=N.array([qx,qy])
         e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
+        e_sec=Ellipse(x0y0,width=2*a1_sec,height=2*b1_sec,angle=theta_sec)
         #make right y-axis
         ax2 = fig.add_subplot(2,2,1)
+        pylab.subplots_adjust(hspace=0.6,wspace=0.3)
         #ax2.set_xlim(oxmin, oxmax)
         ax2.set_ylim(oymin, oymax)
         ax2.yaxis.tick_right()
@@ -681,6 +707,11 @@ class rescalculator:
             e.set_clip_box(ax.bbox)
             e.set_alpha(0.5)
             e.set_facecolor('red')
+            ax.add_artist(e_sec)
+            e_sec.set_clip_box(ax.bbox)
+            e_sec.set_alpha(0.7)
+            e_sec.set_facecolor('blue')
+
             ax.set_xlim(XMin, XMax)
             ax.set_ylim(YMin, YMax)
             xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
@@ -708,6 +739,21 @@ class rescalculator:
         b1=1.0/N.sqrt(mat_diag[1,1])
         thetar=N.arccos(vm[0,0])
         theta=-math.degrees(thetar)
+        mat_sec=N.copy(sec)
+        #print 'proj ', proj
+        (a,b,c)=N.shape(sec)
+        for i in range(c):
+            matm_sec=N.matrix(mat_sec[:,:,i])
+            w_sec,v_sec=N.linalg.eig(matm_sec)
+            vm_sec=N.matrix(v)
+            vmt_sec=vm_sec.T
+            mat_diag_sec=vmt_sec*matm_sec*vm_sec
+
+        a1_sec=1.0/N.sqrt(mat_diag_sec[0,0])
+        b1_sec=1.0/N.sqrt(mat_diag_sec[1,1])
+        thetar_sec=N.arccos(vm_sec[0,0])
+        theta_sec=-math.degrees(thetar_sec)
+
         rsample='latticestar'
         oxmax=XMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
         oxmin=XMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
@@ -720,8 +766,9 @@ class rescalculator:
         #x0y0=N.array([1.0,0.0])
         x0y0=N.array([qx,qw])
         e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
+        e_sec=Ellipse(x0y0,width=2*a1_sec,height=2*b1_sec,angle=theta_sec)
         #make right y-axis
-        ax2 = fig.add_subplot(2,2,2)
+        ax2 = fig.add_subplot(2,2,3)
         #ax2.set_xlim(oxmin, oxmax)
         ax2.set_ylim(oymin, oymax)
         ax2.yaxis.tick_right()
@@ -755,6 +802,10 @@ class rescalculator:
             e.set_clip_box(ax.bbox)
             e.set_alpha(0.5)
             e.set_facecolor('red')
+            ax.add_artist(e_sec)
+            e_sec.set_clip_box(ax.bbox)
+            e_sec.set_alpha(0.7)
+            e_sec.set_facecolor('blue')
             ax.set_xlim(XMin, XMax)
             ax.set_ylim(WMin, WMax)
             xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
@@ -784,6 +835,21 @@ class rescalculator:
         b1=1.0/N.sqrt(mat_diag[1,1])
         thetar=N.arccos(vm[0,0])
         theta=math.degrees(thetar)
+        mat_sec=N.copy(sec)
+        #print 'proj ', proj
+        (a,b,c)=N.shape(sec)
+        for i in range(c):
+            matm_sec=N.matrix(mat_sec[:,:,i])
+            w_sec,v_sec=N.linalg.eig(matm_sec)
+            vm_sec=N.matrix(v)
+            vmt_sec=vm_sec.T
+            mat_diag_sec=vmt_sec*matm_sec*vm_sec
+
+        a1_sec=1.0/N.sqrt(mat_diag_sec[0,0])
+        b1_sec=1.0/N.sqrt(mat_diag_sec[1,1])
+        thetar_sec=N.arccos(vm_sec[0,0])
+        theta_sec=math.degrees(thetar_sec)
+
         rsample='latticestar'
         oxmax=YMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
         oxmin=YMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
@@ -796,8 +862,9 @@ class rescalculator:
         #x0y0=N.array([1.0,0.0])
         x0y0=N.array([qy,qw])
         e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
+        e_sec=Ellipse(x0y0,width=2*a1_sec,height=2*b1_sec,angle=theta_sec)
         #make right y-axis
-        ax2 = fig.add_subplot(2,2,3)
+        ax2 = fig.add_subplot(2,2,4)
         #ax2.set_xlim(oxmin, oxmax)
         ax2.set_ylim(oymin, oymax)
         ax2.yaxis.tick_right()
@@ -831,6 +898,11 @@ class rescalculator:
             e.set_clip_box(ax.bbox)
             e.set_alpha(0.5)
             e.set_facecolor('red')
+            ax.add_artist(e_sec)
+            e_sec.set_clip_box(ax.bbox)
+            e_sec.set_alpha(0.7)
+            e_sec.set_facecolor('blue')
+
             ax.set_xlim(YMin, YMax)
             ax.set_ylim(WMin, WMax)
             xlabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
