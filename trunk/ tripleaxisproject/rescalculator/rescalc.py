@@ -558,7 +558,7 @@ class rescalculator:
              center=0
         if center>H.shape[0]:
              center=H.shape[0]
-        EXP=[EXP[center]]
+        #EXP=[EXP[center]]
         Style1=''
         Style2='--'
         
@@ -776,7 +776,7 @@ class rescalculator:
         ax2.xaxis.set_major_formatter(pylab.NullFormatter())
         ax2.xaxis.set_major_locator(pylab.NullLocator())
         ylabel=r'E' +'(meV)'
-        ax2.set_ylabel(ylabel)
+        #ax2.set_ylabel(ylabel)
         #ax2.set_zorder(3)
         #make top x-axis
         if 1:
@@ -810,10 +810,10 @@ class rescalculator:
             ax.set_ylim(WMin, WMax)
             xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
             ax.set_xlabel(xlabel)
-            #ylabel=r'E (meV)'
-            #ax.set_ylabel(ylabel)
-            ax.yaxis.set_major_formatter(NullFormatter())
-            ax.yaxis.set_major_locator(pylab.NullLocator())
+            ylabel=r'E (meV)'
+            ax.set_ylabel(ylabel)
+            #ax.yaxis.set_major_formatter(NullFormatter())
+            #ax.yaxis.set_major_locator(pylab.NullLocator())
 
             #ax.set_zorder(1)
 
@@ -1326,7 +1326,7 @@ if __name__=="__main__":
         orient2=N.array([[0,1,0]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([3.47],'d');K=N.array([1],'d');L=N.array([0],'d');W=N.array([0],'d')
+        H=N.array([3.47,3.50],'d');K=N.array([1,1.0],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -1342,7 +1342,7 @@ if __name__=="__main__":
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
         EXP['method']=0
-        setup=[EXP]
+        setup=[EXP,EXP]
         myrescal=rescalculator(mylattice)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         myrescal.ResPlot(H, K, L, W, setup)
