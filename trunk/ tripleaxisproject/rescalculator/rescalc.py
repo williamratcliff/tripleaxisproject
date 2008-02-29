@@ -615,17 +615,11 @@ class rescalculator:
         #print 'qy ',qy
         #print 'XWidth ',XWidth
         #print 'YWidth ',YWidth
-        
+        fig=pylab.figure()
         #%========================================================================================================
-        #% plot XE projection
+        #% plot XY projection
         
-#        XEAxes=axes('position',XEAxesPosition); axis([XMin XMax WMin WMax]); box on; hold on;
-#        XEAxis2=axes('position',XEAxesPosition,'XAxisLocation','top','Ytickmode','manual','TickDir','out');
-#        omax=XMax/modvec(o1(1),o1(2),o1(3),rsample);
-#        omin=XMin/modvec(o1(1),o1(2),o1(3),rsample);
-#        olab=['Qx ( units of [' num2str(o1(1)) ' ' num2str(o1(2)) ' ' num2str(o1(3)) '] )'];
-#        axis([omin omax WMin WMax]); xlabel(olab);
-#        axes(XEAxes); xlabel('Qx (\AA-1)'); ylabel('E (meV)');
+
         proj,sec=self.project(RMS,2);
         (a,b,c)=N.shape(proj)
         mat=N.copy(proj)
@@ -638,7 +632,7 @@ class rescalculator:
             mat_diag=vmt*matm*vm
         a1=1.0/N.sqrt(mat_diag[0,0])
         b1=1.0/N.sqrt(mat_diag[1,1])
-        thetar=-N.arccos(vm[0,0])
+        thetar=N.arccos(vm[0,0])
         theta=math.degrees(thetar)
         rsample='latticestar'
         oxmax=XMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
@@ -652,9 +646,8 @@ class rescalculator:
         #x0y0=N.array([1.0,0.0])
         x0y0=N.array([qx,qy])
         e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
-        fig=pylab.figure()
         #make right y-axis
-        ax2 = fig.add_subplot(111)
+        ax2 = fig.add_subplot(2,2,1)
         #ax2.set_xlim(oxmin, oxmax)
         ax2.set_ylim(oymin, oymax)
         ax2.yaxis.tick_right()
@@ -694,6 +687,159 @@ class rescalculator:
             ax.set_xlabel(xlabel)
             ylabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
             ax.set_ylabel(ylabel)
+            #ax.set_zorder(1)
+
+
+        #%========================================================================================================
+        #% plot XE projection
+
+
+        proj,sec=self.project(RMS,1);
+        (a,b,c)=N.shape(proj)
+        mat=N.copy(proj)
+        #print 'proj ', proj
+        for i in range(c):
+            matm=N.matrix(mat[:,:,i])
+            w,v=N.linalg.eig(matm)
+            vm=N.matrix(v)
+            vmt=vm.T
+            mat_diag=vmt*matm*vm
+        a1=1.0/N.sqrt(mat_diag[0,0])
+        b1=1.0/N.sqrt(mat_diag[1,1])
+        thetar=N.arccos(vm[0,0])
+        theta=-math.degrees(thetar)
+        rsample='latticestar'
+        oxmax=XMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+        oxmin=XMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+        oymax=WMax
+        oymin=WMin
+        #print 'a1 ',a1
+        #print 'b1 ',b1
+        #print 'theta ',theta
+        #print 'mat_diag ',mat_diag
+        #x0y0=N.array([1.0,0.0])
+        x0y0=N.array([qx,qw])
+        e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
+        #make right y-axis
+        ax2 = fig.add_subplot(2,2,2)
+        #ax2.set_xlim(oxmin, oxmax)
+        ax2.set_ylim(oymin, oymax)
+        ax2.yaxis.tick_right()
+        ax2.yaxis.set_label_position('right')
+        ax2.xaxis.set_major_formatter(pylab.NullFormatter())
+        ax2.xaxis.set_major_locator(pylab.NullLocator())
+        ylabel=r'E' +'(meV)'
+        ax2.set_ylabel(ylabel)
+        #ax2.set_zorder(3)
+        #make top x-axis
+        if 1:
+            ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-E top')
+            ax3.xaxis.tick_top()
+            ax3.xaxis.set_label_position('top')
+            ax3.set_xlim(oxmin, oxmax)
+            ax3.yaxis.set_major_formatter(NullFormatter())
+            ax3.yaxis.set_major_locator(pylab.NullLocator())
+            xlabel=r'Q$_x$' +'(units of ['+str(o1[0])+' '+str(o1[1])+' '+str(o1[2])+'])'
+            ax3.set_xlabel(xlabel)
+            #ax3.set_zorder(2)
+
+        #make bottom x-axis, left y-axis
+        if 1:
+            ax = fig.add_axes(ax2.get_position(), frameon=False,label='x-E')
+            ax.yaxis.tick_left()
+            ax.yaxis.set_label_position('left')
+            ax.xaxis.tick_bottom()
+            #ax.xaxis.set_label_position('bottom')
+
+            ax.add_artist(e)
+            e.set_clip_box(ax.bbox)
+            e.set_alpha(0.5)
+            e.set_facecolor('red')
+            ax.set_xlim(XMin, XMax)
+            ax.set_ylim(WMin, WMax)
+            xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
+            ax.set_xlabel(xlabel)
+            #ylabel=r'E (meV)'
+            #ax.set_ylabel(ylabel)
+            ax.yaxis.set_major_formatter(NullFormatter())
+            ax.yaxis.set_major_locator(pylab.NullLocator())
+
+            #ax.set_zorder(1)
+
+        #%========================================================================================================
+        #% plot YE projection
+
+
+        proj,sec=self.project(RMS,0);
+        (a,b,c)=N.shape(proj)
+        mat=N.copy(proj)
+        #print 'proj ', proj
+        for i in range(c):
+            matm=N.matrix(mat[:,:,i])
+            w,v=N.linalg.eig(matm)
+            vm=N.matrix(v)
+            vmt=vm.T
+            mat_diag=vmt*matm*vm
+        a1=1.0/N.sqrt(mat_diag[0,0])
+        b1=1.0/N.sqrt(mat_diag[1,1])
+        thetar=N.arccos(vm[0,0])
+        theta=math.degrees(thetar)
+        rsample='latticestar'
+        oxmax=YMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+        oxmin=YMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+        oymax=WMax
+        oymin=WMin
+        #print 'a1 ',a1
+        #print 'b1 ',b1
+        #print 'theta ',theta
+        #print 'mat_diag ',mat_diag
+        #x0y0=N.array([1.0,0.0])
+        x0y0=N.array([qy,qw])
+        e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
+        #make right y-axis
+        ax2 = fig.add_subplot(2,2,3)
+        #ax2.set_xlim(oxmin, oxmax)
+        ax2.set_ylim(oymin, oymax)
+        ax2.yaxis.tick_right()
+        ax2.yaxis.set_label_position('right')
+        ax2.xaxis.set_major_formatter(pylab.NullFormatter())
+        ax2.xaxis.set_major_locator(pylab.NullLocator())
+        ylabel=r'E' +'(meV)'
+        ax2.set_ylabel(ylabel)
+        #ax2.set_zorder(3)
+        #make top x-axis
+        if 1:
+            ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='y-E top')
+            ax3.xaxis.tick_top()
+            ax3.xaxis.set_label_position('top')
+            ax3.set_xlim(oxmin, oxmax)
+            ax3.yaxis.set_major_formatter(NullFormatter())
+            ax3.yaxis.set_major_locator(pylab.NullLocator())
+            xlabel=r'Q$_y$' +'(units of ['+str(o1[0])+' '+str(o1[1])+' '+str(o1[2])+'])'
+            ax3.set_xlabel(xlabel)
+            #ax3.set_zorder(2)
+
+        #make bottom x-axis, left y-axis
+        if 1:
+            ax = fig.add_axes(ax2.get_position(), frameon=False,label='y-E')
+            ax.yaxis.tick_left()
+            ax.yaxis.set_label_position('left')
+            ax.xaxis.tick_bottom()
+            #ax.xaxis.set_label_position('bottom')
+
+            ax.add_artist(e)
+            e.set_clip_box(ax.bbox)
+            e.set_alpha(0.5)
+            e.set_facecolor('red')
+            ax.set_xlim(YMin, YMax)
+            ax.set_ylim(WMin, WMax)
+            xlabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
+            ax.set_xlabel(xlabel)
+            #ylabel=r'E (meV)'
+            #ax.set_ylabel(ylabel)
+            ax.yaxis.set_major_formatter(NullFormatter())
+            ax.yaxis.set_major_locator(pylab.NullLocator())
+
             #ax.set_zorder(1)
 
         
@@ -1127,7 +1273,7 @@ if __name__=="__main__":
         setup=[EXP]
         myrescal=rescalculator(mylattice)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-        #myrescal.ResPlot(H, K, L, W, setup)
+        myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
         print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0]])
