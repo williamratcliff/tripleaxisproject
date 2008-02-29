@@ -75,9 +75,9 @@ class rescalculator:
     def ResMat(self, Q, W,EXP):
         CONVERT1=0.4246609*N.pi/60/180;
         CONVERT2=2.072;
-        npts=self.lattice_calculator.npts
+        npts=len(EXP)
         RM=N.zeros((4, 4, npts),'d');
-        R0=N.zeros((1, npts),'d');
+        R0=N.zeros((npts,1),'d');
         RM_=N.zeros((4, 4),'d');
         D=N.zeros((8, 13),'d');
         d=N.zeros((4, 7),'d');
@@ -92,256 +92,256 @@ class rescalculator:
             moncor=1;
             if 'moncor' in EXP[ind]:
                 moncor = EXP[ind]['moncor']
-            alpha = EXP[ind]['hcol']*CONVERT1;
-            beta =  EXP[ind]['vcol']*CONVERT1;
+            alpha = EXP[ind]['hcol']*CONVERT1
+            beta =  EXP[ind]['vcol']*CONVERT1
             mono=EXP[ind]['mono']
-            etam = mono['mosaic']*CONVERT1;
+            etam = mono['mosaic']*CONVERT1
             etamv=etam
             if 'vmosaic' in mono:
-                etamv = mono['vmosaic']*CONVERT1;
-            ana=EXP[ind]['ana'];
-            etaa = ana['mosaic']*CONVERT1;
-            etaav=etaa;
+                etamv = mono['vmosaic']*CONVERT1
+            ana=EXP[ind]['ana']
+            etaa = ana['mosaic']*CONVERT1
+            etaav=etaa
             if 'vmosaic' in ana:
-                etaav = ana['vmosaic']*CONVERT1;
-            sample=EXP[ind]['sample'];
-            infin=-1;
+                etaav = ana['vmosaic']*CONVERT1
+            sample=EXP[ind]['sample']
+            infin=-1
             if 'infin' in EXP[ind]:
                 infin = EXP[ind]['infin']
             efixed=EXP[ind]['efixed']
             epm=1
             if 'dir1' in EXP[ind]:
-                epm= EXP[ind]['dir1'];
-            ep=1;
+                epm= EXP[ind]['dir1']
+            ep=1
             if 'dir2' in EXP[ind]:
-                ep= EXP[ind]['dir2'];
-            monitorw=1;
-            monitorh=1;
-            beamw=1;
-            beamh=1;
-            monow=1;
-            monoh=1;
-            monod=1;
-            anaw=1;
-            anah=1;
-            anad=1;
-            detectorw=1;
-            detectorh=1;
-            sshape=N.eye(3);
-            L0=1;
-            L1=1;
-            L1mon=1;
-            L2=1;
-            L3=1;        
-            monorv=1e6;
-            monorh=1e6;
-            anarv=1e6;
-            anarh=1e6;
+                ep= EXP[ind]['dir2']
+            monitorw=1
+            monitorh=1
+            beamw=1
+            beamh=1
+            monow=1
+            monoh=1
+            monod=1
+            anaw=1
+            anah=1
+            anad=1
+            detectorw=1
+            detectorh=1
+            sshape=N.eye(3)
+            L0=1
+            L1=1
+            L1mon=1
+            L2=1
+            L3=1
+            monorv=1e6
+            monorh=1e6
+            anarv=1e6
+            anarh=1e6
             if 'beam' in EXP[ind]:
-                beam=EXP[ind]['beam'];
+                beam=EXP[ind]['beam']
                 if 'width' in beam:
-                    beamw=beam['width']**2;
+                    beamw=beam['width']**2
                 if 'height' in beam:
                     beamh=beam['height']**2
-            bshape=N.diag([beamw,beamh]);
+            bshape=N.diag([beamw,beamh])
             if 'monitor' in EXP[ind]:
-                monitor=EXP[ind]['monitor'];
+                monitor=EXP[ind]['monitor']
                 if 'width' in monitor:
                     monitorw=monitor['width']**2
-                monitorh=monitorw;
+                monitorh=monitorw
                 if 'height' in monitor:
                     monitorh=monitor['height']**2;
-            monitorshape=N.diag([monitorw,monitorh]);
+            monitorshape=N.diag([monitorw,monitorh])
             if 'detector' in EXP[ind]:
-                detector=EXP[ind]['detector'];
+                detector=EXP[ind]['detector']
                 if 'width' in detector:
-                    detectorw=detector['width']**2;
+                    detectorw=detector['width']**2
                 if 'height' in detector:
-                    detectorh=detector['height']**2;
-            dshape=N.diag([detectorw,detectorh]);
+                    detectorh=detector['height']**2
+            dshape=N.diag([detectorw,detectorh])
             if 'width' in mono:
-                monow=mono['width']**2;
+                monow=mono['width']**2
             if 'height' in mono:
-                monoh=mono['height']**2;
+                monoh=mono['height']**2
             if 'depth' in mono:
-                monod=mono.depth**2;
-            mshape=N.diag([monod,monow,monoh]);
+                monod=mono.depth**2
+            mshape=N.diag([monod,monow,monoh])
             if 'width' in ana: 
-                anaw=ana['width']**2;
+                anaw=ana['width']**2
             if 'height' in ana:
-                anah=ana['height']**2;
+                anah=ana['height']**2
             if 'depth' in ana:
-                anad=ana['depth']**2;
-            ashape=N.diag([anad,anaw,anah]);
+                anad=ana['depth']**2
+            ashape=N.diag([anad,anaw,anah])
             if 'shape' in sample:
-                sshape=sample['shape'];
+                sshape=sample['shape']
             if 'arms' in EXP[ind]:
-                arms=EXP[ind]['arms'];
-                L0=arms[0];
-                L1=arms[2];
-                L2=arms[3];
-                L3=arms[4];
-                L1mon=L1;
+                arms=EXP[ind]['arms']
+                L0=arms[0]
+                L1=arms[2]
+                L2=arms[3]
+                L3=arms[4]
+                L1mon=L1
                 if len(arms)>3:
-                    L1mon=arms[4];
+                    L1mon=arms[4]
             if 'rv' in mono:
-                monorv=mono['rv'];
+                monorv=mono['rv']
             if 'rh' in mono:
-                monorh=mono['rh'];
+                monorh=mono['rh']
             if 'rv' in ana:
-                anarv=ana['rv'];
+                anarv=ana['rv']
             if 'rh' in ana:
-                anarh=ana['rh'];
+                anarh=ana['rh']
             method=0;
             if 'method' in EXP[ind]:
-                method=EXP[ind]['method'];
+                method=EXP[ind]['method']
             myinstrument=lattice_calculator.instrument()
-            taum=myinstrument.get_tau(mono['tau']);
-            taua=myinstrument.get_tau(ana['tau']);
+            taum=myinstrument.get_tau(mono['tau'])
+            taua=myinstrument.get_tau(ana['tau'])
         
             horifoc=-1;
             if 'horifoc' in EXP[ind]:
-                horifoc=EXP[ind]['horifoc'];
+                horifoc=EXP[ind]['horifoc']
             if horifoc==1: 
-                alpha[2]=alpha[2]*N.sqrt(8*N.log(2)/12); 
+                alpha[2]=alpha[2]*N.sqrt(8*N.log(2)/12)
 #            %---------------------------------------------------------------------------------------------
 #            %Calculate angles and energies
-            w=W[ind];
-            q=Q[ind];
-            ei=efixed;
-            ef=efixed;
+            w=W[ind]
+            q=Q[ind]
+            ei=efixed
+            ef=efixed
             if infin>0:
                  ef=efixed-w
             else:
-                 ei=efixed+w; 
-            ki = N.sqrt(ei/CONVERT2);
-            kf = N.sqrt(ef/CONVERT2);
-            thetam=N.arcsin(taum/(2*ki))*sign(epm); 
-            thetaa=N.arcsin(taua/(2*kf))*sign(ep); 
-            s2theta=-N.arccos( (ki**2+kf**2-q**2)/(2*ki*kf));# %2theta sample
-            thetas=s2theta/2;
-            phi=N.arctan2(-kf*N.sin(s2theta), ki-kf*N.cos(s2theta)); #%Angle from ki to Q
+                 ei=efixed+w
+            ki = N.sqrt(ei/CONVERT2)
+            kf = N.sqrt(ef/CONVERT2)
+            thetam=N.arcsin(taum/(2*ki))*sign(epm)
+            thetaa=N.arcsin(taua/(2*kf))*sign(ep)
+            s2theta=-N.arccos( (ki**2+kf**2-q**2)/(2*ki*kf))# %2theta sample
+            thetas=s2theta/2
+            phi=N.arctan2(-kf*N.sin(s2theta), ki-kf*N.cos(s2theta)) #%Angle from ki to Q
         
  #           %---------------------------------------------------------------------------------------------
 #            %Calculate beam divergences defined by neutron guides
             pi=N.pi
             if alpha[0]<0:
-                  alpha[0]=-alpha[0]*2*0.427/ki*pi/180; 
+                  alpha[0]=-alpha[0]*2*0.427/ki*pi/180
             if alpha[1]<0:
-                  alpha[1]=-alpha[1]*2*0.427/ki*pi/180; 
+                  alpha[1]=-alpha[1]*2*0.427/ki*pi/180
             if alpha[2]<0:
-                  alpha[2]=-alpha[2]*2*0.427/ki*pi/180; 
+                  alpha[2]=-alpha[2]*2*0.427/ki*pi/180
             if alpha[3]<0:
-                  alpha[3]=-alpha[3]*2*0.427/ki*pi/180; 
+                  alpha[3]=-alpha[3]*2*0.427/ki*pi/180
             
             if beta[0]<0:
-                  beta[0]=-beta[0]*2*0.427/ki*pi/180; 
+                  beta[0]=-beta[0]*2*0.427/ki*pi/180
             if beta[1]<0:
-                  beta[1]=-beta[1]*2*0.427/ki*pi/180; 
+                  beta[1]=-beta[1]*2*0.427/ki*pi/180
             if beta[2]<0:
-                  beta[2]=-beta[2]*2*0.427/ki*pi/180; 
+                  beta[2]=-beta[2]*2*0.427/ki*pi/180
             if beta[3]<0:
-                  beta[3]=-beta[3]*2*0.427/ki*pi/180; 
+                  beta[3]=-beta[3]*2*0.427/ki*pi/180
             
 #            %---------------------------------------------------------------------------------------------
 #            %Rededine sample geometry
             psi=thetas-phi;# %Angle from sample geometry X axis to Q
-            rot=N.zeros((3,3));
-            rot[0,0]=N.cos(psi);
-            rot[1,1]=N.cos(psi);
-            rot[0,1]=N.sin(psi);
-            rot[1,0]=-N.sin(psi);
-            rot[2,2]=1;
-            sshape=N.dot(rot.transpose(),N.dot(sshape,rot)); #matrix multiplication?   
+            rot=N.zeros((3,3))
+            rot[0,0]=N.cos(psi)
+            rot[1,1]=N.cos(psi)
+            rot[0,1]=N.sin(psi)
+            rot[1,0]=-N.sin(psi)
+            rot[2,2]=1
+            sshape=N.dot(rot.transpose(),N.dot(sshape,rot)) #matrix multiplication?
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix G    
-            G=1.0/N.array([alpha[0],alpha[1],beta[0],beta[1],alpha[2],alpha[3],beta[2],beta[3]])**2;
-            G=N.diag(G);
+            G=1.0/N.array([alpha[0],alpha[1],beta[0],beta[1],alpha[2],alpha[3],beta[2],beta[3]])**2
+            G=N.diag(G)
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix F    
-            F=1.0/N.array([etam,etamv,etaa,etaav])**2;
+            F=1.0/N.array([etam,etamv,etaa,etaav])**2
             F=N.diag(F);
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix A
-            A[0,0]=ki/2/N.tan(thetam);
-            A[0,1]=-A[0,0];
-            A[3,4]=kf/2/N.tan(thetaa);
-            A[3,5]=-A[3,4];
-            A[1,1]=ki;
-            A[2,3]=ki;
-            A[4,4]=kf;
-            A[5,6]=kf;
+            A[0,0]=ki/2/N.tan(thetam)
+            A[0,1]=-A[0,0]
+            A[3,4]=kf/2/N.tan(thetaa)
+            A[3,5]=-A[3,4]
+            A[1,1]=ki
+            A[2,3]=ki
+            A[4,4]=kf
+            A[5,6]=kf
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix C
-            C[0,0]=1.0/2;
-            C[0,1]=1.0/2;
-            C[2,4]=1.0/2;
-            C[2,5]=1.0/2;
-            C[1,2]=1.0/(2*N.sin(thetam));
+            C[0,0]=1.0/2
+            C[0,1]=1.0/2
+            C[2,4]=1.0/2
+            C[2,5]=1.0/2
+            C[1,2]=1.0/(2*N.sin(thetam))
             C[1,3]=-C[1,2];# %mistake in paper
-            C[3,6]=1.0/(2*N.sin(thetaa));
-            C[3,7]=-C[3,6];
+            C[3,6]=1.0/(2*N.sin(thetaa))
+            C[3,7]=-C[3,6]
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix B
-            B[0,0]=N.cos(phi);
-            B[0,1]=N.sin(phi);
-            B[0,3]=-N.cos(phi-s2theta);
-            B[0,4]=-N.sin(phi-s2theta);
-            B[1,0]=-B[0,1];
-            B[1,1]=B[0,0];
-            B[1,3]=-B[0,4];
-            B[1,4]=B[0,3];
-            B[2,2]=1.0;
-            B[2,5]=-1.0;
-            B[3,0]=2*CONVERT2*ki;
-            B[3,3]=-2*CONVERT2*kf;
+            B[0,0]=N.cos(phi)
+            B[0,1]=N.sin(phi)
+            B[0,3]=-N.cos(phi-s2theta)
+            B[0,4]=-N.sin(phi-s2theta)
+            B[1,0]=-B[0,1]
+            B[1,1]=B[0,0]
+            B[1,3]=-B[0,4]
+            B[1,4]=B[0,3]
+            B[2,2]=1.0
+            B[2,5]=-1.0
+            B[3,0]=2*CONVERT2*ki
+            B[3,3]=-2*CONVERT2*kf
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix S
-            Sinv=blkdiag([bshape,mshape,sshape,ashape,dshape]);# %S-1 matrix        
-            S=N.linalg.inv(Sinv);
+            Sinv=blkdiag([bshape,mshape,sshape,ashape,dshape])# %S-1 matrix
+            S=N.linalg.inv(Sinv)
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix T
             T[0,0]=-1./(2*L0); # %mistake in paper
-            T[0,2]=N.cos(thetam)*(1./L1-1./L0)/2;
-            T[0,3]=N.sin(thetam)*(1./L0+1./L1-2./(monorh*N.sin(thetam)))/2;
-            T[0,5]=N.sin(thetas)/(2*L1);
-            T[0,6]=N.cos(thetas)/(2*L1);
-            T[1,1]=-1./(2*L0*N.sin(thetam));
-            T[1,4]=(1./L0+1./L1-2*N.sin(thetam)/monorv)/(2*N.sin(thetam));
-            T[1,7]=-1./(2*L1*N.sin(thetam));
-            T[2,5]=N.sin(thetas)/(2*L2);
-            T[2,6]=-N.cos(thetas)/(2*L2);
-            T[2,8]=N.cos(thetaa)*(1./L3-1./L2)/2;
-            T[2,9]=N.sin(thetaa)*(1./L2+1./L3-2/(anarh*N.sin(thetaa)))/2;
-            T[2,11]=1./(2*L3);
-            T[3,7]=-1./(2*L2*N.sin(thetaa));
-            T[3,10]=(1./L2+1./L3-2*N.sin(thetaa)/anarv)/(2*N.sin(thetaa));
-            T[3,12]=-1./(2*L3*N.sin(thetaa));
+            T[0,2]=N.cos(thetam)*(1./L1-1./L0)/2
+            T[0,3]=N.sin(thetam)*(1./L0+1./L1-2./(monorh*N.sin(thetam)))/2
+            T[0,5]=N.sin(thetas)/(2*L1)
+            T[0,6]=N.cos(thetas)/(2*L1)
+            T[1,1]=-1./(2*L0*N.sin(thetam))
+            T[1,4]=(1./L0+1./L1-2*N.sin(thetam)/monorv)/(2*N.sin(thetam))
+            T[1,7]=-1./(2*L1*N.sin(thetam))
+            T[2,5]=N.sin(thetas)/(2*L2)
+            T[2,6]=-N.cos(thetas)/(2*L2)
+            T[2,8]=N.cos(thetaa)*(1./L3-1./L2)/2
+            T[2,9]=N.sin(thetaa)*(1./L2+1./L3-2/(anarh*N.sin(thetaa)))/2
+            T[2,11]=1./(2*L3)
+            T[3,7]=-1./(2*L2*N.sin(thetaa))
+            T[3,10]=(1./L2+1./L3-2*N.sin(thetaa)/anarv)/(2*N.sin(thetaa))
+            T[3,12]=-1./(2*L3*N.sin(thetaa))
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of matrix D
 #            % Lots of index mistakes in paper for matix D
-            D[0,0]=-1./L0;
-            D[0,2]=-N.cos(thetam)/L0;
-            D[0,3]=N.sin(thetam)/L0;
-            D[2,1]=D[0,0];
-            D[2,4]=-D[0,0];
-            D[1,2]=N.cos(thetam)/L1;
-            D[1,3]=N.sin(thetam)/L1;
-            D[1,5]=N.sin(thetas)/L1;
-            D[1,6]=N.cos(thetas)/L1;
-            D[3,4]=-1./L1;
-            D[3,7]=-D[3,4];
-            D[4,5]=N.sin(thetas)/L2;
-            D[4,6]=-N.cos(thetas)/L2;
-            D[4,8]=-N.cos(thetaa)/L2;
-            D[4,9]=N.sin(thetaa)/L2;
-            D[6,7]=-1./L2;
-            D[6,10]=-D[6,7];
-            D[5,8]=N.cos(thetaa)/L3;
-            D[5,9]=N.sin(thetaa)/L3;
-            D[5,11]=1./L3;
-            D[7,10]=-D[5,11];
-            D[7,12]=D[5,11];
+            D[0,0]=-1./L0
+            D[0,2]=-N.cos(thetam)/L0
+            D[0,3]=N.sin(thetam)/L0
+            D[2,1]=D[0,0]
+            D[2,4]=-D[0,0]
+            D[1,2]=N.cos(thetam)/L1
+            D[1,3]=N.sin(thetam)/L1
+            D[1,5]=N.sin(thetas)/L1
+            D[1,6]=N.cos(thetas)/L1
+            D[3,4]=-1./L1
+            D[3,7]=-D[3,4]
+            D[4,5]=N.sin(thetas)/L2
+            D[4,6]=-N.cos(thetas)/L2
+            D[4,8]=-N.cos(thetaa)/L2
+            D[4,9]=N.sin(thetaa)/L2
+            D[6,7]=-1./L2
+            D[6,10]=-D[6,7]
+            D[5,8]=N.cos(thetaa)/L3
+            D[5,9]=N.sin(thetaa)/L3
+            D[5,11]=1./L3
+            D[7,10]=-D[5,11]
+            D[7,12]=D[5,11]
 #            %---------------------------------------------------------------------------------------------
 #            %Definition of resolution matrix M
             if method==1:
@@ -354,19 +354,19 @@ class rescalculator:
                 #print N.dot(C.transpose(),N.dot(F,C))
                 #print 'product'
                 #print N.dot(F,C)
-                HF_int=N.linalg.inv(G+N.dot(C.transpose(),N.dot(F,C)));
+                HF_int=N.linalg.inv(G+N.dot(C.transpose(),N.dot(F,C)))
                 HF=similarity_transform(A,HF_int)
                 #print 'HF'
                 #print HF
                 if horifoc>0:
                     HF=N.linalg.inv(HF);
-                    HF[4,4]=(1.0/(kf*alpha[2]))**2; 
-                    HF[4,3]=0; 
-                    HF[3,4]=0; 
-                    HF[3,3]=(N.tan(thetaa)/(etaa*kf))**2;
-                    HF=N.linalg.inv(HF);
+                    HF[4,4]=(1.0/(kf*alpha[2]))**2
+                    HF[4,3]=0
+                    HF[3,4]=0
+                    HF[3,3]=(N.tan(thetaa)/(etaa*kf))**2
+                    HF=N.linalg.inv(HF)
                 Minv=similarity_transform(B,HF)#; %Cooper-Nathans
-            M=N.linalg.inv(Minv);
+            M=N.linalg.inv(Minv)
             #print 'A'
             #print A
             #print 'B'
@@ -385,28 +385,28 @@ class rescalculator:
             #print G
             #print 'F'
             #print F
-            RM_[0,0]=M[0,0];
-            RM_[1,0]=M[1,0];
-            RM_[0,1]=M[0,1];
-            RM_[1,1]=M[1,1];
+            RM_[0,0]=M[0,0]
+            RM_[1,0]=M[1,0]
+            RM_[0,1]=M[0,1]
+            RM_[1,1]=M[1,1]
             
-            RM_[0,2]=M[0,3];
-            RM_[2,0]=M[3,0];
-            RM_[2,2]=M[3,3];
-            RM_[2,1]=M[3,1];
-            RM_[1,2]=M[1,3];
+            RM_[0,2]=M[0,3]
+            RM_[2,0]=M[3,0]
+            RM_[2,2]=M[3,3]
+            RM_[2,1]=M[3,1]
+            RM_[1,2]=M[1,3]
             
-            RM_[0,3]=M[0,2];
-            RM_[3,0]=M[2,0];
-            RM_[3,3]=M[2,2];
-            RM_[3,1]=M[2,1];
-            RM_[1,3]=M[1,2];
- #           %---------------------------------------------------------------------------------------------
+            RM_[0,3]=M[0,2]
+            RM_[3,0]=M[2,0]
+            RM_[3,3]=M[2,2]
+            RM_[3,1]=M[2,1]
+            RM_[1,3]=M[1,2]
+ #           %--------------------------------------------------------------------------------------------
  #           %Calculation of prefactor, normalized to source
             #print 'RM_'
             #print RM_
-            Rm=ki**3/N.tan(thetam); 
-            Ra=kf**3/N.tan(thetaa);
+            Rm=ki**3/N.tan(thetam)
+            Ra=kf**3/N.tan(thetaa)
             #print 'Rm'
             #print Rm
             #print 'Ra'
@@ -414,87 +414,89 @@ class rescalculator:
             if method==1:
                 R0_=Rm*Ra*(2*pi)**4/(64*pi**2*N.sin(thetam)*N.sin(thetaa))\
                 *N.sqrt(N.linalg.det(F)/N.linalg.det\
-                        (N.linalg.inv(N.dot(D,N.dot(N.linalg.inv(S+N.dot(T.T,N.dot(F,T))),D.T)))+G)); #%Popovici
+                        (N.linalg.inv(N.dot(D,N.dot(N.linalg.inv(S+N.dot(T.T,N.dot(F,T))),D.T)))+G)) #%Popovici
             else:
                 R0_=Rm*Ra*(2*pi)**4/(64*pi**2*N.sin(thetam)*N.sin(thetaa))\
-                *N.sqrt( N.linalg.det(F)/N.linalg.det(G+N.dot(C.transpose(),N.dot(F,C)))); #%Cooper-Nathans
+                *N.sqrt( N.linalg.det(F)/N.linalg.det(G+N.dot(C.transpose(),N.dot(F,C)))) #%Cooper-Nathans
                 #print 'RO_'
                 #print R0_
 #            %---------------------------------------------------------------------------------------------
 #            %Normalization to flux on monitor
             if moncor==1:
-                g=G[0:4][:,0:4];
-                f=F[0:2][:,0:2];
+                g=G[0:4][:,0:4]
+                f=F[0:2][:,0:2]
                 #print 'f'
                 #print f
                 #print 'g'
                 #print g
-                c=C[0:2][:,0:4];
-                t[0,0]=-1./(2*L0);#  %mistake in paper
-                t[0,2]=N.cos(thetam)*(1./L1mon-1./L0)/2;
-                t[0,3]=N.sin(thetam)*(1./L0+1./L1mon-2./(monorh*N.sin(thetam)))/2;
-                t[0,6]=1./(2*L1mon);
-                t[1,1]=-1./(2*L0*N.sin(thetam));
-                t[1,4]=(1./L0+1./L1mon-2*N.sin(thetam)/monorv)/(2*N.sin(thetam));
-                sinv=blkdiag([bshape,mshape,monitorshape]);# %S-1 matrix        
-                s=N.linalg.inv(sinv);
-                d[0,0]=-1./L0;
-                d[0,2]=-N.cos(thetam)/L0;
-                d[0,3]=N.sin(thetam)/L0;
-                d[2,1]=D[0,0];
-                d[2,4]=-D[0,0];
-                d[1,2]=N.cos(thetam)/L1mon;
-                d[1,3]=N.sin(thetam)/L1mon;
-                d[1,5]=0;
-                d[1,6]=1./L1mon;
-                d[3,4]=-1./L1mon;
+                c=C[0:2][:,0:4]
+                t[0,0]=-1./(2*L0)#  %mistake in paper
+                t[0,2]=N.cos(thetam)*(1./L1mon-1./L0)/2
+                t[0,3]=N.sin(thetam)*(1./L0+1./L1mon-2./(monorh*N.sin(thetam)))/2
+                t[0,6]=1./(2*L1mon)
+                t[1,1]=-1./(2*L0*N.sin(thetam))
+                t[1,4]=(1./L0+1./L1mon-2*N.sin(thetam)/monorv)/(2*N.sin(thetam))
+                sinv=blkdiag([bshape,mshape,monitorshape])# %S-1 matrix
+                s=N.linalg.inv(sinv)
+                d[0,0]=-1./L0
+                d[0,2]=-N.cos(thetam)/L0
+                d[0,3]=N.sin(thetam)/L0
+                d[2,1]=D[0,0]
+                d[2,4]=-D[0,0]
+                d[1,2]=N.cos(thetam)/L1mon
+                d[1,3]=N.sin(thetam)/L1mon
+                d[1,5]=0
+                d[1,6]=1./L1mon
+                d[3,4]=-1./L1mon
                 if method==1:
                     Rmon=Rm*(2*pi)**2/(8*pi*N.sin(thetam))*N.sqrt(N.linalg.det(f)/\
-                                                                  N.linalg.det(N.linalg.inv(N.dot(d,N.dot(N.linalg.inv(s+t.transpose()*f*t),d.transpose())))+g)); #%Popovici
+                                                                  N.linalg.det(N.linalg.inv(N.dot(d,N.dot(N.linalg.inv(s+t.transpose()*f*t),d.transpose())))+g)) #%Popovici
                 else:
-                    Rmon=Rm*(2*pi)**2/(8*pi*N.sin(thetam))*N.sqrt(N.linalg.det(f)/N.linalg.det(g+N.dot(c.transpose(),N.dot(f,c)))); #%Cooper-Nathans
-                R0_=R0_/Rmon;
-                R0_=R0_*ki; #%1/ki monitor efficiency
+                    Rmon=Rm*(2*pi)**2/(8*pi*N.sin(thetam))*N.sqrt(N.linalg.det(f)/N.linalg.det(g+N.dot(c.transpose(),N.dot(f,c)))) #%Cooper-Nathans
+                R0_=R0_/Rmon
+                R0_=R0_*ki #%1/ki monitor efficiency
                 #print 'R01', R0_
                 #print 'Rmon', Rmon
                 
 #            %---------------------------------------------------------------------------------------------
 #            %Transform prefactor to Chesser-Axe normalization
-            R0_=R0_/(2*pi)**2*N.sqrt(N.linalg.det(RM_));
+            R0_=R0_/(2*pi)**2*N.sqrt(N.linalg.det(RM_))
 #            %---------------------------------------------------------------------------------------------
 #            %Include kf/ki part of cross section
-            R0_=R0_*kf/ki;
+            R0_=R0_*kf/ki
 #            %---------------------------------------------------------------------------------------------
 #            %Take care of sample mosaic if needed [S. A. Werner & R. Pynn, J. Appl. Phys. 42, 4736, (1971)]
             if 'mosaic' in sample:
                 etas = sample['mosaic']*CONVERT1;
-                etasv=etas;
+                etasv=etas
                 if 'vmosaic' in sample:
-                    etasv = sample['vmosaic']*CONVERT1;
-                R0_=R0_/N.sqrt((1.+(q*etas)**2*RM_[3,3])*(1.0+(q*etasv)**2*RM_[1,1]));
+                    etasv = sample['vmosaic']*CONVERT1
+                R0_=R0_/N.sqrt((1.+(q*etas)**2*RM_[3,3])*(1.0+(q*etasv)**2*RM_[1,1]))
                 Minv=N.linalg.inv(RM_)
-                Minv[1,1]=Minv[1,1]+q**2*etas**2;
-                Minv[3,3]=Minv[3,3]+q**2*etasv**2;
-                RM_=N.linalg.inv(Minv);
+                Minv[1,1]=Minv[1,1]+q**2*etas**2
+                Minv[3,3]=Minv[3,3]+q**2*etasv**2
+                RM_=N.linalg.inv(Minv)
 #            %---------------------------------------------------------------------------------------------
 #            %Take care of analyzer reflectivity if needed [I. Zaliznyak, BNL]
             if ('thickness' in ana) & ('Q' in ana):
-                KQ = ana['Q'];
-                KT = ana['thickness'];
-                toa=(taua/2)/N.sqrt(kf**2-(taua/2)**2);
-                smallest=alpha[3];
+                KQ = ana['Q']
+                KT = ana['thickness']
+                toa=(taua/2)/N.sqrt(kf**2-(taua/2)**2)
+                smallest=alpha[3]
                 if alpha[3]>alpha[2]:
                      smallest=alpha[2]
-                Qdsint=KQ*toa;
-                dth=(N.arange(201)/200)*N.sqrt(2*N.log(2))*smallest;
-                wdth=N.exp(-dth**2/2./etaa**2);
-                sdth=KT*Qdsint*wdth/etaa/N.sqrt(2.*pi);
-                rdth=1./(1+1./sdth);
-                reflec=rdth.sum()/wdth.sum();
-                R0_=R0_*reflec;
+                Qdsint=KQ*toa
+                dth=(N.arange(201)/200)*N.sqrt(2*N.log(2))*smallest
+                wdth=N.exp(-dth**2/2./etaa**2)
+                sdth=KT*Qdsint*wdth/etaa/N.sqrt(2.*pi)
+                rdth=1./(1+1./sdth)
+                reflec=rdth.sum()/wdth.sum()
+                R0_=R0_*reflec
 #            %---------------------------------------------------------------------------------------------
-            R0[ind]=R0_;
-            RM[:,:,ind]=RM_[:,:];
+            #print 'ind ', ind
+            #print 'shape ', R0.shape
+            R0[ind]=R0_
+            RM[:,:,ind]=RM_[:,:]
         return R0, RM
     
     def ResMatS(self,H,K,L,W,EXP):
@@ -506,7 +508,7 @@ class rescalculator:
         uq=N.zeros((3,self.lattice_calculator.npts),'d')
         uq[0,:]=H/Q;  #% Unit vector along Q
         uq[1,:]=K/Q;
-        uq[2,:]=L/Q;        
+        uq[2,:]=L/Q;
         xq=self.lattice_calculator.scalar(x[0,:],x[1,:],x[2,:],uq[0,:],uq[1,:],uq[2,:],'latticestar');
         yq=self.lattice_calculator.scalar(y[0,:],y[1,:],y[2,:],uq[0,:],uq[1,:],uq[2,:],'latticestar');
         zq=0; # %scattering vector assumed to be in (self.orient1,self.orient2) plane;        
@@ -571,6 +573,7 @@ class rescalculator:
         [R0,RMS]=self.ResMatS(H,K,L,W,EXP)
         #[xvec,yvec,zvec,sample,rsample]=self.StandardSystem(EXP);
         self.lattice_calculator.StandardSystem()
+        #print 'shape ',self.lattice_calculator.x.shape
         qx=self.lattice_calculator.scalar(self.lattice_calculator.x[0,:],self.lattice_calculator.x[1,:],self.lattice_calculator.x[2,:],H,K,L,'latticestar')
         qy=self.lattice_calculator.scalar(self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],H,K,L,'latticestar')
         qw=W;
@@ -578,27 +581,27 @@ class rescalculator:
         #========================================================================================================
         #find reciprocal-space directions of X and Y axes
         
-        o1=self.lattice_calculator.orient1[:,0] #EXP['orient1']
-        o2=self.lattice_calculator.orient2[:,0] #EXP['orient2']
-        pr=self.lattice_calculator.scalar(o2[0],o2[1],o2[2],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
+        o1=self.lattice_calculator.orient1#[:,0] #EXP['orient1']
+        o2=self.lattice_calculator.orient2#[:,0] #EXP['orient2']
+        pr=self.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
         o2[0]=self.lattice_calculator.y[0,:]*pr
         o2[1]=self.lattice_calculator.y[1,:]*pr
         o2[2]=self.lattice_calculator.y[2,:]*pr
         
-        if N.abs(o2[0])<1e-5:
-             o2[0]=0.0
-        if N.absolute(o2[1])<1e-5:
-             o2[1]=0.0
-        if N.absolute(o2[2])<1e-5:
-             o2[2]=0.0
-        
-        if N.abs(o1[0])<1e-5:
-             o1[0]=0.0
-        if N.absolute(o2[1])<1e-5:
-             o1[1]=0.0
-        if N.absolute(o2[2])<1e-5:
-             o1[2]=0.0
-        
+        if N.abs(o2[0,center])<1e-5:
+             o2[0,center]=0.0
+        if N.absolute(o2[1,center])<1e-5:
+             o2[1,center]=0.0
+        if N.absolute(o2[2,center])<1e-5:
+             o2[2,center]=0.0
+
+        if N.abs(o1[0,center])<1e-5:
+             o1[0,center]=0.0
+        if N.absolute(o2[1,center])<1e-5:
+             o1[1,center]=0.0
+        if N.absolute(o2[2,center])<1e-5:
+             o1[2,center]=0.0
+
         #%========================================================================================================
         #%determine the plot range
         XWidth=max(self.fproject(RMS,0))
@@ -610,7 +613,6 @@ class rescalculator:
         YMin=(min(qy)-YWidth*1.5)
         WMax=(max(qw)+WWidth*1.5)
         WMin=(min(qw)-WWidth*1.5)
-
         #print 'qx ',qx
         #print 'qy ',qy
         #print 'XWidth ',XWidth
@@ -620,21 +622,21 @@ class rescalculator:
         #% plot XY projection
         
 
-        proj,sec=self.project(RMS,2);
+        proj,sec=self.project(RMS,2)
         (a,b,c)=N.shape(proj)
         mat=N.copy(proj)
-        #print 'proj ', proj
+        #print 'proj ', proj.shape
+        a1=[];b1=[];theta=[];a1_sec=[];b1_sec=[];theta_sec=[];e=[]; e_sec=[]
         for i in range(c):
             matm=N.matrix(mat[:,:,i])
             w,v=N.linalg.eig(matm)
             vm=N.matrix(v)
             vmt=vm.T
             mat_diag=vmt*matm*vm
-
-        a1=1.0/N.sqrt(mat_diag[0,0])
-        b1=1.0/N.sqrt(mat_diag[1,1])
-        thetar=N.arccos(vm[0,0])
-        theta=math.degrees(thetar)
+            a1.append(1.0/N.sqrt(mat_diag[0,0]))
+            b1.append(1.0/N.sqrt(mat_diag[1,1]))
+            thetar=N.arccos(vm[0,0])
+            theta.append(math.degrees(thetar))
 
         mat_sec=N.copy(sec)
         #print 'proj ', proj
@@ -645,11 +647,14 @@ class rescalculator:
             vm_sec=N.matrix(v)
             vmt_sec=vm_sec.T
             mat_diag_sec=vmt_sec*matm_sec*vm_sec
+            a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0]))
+            b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
+            thetar_sec=N.arccos(vm_sec[0,0])
+            theta_sec.append(math.degrees(thetar_sec))
+            x0y0=N.array([qx[i],qy[i]])
+            e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
+            e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
 
-        a1_sec=1.0/N.sqrt(mat_diag_sec[0,0])
-        b1_sec=1.0/N.sqrt(mat_diag_sec[1,1])
-        thetar_sec=N.arccos(vm_sec[0,0])
-        theta_sec=math.degrees(thetar_sec)
         #print 'a1_sec ',a1_sec
         #print 'b1_sec ',b1_sec
         #print 'theta_sec ',theta_sec
@@ -668,19 +673,16 @@ class rescalculator:
         #print 'theta ',theta
         #print 'mat_diag ',mat_diag
         #x0y0=N.array([1.0,0.0])
-        x0y0=N.array([qx,qy])
-        e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
-        e_sec=Ellipse(x0y0,width=2*a1_sec,height=2*b1_sec,angle=theta_sec)
         #make right y-axis
         ax2 = fig.add_subplot(2,2,1)
         pylab.subplots_adjust(hspace=0.6,wspace=0.3)
         #ax2.set_xlim(oxmin, oxmax)
-        ax2.set_ylim(oymin, oymax)
+        ax2.set_ylim(oymin[center], oymax[center])
         ax2.yaxis.tick_right()
         ax2.yaxis.set_label_position('right')
         ax2.xaxis.set_major_formatter(pylab.NullFormatter())
         ax2.xaxis.set_major_locator(pylab.NullLocator())
-        ylabel=r'Q$_y$' +'(units of ['+str(o2[0])+' '+str(o2[1])+' '+str(o2[2])+'])'
+        ylabel=r'Q$_y$' +'(units of ['+str(o2[0,center])+' '+str(o2[1,center])+' '+str(o2[2,center])+'])'
         ax2.set_ylabel(ylabel)
         #ax2.set_zorder(3)
         #make top x-axis
@@ -688,10 +690,10 @@ class rescalculator:
             ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-y top')
             ax3.xaxis.tick_top()
             ax3.xaxis.set_label_position('top')
-            ax3.set_xlim(oxmin, oxmax)
+            ax3.set_xlim(oxmin[center], oxmax[center])
             ax3.yaxis.set_major_formatter(NullFormatter())
             ax3.yaxis.set_major_locator(pylab.NullLocator())
-            xlabel=r'Q$_x$' +'(units of ['+str(o1[0])+' '+str(o1[1])+' '+str(o1[2])+'])'
+            xlabel=r'Q$_x$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
             ax3.set_xlabel(xlabel)
             #ax3.set_zorder(2)
 
@@ -702,15 +704,15 @@ class rescalculator:
             ax.yaxis.set_label_position('left')
             ax.xaxis.tick_bottom()
             #ax.xaxis.set_label_position('bottom')
-            
-            ax.add_artist(e)
-            e.set_clip_box(ax.bbox)
-            e.set_alpha(0.5)
-            e.set_facecolor('red')
-            ax.add_artist(e_sec)
-            e_sec.set_clip_box(ax.bbox)
-            e_sec.set_alpha(0.7)
-            e_sec.set_facecolor('blue')
+            for i in range(c):
+                ax.add_artist(e[i])
+                e[i].set_clip_box(ax.bbox)
+                e[i].set_alpha(0.5)
+                e[i].set_facecolor('red')
+                ax.add_artist(e_sec[i])
+                e_sec[i].set_clip_box(ax.bbox)
+                e_sec[i].set_alpha(0.7)
+                e_sec[i].set_facecolor('blue')
 
             ax.set_xlim(XMin, XMax)
             ax.set_ylim(YMin, YMax)
@@ -720,7 +722,6 @@ class rescalculator:
             ax.set_ylabel(ylabel)
             #ax.set_zorder(1)
 
-
         #%========================================================================================================
         #% plot XE projection
 
@@ -729,16 +730,17 @@ class rescalculator:
         (a,b,c)=N.shape(proj)
         mat=N.copy(proj)
         #print 'proj ', proj
+        a1=[];b1=[];theta=[];a1_sec=[];b1_sec=[];theta_sec=[];e=[]; e_sec=[]
         for i in range(c):
             matm=N.matrix(mat[:,:,i])
             w,v=N.linalg.eig(matm)
             vm=N.matrix(v)
             vmt=vm.T
             mat_diag=vmt*matm*vm
-        a1=1.0/N.sqrt(mat_diag[0,0])
-        b1=1.0/N.sqrt(mat_diag[1,1])
-        thetar=N.arccos(vm[0,0])
-        theta=-math.degrees(thetar)
+            a1.append(1.0/N.sqrt(mat_diag[0,0]))
+            b1.append(1.0/N.sqrt(mat_diag[1,1]))
+            thetar=N.arccos(vm[0,0])
+            theta.append(-math.degrees(thetar))
         mat_sec=N.copy(sec)
         #print 'proj ', proj
         (a,b,c)=N.shape(sec)
@@ -748,12 +750,13 @@ class rescalculator:
             vm_sec=N.matrix(v)
             vmt_sec=vm_sec.T
             mat_diag_sec=vmt_sec*matm_sec*vm_sec
-
-        a1_sec=1.0/N.sqrt(mat_diag_sec[0,0])
-        b1_sec=1.0/N.sqrt(mat_diag_sec[1,1])
-        thetar_sec=N.arccos(vm_sec[0,0])
-        theta_sec=-math.degrees(thetar_sec)
-
+            a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0]))
+            b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
+            thetar_sec=N.arccos(vm_sec[0,0])
+            theta_sec.append(-math.degrees(thetar_sec))
+            x0y0=N.array([qx[i],qw[i]])
+            e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
+            e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
         rsample='latticestar'
         oxmax=XMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
         oxmin=XMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
@@ -764,9 +767,6 @@ class rescalculator:
         #print 'theta ',theta
         #print 'mat_diag ',mat_diag
         #x0y0=N.array([1.0,0.0])
-        x0y0=N.array([qx,qw])
-        e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
-        e_sec=Ellipse(x0y0,width=2*a1_sec,height=2*b1_sec,angle=theta_sec)
         #make right y-axis
         ax2 = fig.add_subplot(2,2,3)
         #ax2.set_xlim(oxmin, oxmax)
@@ -783,10 +783,10 @@ class rescalculator:
             ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-E top')
             ax3.xaxis.tick_top()
             ax3.xaxis.set_label_position('top')
-            ax3.set_xlim(oxmin, oxmax)
+            ax3.set_xlim(oxmin[center], oxmax[center])
             ax3.yaxis.set_major_formatter(NullFormatter())
             ax3.yaxis.set_major_locator(pylab.NullLocator())
-            xlabel=r'Q$_x$' +'(units of ['+str(o1[0])+' '+str(o1[1])+' '+str(o1[2])+'])'
+            xlabel=r'Q$_x$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
             ax3.set_xlabel(xlabel)
             #ax3.set_zorder(2)
 
@@ -798,14 +798,15 @@ class rescalculator:
             ax.xaxis.tick_bottom()
             #ax.xaxis.set_label_position('bottom')
 
-            ax.add_artist(e)
-            e.set_clip_box(ax.bbox)
-            e.set_alpha(0.5)
-            e.set_facecolor('red')
-            ax.add_artist(e_sec)
-            e_sec.set_clip_box(ax.bbox)
-            e_sec.set_alpha(0.7)
-            e_sec.set_facecolor('blue')
+            for i in range(c):
+                ax.add_artist(e[i])
+                e[i].set_clip_box(ax.bbox)
+                e[i].set_alpha(0.5)
+                e[i].set_facecolor('red')
+                ax.add_artist(e_sec[i])
+                e_sec[i].set_clip_box(ax.bbox)
+                e_sec[i].set_alpha(0.7)
+                e_sec[i].set_facecolor('blue')
             ax.set_xlim(XMin, XMax)
             ax.set_ylim(WMin, WMax)
             xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
@@ -816,7 +817,7 @@ class rescalculator:
             #ax.yaxis.set_major_locator(pylab.NullLocator())
 
             #ax.set_zorder(1)
-
+        #pylab.show()
         #%========================================================================================================
         #% plot YE projection
 
@@ -825,31 +826,37 @@ class rescalculator:
         (a,b,c)=N.shape(proj)
         mat=N.copy(proj)
         #print 'proj ', proj
+        a1=[];b1=[];theta=[];a1_sec=[];b1_sec=[];theta_sec=[];e=[]; e_sec=[]
         for i in range(c):
             matm=N.matrix(mat[:,:,i])
             w,v=N.linalg.eig(matm)
             vm=N.matrix(v)
             vmt=vm.T
             mat_diag=vmt*matm*vm
-        a1=1.0/N.sqrt(mat_diag[0,0])
-        b1=1.0/N.sqrt(mat_diag[1,1])
-        thetar=N.arccos(vm[0,0])
-        theta=math.degrees(thetar)
-        mat_sec=N.copy(sec)
+            a1.append(1.0/N.sqrt(mat_diag[0,0]))
+            b1.append(1.0/N.sqrt(mat_diag[1,1]))
+            thetar=N.arccos(vm[0,0])
+            theta.append(math.degrees(thetar))
         #print 'proj ', proj
         (a,b,c)=N.shape(sec)
+        mat_sec=N.copy(sec)
         for i in range(c):
             matm_sec=N.matrix(mat_sec[:,:,i])
             w_sec,v_sec=N.linalg.eig(matm_sec)
             vm_sec=N.matrix(v)
             vmt_sec=vm_sec.T
             mat_diag_sec=vmt_sec*matm_sec*vm_sec
+            a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0]))
+            b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
+            thetar_sec=N.arccos(vm_sec[0,0])
+            theta_sec.append(math.degrees(thetar_sec))
+            x0y0=N.array([qy[i],qw[i]])
+            e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
+            e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
 
-        a1_sec=1.0/N.sqrt(mat_diag_sec[0,0])
-        b1_sec=1.0/N.sqrt(mat_diag_sec[1,1])
-        thetar_sec=N.arccos(vm_sec[0,0])
-        theta_sec=math.degrees(thetar_sec)
-
+        print 'qx ',qx
+        print 'qw ',qw
+        print 'theta_sec ',theta_sec
         rsample='latticestar'
         oxmax=YMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
         oxmin=YMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
@@ -860,9 +867,6 @@ class rescalculator:
         #print 'theta ',theta
         #print 'mat_diag ',mat_diag
         #x0y0=N.array([1.0,0.0])
-        x0y0=N.array([qy,qw])
-        e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
-        e_sec=Ellipse(x0y0,width=2*a1_sec,height=2*b1_sec,angle=theta_sec)
         #make right y-axis
         ax2 = fig.add_subplot(2,2,4)
         #ax2.set_xlim(oxmin, oxmax)
@@ -879,10 +883,10 @@ class rescalculator:
             ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='y-E top')
             ax3.xaxis.tick_top()
             ax3.xaxis.set_label_position('top')
-            ax3.set_xlim(oxmin, oxmax)
+            ax3.set_xlim(oxmin[center], oxmax[center])
             ax3.yaxis.set_major_formatter(NullFormatter())
             ax3.yaxis.set_major_locator(pylab.NullLocator())
-            xlabel=r'Q$_y$' +'(units of ['+str(o1[0])+' '+str(o1[1])+' '+str(o1[2])+'])'
+            xlabel=r'Q$_y$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
             ax3.set_xlabel(xlabel)
             #ax3.set_zorder(2)
 
@@ -894,14 +898,15 @@ class rescalculator:
             ax.xaxis.tick_bottom()
             #ax.xaxis.set_label_position('bottom')
 
-            ax.add_artist(e)
-            e.set_clip_box(ax.bbox)
-            e.set_alpha(0.5)
-            e.set_facecolor('red')
-            ax.add_artist(e_sec)
-            e_sec.set_clip_box(ax.bbox)
-            e_sec.set_alpha(0.7)
-            e_sec.set_facecolor('blue')
+            for i in range(c):
+                ax.add_artist(e[i])
+                e[i].set_clip_box(ax.bbox)
+                e[i].set_alpha(0.5)
+                e[i].set_facecolor('red')
+                ax.add_artist(e_sec[i])
+                e_sec[i].set_clip_box(ax.bbox)
+                e_sec[i].set_alpha(0.7)
+                e_sec[i].set_facecolor('blue')
 
             ax.set_xlim(YMin, YMax)
             ax.set_ylim(WMin, WMax)
@@ -1017,17 +1022,19 @@ class rescalculator:
             qx=[]
             qy=[]
             qmod=[]
-            for i in range(H.shape[0]):
+            for i in range(len(qscan)):
                 qh=N.array([qscan[i][0]],'Float64')
                 qk=N.array([qscan[i][1]],'Float64')
                 ql=N.array([qscan[i][2]],'Float64')
                 tmat=(self.cooper_nathans_crystal_transform(qh,qk,ql))
                 qcooper=N.matrix(tmat[0:3,0:3,i])*N.matrix(qscan[i],'Float64').T
                 qscan_mod=self.lattice_calculator.modvec(qh,qk,ql,'latticestar')
-                qx.append(qcooper[0]/qscan_mod)
-                qy.append(qcooper[1]/qscan_mod)
+                #print 'qcooper ',qcooper[0,0]
+                qx.append(qcooper[0,0]/qscan_mod)
+                qy.append(qcooper[1,0]/qscan_mod)
                 
         q_correction=[]
+        #print 'qx ',qx[0][0]
         for i in range(RM.shape[2]):
             Myy=RM[1,1,i]
             Mxx=RM[0,0,i]
@@ -1048,12 +1055,13 @@ class rescalculator:
         Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
         print 'Q ',Q
         npts=self.lattice_calculator.npts
+        print 'npts ',npts
         center=N.round(H.shape[0]/2)
         if center<1:
              center=0
         if center>H.shape[0]:
              center=H.shape[0]
-        EXP=[EXP[center]]
+        #EXP=[EXP[center]]
 
         [R0c,RMc]=self.ResMat(Q,W,EXP)
         [R0,RMS]=self.ResMatS(H,K,L,W,EXP)
@@ -1067,32 +1075,17 @@ class rescalculator:
 
         o1=self.lattice_calculator.orient1 #EXP['orient1']
         o2=self.lattice_calculator.orient2 #EXP['orient2']
-        pr=self.lattice_calculator.scalar(o2[0],o2[1],o2[2],self.lattice_calculator.y[0],self.lattice_calculator.y[1],self.lattice_calculator.y[2],'latticestar')
-        o2[0]=self.lattice_calculator.y[0]*pr
-        o2[1]=self.lattice_calculator.y[1]*pr
-        o2[2]=self.lattice_calculator.y[2]*pr
+#        print 'o2shape ',o2.shape
+#        print 'yshape ',self.lattice_calculator.y.shape
+        pr=self.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
+        o2[0]=self.lattice_calculator.y[0,:]*pr
+        o2[1]=self.lattice_calculator.y[1,:]*pr
+        o2[2]=self.lattice_calculator.y[2,:]*pr
 
-        if N.abs(o2[0])<1e-5:
-             o2[0]=0.0
-        if N.absolute(o2[1])<1e-5:
-             o2[1]=0.0
-        if N.absolute(o2[2])<1e-5:
-             o2[2]=0.0
 
-        if N.abs(o1[0])<1e-5:
-             o1[0]=0.0
-        if N.absolute(o2[1])<1e-5:
-             o1[1]=0.0
-        if N.absolute(o2[2])<1e-5:
-             o1[2]=0.0
-
-        #%========================================================================================================
-        #%determine the plot range
         XWidth=max(self.fproject(RMS,0))
         YWidth=max(self.fproject(RMS,1))
         WWidth=max(self.fproject(RMS,2))
-
-
 
         proj,sec=self.project(RMS,1);
         (a,b,c)=N.shape(proj)
@@ -1315,15 +1308,15 @@ if __name__=="__main__":
 
 
     if 1:
-        a=N.array([5.72],'d')
-        b=N.array([5.72],'d')
-        c=N.array([9.24],'d')
-        alpha=N.array([90],'d')
-        beta=N.array([90],'d')
-        gamma=N.array([90],'d')
+        a=N.array([5.72, 5.72],'d')
+        b=N.array([5.72, 5.72],'d')
+        c=N.array([9.24,9.24],'d')
+        alpha=N.array([90,90],'d')
+        beta=N.array([90,90],'d')
+        gamma=N.array([90,90],'d')
  #       orient1=N.array([[0,1,1]],'d')
-        orient1=N.array([[1,0,0]],'d')
-        orient2=N.array([[0,1,0]],'d')
+        orient1=N.array([[1,0,0],[1,0,0]],'d')
+        orient2=N.array([[0,1,0],[0,1,0]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
         H=N.array([3.47,3.50],'d');K=N.array([1,1.0],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
@@ -1348,5 +1341,5 @@ if __name__=="__main__":
         myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
-        print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0]])
+        print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0],[1,1,0]])
         print myrescal.CalcWidths(H,K,L,W,setup)
