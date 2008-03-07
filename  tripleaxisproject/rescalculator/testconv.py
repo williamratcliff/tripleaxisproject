@@ -52,7 +52,7 @@ if __name__=="__main__":
         #print 'background ',background
         sqw=sqwdemo.SqwDemo(H,K,L,W,p)
         #print 'sqw ', sqw
-        ac=[5,0]
+        ac=[65,0]
         conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
         print conv
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
