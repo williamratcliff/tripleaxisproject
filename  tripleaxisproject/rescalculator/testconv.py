@@ -7,18 +7,18 @@ import convres
 
 if __name__=="__main__":
     if 1:
-        a=N.array([6],'d')
-        b=N.array([7],'d')
-        c=N.array([8],'d')
-        alpha=N.array([90],'d')
-        beta=N.array([90],'d')
-        gamma=N.array([90],'d')
+        a=N.array([6,6],'d')
+        b=N.array([7,7],'d')
+        c=N.array([8,8],'d')
+        alpha=N.array([90,90],'d')
+        beta=N.array([90,90],'d')
+        gamma=N.array([90,90],'d')
  #       orient1=N.array([[0,1,1]],'d')
-        orient1=N.array([[1,0,0]],'d')
-        orient2=N.array([[0,0,1]],'d')
+        orient1=N.array([[1,0,0],[1,0,0]],'d')
+        orient2=N.array([[0,0,1],[0,0,1]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([1.5],'d');K=N.array([0],'d');L=N.array([.35],'d');W=N.array([20],'d')
+        H=N.array([1.5,1.5],'d');K=N.array([0,0],'d');L=N.array([.35,0.35],'d');W=N.array([20,20],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -34,7 +34,7 @@ if __name__=="__main__":
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
         EXP['method']=0
-        setup=[EXP]
+        setup=[EXP,EXP]
 
         #Parameter values for the cross section
         p=N.zeros((7,),'float64')
@@ -52,7 +52,7 @@ if __name__=="__main__":
         #print 'background ',background
         sqw=sqwdemo.SqwDemo(H,K,L,W,p)
         #print 'sqw ', sqw
-        ac=[45,0]
+        ac=[5,0]
         conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
         print conv
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
