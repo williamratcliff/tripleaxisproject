@@ -4,6 +4,8 @@ import scipy.integrate as integrate
 import lattice_calculator
 import rescalc
 import copy
+import numpyutils
+
 pi=N.pi
 def ConvRes(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
     """"Numerically calculate the convolution of a user-defined cross-section
@@ -59,6 +61,22 @@ def ConvRes(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
 ##    print 'tqwy ',tqwy
 ##    print 'tqwx ',tqwx
 
+    print 'Mzz ',Mzz
+    print 'Mww ',Mww
+    print 'Mxx ',Mxx
+    print 'Mxy ',Mxy
+    print 'Mxw ',Mxw
+    print 'Myy ',Myy
+    print 'Myw ',Myw
+    print 'detM ', detM
+    print 'tqz ',tqz
+    print 'tqx ', tqx
+    print 'tqyy ',tqyy
+    print 'tqyx ',tqyx
+    print 'tqww ',tqww
+    print 'tqwy ',tqwy
+    print 'tqwx ',tqwx
+
     #================================================================================================
     myargs=(H,K,L,W,p)
     testsqw=sqw(H,K,L,W,p)
@@ -96,11 +114,20 @@ def ConvRes(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
        a=-pi/2+step1/2
        b=pi/2-step1/2
        dpts=N.complex(0,2*M[0]+1)
-       [cx,cy,cw]=N.mgrid[a:b:dpts,a:b:dpts,a:b:dpts]
+       cx,cy,cw=N.mgrid[a:b:dpts,a:b:dpts,a:b:dpts]
+       #cx,cy,cw=numpyutils.meshgrid(dd1,N.copy(dd1),N.copy(dd1),indexing='ij')
+       print 'cx ',cx[:,:,0]
+       print 'cx ',cx.shape
        #tx=N.tan(N.reshape(cx,(N.size(cx),)))
-       tx=N.tan(cx.flatten())
-       ty=N.copy(tx)
-       tw=N.copy(tx)
+       tx=N.tan(cx.reshape(N.size(cx),1,order='F').copy().T).flatten()
+       ty=N.tan(cy.reshape(N.size(cx),1,order='F').copy().T).flatten()
+       tw=N.tan(cw.reshape(N.size(cx),1,order='F').copy().T).flatten()
+       print 'cx ',cx.reshape(N.size(cx),1,order='F').copy().T
+       #exit()
+       for pt in range(15):
+            print 'cx %f'%(cx.reshape(N.size(cx),1,order='F').copy()[pt],)
+       #exit()
+
        #N.tan(N.reshape(cy,(N.size(cy),))); N.tan(N.reshape(cw,(N.size(cw),)))
        print 'tx ',tx.shape
        tz=N.tan(dd2)
@@ -123,14 +150,14 @@ def ConvRes(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
               K1=K[i]+dQ1*xvec[1,i]+dQ2*yvec[1,i]+dQ4*zvec[1,i]
               L1=L[i]+dQ1*xvec[2,i]+dQ2*yvec[2,i]+dQ4*zvec[2,i]
               W1=W[i]+dW;
-              print 'dQ1 ',dQ1
-              print 'dQ3 ',dQ2
-              print 'dW ',dW
+              print 'dQ1 ',dQ1[0:15]
+              print 'dQ3 ',dQ2[0:15]
+              print 'dW ',dW[0:15]
               print 'dQ4 ',dQ4
-              print 'H1 ',H1
-              print 'K1 ',K1
-              print 'L1 ',L1
-              print 'W1 ',W1
+              print 'H1 ',H1[0:15]
+              print 'K1 ',K1[0:15]
+              print 'L1 ',L1[0:15]
+              print 'W1 ',W1[0:15]
               print 'H1_shape ',H1.shape
               myint=sqw(H1,K1,L1,W1,p)
               for pt in range(15):
@@ -143,7 +170,7 @@ def ConvRes(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
               conv[i]=(convs[:,i]*prefactor[:,i]).sum()
            print 'conv',conv
        factor=step1**3*step2/N.sqrt(detM)
-       print 'factor ',factor
+       #print 'factor ',factor
        conv=conv*factor
        if M[1]==0:
             conv=conv*0.79788

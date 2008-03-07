@@ -31,8 +31,12 @@ def SqwDemo(H,K,L,W,p):
 
 
     # Intensity scales as (1-cos(2*pi*H))/omega0 for each of the three modes:
-    sqw=zeros((3,H.shape[0]),'float64')
+    sqw=zeros((3,size(H)),'float64')
+    #print 'sqw ',sqw.shape
+    #print 'lorx ',lorx.shape
+    #print 'done'
     sqw[0,:]=lorx*(1-cos(pi*H))/omegax/2
     sqw[1,:]=lory*(1-cos(pi*H))/omegay/2
     sqw[2,:]=lorz*(1-cos(pi*H))/omegaz/2
+    #print 'sqw ',sqw
     return sqw
