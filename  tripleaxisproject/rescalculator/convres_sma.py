@@ -31,24 +31,36 @@ def voigt(x,a):
     nx=N.size(x);
     if N.size(a)==1:
          a=N.ones((nx,),'float64')
-    y=N.zeros((nx,),'float64')
-    j=0 #TODO why?
-    t=a-j*x; ax=N.abs(x); s=ax + a; u=t**2
-    
+    y=N.zeros((nx,),'complex')
+    t=a+N.complex(0,1)*x; ax=N.abs(x); s=ax + a; u=t**2
+    for idx in range(10):
+        print '%d a %f ax %f x %f s %f u %f'%(idx,a[idx],ax[idx],x[idx],s[idx],u[idx])
     good=N.where(a==0)[0]
-    y[good]=N.exp(-x[good]**2)
+    if good.shape[0]!=0:
+        y[good]=N.exp(-x[good]**2)
     good=N.where((a>=15) | (s>=15))[0]
-    y[good]=approx1(t[good])
-    good=N.where((s<15) & (a<15) & (a>=5.5))
-    y[good]=approx2(t[good],u[good])
-    good=N.where((s<15) & (s>=5.5) & (a<5.5))
-    y[good]=approx2(t[good],u[good])
-    good=N.where((s<5.5) & (a<5.5) & (a>=0.75))
-    y[good]=approx3(t[good])
-    good=N.where((s<5.5) & (a>=0.195*ax-0.176) & (a<0.75))
-    y[good]=approx3(t[good])
-    good=N.where(~((s<5.5) & (a>=0.195*ax-0.176)) & (a<0.75))
-    y[good]= N.exp(u[good])-approx4(t[good],u[good])
+    if type(good)==type((1,2)):
+        good=good[0]
+        print 'innergood ',good
+    if good.shape[0]!=0:
+        print 'good', good
+        y[good]=approx1(t[good])
+    good=N.where((s<15) & (a<15) & (a>=5.5))[0]
+    print 'good2',good
+    if good.shape[0]!=0:
+        y[good]=approx2(t[good],u[good])
+    good=N.where((s<15) & (s>=5.5) & (a<5.5))[0]
+    if good.shape[0]!=0:
+        y[good]=approx2(t[good],u[good])
+    good=N.where((s<5.5) & (a<5.5) & (a>=0.75))[0]
+    if good.shape[0]!=0:
+        y[good]=approx3(t[good])
+    good=N.where((s<5.5) & (a>=0.195*ax-0.176) & (a<0.75))[0]
+    if good.shape[0]!=0:
+        y[good]=approx3(t[good])
+    good=N.where(~((s<5.5) & (a>=0.195*ax-0.176)) & (a<0.75))[0]
+    if good.shape[0]!=0:
+        y[good]= N.exp(u[good])-approx4(t[good],u[good])
     y=N.real(y)
     return y
 
@@ -168,10 +180,10 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
                     print '%d %d voigt %f'%(idx,j,vog[idx])
                  add=myint[j,:]*voigt(Omega,Gamma)*norm*normz[iz]/detxy[i]/detz[i]
                  convs[j,i]=convs[j,i]+add.sum()
-                 print 'convs ',convs
+                 #print 'convs ',convs
               #print 'conv ',conv.shape
               conv[i]=(convs[:,i]*prefactor[:,i]).sum()
-              print 'conv ',conv[i]
+              #print 'conv ',conv[i]
        factor=step1**2*step2
        #print 'factor ',factor
        conv=conv*factor
