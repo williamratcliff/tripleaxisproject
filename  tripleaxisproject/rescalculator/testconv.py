@@ -3,7 +3,9 @@ import lattice_calculator
 import rescalc
 import prefdemo
 import sqwdemo
+import smademo
 import convres
+import convres_sma
 
 if __name__=="__main__":
     if 1:
@@ -51,10 +53,16 @@ if __name__=="__main__":
         #print 'prefactor ',prefactor
         #print 'background ',background
         sqw=sqwdemo.SqwDemo(H,K,L,W,p)
+        disp,myint,WL=smademo.SMADemo(H,K,L,p)
+        print disp
+        print myint
+        print WL
         #print 'sqw ', sqw
-        ac=[65,0]
-        conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
-        print conv
+        ac=[5,0]
+        #conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
+        #print conv
+        conv_sma=convres_sma.ConvResSMA(smademo.SMADemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
+        print conv_sma
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         #myrescal.ResPlot(H, K, L, W, setup)
         #print 'RMS'
