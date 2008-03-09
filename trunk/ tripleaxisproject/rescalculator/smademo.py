@@ -15,7 +15,7 @@ def SMADemo(H,K,L,p):
     Deltay=p[1]	#				% Gap at the AF zone-center in meV for y-axis mode
     Deltaz=p[2]	#				% Gap at the AF zone-center in meV for z-axis mode
     cc=p[3] #						% Bandwidth in meV
-    Gamma=p[4] #					    % Intrinsic HWHM of exccitation in meV
+    Gamma=p[4] #					    % Intrinsic HWHM of excitation in meV
     #I=p[6);							% Intensity prefactor It will be used in the PrefDemo function, not here!
     #bgr=p[7);						% Background. It will be used in the PrefDemo function, not here!
 
@@ -23,6 +23,7 @@ def SMADemo(H,K,L,p):
     omegax=sqrt(cc**2*(sin(2*pi*H))**2+Deltax**2)
     omegay=sqrt(cc**2*(sin(2*pi*H))**2+Deltay**2)
     omegaz=sqrt(cc**2*(sin(2*pi*H))**2+Deltaz**2)
+    w0=zeros((3,size(H)),'float64')
     w0[0,:]=omegax
     w0[1,:]=omegay
     w0[2,:]=omegaz
@@ -32,9 +33,9 @@ def SMADemo(H,K,L,p):
     #print 'sqw ',sqw.shape
     #print 'lorx ',lorx.shape
     #print 'done'
-    sqw[0,:]=lorx*(1-cos(pi*H))/omegax/2
-    sqw[1,:]=lory*(1-cos(pi*H))/omegay/2
-    sqw[2,:]=lorz*(1-cos(pi*H))/omegaz/2
+    sqw[0,:]=(1-cos(pi*H))/omegax/2
+    sqw[1,:]=(1-cos(pi*H))/omegay/2
+    sqw[2,:]=(1-cos(pi*H))/omegaz/2
     #print 'sqw ',sqw
     #% Now set all energy widths of all branches to Gamma
     HWHM=ones(sqw.shape,'float64')*Gamma
