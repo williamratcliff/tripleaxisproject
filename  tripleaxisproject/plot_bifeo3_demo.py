@@ -19,7 +19,7 @@ def plot_nodes(tri):
 def plot_data(xa,ya,za,fig,nfig,colorflag=False):
 
     cmap = pylab.cm.jet
-    cmap.set_bad('w', 1.0)   
+    cmap.set_bad('w', 1.0)
     myfilter=N.array([[0.1,0.2,0.1],[0.2,0.8,0.2],[0.1,0.2,0.1]],'d') /2.0
     zout=convolve2d(za,myfilter,mode='same')
     zima = ma.masked_where(N.isnan(zout),zout)
@@ -76,7 +76,7 @@ def prep_data(filename):
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
 #    return x,y,z
-    return xi,yi,zi    
+    return xi,yi,zi
 
 
 
@@ -117,7 +117,7 @@ def prep_data2(xt,yt,zorigt):
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
 #    return x,y,z
-    return xi,yi,zi    
+    return xi,yi,zi
 
 
 
@@ -172,75 +172,77 @@ if __name__ == '__main__':
         #xlabel=r'Q$ \ \ (\AA^{-1}$)'
         xlabel='(1 1 0)'
         ylabel='(1 -1 -2)'
-     
-        
-    if 1:    
-        ax,g=plot_data(xd,yd,zd,fig,1,colorflag=True)   
+
+
+    if 1:
+        ax,g=plot_data(xd,yd,zd,fig,1,colorflag=True)
         #ax.text(.98,.20,'E=0 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.set_ylabel(ylabel)
         ax.set_xlabel(xlabel)
-        ax.xaxis.set_major_formatter(NullFormatter())  
-        ax.set_ylim(ylim); ax.set_xlim(xlim)  
+        ax.xaxis.set_major_formatter(NullFormatter())
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
         #g.ax.ticks=N.arange(0,100,20)
-        
+
     if 0:
         ax,g=plot_data(xe,ye,ze,fig,2,colorflag=True)
         ax.text(.98,.20,'E=-1.3 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.yaxis.set_major_formatter(NullFormatter())
-        ax.xaxis.set_major_formatter(NullFormatter())    
-        ax.set_ylim(ylim); ax.set_xlim(xlim)  
-        
+        ax.xaxis.set_major_formatter(NullFormatter())
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
+
     if 0:
         ax,g=plot_data(xf,yf,zf,fig,3,colorflag=True)
         ax.text(.98,.20,'0 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.set_ylabel(ylabel)
-        ax.xaxis.set_major_formatter(NullFormatter())  
-        ax.set_ylim(ylim); ax.set_xlim(xlim)    
+        ax.xaxis.set_major_formatter(NullFormatter())
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
     if 0:
         ax,g=plot_data(xg,yg,zg,fig,4,colorflag=True)
         ax.text(.98,.20,'1.3 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.yaxis.set_major_locator(MultipleLocator(1))
         ax.yaxis.set_major_formatter(NullFormatter())
-        ax.xaxis.set_major_formatter(NullFormatter()) 
-        ax.set_ylim(ylim); ax.set_xlim(xlim)     
-    if 0:    
+        ax.xaxis.set_major_formatter(NullFormatter())
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
+    if 0:
         ax,g=plot_data(xh,yh,zh,fig,5,colorflag=True)
         ax.text(.98,.20,'0 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.set_ylabel(ylabel)
         ax.set_xlabel(xlabel)
         ax.xaxis.set_minor_formatter(NullFormatter())
-        ax.set_ylim(ylim); ax.set_xlim(xlim)  
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
         fmt = FormatStrFormatter('%0.3g')  # or whatever
         ax.xaxis.set_major_formatter(fmt)
         ax.xaxis.set_major_locator(MaxNLocator(5))
-    if 0:    
+    if 0:
         ax,g=plot_data(xi,yi,zi,fig,6,colorflag=True)
         ax.text(.98,.20,'-1.3 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.set_xlabel(xlabel)
         ax.yaxis.set_major_formatter(NullFormatter())
         ax.xaxis.set_minor_formatter(NullFormatter())
-        ax.set_ylim(ylim); ax.set_xlim(xlim)  
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
         fmt = FormatStrFormatter('%0.3g')  # or whatever
         ax.xaxis.set_major_formatter(fmt)
         ax.xaxis.set_major_locator(MaxNLocator(5))
 
-    if 0:    
+    if 0:
         ax,g=plot_data(xf,yf,zf,fig,6,colorflag=True)
         ax.text(.98,.20,'0 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.set_xlabel(xlabel)
         ax.yaxis.set_major_formatter(NullFormatter())
-        ax.set_ylim(ylim); ax.set_xlim(xlim)  
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
         #fmt = FormatStrFormatter('%1.4g')  # or whatever
         #ax.yaxis.set_major_formatter(fmt)
-        
-        
-    if 1:    
+
+
+    if 1:
         print 'gca ', fig.gca()
         for im in fig.gca().get_images():
             print im
             im.set_clim(0.0,660.0)
         #pylab.show()
-    if 1:
+    if 0:
         print 'saving'
         pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
         print 'saved'
+    if 1:
+        pylab.show()
