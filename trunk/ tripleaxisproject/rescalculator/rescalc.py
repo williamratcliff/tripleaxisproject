@@ -525,7 +525,7 @@ class rescalculator:
         EXProt=EXP;
 
 #        %Sample shape matrix in coordinate system defined by scattering vector
-        for i in range(self.lattice_calculator.npts):
+        for i in range(len(EXP)):
             sample=EXP[i]['sample'];
             if 'shape' in sample:
                 rot[0,0]=tmat[0,0,i];
@@ -542,7 +542,7 @@ class rescalculator:
 
         mul=N.zeros((4,4));
         e=N.eye(4,4);
-        for i in range(self.lattice_calculator.npts):
+        for i in range(len(EXP)):
             if 'Smooth' in EXP[i]:
                 if 'X' in (EXP[i]['Smooth']):
                     mul[0,0]=1./(EXP[i]['Smooth']['X']**2/8/N.log(2));
@@ -1336,10 +1336,20 @@ if __name__=="__main__":
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
         EXP['method']=0
-        setup=[EXP,EXP]
+        setup=[EXP]
         myrescal=rescalculator(mylattice)
+        newinput=CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+                            H=H,K=K,L=L,W=W,setup=setup)
+        mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+                        beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
+                        orient2=newinput['orient2'])
+        myrescal.__init__(mylattice)
+        Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
+        R0,RM=myrescal.ResMat(Q,W,setup)
+        print 'RM '
+        print RM.transpose()[0]
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-        myrescal.ResPlot(H, K, L, W, setup)
+        #myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
         print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0],[1,1,0]])
