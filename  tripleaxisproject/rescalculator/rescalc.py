@@ -6,6 +6,7 @@ from matplotlib.patches import Ellipse
 from matplotlib.ticker import NullFormatter, MultipleLocator
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
+import copy
 
 import lattice_calculator
 eps=1e-3
@@ -76,8 +77,9 @@ class rescalculator:
         CONVERT1=0.4246609*N.pi/60/180;
         CONVERT2=2.072;
         npts=len(EXP)
-        RM=N.zeros((4, 4, npts),'d');
-        R0=N.zeros((npts,1),'d');
+        Qnpts=N.size(Q)
+        RM=N.zeros((4, 4, Qnpts),'d');
+        R0=N.zeros((Qnpts,1),'d');
         RM_=N.zeros((4, 4),'d');
         D=N.zeros((8, 13),'d');
         d=N.zeros((4, 7),'d');
@@ -536,7 +538,9 @@ class rescalculator:
                 EXProt[i]['sample']['shape']=N.dot(rot,N.dot(sample['shape'],rot.T));
 
         R0,RM= self.ResMat(Q,W,EXProt)
-
+        print 'RM ',RM.shape
+        print 'npts ',self.lattice_calculator.npts
+        print 'tmat ',tmat.shape
         for i in range(self.lattice_calculator.npts):
            RMS[:,:,i]=N.dot((tmat[:,:,i]).transpose(),N.dot(RM[:,:,i],tmat[:,:,i]));
 
@@ -1339,7 +1343,7 @@ if __name__=="__main__":
         setup=[EXP]
         myrescal=rescalculator(mylattice)
         newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
-                            H=H,K=K,L=L,W=W,setup=setup)
+                            H=H,K=K,L=L,W=W,setup=copy.deepcopy(setup))
         mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
                         beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
                         orient2=newinput['orient2'])
@@ -1347,7 +1351,8 @@ if __name__=="__main__":
         Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
         R0,RM=myrescal.ResMat(Q,W,setup)
         print 'RM '
-        print RM.transpose()[0]
+        print RM.transpose()
+        exit()
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         #myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
