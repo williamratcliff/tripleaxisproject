@@ -170,8 +170,8 @@ if __name__ == '__main__':
         xlim=(.485,.515)
         #ylabel='E (meV)'
         #xlabel=r'Q$ \ \ (\AA^{-1}$)'
-        xlabel='(1 1 0)'
-        ylabel='(1 -1 -2)'
+        ylabel='(1 1 0)'
+        xlabel='(1 -1 -2)'
 
 
     if 1:
