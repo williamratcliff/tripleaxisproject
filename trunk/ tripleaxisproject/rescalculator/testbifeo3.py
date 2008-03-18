@@ -37,7 +37,13 @@ if __name__=="__main__":
         EXP['efixed']=14.7
         EXP['method']=0
         setup=[EXP]
-
+        ht=N.linspace(-1,1,21)
+        kt=N.linspace(-2,2,41)
+        h,k=N.meshgrid(ht,kt)
+        H=h.flatten()
+        K=k.flatten()
+        #print 'H shape ',H.shape
+        #print 'K shape ',K.shape
         #Parameter values for the cross section
         p=N.zeros((7,),'float64')
         p[0]=3#					% Gap at the AF zone-center in meV for x-axis mode
@@ -49,7 +55,7 @@ if __name__=="__main__":
         p[6]=40#                 % Flat background
         #print 'p ',p
         myrescal=rescalc.rescalculator(mylattice)
-        newinput=CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+        newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
                             H=H,K=K,L=L,W=W,setup=setup)
         mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
                         beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
@@ -62,8 +68,8 @@ if __name__=="__main__":
         setup=newinput['setup']
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-        print 'RMS'
-        print RMS.transpose()[0]
+        #print 'RMS'
+        #print RMS.transpose()[0]
 
         #myrescal.ResPlot(H, K, L, W, setup)
 
@@ -72,15 +78,19 @@ if __name__=="__main__":
         #print 'background ',background
         sqw=sqwdemo.SqwDemo(H,K,L,W,p)
         disp,myint,WL=smademo.SMADemo(H,K,L,p)
-        print disp
-        print myint
-        print WL
+        #print disp
+        #print myint
+        #print WL
         #print 'sqw ', sqw
         ac=[5,0]
         #conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
         #print conv
         conv_sma=convres_sma.ConvResSMA(smademo.SMADemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
-        print conv_sma
+        print 'conv'
+        #print conv_sma
+        print 'shape ',conv_sma.shape
+        #print 'H shape ', H.shape
+        #print 'W shape ', W.shape
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         #myrescal.ResPlot(H, K, L, W, setup)
         #print 'RMS'

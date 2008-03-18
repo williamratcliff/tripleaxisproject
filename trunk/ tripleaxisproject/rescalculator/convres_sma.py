@@ -33,20 +33,20 @@ def voigt(x,a):
          a=N.ones((nx,),'float64')
     y=N.zeros((nx,),'complex')
     t=a+N.complex(0,1)*x; ax=N.abs(x); s=ax + a; u=t**2
-    for idx in range(10):
-        print '%d a %f ax %f x %f s %f u %f'%(idx,a[idx],ax[idx],x[idx],s[idx],u[idx])
+    #for idx in range(10):
+    #    print '%d a %f ax %f x %f s %f u %f'%(idx,a[idx],ax[idx],x[idx],s[idx],u[idx])
     good=N.where(a==0)[0]
     if good.shape[0]!=0:
         y[good]=N.exp(-x[good]**2)
     good=N.where((a>=15) | (s>=15))[0]
     if type(good)==type((1,2)):
         good=good[0]
-        print 'innergood ',good
+    #    print 'innergood ',good
     if good.shape[0]!=0:
-        print 'good', good
+    #    print 'good', good
         y[good]=approx1(t[good])
     good=N.where((s<15) & (a<15) & (a>=5.5))[0]
-    print 'good2',good
+    #print 'good2',good
     if good.shape[0]!=0:
         y[good]=approx2(t[good],u[good])
     good=N.where((s<15) & (s>=5.5) & (a<5.5))[0]
@@ -173,11 +173,11 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
                  Omega=GammaFactor[i]*(disp[j,:]-W[i])+OmegaFactorx[i]*dQ1+OmegaFactory[i]*dQ2
                  #print 'Gamma Shape Omega', Gamma.shape, Omega.shape,disp.shape,W.shape
                  vog=voigt(Omega,Gamma)
-                 for idx in range(15):
-                    #print '%d %d Gamma %f disp %f W %f Omega %f'%(idx,j, Gamma[idx],disp[j,idx],W[0],\
-                    #    Omega[idx])
-                    #print '%d norm %f normz %f detxy %f detz %f'%(idx,norm[idx],normz[0],detxy[0],detz[0])
-                    print '%d %d voigt %f'%(idx,j,vog[idx])
+                 #for idx in range(15):
+                    ##print '%d %d Gamma %f disp %f W %f Omega %f'%(idx,j, Gamma[idx],disp[j,idx],W[0],\
+                    ##    Omega[idx])
+                    ##print '%d norm %f normz %f detxy %f detz %f'%(idx,norm[idx],normz[0],detxy[0],detz[0])
+                    #print '%d %d voigt %f'%(idx,j,vog[idx])
                  add=myint[j,:]*voigt(Omega,Gamma)*norm*normz[iz]/detxy[i]/detz[i]
                  convs[j,i]=convs[j,i]+add.sum()
                  #print 'convs ',convs
