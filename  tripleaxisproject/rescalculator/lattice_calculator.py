@@ -24,7 +24,7 @@ def myradians(x):
 @autovectorized
 def mydegrees(x):
     return math.degrees(x)
-#vecradians = N.vectorize(myradians, otypes=[double]) 
+#vecradians = N.vectorize(myradians, otypes=[double])
 
 def sign(x):
     if x>0:
@@ -61,6 +61,28 @@ def similarity_transform(A,B):
     #
     return G2
 
+def CleanArgs(**args):
+    """Takes as input a set of arrays and/or scalars given as keyword arguments.  It returns a set of the arrays that are the length as the longest entry
+    For shorter arrays, it pads them with the last value in the array.  It returns a dictionary based on the calling args"""
+    npts=[]
+    for name,val in args.iteritems():
+        if type(val) in [type(13),type(13.0)]:
+            args[name]=N.array([val],'float64')
+        npts.append(args[name].shape[0])
+    maxpts=max(npts)
+    for name,val in args.iteritems():
+        if val.shape[0]<maxpts:
+            last_val=val[-1]
+            if len(val.shape)==1:
+                addendum=last_val*N.ones((maxpts-val.shape[0],),'float64')
+                args[name]=N.concatenate((val,addendum))
+            elif len(val.shape)==2:
+                addendum=N.tile(last_val,(maxpts-val.shape[0],1))
+                args[name]=N.concatenate((val,addendum))
+        #print name, len(val.shape),args[name]
+    return args
+
+
 class instrument:
     def __init__(self):
             self.tau_list={'pg(002)':1.87325, \
@@ -84,24 +106,27 @@ class lattice:
                  gamma=N.array([90, 90], 'd'), \
                  orient1=N.array([[1, 0, 0], [1, 0, 0]], 'd'), \
                  orient2=N.array([[0, 1, 0], [0, 1, 0]], 'd')):
-        self.a=a
-        self.b=b
-        self.c=c
-        self.alphad=alpha
-        self.betad=beta
-        self.gammad=gamma
-        self.alpha=myradians(alpha)
-        self.beta=myradians(beta)
-        self.gamma=myradians(gamma)
+        newinput=CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2)
+        self.a=newinput['a']
+        self.b=newinput['b']
+        self.c=newinput['c']
+        self.alphad=newinput['alpha']
+        self.betad=newinput['beta']
+        self.gammad=newinput['gamma']
+        self.alpha=myradians(newinput['alpha'])
+        self.beta=myradians(newinput['beta'])
+        self.gamma=myradians(newinput['gamma'])
         self.star()
         self.gtensor('lattice')
         self.gtensor('latticestar')
         self.npts=N.size(a)
-        self.orient1=orient1.transpose()
-        self.orient2=orient2.transpose()
+        self.orient1=newinput['orient1'].transpose()
+        self.orient2=newinput['orient2'].transpose()
         self.StandardSystem()
         self.instrument=instrument()
         return
+
+
 
     def scalar(self, x1, y1, z1, x2, y2, z2, lattice):
         "calculates scalar product of two vectors"
@@ -119,7 +144,7 @@ class lattice:
             alpha=self.alphastar
             beta=self.betastar
             gamma=self.gammastar
-        
+
         s=x1*x2*a**2+y1*y2*b**2+z1*z2*c**2+\
            (x1*y2+x2*y1)*a*b*N.cos(gamma)+\
            (x1*z2+x2*z1)*a*c*N.cos(beta)+\
@@ -160,9 +185,9 @@ class lattice:
     def angle(self, x1, y1, z1, x2, y2, z2, lattice):
         "Calculate the angle between vectors in real and reciprocal space"
         "xi,yi,zi are the fractional cell coordinates of the vectors"
-        phi=N.arccos(self.scalar(x1, y1, z1, x2, y2, z2, lattice)/self.modvec(x1, y1, z1, lattice)/self.modvec(x1, y1, z1, lattice))    
+        phi=N.arccos(self.scalar(x1, y1, z1, x2, y2, z2, lattice)/self.modvec(x1, y1, z1, lattice)/self.modvec(x1, y1, z1, lattice))
         return phi
-    
+
     def modvec(self, x, y, z, lattice):
         "Calculates modulus of a vector defined by its fraction cell coordinates"
         "or Miller indexes"
@@ -242,12 +267,12 @@ class lattice:
         x[0, :]=x[0, :]/modx; # First unit basis vector
         x[1, :]=x[1, :]/modx;
         x[2, :]=x[2, :]/modx;
-        
+
         proj=self.scalar(orient2[0, :], orient2[1, :], orient2[2, :], \
                     x[0, :], x[1, :], x[2, :], 'latticestar')
-        
+
         y=N.copy(orient2)
-        y[0, :]=y[0, :]-x[0, :]*proj; 
+        y[0, :]=y[0, :]-x[0, :]*proj;
         y[1, :]=y[1, :]-x[1, :]*proj;
         y[2, :]=y[2, :]-x[2, :]*proj;
 
@@ -262,38 +287,38 @@ class lattice:
             y[0, :]=y[0, :]/mody; # Second unit basis vector
             y[1, :]=y[1, :]/mody;
             y[2, :]=y[2, :]/mody;
-    
+
             z=N.copy(y);
-    
+
             z[0, :]=x[1, :]*y[2, :]-y[1, :]*x[2, :];
             z[1, :]=x[2, :]*y[0, :]-y[2, :]*x[0, :];
             z[2, :]=-x[1, :]*y[0, :]+y[1, :]*x[0, :];
-    
+
             proj=self.scalar(z[0, :], z[1, :], z[2, :], x[0, :], x[1, :], x[2, :], 'latticestar');
-    
-            z[0, :]=z[0, :]-x[0, :]*proj; 
+
+            z[0, :]=z[0, :]-x[0, :]*proj;
             z[1, :]=z[1, :]-x[1, :]*proj;
             z[2, :]=z[2, :]-x[2, :]*proj;
-    
+
             proj=self.scalar(z[0, :], z[1, :], z[2, :], y[0, :], y[1, :], y[2, :], 'latticestar');
-    
-            z[0, :]=z[0, :]-y[0, :]*proj; 
+
+            z[0, :]=z[0, :]-y[0, :]*proj;
             z[1, :]=z[1, :]-y[1, :]*proj;
             z[2, :]=z[2, :]-y[2, :]*proj;
-    
+
             modz=self.modvec(z[0, :], z[1, :], z[2, :], 'latticestar');
-    
+
             z[0, :]=z[0, :]/modz; #% Third unit basis vector
             z[1, :]=z[1, :]/modz;
-            z[2, :]=z[2, :]/modz;     
-            
+            z[2, :]=z[2, :]/modz;
+
             self.x=x
             self.y=y
-            self.z=z    
+            self.z=z
         except ValueError:
-            print 'ORIENTATION VECTORS ARE COLLINEAR x,y,z not set'    
+            print 'ORIENTATION VECTORS ARE COLLINEAR x,y,z not set'
         return
-    
+
     def S2R(self, qx, qy, qz):
         "Given cartesian coordinates of a vector in the S System, calculate its Miller indexes."
         x=self.x
@@ -304,7 +329,7 @@ class lattice:
         L=qx*x[2, :]+qy*y[2, :]+qz*z[2, :];
         q=N.sqrt(qx**2+qy**2+qz**2);
         return H, K, L, q
-    
+
     def R2S(self, H, K, L):
         "Given reciprocal-space coordinates of a vecotre, calculate its coordinates in the Cartesian space."
         x=self.x
@@ -321,13 +346,21 @@ class lattice:
         and spectrometer and sample parameters specified in EXP calculates the wave vector
         transfer in the sample (H, K, L), Q=|(H,K,L)|, energy tranfer E, and incident
         and final neutron energies."""
-
-
-        taum=N.empty(M2.shape,'d')
-        taua=N.empty(M2.shape,'d')
-        for ind in range(M2.shape[0]):
+        newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alphad,beta=self.betad,\
+                            gamma=self.gammad,orient1=self.orient1.T,orient2=self.orient2.T,M2=M2,S1=S1,S2=S2,A2=A2)
+        self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+                        beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
+                        orient2=newinput['orient2'])
+        M2=newinput['M2']
+        S1=newinput['S1']
+        S2=newinput['S2']
+        A2=newinput['A2']
+        npts=len(EXP)
+        taum=N.empty(npts,'d')
+        taua=N.empty(npts,'d')
+        for ind in range(npts):
              taum[ind]=self.instrument.get_tau(EXP[ind]['mono']['tau'])
-        for ind in range(M2.shape[0]):
+        for ind in range(npts):
              taua[ind]=self.instrument.get_tau(EXP[ind]['ana']['tau'])
         ki=taum/N.sqrt(2.0-2*N.cos(M2))
         Ei=2.072142*ki**2
@@ -351,17 +384,27 @@ class lattice:
     def SpecGoTo(self,H,K,L,E,EXP):
         """Calculate shaft angles given momentum transfer H, K, L, energy transfer E, and
           spectrometer and smaple parameters in EXP."""
+        newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alphad,beta=self.betad,\
+                            gamma=self.gammad,orient1=self.orient1.T,orient2=self.orient2.T,H=H,K=K,L=L,E=E)
+        self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+                        beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
+                        orient2=newinput['orient2'])
+        H=newinput['H']
+        K=newinput['K']
+        L=newinput['L']
+        E=newinput['E']
 
         CONVERT2=2.072
         #mono=[EXP['mono']]
-        taum=N.empty(H.shape,'float64')
-        taua=N.empty(H.shape,'float64')
-        infin=-1*N.ones((self.npts,1),'float64')
-        dir1=N.ones((self.npts,1),'float64')
-        dir2=N.ones((self.npts,1),'float64')
-        mondir=N.ones((self.npts,1),'float64')
-        efixed=N.empty((self.npts,1),'float64')
-        for ind in range(self.npts):
+        npts=len(EXP)
+        taum=N.empty((npts,),'float64')
+        taua=N.empty((npts,),'float64')
+        infin=-1*N.ones((npts,1),'float64')
+        dir1=N.ones((npts,1),'float64')
+        dir2=N.ones((npts,1),'float64')
+        mondir=N.ones((npts,1),'float64')
+        efixed=N.empty((npts,1),'float64')
+        for ind in range(npts):
             taum[ind]=self.instrument.get_tau(EXP[ind]['mono']['tau'])
             taua[ind]=self.instrument.get_tau(EXP[ind]['ana']['tau'])
             if ('infin' in EXP[ind]):
@@ -375,13 +418,13 @@ class lattice:
             efixed[ind]=EXP[ind]['efixed']
 
         qx,qy,qz,Q=self.R2S(H,K,L)
-        dir=N.zeros((3,self.npts),'float64')
+        dir=N.zeros((3,npts),'float64')
         dir[0,:]=mondir
         dir[1,:]=-dir[0,:]*dir1
         dir[2,:]=-dir[1,:]*dir2
 
         ei=efixed+E
-        ef=efixed
+        ef=efixed+0*E
         change=N.where(infin>0)
         if N.size(change)!=0:
             ef[change]=efixed[change]-E[change]
@@ -422,7 +465,7 @@ class TestLattice(unittest.TestCase):
         orient2=N.array([[0,1,1]],'d')
         self.fixture = lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-    
+
     def test_astar(self):
         self.assertAlmostEqual(self.fixture.astar[0],1.0,2,'astar Not equal to '+str(1.0))
     def test_bstar(self):
@@ -445,14 +488,14 @@ class TestLattice(unittest.TestCase):
     def test_gstar(self):
         #print self.fixture.gstar
         self.assertAlmostEqual(self.fixture.gstar[:,:,0][0,0],1.0*N.eye(3)[0,0] ,2,'gstar Not equal to '+str(1.0 ))
- 
+
     def test_StandardSystem_x(self):
  #       #print self.fixture.gstar
         self.assertAlmostEqual(self.fixture.x[0],1.0 ,2,'Standard System x Not equal to '+str(1.0 ))
- 
-    
-      
-                               
+
+
+
+
 #    def test_zeroes(self):
 #        self.assertEqual(0 + 0, 0)
 #        self.assertEqual(5 + 0, 5)
@@ -466,11 +509,11 @@ class TestLattice(unittest.TestCase):
 #        self.assertEqual(-19 + 20, 1)
 #        self.assertEqual(999 + -1, 998)
 #        self.assertEqual(-300.1 + -400.2, -700.3)
-#        
+#
 
 if __name__=="__main__":
     if 1:
-        a=N.array([2*pi],'d')
+        a=N.array([2*pi,2*pi],'d')
         b=N.array([8],'d')
         c=N.array([11],'d')
         alpha=N.array([87],'d')
@@ -496,7 +539,7 @@ if __name__=="__main__":
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
         EXP['method']=0
-        setup=[EXP]  
+        setup=[EXP]
         M2=myradians(N.array([41.177]))
         A2=myradians(N.array([41.177]))
         S1=myradians(N.array([66.4363]))
