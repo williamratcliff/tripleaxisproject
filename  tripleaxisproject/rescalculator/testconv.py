@@ -36,7 +36,7 @@ if __name__=="__main__":
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
         EXP['method']=0
-        setup=[EXP,EXP]
+        setup=[EXP]
 
         #Parameter values for the cross section
         p=N.zeros((7,),'float64')

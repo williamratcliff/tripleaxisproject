@@ -1338,7 +1338,7 @@ if __name__=="__main__":
         EXP['method']=0
         setup=[EXP]
         myrescal=rescalculator(mylattice)
-        newinput=CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+        newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
                             H=H,K=K,L=L,W=W,setup=setup)
         mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
                         beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
@@ -1354,3 +1354,4 @@ if __name__=="__main__":
         print RMS.transpose()[0]
         print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0],[1,1,0]])
         print myrescal.CalcWidths(H,K,L,W,setup)
+        print 'setup length ',len(setup)
