@@ -20,7 +20,7 @@ if __name__=="__main__":
         orient2=N.array([[0,-1,0]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([.5,1],'d');K=N.array([.5,2],'d');L=N.array([0],'d');W=N.array([0],'d')
+        H=N.array([.5,1],'d');K=N.array([.5,1.2],'d');L=N.array([0],'d');W=N.array([0],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -49,13 +49,23 @@ if __name__=="__main__":
         p[6]=40#                 % Flat background
         #print 'p ',p
         myrescal=rescalc.rescalculator(mylattice)
+        newinput=CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+                            H=H,K=K,L=L,W=W,setup=setup)
+        mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+                        beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
+                        orient2=newinput['orient2'])
+        myrescal.__init__(mylattice)
+        H=newinput['H']
+        K=newinput['K']
+        L=newinput['L']
+        W=newinput['W']
+        setup=newinput['setup']
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         print 'RMS'
         print RMS.transpose()[0]
 
-        myrescal.ResPlot(H, K, L, W, setup)
-        exit()
+        #myrescal.ResPlot(H, K, L, W, setup)
 
         (prefactor,background)=prefdemo.PrefDemo(H,K,L,W,myrescal,p)
         #print 'prefactor ',prefactor
