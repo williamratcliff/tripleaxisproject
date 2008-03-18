@@ -26,7 +26,7 @@ def autovectorized(f):
 def myradians(x):
     return math.radians(x)
 
-#vecradians = N.vectorize(myradians, otypes=[double]) 
+#vecradians = N.vectorize(myradians, otypes=[double])
 
 def sign(x):
     if x>0:
@@ -71,7 +71,7 @@ class rescalculator:
     def __init__(self, mylattice):
         self.lattice_calculator=mylattice
         return
-    
+
     def ResMat(self, Q, W,EXP):
         CONVERT1=0.4246609*N.pi/60/180;
         CONVERT2=2.072;
@@ -166,7 +166,7 @@ class rescalculator:
             if 'depth' in mono:
                 monod=mono.depth**2
             mshape=N.diag([monod,monow,monoh])
-            if 'width' in ana: 
+            if 'width' in ana:
                 anaw=ana['width']**2
             if 'height' in ana:
                 anah=ana['height']**2
@@ -198,11 +198,11 @@ class rescalculator:
             myinstrument=lattice_calculator.instrument()
             taum=myinstrument.get_tau(mono['tau'])
             taua=myinstrument.get_tau(ana['tau'])
-        
+
             horifoc=-1;
             if 'horifoc' in EXP[ind]:
                 horifoc=EXP[ind]['horifoc']
-            if horifoc==1: 
+            if horifoc==1:
                 alpha[2]=alpha[2]*N.sqrt(8*N.log(2)/12)
 #            %---------------------------------------------------------------------------------------------
 #            %Calculate angles and energies
@@ -221,7 +221,7 @@ class rescalculator:
             s2theta=-N.arccos( (ki**2+kf**2-q**2)/(2*ki*kf))# %2theta sample
             thetas=s2theta/2
             phi=N.arctan2(-kf*N.sin(s2theta), ki-kf*N.cos(s2theta)) #%Angle from ki to Q
-        
+
  #           %---------------------------------------------------------------------------------------------
 #            %Calculate beam divergences defined by neutron guides
             pi=N.pi
@@ -233,7 +233,7 @@ class rescalculator:
                   alpha[2]=-alpha[2]*2*0.427/ki*pi/180
             if alpha[3]<0:
                   alpha[3]=-alpha[3]*2*0.427/ki*pi/180
-            
+
             if beta[0]<0:
                   beta[0]=-beta[0]*2*0.427/ki*pi/180
             if beta[1]<0:
@@ -242,7 +242,7 @@ class rescalculator:
                   beta[2]=-beta[2]*2*0.427/ki*pi/180
             if beta[3]<0:
                   beta[3]=-beta[3]*2*0.427/ki*pi/180
-            
+
 #            %---------------------------------------------------------------------------------------------
 #            %Rededine sample geometry
             psi=thetas-phi;# %Angle from sample geometry X axis to Q
@@ -254,11 +254,11 @@ class rescalculator:
             rot[2,2]=1
             sshape=N.dot(rot.transpose(),N.dot(sshape,rot)) #matrix multiplication?
 #            %---------------------------------------------------------------------------------------------
-#            %Definition of matrix G    
+#            %Definition of matrix G
             G=1.0/N.array([alpha[0],alpha[1],beta[0],beta[1],alpha[2],alpha[3],beta[2],beta[3]])**2
             G=N.diag(G)
 #            %---------------------------------------------------------------------------------------------
-#            %Definition of matrix F    
+#            %Definition of matrix F
             F=1.0/N.array([etam,etamv,etaa,etaav])**2
             F=N.diag(F);
 #            %---------------------------------------------------------------------------------------------
@@ -389,13 +389,13 @@ class rescalculator:
             RM_[1,0]=M[1,0]
             RM_[0,1]=M[0,1]
             RM_[1,1]=M[1,1]
-            
+
             RM_[0,2]=M[0,3]
             RM_[2,0]=M[3,0]
             RM_[2,2]=M[3,3]
             RM_[2,1]=M[3,1]
             RM_[1,2]=M[1,3]
-            
+
             RM_[0,3]=M[0,2]
             RM_[3,0]=M[2,0]
             RM_[3,3]=M[2,2]
@@ -457,7 +457,7 @@ class rescalculator:
                 R0_=R0_*ki #%1/ki monitor efficiency
                 #print 'R01', R0_
                 #print 'Rmon', Rmon
-                
+
 #            %---------------------------------------------------------------------------------------------
 #            %Transform prefactor to Chesser-Axe normalization
             R0_=R0_/(2*pi)**2*N.sqrt(N.linalg.det(RM_))
@@ -498,7 +498,7 @@ class rescalculator:
             R0[ind]=R0_
             RM[:,:,ind]=RM_[:,:]
         return R0, RM
-    
+
     def ResMatS(self,H,K,L,W,EXP):
 # [len,H,K,L,W,EXP]=CleanArgs(H,K,L,W,EXP);
         x=self.lattice_calculator.x
@@ -511,7 +511,7 @@ class rescalculator:
         uq[2,:]=L/Q;
         xq=self.lattice_calculator.scalar(x[0,:],x[1,:],x[2,:],uq[0,:],uq[1,:],uq[2,:],'latticestar');
         yq=self.lattice_calculator.scalar(y[0,:],y[1,:],y[2,:],uq[0,:],uq[1,:],uq[2,:],'latticestar');
-        zq=0; # %scattering vector assumed to be in (self.orient1,self.orient2) plane;        
+        zq=0; # %scattering vector assumed to be in (self.orient1,self.orient2) plane;
         tmat=N.zeros((4,4,self.lattice_calculator.npts)); #%Coordinate transformation matrix
         tmat[3,3,:]=1;
         tmat[2,2,:]=1;
@@ -519,11 +519,11 @@ class rescalculator:
         tmat[0,1,:]=yq;
         tmat[1,1,:]=xq;
         tmat[1,0,:]=-yq;
-        
+
         RMS=N.zeros((4,4,self.lattice_calculator.npts));
         rot=N.zeros((3,3));
         EXProt=EXP;
-        
+
 #        %Sample shape matrix in coordinate system defined by scattering vector
         for i in range(self.lattice_calculator.npts):
             sample=EXP[i]['sample'];
@@ -534,12 +534,12 @@ class rescalculator:
                 rot[1,1]=tmat[1,1,i];
                 rot[2,2]=tmat[2,2,i];
                 EXProt[i]['sample']['shape']=N.dot(rot,N.dot(sample['shape'],rot.T));
-        
+
         R0,RM= self.ResMat(Q,W,EXProt)
-        
+
         for i in range(self.lattice_calculator.npts):
            RMS[:,:,i]=N.dot((tmat[:,:,i]).transpose(),N.dot(RM[:,:,i],tmat[:,:,i]));
-        
+
         mul=N.zeros((4,4));
         e=N.eye(4,4);
         for i in range(self.lattice_calculator.npts):
@@ -563,13 +563,13 @@ class rescalculator:
         #EXP=[EXP[center]]
         Style1=''
         Style2='--'
-        
+
         XYAxesPosition=[0.1, 0.6, 0.3, 0.3]
         XEAxesPosition=[0.1, 0.1, 0.3, 0.3]
         YEAxesPosition=[0.6, 0.6, 0.3, 0.3]
         TextAxesPosition=[0.45, 0.0, 0.5, 0.5]
-        GridPoints=101                
-        
+        GridPoints=101
+
         [R0,RMS]=self.ResMatS(H,K,L,W,EXP)
         #[xvec,yvec,zvec,sample,rsample]=self.StandardSystem(EXP);
         self.lattice_calculator.StandardSystem()
@@ -577,17 +577,17 @@ class rescalculator:
         qx=self.lattice_calculator.scalar(self.lattice_calculator.x[0,:],self.lattice_calculator.x[1,:],self.lattice_calculator.x[2,:],H,K,L,'latticestar')
         qy=self.lattice_calculator.scalar(self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],H,K,L,'latticestar')
         qw=W;
-        
+
         #========================================================================================================
         #find reciprocal-space directions of X and Y axes
-        
+
         o1=self.lattice_calculator.orient1#[:,0] #EXP['orient1']
         o2=self.lattice_calculator.orient2#[:,0] #EXP['orient2']
         pr=self.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
         o2[0]=self.lattice_calculator.y[0,:]*pr
         o2[1]=self.lattice_calculator.y[1,:]*pr
         o2[2]=self.lattice_calculator.y[2,:]*pr
-        
+
         if N.abs(o2[0,center])<1e-5:
              o2[0,center]=0.0
         if N.absolute(o2[1,center])<1e-5:
@@ -620,7 +620,7 @@ class rescalculator:
         fig=pylab.figure()
         #%========================================================================================================
         #% plot XY projection
-        
+
 
         proj,sec=self.project(RMS,2)
         (a,b,c)=N.shape(proj)
@@ -859,8 +859,8 @@ class rescalculator:
         print 'qw ',qw
         print 'theta_sec ',theta_sec
         rsample='latticestar'
-        oxmax=YMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
-        oxmin=YMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+        oxmax=YMax/self.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+        oxmin=YMin/self.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
         oymax=WMax
         oymin=WMin
         #print 'a1 ',a1
@@ -887,7 +887,7 @@ class rescalculator:
             ax3.set_xlim(oxmin[center], oxmax[center])
             ax3.yaxis.set_major_formatter(NullFormatter())
             ax3.yaxis.set_major_locator(pylab.NullLocator())
-            xlabel=r'Q$_y$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
+            xlabel=r'Q$_y$' +'(units of ['+str(o2[0,center])+' '+str(o2[1,center])+' '+str(o2[2,center])+'])'
             ax3.set_xlabel(xlabel)
             #ax3.set_zorder(2)
 
@@ -920,17 +920,17 @@ class rescalculator:
 
             #ax.set_zorder(1)
 
-        
+
         pylab.show()
-        
-        
+
+
         #self.PlotEllipse(proj,qx,qw,Style1);
         #self.PlotEllipse(sec,qx,qw,Style2);
         #pylab.show()
         return
-        
-        
-        
+
+
+
     def fproject(self,mat_in,i):
         """return hwhm of projection"""
         if (i==0):
@@ -944,7 +944,7 @@ class rescalculator:
             j=1
         mat=N.array(mat_in)
         (a,b,c)=N.shape(mat)
-        proj=N.zeros((2,2,c),'d')        
+        proj=N.zeros((2,2,c),'d')
         proj[0,0,:]=mat[i,i,:]-mat[i,v,:]*mat[i,v,:]/mat[v,v,:]
         proj[0,1,:]=mat[i,j,:]-mat[i,v,:]*mat[j,v,:]/mat[v,v,:]
         proj[1,0,:]=mat[j,i,:]-mat[j,v,:]*mat[i,v,:]/mat[v,v,:]
@@ -952,8 +952,8 @@ class rescalculator:
         hwhm=proj[0,0,:]-proj[0,1,:]*proj[0,1,:]/proj[1,1,:]
         hwhm=N.sqrt(2*N.log(2))/N.sqrt(hwhm)
         return hwhm
-           
-    
+
+
     def PlotEllipse(self,mat_in,x0,y0,style):
         """plot ellipse"""
         mat=N.array(mat_in)
@@ -967,7 +967,7 @@ class rescalculator:
             y=r*N.sin(phi)+y0[i];
             pylab.plot(x,y,style);
         return
-    
+
     def project(self,mat_in,v):
         """return projection and cross section matrices"""
         if v == 2:
@@ -1012,7 +1012,7 @@ class rescalculator:
         tmat[1,0,:]=-yq;
         return tmat
 
-    
+
     def calc_correction(self,H,K,L,W,EXP,qscan=None):
         "Returns the correction factor such that I_int=F^2*correction"
         Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
@@ -1033,7 +1033,7 @@ class rescalculator:
                 #print 'qcooper ',qcooper[0,0]
                 qx.append(qcooper[0,0]/qscan_mod)
                 qy.append(qcooper[1,0]/qscan_mod)
-                
+
         q_correction=[]
         #print 'qx ',qx[0][0]
         for i in range(RM.shape[2]):
@@ -1217,7 +1217,7 @@ class TestLattice(unittest.TestCase):
         orient2=N.array([[0,1,1]],'d')
         self.fixture = lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-    
+
     def test_astar(self):
         self.assertAlmostEqual(self.fixture.astar[0],1.0,2,'astar Not equal to '+str(1.0))
     def test_bstar(self):
@@ -1240,14 +1240,14 @@ class TestLattice(unittest.TestCase):
     def test_gstar(self):
         #print self.fixture.gstar
         self.assertAlmostEqual(self.fixture.gstar[:,:,0][0,0],1.0*N.eye(3)[0,0] ,2,'gstar Not equal to '+str(1.0 ))
- 
+
     def test_StandardSystem_x(self):
  #       #print self.fixture.gstar
         self.assertAlmostEqual(self.fixture.x[0],1.0 ,2,'Standard System x Not equal to '+str(1.0 ))
- 
-    
-      
-                               
+
+
+
+
 #    def test_zeroes(self):
 #        self.assertEqual(0 + 0, 0)
 #        self.assertEqual(5 + 0, 5)
@@ -1261,7 +1261,7 @@ class TestLattice(unittest.TestCase):
 #        self.assertEqual(-19 + 20, 1)
 #        self.assertEqual(999 + -1, 998)
 #        self.assertEqual(-300.1 + -400.2, -700.3)
-#        
+#
 
 if __name__=="__main__":
     if 0:
@@ -1292,7 +1292,7 @@ if __name__=="__main__":
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
         EXP['method']=0
-        setup=[EXP]  
+        setup=[EXP]
         myrescal=rescalculator(mylattice)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         #myrescal.ResPlot(H, K, L, W, setup)

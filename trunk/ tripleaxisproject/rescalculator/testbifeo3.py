@@ -17,10 +17,10 @@ if __name__=="__main__":
         gamma=N.array([90],'d')
  #       orient1=N.array([[0,1,1]],'d')
         orient1=N.array([[1,0,0]],'d')
-        orient2=N.array([[0,1,0]],'d')
+        orient2=N.array([[0,-1,0]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([.5],'d');K=N.array([.5],'d');L=N.array([0],'d');W=N.array([0],'d')
+        H=N.array([.5,1],'d');K=N.array([.5,2],'d');L=N.array([0],'d');W=N.array([0],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -50,6 +50,10 @@ if __name__=="__main__":
         #print 'p ',p
         myrescal=rescalc.rescalculator(mylattice)
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+        R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+        print 'RMS'
+        print RMS.transpose()[0]
+
         myrescal.ResPlot(H, K, L, W, setup)
         exit()
 
