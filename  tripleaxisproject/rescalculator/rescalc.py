@@ -78,8 +78,8 @@ class rescalculator:
         CONVERT2=2.072;
         npts=len(EXP)
         Qnpts=N.size(Q)
-        RM=N.zeros((4, 4, Qnpts),'d');
-        R0=N.zeros((Qnpts,1),'d');
+        RM=N.zeros((4, 4, npts),'d');
+        R0=N.zeros((npts,1),'d');
         RM_=N.zeros((4, 4),'d');
         D=N.zeros((8, 13),'d');
         d=N.zeros((4, 7),'d');
@@ -538,9 +538,9 @@ class rescalculator:
                 EXProt[i]['sample']['shape']=N.dot(rot,N.dot(sample['shape'],rot.T));
 
         R0,RM= self.ResMat(Q,W,EXProt)
-        print 'RM ',RM.shape
-        print 'npts ',self.lattice_calculator.npts
-        print 'tmat ',tmat.shape
+        #print 'RM ',RM.shape
+        #print 'npts ',self.lattice_calculator.npts
+        #print 'tmat ',tmat.shape
         for i in range(self.lattice_calculator.npts):
            RMS[:,:,i]=N.dot((tmat[:,:,i]).transpose(),N.dot(RM[:,:,i],tmat[:,:,i]));
 

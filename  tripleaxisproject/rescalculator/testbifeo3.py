@@ -128,8 +128,8 @@ if __name__=="__main__":
         ymin=.45
         ymax=.55
         #.485, .515
-        ht=N.linspace(xmin,xmax,21)
-        kt=N.linspace(ymin,ymax,41)
+        ht=N.linspace(xmin,xmax,5)
+        kt=N.linspace(ymin,ymax,5)
         h,k=N.meshgrid(ht,kt)
         H=h.flatten()
         K=k.flatten()
@@ -171,7 +171,9 @@ if __name__=="__main__":
         conv_sma=convres_sma.ConvResSMA(smabifeo3.SMADemo,prefbifeo3.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
         print 'conv '
         print conv_sma.shape
-        #exit()
+        print conv_sma.max()
+        print myint.max()
+        exit()
         #print 'sqw ', sqw
         xd,yd,zd=prep_data2(H,K,conv_sma[0,:]);
         if 1:
