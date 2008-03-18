@@ -129,14 +129,13 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
     try:
         (modes,points)=testsqw.shape
     except:
-        (modes,)=testsqw.shape
-        points=1
+        (points,)=testsqw.shape
+        modes=1
     if pref==None:
        prefactor=N.ones((modes,points),'float64')
        bgr=0
     else:
         prefactor,bgr=pref(H,K,L,W,myrescal,p)
-
 #    %========================= fix  method ===========================================================
     if METHOD=='fixed':
        M=ACCURACY
@@ -169,7 +168,10 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
               #for idx in range(15):
               #    print '%d H1 %f K1 %f L1 %f myint %f'%(idx,H1[idx],K1[idx],L1[idx],myint[0,idx])
               for j in range(modes):
-                 Gamma=WL[j,:]*GammaFactor[i]
+                 if modes==1:
+                     Gamma=WL*GammaFactor[i]
+                 else:
+                    Gamma=WL[j,:]*GammaFactor[i]
                  Omega=GammaFactor[i]*(disp[j,:]-W[i])+OmegaFactorx[i]*dQ1+OmegaFactory[i]*dQ2
                  #print 'Gamma Shape Omega', Gamma.shape, Omega.shape,disp.shape,W.shape
                  vog=voigt(Omega,Gamma)
@@ -178,7 +180,10 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
                     ##    Omega[idx])
                     ##print '%d norm %f normz %f detxy %f detz %f'%(idx,norm[idx],normz[0],detxy[0],detz[0])
                     #print '%d %d voigt %f'%(idx,j,vog[idx])
-                 add=myint[j,:]*voigt(Omega,Gamma)*norm*normz[iz]/detxy[i]/detz[i]
+                 if modes==1:
+                    add=myint*voigt(Omega,Gamma)*norm*normz[iz]/detxy[i]/detz[i]
+                 else:
+                    add=myint[j,:]*voigt(Omega,Gamma)*norm*normz[iz]/detxy[i]/detz[i]
                  convs[j,i]=convs[j,i]+add.sum()
                  #print 'convs ',convs
               #print 'conv ',conv.shape
