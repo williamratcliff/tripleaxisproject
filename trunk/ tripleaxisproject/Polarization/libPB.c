@@ -330,6 +330,7 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
 
     if( (ierr = PBcorrectDatapt(&d)) ) {
       if( *DBG ) printf("ERROR in PBcorrectDatapt = %d\n",ierr) ;
+      return ierr ;
     }
 
     if( *DBG > 1 ) {
@@ -1004,28 +1005,33 @@ static int PBcorrect(PBdatapt *d)
   N = d->Nactive;
 
   if( CalcMethod == 0 ) {
-    /* invert M returning INV and partials P */
-    det = invertP(N, &M, &INV, &P) ;
-    if( fabs(det) <= 0. ) return 3 ;
-    /*
-      Su = SUMv INVuv Cv
-      sigSu^2 = SUMv SUMmn(dINVuv/dAmn sigAmn)^2 Cv^2
-      + SUMv INVuv^2 sigCv^2
-    */
-    for( i=0 ; i<N ; i++ ) {
-      D.S[i] = 0. ;
-      D.Sesq[i] = 0. ;
-      for( j=0 ; j<N ; j++ ) {
-	invij = INV.A[i][j] ;
-	D.S[i] += invij*D.Y[j] ;
-	sumsiguv = 0. ;
-	for( k=0 ; k<N ; k++ ) {
-	  for( l=0 ; l<N ; l++ ) {
-	    Pkl = P.m[i][j].A[k][l] ;
-	    sumsiguv += Pkl*Pkl*D.Cesq[k][l] ;
+    if( N == 1 ) {
+      D.S[0] = D.Y[0]/M.A[0][0] ;
+      D.Sesq[0] = D.S[0]*D.S[0]*(D.Cesq[0][0]/(M.A[0][0]*M.A[0][0])+D.Yesq[0]/(D.Y[0]*D.Y[0]));
+    } else {
+      /* invert M returning INV and partials P */
+      det = invertP(N, &M, &INV, &P) ;
+      if( fabs(det) <= 0. ) return 3 ;
+      /*
+	Su = SUMv INVuv Cv
+	sigSu^2 = SUMv SUMmn(dINVuv/dAmn sigAmn)^2 Cv^2
+	+ SUMv INVuv^2 sigCv^2
+      */
+      for( i=0 ; i<N ; i++ ) {
+	D.S[i] = 0. ;
+	D.Sesq[i] = 0. ;
+	for( j=0 ; j<N ; j++ ) {
+	  invij = INV.A[i][j] ;
+	  D.S[i] += invij*D.Y[j] ;
+	  sumsiguv = 0. ;
+	  for( k=0 ; k<N ; k++ ) {
+	    for( l=0 ; l<N ; l++ ) {
+	      Pkl = P.m[i][j].A[k][l] ;
+	      sumsiguv += Pkl*Pkl*D.Cesq[k][l] ;
+	    }
 	  }
+	  D.Sesq[i] += sumsiguv*D.Y[j]*D.Y[j] + invij*invij*D.Yesq[j] ;
 	}
-	D.Sesq[i] += sumsiguv*D.Y[j]*D.Y[j] + invij*invij*D.Yesq[j] ;
       }
     }
   } else if( N == 2 && CalcMethod == 2 ) {
@@ -2221,7 +2227,7 @@ static int PBdefineCells(char *filename)
    static char Cstrs[4][4] = {"Cpp","Cmm","Cpm","Cmp"} ;
    static char Sstrs[4][4] = {"Spp","Smm","Spm","Smp"} ;
 
-   int i, ierr, j, k, n, is, ic, nw ;
+   int i, ierr, j, k, n, is, ic, nw, inw ;
    char *cp ;
    char buf[512], labl[64] ;
    char outfile[512] ;
@@ -2263,11 +2269,6 @@ static int PBdefineCells(char *filename)
      return 2 ;
    }
    fprintf(fpout,"# ") ;
-   for( j=0 ; j<4 ; j++ ) {
-     if( flags.Sconstrain[j] ) continue ;
-     fprintf(fpout, "%6s       %3sERR    ", Sstrs[j],Sstrs[j]) ;
-   }
-   fprintf(fpout,"     NSFflipRatio\n") ;
 
    n = 0 ;
 
@@ -2284,28 +2285,40 @@ static int PBdefineCells(char *filename)
        if( *cp == '\n' || *cp == '\0' ) break ;
        /* try to scan this word as a double */
 
-
+       inw = nw/2 - 1 ;
        if( sscanf(cp, "%lf", &dbl)<1 ) {
 	 if( nw < 2 ) {
 	   printf("failed to read lambdaI or lambdaF at data pt # %d\n",n+1) ;
 	   fclose(fp) ; fclose(fpout) ;
 	   return 3 ;
 	 } else if( nw < 10 ) {
-	   if( flags.CountsEnable[nw/2 - 1] ) {
-	     printf("failed to read required counts %d\n",nw/2-1) ;
-	     fclose(fp) ; fclose(fpout) ;
-	     return 4 ;
+	   if( flags.CountsEnable[inw] ) {
+	     printf("invalid counts disables equation index %d and zeros that cross-section\n",inw) ;
+	     flags.CountsEnable[inw] = 0;
+	     flags.Sconstrain[inw] = 1;
+	     for( j=0 ; j<4 ; j++ ) {
+	       if( inw == 0 ) { flags.Spp[j] = 0. ; }
+	       else if( inw == 1 ) { flags.Smm[j] = 0. ; }
+	       else if( inw == 2 ) { flags.Spm[j] = 0. ; }
+	       else if( inw == 3 ) { flags.Smp[j] = 0. ; }
+	     }
+	     constraintTOeqs();
 	   }
 	 } else {
 	   d.Yresq[nw-10] = d.Yesq[nw-10] = d.Y[nw-10] ;
 	 }
        } else {
-	 if( dbl <= 0. ) {
+	 if( dbl < 0. ) {
 	   printf("read negative value\n") ;
 	   fclose(fp) ; fclose(fpout) ;
 	   return 4 ;
 	 }
 	 if( nw < 2 ) {
+	   if( dbl <= 0. ) {
+	     printf("read non-positive for energy\n") ;
+	     fclose(fp) ; fclose(fpout) ;
+	     return 4 ;
+	   }
 	   dbl /= Dn ;
 	   dbl = TWOPI/sqrt(dbl) ;
 	 }
@@ -2316,9 +2329,9 @@ static int PBdefineCells(char *filename)
 	   EF = dbl ;
 	   d.lambF = dbl ;
 	 } else if( nw < 10 && nw%2 == 0 ) {
-	   d.Y[nw/2-1] = d.Yr[nw/2-1] = dbl ;
-	   d.Yesq[nw/2-1] = d.Yresq[nw/2-1] = dbl ;
-	 } else if( nw < 10 && sscanf(cp, "%lu",&(d.sec[nw/2-1])) < 1 ) {
+	   d.Y[inw] = d.Yr[inw] = dbl ;
+	   d.Yesq[inw] = d.Yresq[inw] = dbl ;
+	 } else if( nw < 10 && sscanf(cp, "%lu",&(d.sec[inw])) < 1 ) {
 	   printf("failed to read time stamp as unsigned long pt # %d\n",n+1);
 	   fclose(fp) ; fclose(fpout) ;
 	   return 3 ;
@@ -2348,6 +2361,14 @@ static int PBdefineCells(char *filename)
      }
 
      /* write the output */
+
+     if( n == 0 ) {
+       for( j=0 ; j<4 ; j++ ) {
+	 if( flags.Sconstrain[j] ) continue ;
+	 fprintf(fpout, "%6s       %3sERR    ", Sstrs[j],Sstrs[j]) ;
+       }
+       fprintf(fpout,"     NSFflipRatio\n") ;
+     }
 
      for( j=0 ; j<d.Nfree ; j++ ) {
        is = d.freeS[j] ;
