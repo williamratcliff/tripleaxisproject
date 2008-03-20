@@ -20,7 +20,7 @@ if __name__=="__main__":
         orient2=N.array([[0,0,1],[0,0,1]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([1.5,1.5],'d');K=N.array([0,0],'d');L=N.array([.35,0.35],'d');W=N.array([20,20],'d')
+        H=N.array([1.5,1.5],'d');K=N.array([0,0],'d');L=N.array([.35,0.35],'d');W=N.array([20,10],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -36,7 +36,7 @@ if __name__=="__main__":
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
         EXP['method']=0
-        setup=[EXP]
+        setup=[EXP,EXP]
 
         #Parameter values for the cross section
         p=N.zeros((7,),'float64')
