@@ -9,7 +9,8 @@ import scriptutil as SU
 import re
 import simple_combine
 import sys
-sys.path.append(r'c:\tripleaxisproject2\polarization')
+#sys.path.append(r'c:\tripleaxisproject2\polarization')
+sys.path.append(r'c:\mytripleaxisproject\polarization')
 import polcorrect_lib
 from matplotlib.ticker import NullFormatter, MultipleLocator
 from matplotlib.ticker import FormatStrFormatter
@@ -640,11 +641,28 @@ if __name__=="__main__":
         #print Counts_mp.shape
         #print I[0].shape
         #print I[1].shape
-
-
+        if 1:
+            outputfile=r'c:\bifeo3xtal\hhl_pm.txt'
+            f=open(outputfile,'wt')
+            f.write('H K L I Ierr\n')
+            for i in range(H_pm.size):
+                s='%f %f %f %f %f'%(H_pm[i],K_pm[i],L_pm[i],corrected_counts['Spm'][i],corrected_counts['Epm'][i])
+                print s
+                f.write(s+'\n')
+            f.close()
+        if 1:
+            outputfile=r'c:\bifeo3xtal\hhl_mp.txt'
+            f=open(outputfile,'wt')
+            f.write('H K L I Ierr\n')
+            for i in range(H_mp.size):
+                s='%f %f %f %f %f'%(H_mp[i],K_mp[i],L_mp[i],corrected_counts['Smp'][i],corrected_counts['Emp'][i])
+                print s
+                f.write(s+'\n')
+            f.close()
 
 # Next zone
         myend='out'
+        myend='bt7'
         mydirectory=r'c:\bifeo3xtal\jan8_2008\9175\data'
         myfilebase='fieldscansplusminusreset53630'
         myfilebase2='fieldscanminusplusreset53631'
@@ -657,23 +675,101 @@ if __name__=="__main__":
         myfilestr=flist[0]
         mydatareader=readncnr.datareader()
         mydata_pm=mydatareader.readbuffer(myfilestr)
+
         q_pm=N.array(mydata_pm.data['qx'])
-        counts_pm=N.array(mydata_pm.data['detector_corrected'])
-        errs_pm=N.array(mydata_pm.data['detector_errs_corrected'])
+        qh_pm=N.array(mydata_pm.data['qx'])
+        qk_pm=N.array(mydata_pm.data['qy'])
+        ql_pm=N.array(mydata_pm.data['qz'])
+
+        a=N.array([3.97296],'d')
+        b=N.array([2.79045],'d')
+        c=N.array([13.86],'d')
+        alpha=N.array([90],'d')
+        beta=N.array([90],'d')
+        gamma=N.array([90],'d')
+        orient1=N.array([[1,0,0]],'d')
+        orient2=N.array([[0,1,0]],'d')
+
+
+        mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                               orient1=orient1,orient2=orient2)
+        Q_pm=mylattice.modvec(qh_pm,qk_pm,ql_pm,'latticestar')
+        #counts_pm=N.array(mydata_pm.data['detector_corrected'])
+        #errs_pm=N.array(mydata_pm.data['detector_errs_corrected'])
+        counts_pm=N.array(mydata_pm.data['detector'])
+        errs_pm=N.sqrt(counts_pm)
 
 
         myfilestr=flist2[0]
         mydatareader=readncnr.datareader()
         mydata_mp=mydatareader.readbuffer(myfilestr)
         q_mp=N.array(mydata_mp.data['qx'])
-        counts_mp=N.array(mydata_mp.data['detector_corrected'])
-        errs_mp=N.array(mydata_mp.data['detector_errs_corrected'])
+        qh_mp=N.array(mydata_mp.data['qx'])
+        qk_mp=N.array(mydata_mp.data['qy'])
+        ql_mp=N.array(mydata_mp.data['qz'])
+
+
+        mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                               orient1=orient1,orient2=orient2)
+        Q_mp=mylattice.modvec(qh_mp,qk_mp,ql_mp,'latticestar')
+
+        #counts_mp=N.array(mydata_mp.data['detector_corrected'])
+        #errs_mp=N.array(mydata_mp.data['detector_errs_corrected'])
+
+        counts_mp=N.array(mydata_mp.data['detector'])
+        errs_mp=N.sqrt(counts_mp)
+
         cartoon()
+
+        timestamp={}
+        errs={}
+        counts={}
+        timestamp['mp']=N.array(mydata_mp.data['timestamp'])
+        timestamp['pm']=N.array(mydata_pm.data['timestamp'])
+        counts['pm']=counts_pm
+        counts['mp']=counts_mp
+        errs['pm']=errs_pm
+        errs['mp']=errs_mp
+        Ei_mp=14.7*N.ones(qh_pm.shape,'float64')
+        Ef_mp=14.7*N.ones(qh_pm.shape,'float64')
+
+        cell=r'C:\mytripleaxisproject\polarization\cells.txt'
+        mypolcor=polcorrect_lib.polarization_correct(counts,errs,timestamp,cell,Ei_mp,Ef_mp)
+        corrected_counts2=mypolcor.correct(pbflags)
+
+        if 1:
+            outputfile=r'c:\bifeo3xtal\hkhminusk_pm.txt'
+            f=open(outputfile,'wt')
+            f.write('Q H K L I Ierr\n')
+            for i in range(qh_pm.size):
+                #s='%f %f %f %f %f'%(qh_pm[i],qk_pm[i],ql_pm[i],counts_pm[i],errs_pm[i])
+                s='%f %f %f %f %f %f'%(Q_pm[i],qh_pm[i],qk_pm[i],ql_pm[i],corrected_counts2['Spm'][i],corrected_counts2['Epm'][i])
+                f.write(s+'\n')
+                print s
+            f.close()
+
+        if 1:
+            outputfile=r'c:\bifeo3xtal\hkhminusk_mp.txt'
+            f=open(outputfile,'wt')
+            f.write('Q H K L I Ierr\n')
+
+            for i in range(qh_mp.size):
+                #s='%f %f %f %f %f'%(qh_mp[i],qk_mp[i],ql_mp[i],counts_mp[i],errs_mp[i])
+                s='%f %f %f %f %f %f'%(Q_mp[i],qh_mp[i],qk_mp[i],ql_mp[i],corrected_counts2['Smp'][i],corrected_counts2['Emp'][i])
+                print s
+                f.write(s+'\n')
+                print s
+            f.close()
+
+        exit()
+        #print qh_mp.shape
 
         if 1:
             pylab.subplot(3,2,6)
-            pylab.errorbar(q_mp,counts_mp,fmt='bo',yerr=errs_mp,linestyle='None')
-            pylab.errorbar(q_pm,counts_pm,fmt='ro',yerr=errs_pm,linestyle='None')
+            #pylab.errorbar(q_mp,counts_mp,fmt='bo',yerr=errs_mp,linestyle='None')
+            #pylab.errorbar(q_pm,counts_pm,fmt='ro',yerr=errs_pm,linestyle='None')
+            pylab.errorbar(q_mp,corrected_counts2['Smp'],fmt='bo',yerr=corrected_counts2['Emp'],linestyle='None')
+            pylab.errorbar(q_pm,corrected_counts2['Spm'],fmt='ro',yerr=corrected_counts2['Epm'],linestyle='None')
 
 
         if 1:
