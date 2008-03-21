@@ -681,6 +681,7 @@ if __name__=="__main__":
         qk_pm=N.array(mydata_pm.data['qy'])
         ql_pm=N.array(mydata_pm.data['qz'])
 
+
         a=N.array([3.97296],'d')
         b=N.array([2.79045],'d')
         c=N.array([13.86],'d')
@@ -700,6 +701,17 @@ if __name__=="__main__":
         errs_pm=N.sqrt(counts_pm)
 
 
+        ht_pm=-qh_pm+qk_pm
+        kt_pm=qh_pm+qk_pm
+        lt_pm=-2*qh_pm
+        qh_pm=ht_pm
+        qk_pm=kt_pm
+        ql_pm=lt_pm
+        q_pm=qh_pm
+
+
+
+
         myfilestr=flist2[0]
         mydatareader=readncnr.datareader()
         mydata_mp=mydatareader.readbuffer(myfilestr)
@@ -707,6 +719,7 @@ if __name__=="__main__":
         qh_mp=N.array(mydata_mp.data['qx'])
         qk_mp=N.array(mydata_mp.data['qy'])
         ql_mp=N.array(mydata_mp.data['qz'])
+
 
 
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
@@ -718,6 +731,16 @@ if __name__=="__main__":
 
         counts_mp=N.array(mydata_mp.data['detector'])
         errs_mp=N.sqrt(counts_mp)
+
+        ht_mp=-qh_mp+qk_mp
+        kt_mp=qh_mp+qk_mp
+        lt_mp=-2*qh_mp
+        qh_mp=ht_mp
+        qk_mp=kt_mp
+        ql_mp=lt_mp
+        q_mp=qh_mp
+
+
 
         cartoon()
 
@@ -761,7 +784,7 @@ if __name__=="__main__":
                 print s
             f.close()
 
-        exit()
+        #exit()
         #print qh_mp.shape
 
         if 1:
