@@ -8,6 +8,9 @@ import readncnr2 as readncnr
 import scriptutil as SU
 import re
 import simple_combine
+import sys
+sys.path.append(r'c:\tripleaxisproject2\polarization')
+import polcorrect_lib
 eps=1e-3
 pi=N.pi
 
@@ -80,7 +83,7 @@ if __name__=="__main__":
         myfilebase2='bfo_spinflip51579'
         myfilebase3='bfo_spinflip51583'
         myend='bt7'
-
+        data={}
         #pm
         myfilebaseglob=myfilebase+'*.'+myend
         print myfilebaseglob
@@ -152,9 +155,35 @@ if __name__=="__main__":
         ylist=[Counts_pm,Counts_mp]
         yerrlist=[N.sqrt(Counts_pm),N.sqrt(Counts_mp)]
         I,Ierr=simple_combine.monitor_normalize(ylist,yerrlist,monlist)
-        data={}
-        data['pm']=I[0]
-        data['mp']=I[1]
+        counts={}
+        errs={}
+        counts['pm']=I[0]
+        counts['mp']=I[1]
+        errs['pm']=Ierr[0]
+        errs['mp']=Ierr[1]
+        cell=mydirectory+'\WilliamOct2007horizCells.txt'
+        print cell
+        pbflags=polcorrect_lib.PBflags()
+        pbflags.MonitorCorrect=0
+        pbflags.PolMonitorCorrect=1
+        pbflags.MonoSelect=1
+        pbflags.Debug=0
+        pbflags.SimFlux=0
+        pbflags.SimDeviate=0
+        pbflags.NoNegativeCS=0
+        pbflags.HalfPolarized=0
+        pbflags.CountsEnable=[0,0,1,1]
+        pbflags.CountsAdd1=[0,0,0,0]
+        pbflags.CountsAdd2=[0,0,0,0]
+        pbflags.Sconstrain=[1,1,0,0]
+        pbflags.Spp=[0,0,0,0]
+        pbflags.Smm=[0,0,0,0]
+        pbflags.Spm=[0,0,0,0]
+        pbflags.Smp=[0,0,0,0]
+
+        mypolcor=polcorrect_lib.polarization_correct(counts,errs,timestamp,cell,Ei_mp,Ef_mp)
+        corrected_counts=mypolcor.correct(pbflags)
+
         #print timestamp['mp'].shape
         #print timestamp['pm'].shape
         #print S1.shape
@@ -166,10 +195,51 @@ if __name__=="__main__":
         #print Counts_mp.shape
         #print I[0].shape
         #print I[1].shape
-        if 0:
-            pylab.plot(H_mp,data['mp'],'bo')
-            pylab.plot(H_pm,data['pm'],'ro')
+
+
+
+# Next zone
+        myend='out'
+        mydirectory=r'c:\bifeo3xtal\jan8_2008\9175\data'
+        myfilebase='fieldscansplusminusreset53630'
+        myfilebase2='fieldscanminusplusreset53631'
+
+        myfilebaseglob=myfilebase+'*.'+myend
+        flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
+        myfilebaseglob=myfilebase2+'*.'+myend
+        flist2 = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
+
+        myfilestr=flist[0]
+        mydatareader=readncnr.datareader()
+        mydata_pm=mydatareader.readbuffer(myfilestr)
+        q_pm=N.array(mydata_pm.data['qx'])
+        counts_pm=N.array(mydata_pm.data['detector_corrected'])
+        errs_pm=N.array(mydata_pm.data['detector_errs_corrected'])
+
+
+        myfilestr=flist2[0]
+        mydatareader=readncnr.datareader()
+        mydata_mp=mydatareader.readbuffer(myfilestr)
+        q_mp=N.array(mydata_mp.data['qx'])
+        counts_mp=N.array(mydata_mp.data['detector_corrected'])
+        errs_mp=N.array(mydata_mp.data['detector_errs_corrected'])
+
+        if 1:
+            pylab.errorbar(q_mp,counts_mp,fmt='bo',yerr=errs_mp,linestyle='None')
+            pylab.errorbar(q_pm,counts_pm,fmt='ro',yerr=errs_pm,linestyle='None')
             pylab.show()
+
+
+        if 0:
+            pylab.errorbar(H_mp,corrected_counts['Smp'],fmt='bo',yerr=corrected_counts['Emp'],linestyle='None')
+            pylab.errorbar(H_pm,corrected_counts['Spm'],fmt='ro',yerr=corrected_counts['Epm'],linestyle='None')
+            pylab.show()
+
+        if 0:
+            pylab.errorbar(H_mp,data['mp'],fmt='bo',yerr=errs['mp'],linestyle='None')
+            pylab.errorbar(H_pm,data['pm'],fmt='ro',yerr=errs['pm'],linestyle='None')
+            pylab.show()
+
 
 
         exit()

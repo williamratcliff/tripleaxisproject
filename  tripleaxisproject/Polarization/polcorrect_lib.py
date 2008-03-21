@@ -162,41 +162,15 @@ def calc_energy(angle,dspace):
     return energy
 
 class polarization_correct:
-    def __init__(self,files,cell):
+    def __init__(self,counts,errors,timestamp,cell,ei,ef):
         self.mydata={}
-        self.counts={}
-        self.errors={}
-        ei=[]
-        ef=[]
-        self.timestamp={}
-        self.files=files
+        self.counts=counts
+        self.length=self.counts['pm'].shape[0] #brittle
+        self.errors=errors
+        self.ei=ei
+        self.ef=ef
+        self.timestamp=timestamp
         self.cell=cell
-        for key,myfilestr in files.iteritems():
-            mydatareader=readncnr.datareader()
-            self.mydata[key]=mydatareader.readbuffer(myfilestr)
-            #print mydata[key].metadata
-            self.counts[key]=N.array(self.mydata[key].data[self.mydata[key].metadata['count_info']['signal']])
-            self.errors[key]=N.sqrt(self.counts[key])
-            self.timestamp[key]=N.array(self.mydata[key].data['timestamp'])
-            #TODO currently, we assume that the files are taken at the same points--is this safe?
-            self.length=self.counts[key].shape[0]
-            a2=N.array(self.mydata[key].data['a2'])
-            if self.mydata[key].metadata['count_info']['analyzerdetectormode'].lower()=='diffdet':
-                #a6=N.array(mydata[key].data['A5'])*2.0
-                a6=a2
-            else:
-                a6=N.array(self.mydata[key].data['a6'])
-            #TODO who's bright idea was it to have A6 listed as "IN"
-            #TODO we also assume that the energies will be the same!!!
-            dmono=self.mydata[key].metadata['dspacing']['monochromator_dspacing']
-            dana=self.mydata[key].metadata['dspacing']['analyzer_dspacing']
-            #print a6
-            ei.append(calc_energy(a2,dmono))
-            ef.append(calc_energy(a6,dana))
-            #print self.length
-        self.ei=N.array(ei,'float64')
-        self.ef=N.array(ef,'float64')
-        #print mydata[key].data.keys()
         return
     def output(self,outputfile=None):
         keys=['pp','mm','pm','mp']
@@ -351,6 +325,8 @@ class polarization_correct:
         mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
         #print Smp[0]
         #print Spm[0]
+        #print self.ei
+        #print self.ef
 
         corrected_counts={}
         corrected_counts['Spp']=Spp[0]
@@ -365,17 +341,17 @@ class polarization_correct:
         corrected_counts['Smp']=Smp[0]
         corrected_counts['Emp']=Emp[0]
         self.corrected_counts=corrected_counts
-        print
+        #print
         #append corrected counts to our dataset
-        self.outdata={}
-        for key in keys:
-            if self.counts.has_key(key):
-                self.outdata[key]=copy.deepcopy(self.mydata[key])
-                #self.mydata[key].data[self.mydata[key].metadata['signal']]
-                newfield=self.mydata[key].metadata['count_info']['signal']+'_corrected'
-                self.outdata[key].data[newfield]=corrected_counts['S'+key]
-                newfield=self.mydata[key].metadata['count_info']['signal']+'_errs_corrected'
-                self.outdata[key].data[newfield]=corrected_counts['E'+key]
+#        self.outdata={}
+#        for key in keys:
+#            if self.counts.has_key(key):
+#                self.outdata[key]=copy.deepcopy(self.mydata[key])
+#                #self.mydata[key].data[self.mydata[key].metadata['signal']]
+#                newfield=self.mydata[key].metadata['count_info']['signal']+'_corrected'
+#                self.outdata[key].data[newfield]=corrected_counts['S'+key]
+#                newfield=self.mydata[key].metadata['count_info']['signal']+'_errs_corrected'
+#                self.outdata[key].data[newfield]=corrected_counts['E'+key]
 
 
         return corrected_counts
