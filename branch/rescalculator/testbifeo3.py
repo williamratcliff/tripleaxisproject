@@ -208,6 +208,7 @@ if __name__=="__main__":
 
 
         exit()
+        exit()
         ac=[5,0]
         #conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
         #print conv
