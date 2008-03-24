@@ -29,7 +29,7 @@ def SMADemo(H,K,L,p):
     qx=(H-hcenter)*2*pi
     qy=(K-kcenter)*2*pi
     qz=(L-lcenter)*2*pi
-    num=1.0*corrh*corrk*corrl/pi**2
+    num=(corrh*corrk*corrl)/pi**2
     den=(qx**2*corrh**2+qy**2*corrk**2+qz**2*corrl**2+1)
     L=num/den**2.0
     sqw=L

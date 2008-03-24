@@ -128,15 +128,15 @@ if __name__=="__main__":
         ymin=.45
         ymax=.55
         #.485, .515
-        ht=N.linspace(xmin,xmax,15)
-        kt=N.linspace(ymin,ymax,15)
+        ht=N.linspace(xmin,xmax,45)
+        kt=N.linspace(ymin,ymax,45)
         h,k=N.meshgrid(ht,kt)
         H=h.flatten()
         K=k.flatten()
         #Parameter values for the cross section
         p=N.zeros((4,),'float64')
         #p=[hcenter,kcenter,lcenter,corr,Intensity,background]
-        p=[0.5,0.5,0,2.0e6,1000,0]
+        p=[0.5,0.5,0,2.0e0,1000,0]
         myrescal=rescalc.rescalculator(mylattice)
         newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
                             H=H,K=K,L=L,W=W,setup=setup)
