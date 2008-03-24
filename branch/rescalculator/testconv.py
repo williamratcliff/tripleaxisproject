@@ -2,7 +2,8 @@ import numpy as N
 import lattice_calculator
 import rescalc
 import prefdemo
-import sqwdemo
+#import sqwdemo
+import sqwdemo_bifeo3
 import smademo
 import convres
 import convres_sma
@@ -58,15 +59,16 @@ if __name__=="__main__":
         (prefactor,background)=prefdemo.PrefDemo(H,K,L,W,myrescal,p)
         #print 'prefactor ',prefactor
         #print 'background ',background
-        sqw=sqwdemo.SqwDemo(H,K,L,W,p)
+        sqw=sqwdemo_bifeo3.SqwDemo(H,K,L,W,p)
         disp,myint,WL=smademo.SMADemo(H,K,L,p)
-        print disp
-        print myint
-        print WL
+        #print disp
+        #print myint
+        #print WL
         #print 'sqw ', sqw
         ac=[5,0]
-        #conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
-        #print conv
+        conv=convres.ConvRes(sqwdemo_bifeo3.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
+        print conv
+        exit()
         conv_sma=convres_sma.ConvResSMA(smademo.SMADemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
         print conv_sma
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)

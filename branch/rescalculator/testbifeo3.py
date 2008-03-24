@@ -1,8 +1,8 @@
 import numpy as N
 import lattice_calculator
 import rescalc
-import prefdemo
-#import sqwdemo
+#import prefdemo_bifeo3
+#import sqwdemo_bifeo3
 #import smademo
 import prefbifeo3
 import smabifeo3
