@@ -542,7 +542,7 @@ class rescalculator:
         #print 'npts ',self.lattice_calculator.npts
         #print 'tmat ',tmat.shape
         for i in range(self.lattice_calculator.npts):
-           RMS[:,:,i]=N.dot((tmat[:,:,i]).transpose(),N.dot(RM[:,:,i],tmat[:,:,i]));
+           RMS[:,:,i]=N.dot((tmat[:,:,i]).transpose(),N.dot(RM[:,:,i],tmat[:,:,i]))
 
         mul=N.zeros((4,4));
         e=N.eye(4,4);
@@ -555,7 +555,7 @@ class rescalculator:
                     mul[3,3]=1./(EXP[i]['Smooth']['Z']**2/8/N.log(2));
                     R0[i]=R0[i]/N.sqrt(N.linalg.det(e/RMS[:,:,i]))*N.sqrt(N.linalg.det(e/mul+e/RMS[:,:,i]));
                     RMS[:,:,i]=e/(e/mul+e/RMS[:,:,i]);
-        return R0, RMS
+        return R0.T, RMS
 
     def ResPlot(self,H,K,L,W,EXP):
         """Plot resolution ellipse for a given scan"""
@@ -1298,7 +1298,8 @@ if __name__=="__main__":
         EXP['method']=0
         setup=[EXP]
         myrescal=rescalculator(mylattice)
-        R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+        #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+        R0,RM= self.ResMat(Q,W,setup)
         #myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
@@ -1313,9 +1314,9 @@ if __name__=="__main__":
 
 
     if 1:
-        a=N.array([5.72, 5.72],'d')
-        b=N.array([5.72, 5.72],'d')
-        c=N.array([9.24,9.24],'d')
+        a=N.array([6., 6.],'d')
+        b=N.array([7., 7.],'d')
+        c=N.array([8.,8],'d')
         alpha=N.array([90,90],'d')
         beta=N.array([90,90],'d')
         gamma=N.array([90,90],'d')
@@ -1324,7 +1325,7 @@ if __name__=="__main__":
         orient2=N.array([[0,1,0],[0,1,0]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([3.47,3.50],'d');K=N.array([1,1.0],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
+        H=N.array([1.5,1.5],'d');K=N.array([0,0.0],'d');L=N.array([0.35,0.35],'d');W=N.array([20,10],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -1343,7 +1344,7 @@ if __name__=="__main__":
         setup=[EXP]
         myrescal=rescalculator(mylattice)
         newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
-                            H=H,K=K,L=L,W=W,setup=copy.deepcopy(setup))
+                            H=H,K=K,L=L,W=W,setup=setup)
         mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
                         beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
                         orient2=newinput['orient2'])
@@ -1352,6 +1353,7 @@ if __name__=="__main__":
         R0,RM=myrescal.ResMat(Q,W,setup)
         print 'RM '
         print RM.transpose()
+        print 'R0 ',R0
         exit()
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         #myrescal.ResPlot(H, K, L, W, setup)

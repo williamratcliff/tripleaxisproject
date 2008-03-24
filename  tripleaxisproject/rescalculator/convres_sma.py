@@ -155,6 +155,7 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
        tz=N.tan(dd2)
        norm=(1+tx**2)*(1+ty**2)*N.exp(-0.5*(tx**2+ty**2))
        normz=N.exp(-0.5*(tz**2))*(1+tz**2)
+       #print 'ty ',ty
        #print 'norm shape ', norm.shape,normz.shape,detxy.shape,detz.shape
        for iz in range(N.size(tz)):
            for i in range(npts):
@@ -165,21 +166,37 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
               K1=K[i]+dQ1*xvec[1,i]+dQ2*yvec[1,i]+dQ4*zvec[1,i]
               L1=L[i]+dQ1*xvec[2,i]+dQ2*yvec[2,i]+dQ4*zvec[2,i]
               disp,myint,WL=sqw(H1,K1,L1,p)
-              #for idx in range(15):
-              #    print '%d H1 %f K1 %f L1 %f myint %f'%(idx,H1[idx],K1[idx],L1[idx],myint[0,idx])
+              #print 'dQ1 ',dQ1
+              #print 'tqxx ', tqxx[0]
+              #print 'tqxy ', tqxy[0]
+              #print 'tqy ',tqy[0]
+              #print 'tqz ',tqz[0]
+              #for idx in range(4):
+              #    print '%d H1 %f K1 %f L1 %f myint %f'%(idx,H1[idx],K1[idx],L1[idx],myint[idx])
               for j in range(modes):
                  if modes==1:
-                     Gamma=WL*GammaFactor[i]
+                    #disp.reshape((disp.size,1))
+                    #myint.reshape((myint.size,1))
+                    #WL.reshape((WL.size,1))
+                    Gamma=WL*GammaFactor[i]
+                    Gamma=Gamma.reshape((Gamma.size,))
                  else:
                     Gamma=WL[j,:]*GammaFactor[i]
                  Omega=GammaFactor[i]*(disp[j,:]-W[i])+OmegaFactorx[i]*dQ1+OmegaFactory[i]*dQ2
+                 #Omega=Omega.reshape((1,Omega.size))
                  #print 'Gamma Shape Omega', Gamma.shape, Omega.shape,disp.shape,W.shape
                  vog=voigt(Omega,Gamma)
-                 #for idx in range(15):
-                    ##print '%d %d Gamma %f disp %f W %f Omega %f'%(idx,j, Gamma[idx],disp[j,idx],W[0],\
-                    ##    Omega[idx])
-                    ##print '%d norm %f normz %f detxy %f detz %f'%(idx,norm[idx],normz[0],detxy[0],detz[0])
-                    #print '%d %d voigt %f'%(idx,j,vog[idx])
+                 #print 'j'
+                 #print 'Gamma ',Gamma.shape
+                 #print 'disp ',disp.shape
+                 #print 'Omega ',Omega.shape
+                 #print 'vog ', vog.shape
+                 #print vog.shape
+                 #for idx in range(4):
+                 #   #print idx,j,Gamma.shape, disp.shape,W.shape, Omega.shape
+                 #   print '%d %d Gamma %f disp %f W %f Omega %f'%(idx,j, Gamma[0,idx],disp[0,idx],W[0],Omega[0,idx])
+                 #   print '%d norm %f normz %f detxy %f detz %f'%(idx,norm[idx],normz[0],detxy[0],detz[0])
+                 #   print '%d %d voigt %f'%(idx,j,vog[idx])
                  if modes==1:
                     add=myint*voigt(Omega,Gamma)*norm*normz[iz]/detxy[i]/detz[i]
                  else:
@@ -234,9 +251,14 @@ def ConvResSMA(sqw,pref,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=[7,0]):
 ##
 ##    if found==0:
 ##       error('??? Error in ConvRes: Unknown convolution method! Valid options are: "fix",  "mc".');
-
+    #print 'conv ',conv
+    #print 'R0 ',R0
+    #print R0.shape
+    #print conv.shape
     conv=conv*R0
+    #print 'convr0 ',conv
     conv=conv+bgr
+    #print 'convbgr ',conv
     return conv
 
 
