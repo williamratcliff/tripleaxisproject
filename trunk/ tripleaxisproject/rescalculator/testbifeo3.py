@@ -1,8 +1,8 @@
 import numpy as N
 import lattice_calculator
 import rescalc
-import prefdemo
-#import sqwdemo
+#import prefdemo_bifeo3
+#import sqwdemo_bifeo3
 #import smademo
 import prefbifeo3
 import smabifeo3
@@ -103,7 +103,7 @@ if __name__=="__main__":
         gamma=N.array([90],'d')
  #       orient1=N.array([[0,1,1]],'d')
         orient1=N.array([[1,0,0]],'d')
-        orient2=N.array([[0,-1,0]],'d')
+        orient2=N.array([[0,1,0]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
         H=N.array([.5,1],'d');K=N.array([.5,1.2],'d');L=N.array([0],'d');W=N.array([0],'d')
@@ -128,17 +128,15 @@ if __name__=="__main__":
         ymin=.45
         ymax=.55
         #.485, .515
-        ht=N.linspace(xmin,xmax,5)
-        kt=N.linspace(ymin,ymax,5)
+        ht=N.linspace(xmin,xmax,45)
+        kt=N.linspace(ymin,ymax,45)
         h,k=N.meshgrid(ht,kt)
         H=h.flatten()
         K=k.flatten()
-        #print 'H shape ',H.shape
-        #print 'K shape ',K.shape
         #Parameter values for the cross section
         p=N.zeros((4,),'float64')
         #p=[hcenter,kcenter,lcenter,corr,Intensity,background]
-        p=[0.5,0.5,0,2.0e1,1000,0]
+        p=[0.5,0.5,0,2.0e0,1000,0]
         myrescal=rescalc.rescalculator(mylattice)
         newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
                             H=H,K=K,L=L,W=W,setup=setup)
@@ -151,6 +149,9 @@ if __name__=="__main__":
         L=newinput['L']
         W=newinput['W']
         setup=newinput['setup']
+        #print 'H shape ',H
+        #print 'K shape ',K
+
         #R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         #print 'RMS'
@@ -167,13 +168,14 @@ if __name__=="__main__":
         #print myint
         #print WL
         #print myint.shape
-        ac=[5,0]
+        ac=[15,0]
+        print 'start'
         conv_sma=convres_sma.ConvResSMA(smabifeo3.SMADemo,prefbifeo3.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
-        print 'conv '
-        print conv_sma.shape
-        print conv_sma.max()
-        print myint.max()
-        exit()
+        print 'conv ', conv_sma
+        #print conv_sma.shape
+        #print conv_sma.max()
+        #print myint.max()
+        #exit()
         #print 'sqw ', sqw
         xd,yd,zd=prep_data2(H,K,conv_sma[0,:]);
         if 1:
@@ -205,6 +207,7 @@ if __name__=="__main__":
 
 
 
+        exit()
         exit()
         ac=[5,0]
         #conv=convres.ConvRes(sqwdemo.SqwDemo,prefdemo.PrefDemo,H,K,L,W,myrescal,setup,p,METHOD='fixed',ACCURACY=ac)
