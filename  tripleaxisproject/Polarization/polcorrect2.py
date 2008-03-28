@@ -224,7 +224,7 @@ class polarization_correct:
     def savefiles(self):
         mywriter=writebt7.datawriter()
         for key,myfilestr in self.files.iteritems():
-            print 'key ',key
+            #print 'key ',key
             mywriter.write(myoutfilestr=myfilestr+'.out',mydata=self.outdata[key])
         return
 
@@ -377,7 +377,7 @@ class polarization_correct:
                 self.outdata[key].data[newfield]=corrected_counts['S'+key]
                 newfield=self.mydata[key].metadata['count_info']['signal']+'_errs_corrected'
                 self.outdata[key].data[newfield]=corrected_counts['E'+key]
-
+                #print 'correcting key ',key,' len ',self.outdata[key].data[newfield].shape
 
         return corrected_counts
 
