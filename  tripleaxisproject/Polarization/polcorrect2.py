@@ -106,8 +106,8 @@ PBflags=cstruct.cstruct(('MonitorCorrect',N.intc),
                     ('Spm','float64',(4,)),
                     ('Smp','float64',(4,))
                     )
-                    
-                    
+
+
 
 
 #typedef struct {
@@ -224,10 +224,11 @@ class polarization_correct:
     def savefiles(self):
         mywriter=writebt7.datawriter()
         for key,myfilestr in self.files.iteritems():
-            mywriter.write(myoutfilestr=myfilestr+'.out',mydata=self.outdata[key]) 
+            print 'key ',key
+            mywriter.write(myoutfilestr=myfilestr+'.out',mydata=self.outdata[key])
         return
 
-    
+
     def correct(self,pbflags):
         keys=['pp','mm','pm','mp']
         pbinput=PBindata()
@@ -288,14 +289,14 @@ class polarization_correct:
                     pbinput.tmp=dummytmp.ctypes.data_as(c_ulong_p)
                     pbinput.Cmp=dummyCmp.ctypes.data_as(c_double_p)
                     pbinput.Emp=dummyEmp.ctypes.data_as(c_double_p)
-               
-            
+
+
         #print 'mylength ',self.length
         Spp=N.empty((1,self.length),'float64')
         Smm=N.empty((1,self.length),'float64')
         Spm=N.empty((1,self.length),'float64')
         Smp=N.empty((1,self.length),'float64')
-                    
+
         pboutput.Spp=Spp.ctypes.data_as(c_double_p)
         pboutput.Smm=Smm.ctypes.data_as(c_double_p)
         pboutput.Spm=Spm.ctypes.data_as(c_double_p)
@@ -306,7 +307,7 @@ class polarization_correct:
         Epm=N.empty((1,self.length),'float64')
         Emp=N.empty((1,self.length),'float64')
         R=N.empty((1,self.length),'float64')
-                    
+
         pboutput.Epp=Epp.ctypes.data_as(c_double_p)
         pboutput.Emm=Emm.ctypes.data_as(c_double_p)
         pboutput.Epm=Epm.ctypes.data_as(c_double_p)
@@ -358,10 +359,10 @@ class polarization_correct:
 
         corrected_counts['Smm']=Smm[0]
         corrected_counts['Emm']=Emm[0]
-        
+
         corrected_counts['Spm']=Spm[0]
         corrected_counts['Epm']=Epm[0]
-        
+
         corrected_counts['Smp']=Smp[0]
         corrected_counts['Emp']=Emp[0]
         self.corrected_counts=corrected_counts
@@ -376,7 +377,7 @@ class polarization_correct:
                 self.outdata[key].data[newfield]=corrected_counts['S'+key]
                 newfield=self.mydata[key].metadata['count_info']['signal']+'_errs_corrected'
                 self.outdata[key].data[newfield]=corrected_counts['E'+key]
-            
+
 
         return corrected_counts
 
