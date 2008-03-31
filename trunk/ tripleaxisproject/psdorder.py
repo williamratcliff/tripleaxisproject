@@ -49,6 +49,8 @@ def read_order_files(flist):
         #    #mon0=mydata.header['count_info']['monitor']
         #    mon0=5.0e4
         mon=mydata.metadata['count_info']['monitor']
+        if count==0:
+            mon0=mon
         #print count, mon0,mon
         #temp=N.concatenate((temp,N.array(mydata.data['temp'])))
         H.append(N.array(mydata.data['magfield'],'float64'))
@@ -62,11 +64,11 @@ def read_order_files(flist):
         #print 'loop done'
         psd_arr=N.array(psd_arr,'float64')
         effs=N.tile(psd_channel_efficiency,(1,psd_arr.shape[1]))
-        Ierr.append(N.sqrt(psd_arr)*effs)
+        Ierr.append(N.sqrt(psd_arr)*effs*mon0/mon)
 
         #print 'psdarr shape ',psd_arr.shape
         #print 'new shape ',N.tile(psd_channel_efficiency,(1,psd_arr.shape[1])).shape
-        psd_arr=psd_arr*effs
+        psd_arr=psd_arr*effs*mon0/mon
         a4_center_arr=N.array(a4_center)
         #print psd_arr.shape
         #print a4_center_arr.shape
@@ -124,8 +126,8 @@ if __name__=='__main__':
         pylab.plot(x,y,linewidth=0,marker='s')
         pylab.show()
     if 1:
-        #mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
-        mydirectory=r'C:\ca3comno6\Feb4_2008\data'
+        mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
+        #mydirectory=r'C:\ca3comno6\Feb4_2008\data'
         myfilebase='peak'
         myend='bt7'
         flist=[]

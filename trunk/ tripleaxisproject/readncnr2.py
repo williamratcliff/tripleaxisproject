@@ -14,7 +14,7 @@ def get_tokenized_line(myfile,returnline=['']):
         returnline[0]=lineStr.rstrip()
         strippedLine=lineStr.lower().rstrip()
         tokenized=strippedLine.split()
-        
+
         return tokenized
 
 
@@ -24,7 +24,7 @@ class datareader:
         #define Data Abstraction Layer
         self.data_abstraction_layer()
         return
-    
+
     def data_abstraction_layer(self):
         self.metadata={}
         self.additional_metadata={}
@@ -144,7 +144,7 @@ class datareader:
         motor2['step']=float(tokenized[2])
         motor2['end']=float(tokenized[3])
         self.metadata['motor2']=motor2
-        
+
     #motor3
         tokenized=get_tokenized_line(myfile)
     #    print tokenized
@@ -179,12 +179,12 @@ class datareader:
         #skip line describing Motor Start Step End
         lineStr = myfile.readline()
         return
-    
+
     def readimetadata(self,myfile):
     #experiment info
         tokenized=get_tokenized_line(myfile)
         #collimations=[] #in stream order
-        
+
         #self.metadata['collimations']={}
         self.metadata['collimations']['coll1']=float(tokenized[0])
         self.metadata['collimations']['coll2']=float(tokenized[1])
@@ -193,20 +193,20 @@ class datareader:
         #collimations.append(float(tokenized[1]))
         #collimations.append(float(tokenized[2]))
         #collimations.append(float(tokenized[3]))
-        
+
         #mosaic=[] #order is monochromator, sample, mosaic
         #self.metadata['mosaic']={}
         self.metadata['mosaic']['mosaic_monochromator']=float(tokenized[4])
         self.metadata['mosaic']['mosaic_sample']=float(tokenized[5])
         self.metadata['mosaic']['mosaic_analyzer']=float(tokenized[6])
-        
+
         #self.metadata['energy_info']={}
         self.metadata['energy_info']['wavelength']=float(tokenized[7])
-        
+
         #self.metadata['temperature_info']={}
         self.metadata['temperature_info']['Tstart']=float(tokenized[8])
         self.metadata['temperature_info']['Tstep']=float(tokenized[9])
-        
+
         #self.metadata['magnetic_field']={}
         self.metadata['magnetic_field']['hfield']=float(tokenized[10])
         #print tokenized
@@ -231,19 +231,19 @@ class datareader:
 ##        mosaic.append(float(tokenized[6]))
 ##        self.metadata['mosaic']=mosaic
 
-        
+
         #self.metadata['collimations']={}
         self.metadata['collimations']['coll1']=float(tokenized[0])
         self.metadata['collimations']['coll2']=float(tokenized[1])
         self.metadata['collimations']['coll3']=float(tokenized[2])
         self.metadata['collimations']['coll4']=float(tokenized[3])
-        
+
         #self.metadata['mosaic']={}
         self.metadata['mosaic']['mosaic_monochromator']=float(tokenized[4])
         self.metadata['mosaic']['mosaic_sample']=float(tokenized[5])
         self.metadata['mosaic']['mosaic_analyzer']=float(tokenized[6])
 
-        
+
         #self.metadata['orient1']={}
         self.metadata['orient1']['h']=float(tokenized[7])
         self.metadata['orient1']['k']=float(tokenized[8])
@@ -253,7 +253,7 @@ class datareader:
         self.metadata['orient2']['h']=float(tokenized[11])
         self.metadata['orient2']['k']=float(tokenized[12])
         self.metadata['orient2']['l']=float(tokenized[13])
-        
+
 ##        orient1.append(float(tokenized[7]))
 ##        orient1.append(float(tokenized[8]))
 ##        orient1.append(float(tokenized[9]))
@@ -324,7 +324,7 @@ class datareader:
                 field='Temp'.lower()
             self.columndict[field]=[]
             self.columnlist.append(field)
-        return 
+        return
 
     def determinefiletype(self,myfile):
     #get first line
@@ -340,20 +340,20 @@ class datareader:
         self.metadata['file_info']['filebase']=self.metadata['file_info']['filename'][0:5]
         self.metadata['file_info']['scantype']=tokenized[5].strip("'").lower()
         self.metadata['file_info']['instrument']=self.metadata['file_info']['filename'].split('.')[1].lower()
-        
+
         month_str=tokenized[1].strip("\'").lower()
-        
+
         self.metadata['timestamp']['month']=months[month_str]#tokenized[1].strip("\'").lower()
         self.metadata['timestamp']['day']=int(tokenized[2].strip("\'"))
         self.metadata['timestamp']['year']=int(tokenized[3].strip("\'"))
         self.metadata['timestamp']['time']=tokenized[4].strip("\'")
-        
+
         #I skip this for now, because it is not reliable about the actual number of points in the file, just the desired number
         #self.metadata['npts']=int(tokenized[9])
-        
-        
-        
-        #skip over names of fields 
+
+
+
+        #skip over names of fields
         lineStr=myfile.readline()
         #comment and filename
         self.metadata['file_info']['comment']=myfile.readline().rstrip()
@@ -362,7 +362,7 @@ class datareader:
     def readcolumns(self,myfile):
         self.get_columnmetadatas(myfile)
         # get the names of the fields
-    #   prepare to read the data    
+    #   prepare to read the data
         count =  0
         while 1:
             lineStr = myfile.readline()
@@ -396,8 +396,8 @@ class datareader:
             self.columnlist.append(field)
         self.columnlist.append('timestamp')
         self.columndict['timestamp']=[]
-        return 
-    
+        return
+
     def range_parser(self,rangestr,scan_description):
         #print rangestr
         range_split=rangestr.split('range=')
@@ -411,7 +411,7 @@ class datareader:
             else:
                 scan_description['range']['e']['center']=float(toks[0])
                 scan_description['range']['e']['step']=float(toks[1])
-        
+
         if fields[0]=='q':
             toks=fields[1].split()
             #print 'toks',toks
@@ -437,18 +437,18 @@ class datareader:
                 scan_description['range']['q']['step']['h']=float(stop[0])
                 scan_description['range']['q']['step']['k']=float(stop[1])
                 scan_description['range']['q']['step']['l']=float(stop[2])
-        
+
         #print 'Range', scan_description['range']
         return
-        
-    
+
+
     def parse_scan(self,scanstr):
         scan_description={}
         scan_description['scan_string']=scanstr
         scan_description['range']={}
         scan_description['range']['e']={}
         scan_description['range']['q']={}
-        
+
         toks=scanstr.split(':')
         for i in range(1,len(toks)):
             if toks[i][0]=='r':
@@ -470,6 +470,10 @@ class datareader:
         while myFlag:
             tokenized=get_tokenized_line(myfile,returnline=returnline)
             #print tokenized
+            if tokenized==[]:
+                tokenized=['']
+            if tokenized[0].lower()=="#Date".lower():
+                pass
             if tokenized[0].lower()=="#Date".lower():
                 date_tokens=tokenized[1].split('-')
                 self.metadata['timestamp']={}
@@ -485,7 +489,7 @@ class datareader:
                 self.metadata['timestamp']['day']=int(date_tokens[2].strip("\'"))
                 self.metadata['timestamp']['year']=int(date_tokens[0].strip("\'"))
                 self.metadata['timestamp']['time']=tokenized[2].strip("\'")
-            elif tokenized[0].lower()=="#Epoch".lower(): 
+            elif tokenized[0].lower()=="#Epoch".lower():
                 #timeobj=date.datatetime(year,month,day,hour,minute,second)
                 Epoch=float(tokenized[1])
                 #timeobj=mx.DateTime.DateTimeFromTicks(ticks=Epoch) #what I originally used
@@ -514,7 +518,7 @@ class datareader:
                 for i in range(1,len(tokenized)):
                     mycomment=mycomment+' '+tokenized[i]
                 self.metadata['file_info']['comment']=mycomment
-            elif tokenized[0].lower()=="#MonoSpacing".lower(): 
+            elif tokenized[0].lower()=="#MonoSpacing".lower():
                 self.metadata['dspacing']['monochromator_dspacing']=float(tokenized[1])
             elif tokenized[0].lower()=="#AnaSpacing".lower():
                 self.metadata['dspacing']['analyzer_dspacing']=float(tokenized[1])
@@ -630,13 +634,13 @@ class datareader:
             if self.metadata['file_info']['scantype'].lower()=='q':
                 print "calling readqbuffer"
                 self.readqmetadata(myfile)
-            
+
             #read columns
             self.readcolumns(myfile)
             myfile.close()
             mydata=Data(self.metadata,self.columndict)
             #print self.metadata
-            #print self.columnlist   
+            #print self.columnlist
         else:
             #instrument is bt7
             self.readbt7(myfile)
@@ -654,7 +658,7 @@ class Data:
         self.data=data
         self.header=header
         self.additional_metadata=additional_metadata
-    
+
     def get_monitor(self):
         return self.metadata['monitor']
     #@property
@@ -724,7 +728,7 @@ class Data:
             res=start*N.ones((1,self.npts),'d')
         else:
             res=N.arange(start,motor['end'],step)
-        return res        
+        return res
     def gen_motor6_arr(self):
         motor=self.get_motor6()
         step=motor['step']
@@ -734,10 +738,10 @@ class Data:
         else:
             res=N.arange(start,motor['end'],step)
         return res
-    
+
 
 #   self.columndict[field]
-    
+
     #count_type=property(get_count_type)
     #filetype=property(get_filetype)
     #npts=property(get_npts)
@@ -746,10 +750,10 @@ class Data:
     motor3=property(get_motor3)
     motor4=property(get_motor4)
     motor5=property(get_motor5)
-    motor6=property(get_motor6)    
+    motor6=property(get_motor6)
     #data_fields=property(get_data_fields)
     #monitor=property(get_monitor)
-    
+
 
 def num2string(num):
     numstr=None
@@ -775,7 +779,7 @@ if __name__=='__main__':
         #mywriter=writebt7.datawriter()
         #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
         print mydata.data['timestamp']
-        print 'done'          
+        print 'done'
         #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
         #print N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])
         #print len(mydata.data['timestamp'])
