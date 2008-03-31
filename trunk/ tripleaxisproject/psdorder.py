@@ -5,7 +5,7 @@ import re
 import readncnr2 as readncnr
 import simple_combine
 #import scipy
-from scipy.optimize import leastsq  
+from scipy.optimize import leastsq
 import copy
 import scipy.odr
 pi=N.pi
@@ -18,7 +18,7 @@ psd_a4_spacing=N.array([46.35,	  46.45,    46.54,     46.69,    46.84,     46.94
                         50.18,    50.28,    50.40,     50.53,    50.65,     50.81, \
                         50.91,    51.06,    51.19,     51.30,    51.46,     51.60, \
                         51.71,    51.83,    51.95,     52.09,    52.23,     52.14])
-psd_a4_offset=psd_a4_spacing-psd_a4_spacing[22]
+psd_a4_offset=-(psd_a4_spacing-psd_a4_spacing[23])
 psd_a4_offset=N.reshape(psd_a4_offset,(psd_a4_offset.shape[0],1))
 psd_channel_efficiency=N.array([3.9918,	2.4668,	2.7027,	2.5016,	2.2414,	2.2440,	2.0113,	1.900,\
                                 1.7849,	1.7825,	1.6490,	1.4734,	1.3835,	1.3968,	1.3708,\
@@ -61,9 +61,12 @@ def read_order_files(flist):
             a4_center.append(a4)
         #print 'loop done'
         psd_arr=N.array(psd_arr,'float64')
+        effs=N.tile(psd_channel_efficiency,(1,psd_arr.shape[1]))
+        Ierr.append(N.sqrt(psd_arr)*effs)
+
         #print 'psdarr shape ',psd_arr.shape
         #print 'new shape ',N.tile(psd_channel_efficiency,(1,psd_arr.shape[1])).shape
-        psd_arr=psd_arr*N.tile(psd_channel_efficiency,(1,psd_arr.shape[1]))
+        psd_arr=psd_arr*effs
         a4_center_arr=N.array(a4_center)
         #print psd_arr.shape
         #print a4_center_arr.shape
@@ -76,7 +79,7 @@ def read_order_files(flist):
         #Iterr=N.sqrt(It)
         monlist.append(mon)
         I.append(psd_arr)
-        Ierr.append(N.sqrt(psd_arr))
+        #Ierr.append(N.sqrt(psd_arr))
         count=count+1
     return N.array(H),N.array(I),N.array(Ierr),N.array(monlist),N.array(a4list)
 
@@ -121,8 +124,8 @@ if __name__=='__main__':
         pylab.plot(x,y,linewidth=0,marker='s')
         pylab.show()
     if 1:
-        mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
-        #mydirectory=r'C:\ca3comno6\Feb4_2008\data'
+        #mydirectory=r'C:\ca3comno6\Feb4_2008\Ca3CoMnO6\Feb4_2008\data'
+        mydirectory=r'C:\ca3comno6\Feb4_2008\data'
         myfilebase='peak'
         myend='bt7'
         flist=[]
@@ -181,7 +184,7 @@ if __name__=='__main__':
         peak4.Ierr=Ierr[:,:,1]
         peak4.a4=a4[:,:,1]
         peak4.monlist=monlist
-        
+
         peak5=peak()
         peak5.H=H[:,0]
         peak5.I=I[:,:,0]
