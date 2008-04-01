@@ -36,7 +36,7 @@ def monitor_normalize(ylist,yerrlist,monlist,monitor=None):
         y_out[i]=y_out[i]*correction[i]
         yerr_out[i]=yerr_out[i]*correction[i]
     return y_out,yerr_out
-    
+
 
 def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=None,step=None):
     mon0=monlist[0]
@@ -52,13 +52,13 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
         x_in=N.concatenate((x_in,N.array(xlist[i],'float64')))
         y_in=N.concatenate((y_in,N.array(ylist_corrected[i],'float64')))
         yerr_in=N.concatenate((yerr_in,N.array(yerrlist_corrected[i],'float64')))
-        
+
         #While it would be convenient to check for zero steps, I think predictability is better than convenience
         #So, in that case, the user should specify the stepsize that they want!!!
         #As a convenience, we do only determine the minimum stepsize for arrays in which there are more than one element
         #of course, the problem this runs is that it may not truly be the minimum step size, but if we use the
         #total concatenated array, then if there are some identical ones, then we're also screwed...
-        
+
         currmin=xlist[i].min()
         currmax=xlist[i].max()
         if xlist[i].shape[0]>1:
@@ -84,7 +84,7 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
     #print 'min_step',min_step
     #print xmin
     #print xmax
-   
+
     if method==None:
         #default behavior, sum points when they overlap to within either a reasonable or user defined epsilon
         if eps==None:
@@ -94,11 +94,11 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
         x_in=x_in[ind]
         y_in=y_in[ind]
         yerr_in=yerr_in[ind]
-        
+
         x_out=[]#N.array([],'float64')
         y_out=[]#N.array([],'float64')
         yerr_out=[]#N.array([],'float64')
-        
+
         i=0; iright=1
         curr_y=y_in[0]
         curr_yerrsq=yerr_in[0]*yerr_in[0]
@@ -124,7 +124,7 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
                 print 'count',count
                 yerr_out.append(N.sqrt(curr_yerrsq)/count) #normalize back to original monitor
                 count=1.0
-                
+
             i=i+1
     if method=='interpolate':
         if step==None:
@@ -137,9 +137,9 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
         yerr_out=N.zeros(x_out.shape,'float64')
         count=0
         for i in range(len(ylist)):
-            yinterpolater=interpolate.interp1d(xlist[i],ylist_corrected[i],fill_value=0.0,kind='linear',copy=True)
+            yinterpolater=interpolate.interp1d(xlist[i],ylist_corrected[i],fill_value=0.0,kind='linear',copy=True,bounds_error=False)
             y_interpolated=yinterpolater(x_out)
-            yerrinterpolater=interpolate.interp1d(xlist[i],yerrlist_corrected[i]*yerrlist_corrected[i],fill_value=0.0,kind='linear',copy=True)
+            yerrinterpolater=interpolate.interp1d(xlist[i],yerrlist_corrected[i]*yerrlist_corrected[i],fill_value=0.0,kind='linear',copy=True,bounds_error=False)
             yerr_interpolatedsq=yerrinterpolater(x_out)
             y_out=y_out+y_interpolated
             yerr_outsq=yerr_out+yerr_interpolatedsq
@@ -150,7 +150,7 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
     y_out=N.array(y_out,'float64')
     yerr_out=N.array(yerr_out,'float64')
     return x_out,y_out,yerr_out
- 
+
 def print_arr(arrlist):
     for i in range((arrlist[0].shape[0])):
         s=''
@@ -197,8 +197,8 @@ if __name__=='__main__':
         pylab.errorbar(x2,y1_interpolated,y1err_interpolated,marker='s',linestyle='None',mfc='red')
         pylab.show()
         #print_arr([x2,y2,y1_interpolated])
-        
-        
+
+
         exit()
 ##    print 'in'
 ##    ylist_norm,yerrlist_norm=monitor_normalize(ylist,yerrlist,monlist)
@@ -221,9 +221,9 @@ if __name__=='__main__':
         #ax.set_xlabel(xlabel)
         ax=fig.add_subplot(1,2,1)
         ax.errorbar(x1,y1,y1err,marker='s',mfc='blue',linestyle='None')
-        ax.errorbar(x2,y2,y2err,marker='s',mfc='red',linestyle='None')  
-        ax.set_ylim(ylim); ax.set_xlim(xlim)   
+        ax.errorbar(x2,y2,y2err,marker='s',mfc='red',linestyle='None')
+        ax.set_ylim(ylim); ax.set_xlim(xlim)
         ax3=fig.add_subplot(1,2,2)
         ax3.errorbar(xout,yout,yerrout,marker='s',mfc='blue',linestyle='None')
-        ax3.set_ylim(ylim); ax3.set_xlim(xlim)  
+        ax3.set_ylim(ylim); ax3.set_xlim(xlim)
         pylab.show()
