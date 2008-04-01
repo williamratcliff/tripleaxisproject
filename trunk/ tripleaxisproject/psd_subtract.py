@@ -95,6 +95,20 @@ def get_lowT_file():
         a4range=N.intersect1d(N.where(a4>a4min)[0],N.where(a4<a4max)[0])
         return a4,I,Ierr,Tstitched,mon_stitched
 
+def output(a4,I,Ierr,outputfile=None):
+        s=''
+        if outputfile!=None:
+            f=open(outputfile,'wt')
+        for i in range(a4.size):
+            s=s+'%2.3f %2.3f %2.3f'%(a4[i],I[i],Ierr[i])
+            s=s+'\n'
+        if outputfile==None:
+            print s
+        else:
+            f.write(s)
+        if outputfile!=None:
+            f.close()
+        return
 
 if __name__=='__main__':
     delta=.01
@@ -117,6 +131,8 @@ if __name__=='__main__':
     monlist=[mon_stiched_low,mon_stiched_high]
     a4out,Iout,Ierrout=simple_combine.simple_combine(a4list,Ilist,Ierrlist,monlist,method='interpolate',step=0.02)
     print 'done'
+    output(a4out,Iout,Ierrout)
+    #exit()
     pylab.subplot(3,1,1)
     pylab.errorbar(a4_low,I_low,Ierr_low,linestyle='None',marker='s',mfc='blue')
     pylab.subplot(3,1,2)

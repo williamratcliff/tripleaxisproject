@@ -238,20 +238,49 @@ def manyplots(peak1):
             pylab.show()
         return()
 
+def output(a4,I,Ierr,outputfile=None):
+        s=''
+        if outputfile!=None:
+            f=open(outputfile,'wt')
+        for i in range(a4.size):
+            s=s+'%2.3f %2.3f %2.3f'%(a4[i],I[i],Ierr[i])
+            s=s+'\n'
+        if outputfile==None:
+            print s
+        else:
+            f.write(s)
+        if outputfile!=None:
+            f.close()
+        return
+
+
 def averagesum(peak1):
-        l=17
-        r=23
         a4min=34
         a4max=35.5
         a4=peak1.a4[:,0]
         monlist=peak1.monlist
         a4range=N.intersect1d(N.where(a4>a4min)[0],N.where(a4<a4max)[0])
+        l=min(a4range)
+        r=max(a4range)
+        print a4range
+        print 'l=',l,' r=',r
         #a4,I,Ierr,Tstitched,mon_stitched=get_highT_file()
         #a4range=N.intersect1d(N.where(a4>a4min)[0],N.where(a4<a4max)[0])
         #I=I*monlist[0]/mon_stitched
         #Ierr=Ierr*monlist[0]/mon_stitched
-        #pylab.errorbar(a4[a4range],I[a4range],Ierr[a4range],linestyle='None',marker='s',mfc='blue')
+        #pylab.errorbar(a4[a4range],peak1.I[a4range,95],peak1.Ierr[a4range,95],linestyle='None',marker='s',mfc='blue')
         #pylab.show()
+        #exit()
+        #print 'a4range ',a4range
+        #I_sum=0.0
+        #Ierr_sum=0.0
+        #for i in range(l,r):
+        #    I_sum=I_sum+I[i]
+        #    Ierr_sum=Ierr+Ierr[i]**2
+        #Ierr_sum=N.sqrt(Ierr_sum)
+        #print 'l=',l,' r=',r
+        #print 'I_sum=',N.average(peak1.I[l:r])*0.5
+        #print 'I_err=',N.sqrt(N.average(peak1.Ierr[l:r]**2))*0.5
 
 
 
@@ -264,12 +293,19 @@ def averagesum(peak1):
         for i in range(l,r):
             I=I+peak1.I[i,:]
             Ierr=Ierr+peak1.Ierr[i,:]**2
-        Ierr=N.sqrt(Ierr)
-        #print I.shape
+        print 'a4size ',a4range.size
+        I=I/(r-l-1)
+        Ierr=N.sqrt(Ierr)/(r-l-1)
+        print N.average(peak1.I[l:r,:],axis=0)
+        print 'peak1'
+        print peak1.I[l:r,95]
+        print 'H',H[95]
+        print H.size
+        #exit()
         H_ave=[]
         I_ave=[]
         Ierr_ave=[]
-        ave=5
+        ave=1
         #print 'H ', H
         if ave >1:
             for i in range(0,H.size-ave,ave):
@@ -283,11 +319,15 @@ def averagesum(peak1):
             H_ave=H
         I=N.array(I_ave)
         Ierr=N.array(Ierr_ave)
-        if 0:
+        H_ave=N.concatenate((H_ave,N.array([8.5])))
+        Imax=I_ave.max()
+        I_ave=N.concatenate((I_ave,N.array([45.32])))/Imax
+        Ierr_ave=N.concatenate((Ierr_ave,N.array([1.327])))/Imax
+        if 1:
             pylab.errorbar(H_ave,I_ave,Ierr_ave,linestyle='None',marker='s',mfc='blue')
             #pylab.ylim((40,150))
             pylab.show()
-        #exit()
+        exit()
         T=N.array(H_ave)
         #print T
         #print 'I0 ',I[0]
@@ -345,7 +385,8 @@ if __name__=='__main__':
         myfilebase='LaOFeAsImpuritydown'
         myend='bt7'
         flist=[]
-        for myfileseq in range(56419,56421,1):
+        rlist=[56421,56420,56419]
+        for myfileseq in rlist:#range(56419,56421,1):
             print myfileseq
             myfilestr=mydirectory+'\\'+myfilebase+str(myfileseq)+'.'+myend
             flist.append(myfilestr)
@@ -365,9 +406,31 @@ if __name__=='__main__':
         peak1.Ierr=Ierr
         peak1.a4=a4
         peak1.monlist=monlist
+        #print peak1.Ierr[0:17,95]
+        #print peak1.I[0:17,95]
+        #exit()
         averagesum(peak1)
         exit()
         a4,I,Ierr,Tstitched,mon_stitched=get_highT_file()
+        a4min=34
+        a4max=35.5
+        a4=peak1.a4[:,0]
+        #fix the a4 range
+        a4range=N.intersect1d(N.where(a4>a4min)[0],N.where(a4<a4max)[0])
+        l=min(a4range)
+        r=max(a4range)
+        print 'a4range ',a4range
+        I_sum=0.0
+        Ierr_sum=0.0
+        #for i in range(l,r):
+        #    I_sum=I_sum+I[i]
+        #    Ierr_sum=Ierr+Ierr[i]**2
+        #Ierr_sum=N.sqrt(Ierr_sum)
+        print 'l=',l,' r=',r
+        print 'I_sum=',N.average(I[l:r])*monlist[0]/mon_stitched
+        print 'I_err=',N.sqrt(N.average(Ierr[l:r]**2))*monlist[0]/mon_stitched
+        print monlist[0]
+        exit()
         I=I*monlist[0]/mon_stitched
         Ierr=Ierr*monlist[0]/mon_stitched
         pylab.errorbar(a4,I,Ierr,linestyle='None',marker='s',mfc='blue')
