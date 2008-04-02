@@ -63,7 +63,8 @@ def read_stitched(myfilestr):
 
 def get_highT_file():
         mydirectory=r'C:\12436\data'
-        myfilestr=mydirectory+'\\'+'LaOFeAs56416.stitched'
+        #myfilestr=mydirectory+'\\'+'LaOFeAs56416.stitched'
+        myfilestr=mydirectory+'\\'+'170Kch4to44good.dat'
         flist=[myfilestr]
         print flist
         a4,I,Ierr=read_stitched(myfilestr)
@@ -82,7 +83,8 @@ def get_highT_file():
 
 def get_lowT_file():
         mydirectory=r'C:\12436\data'
-        myfilestr=mydirectory+'\\'+'LaOFeAs56413.stitched'
+        #myfilestr=mydirectory+'\\'+'LaOFeAs56413.stitched'
+        myfilestr=mydirectory+'\\'+'8Kch4to44good.dat'
         flist=[myfilestr]
         print flist
         a4,I,Ierr=read_stitched(myfilestr)
@@ -111,7 +113,8 @@ def output(a4,I,Ierr,outputfile=None):
         return
 
 if __name__=='__main__':
-    delta=.01
+    delta=.03
+    mydirectory=r'C:\12436\data'
     if len(sys.argv)>1:
         delta=float(sys.argv[1])
     print 'delta= ',delta
@@ -125,21 +128,24 @@ if __name__=='__main__':
     a4max=min(a4_low_max,a4_high_max)
     a4range_high=N.intersect1d(N.where(a4_high>a4min)[0],N.where(a4_high<a4max)[0])
     a4range_low=N.intersect1d(N.where(a4_low>a4min)[0],N.where(a4_low<a4max)[0])
-    a4list=[a4_low+delta,a4_high]
+    a4list=[a4_low,a4_high+delta]
     Ilist=[I_low,-I_high]
     Ierrlist=[Ierr_low,Ierr_high]
     monlist=[mon_stiched_low,mon_stiched_high]
-    a4out,Iout,Ierrout=simple_combine.simple_combine(a4list,Ilist,Ierrlist,monlist,method='interpolate',step=0.02)
+    a4out,Iout,Ierrout=simple_combine.simple_combine(a4list,Ilist,Ierrlist,monlist,method='interpolate',step=0.1)
     print 'done'
-    output(a4out,Iout,Ierrout)
+    background=300.0
+    Iout=Iout+background
+    myfilestr=mydirectory+'\\'+'subtracted.txt'
+    output(a4out,Iout,Ierrout,outputfile=myfilestr)
     #exit()
     pylab.subplot(3,1,1)
-    pylab.errorbar(a4_low,I_low,Ierr_low,linestyle='None',marker='s',mfc='blue')
+    pylab.errorbar(a4_low,I_low,Ierr_low,linestyle='None',marker='s',mfc='blue',markersize=1.0)
     pylab.subplot(3,1,2)
-    pylab.errorbar(a4_high,I_high,Ierr_high,linestyle='None',marker='s',mfc='red')
+    pylab.errorbar(a4_high,I_high,Ierr_high,linestyle='None',marker='s',mfc='red',markersize=2.0)
     pylab.subplot(3,1,3)
     #for delta in N.arange(-.1,.1,.01):
     #    print delta
-    pylab.errorbar(a4out,Iout,Ierrout,linestyle='None',marker='s',mfc='green')
-    pylab.ylim((-20,20))
+    pylab.errorbar(a4out,Iout-background,Ierrout,linestyle='None',marker='s',mfc='green',markersize=1.0)
+    pylab.ylim((-30,30))
     pylab.show()
