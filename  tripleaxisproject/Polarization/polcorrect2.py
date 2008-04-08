@@ -171,12 +171,18 @@ class polarization_correct:
         self.timestamp={}
         self.files=files
         self.cell=cell
+        mymonFlag=False
         for key,myfilestr in files.iteritems():
             mydatareader=readncnr.datareader()
             self.mydata[key]=mydatareader.readbuffer(myfilestr)
             #print mydata[key].metadata
-            self.counts[key]=N.array(self.mydata[key].data[self.mydata[key].metadata['count_info']['signal']])
-            self.errors[key]=N.sqrt(self.counts[key])
+            mon=self.mydata[key].data['monitor']
+            if mymonFlag==False:
+                mon0=mon
+                mymonFlag=True
+            self.mydata[key].data['monitor']=N.array(self.mydata[key].data['monitor'],'float64')*mon0/mon
+            self.counts[key]=N.array(self.mydata[key].data[self.mydata[key].metadata['count_info']['signal']])*mon0/mon
+            self.errors[key]=N.sqrt(self.counts[key])*mon0/mon
             self.timestamp[key]=N.array(self.mydata[key].data['timestamp'])
             #TODO currently, we assume that the files are taken at the same points--is this safe?
             self.length=self.counts[key].shape[0]
