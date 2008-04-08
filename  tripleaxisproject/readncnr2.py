@@ -400,7 +400,7 @@ class datareader:
         if self.columndict.has_key('timestamp')==False:
             self.timestamp_flag=False
             self.columnlist.append('timestamp')
-            print 'no timestamp'
+            #print 'no timestamp'
             self.columndict['timestamp']=[]
         return
 
@@ -580,7 +580,10 @@ class datareader:
                 for i in range(1,len(tokenized)):
                     scanstr=scanstr+tokenized[i]+' '
                 self.metadata['file_info']['scan_description']=scanstr
-                self.additional_metadata['parsed_scandescription']=self.parse_scan(scanstr)
+                if self.metadata['file_info']['filebase']!='fpx':
+                    self.additional_metadata['parsed_scandescription']=self.parse_scan(scanstr)
+                    #CAN'T SEEM TO PARSE fpx files, but if the filename is broken as in the last cycle, then how do I know?
+                    #Better soln is to fix parser
                 #print self.metadata['scan_description']['range']
             else:
                 currfield=tokenized[0].lower().lower().strip('#')
@@ -618,6 +621,10 @@ class datareader:
                                 self.columndict[field].append((tokenized[i]))
                         count=count+1
                 myFlag=False
+        if len(self.columndict[self.columnlist[0]])==0:
+            self.columndict={}
+            self.columnlist=[]
+            #This is a drastic step, but if the file is empty, then no point in even recording the placeholders
         #print self.columndict['Qx']
         #print self.columnlist
         return
@@ -779,8 +786,9 @@ if __name__=='__main__':
         myfilestr=r'c:\summerschool2007\\qCdCr014.ng5'
     if 1:
         #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7'
-        myfilestr=r'c:\12436\data\LaOFeAs56413.bt7'
-        #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
+        #myfilestr=r'c:\12436\data\LaOFeAs56413.bt7'
+        myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
+        myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\fpx53418.bt7'
         mydatareader=datareader()
         #mydata=mydatareader.readbuffer(myfilestr,lines=91)
         mydata=mydatareader.readbuffer(myfilestr)
