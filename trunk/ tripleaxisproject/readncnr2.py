@@ -382,6 +382,8 @@ class datareader:
     #    tokenized=get_tokenized_line(myfile)
         self.columndict={}
         self.columnlist=[]
+        self.timestamp_flag=True
+        #originally set the timestamp flag to True, if it turns out that there is not timestamp in the file, then create one using the time field
         for i in N.arange(1,len(tokenized)):
             field=tokenized[i]
             if field=='QX':
@@ -394,8 +396,12 @@ class datareader:
                 field='Temp'.lower()
             self.columndict[field]=[]
             self.columnlist.append(field)
-        self.columnlist.append('timestamp')
-        self.columndict['timestamp']=[]
+        #In old bt7 files, there was no timestamp, so add one for those, otherwise use the one in the file
+        if self.columndict.has_key('timestamp')==False:
+            self.timestamp_flag=False
+            self.columnlist.append('timestamp')
+            print 'no timestamp'
+            self.columndict['timestamp']=[]
         return
 
     def range_parser(self,rangestr,scan_description):
@@ -600,9 +606,10 @@ class datareader:
                         for i in range(len(tokenized)):
                             field=self.columnlist[i]
                             try:
-                                if field.lower()=='time':
+                                if field.lower()=='time' and self.timestamp_flag==False:
                                     #timedelta=mx.DateTime.DateTimeDelta(0,0,0,float(tokenized[i])) #orig
                                     #self.columndict['timestamp'].append((timeobj+timedelta).ticks()) #orig
+                                    #timestamp_flag is True if the timestamp is already given in the file
                                     timedelta=datetime.timedelta(seconds=float(tokenized[i]))
                                     self.columndict['timestamp'].append(mktime((timeobj+timedelta).timetuple()))
                                     timeobj=timeobj+timedelta
@@ -771,10 +778,12 @@ if __name__=='__main__':
         #ibuff
         myfilestr=r'c:\summerschool2007\\qCdCr014.ng5'
     if 1:
-        myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7'
+        #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7'
+        myfilestr=r'c:\12436\data\LaOFeAs56413.bt7'
         #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
         mydatareader=datareader()
-        mydata=mydatareader.readbuffer(myfilestr,lines=91)
+        #mydata=mydatareader.readbuffer(myfilestr,lines=91)
+        mydata=mydatareader.readbuffer(myfilestr)
         myoutfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7.out'
         #mywriter=writebt7.datawriter()
         #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
@@ -796,7 +805,7 @@ if __name__=='__main__':
         mydatareader=datareader()
         mydata=mydatareader.readbuffer(myfilestr,lines=91)
 
-    if 1:
+    if 0:
         print 'metadata'
         print mydata.metadata['file_info']
     if 0:
