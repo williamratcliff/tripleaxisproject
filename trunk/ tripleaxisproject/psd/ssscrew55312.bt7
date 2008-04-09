@@ -1,0 +1,39 @@
+#ICE         1.0
+#ICEVersionURL $HeadURL$#Filename    ssscrew55312
+#Date        2008-02-22 15:29:43 EST
+#InstrName   BT7
+#Epoch       1203712183.35
+#ExptID      11804
+#ExptName    "profiletest"
+#ExptParticipants "Steve, Mike"
+#ExptDetails "test profiling"
+#ExptComment 
+#User        bt7
+#Comment     
+#Npoints     1
+#TemperatureUnits sensor
+#Ncolumns    141
+#DetectorDims
+#Signal      9 Detector
+#Reference   8 Monitor
+#ScanType   MOTOR
+#ScannedDevices A4 
+#DetectorEfficiencies Monitor=1.0 PSDC37=1.0 Monitor2=1.0 PSDC02=1.0 PSDC03=1.0 PSDC00=1.0 PSDC01=1.0 PSDC06=1.0 PSDC07=1.0 PSDC04=1.0 PSDC05=1.0 PSDC08=1.0 PSDC09=1.0 SDC0=1.0 SDC1=1.0 SDC2=1.0 PSDC11=1.0 PSDC10=1.0 PSDC13=1.0 PSDC12=1.0 PSDC15=1.0 PSDC14=1.0 PSDC17=1.0 PSDC16=1.0 PSDC19=1.0 PSDC18=1.0 PSDC46=1.0 PSDC47=1.0 PSDC45=1.0 PSDC43=1.0 PSDC40=1.0 PSDC32=1.0 PSDC41=1.0 PSDC31=1.0 PSDC28=1.0 PSDC29=1.0 PSDC24=1.0 PSDC25=1.0 PSDC26=1.0 PSDC27=1.0 PSDC20=1.0 PSDC21=1.0 PSDC22=1.0 PSDC23=1.0 Time=1.0 PSDC34=1.0 DDC1=1.0 DDC0=1.0 DDC2=1.0 PSDC39=1.0 PSDC38=1.0 PSDC33=1.0 PSDC30=1.0 PSDC36=1.0 PSDC35=1.0 PSDC44=1.0 TDC08=1.0 TDC10=1.0 PSDC42=1.0 TDC06=1.0 TDC07=1.0 TDC04=1.0 TDC05=1.0 TDC02=1.0 TDC03=1.0 TDC00=1.0 TDC01=1.0 TDC09=1.0 
+#FixedE     
+#Lattice     5.3783 5.58 7.5565 90 90 90
+#Orient      4 0 0 0 0 6
+#MonoSpacing 3.35416
+#AnaSpacing  3.35416
+#MonoVertiFocus SAGITTAL
+#MonoHorizFocus FLAT
+#AnalyzerDetectorMode 6 Undefined
+#AnalyzerDetectorDevicesOfInterest PSDC00 PSDC01 PSDC02 PSDC03 PSDC04 PSDC05 PSDC06 PSDC07 PSDC08 PSDC09 PSDC10 PSDC11 PSDC12 PSDC13 PSDC14 PSDC15 PSDC16 PSDC17 PSDC18 PSDC19 PSDC20 PSDC21 PSDC22 PSDC23 PSDC24 PSDC25 PSDC26 PSDC27 PSDC28 PSDC29 PSDC30 PSDC31 PSDC32 PSDC33 PSDC34 PSDC35 PSDC36 PSDC37 PSDC38 PSDC39 PSDC40 PSDC41 PSDC42 PSDC43 PSDC44 PSDC45 PSDC46 PSDC47
+#AnalyzerDDGroup DDC0 DDC1 DDC2
+#AnalyzerDoorDetectorGroup TDC00 TDC01 TDC02 TDC03 TDC04 TDC05 TDC06 TDC07 TDC08
+#AnalyzerPSDGroup PSDC00 PSDC01 PSDC02 PSDC03 PSDC04 PSDC05 PSDC06 PSDC07 PSDC08 PSDC09 PSDC10 PSDC11 PSDC12 PSDC13 PSDC14 PSDC15 PSDC16 PSDC17 PSDC18 PSDC19 PSDC20 PSDC21 PSDC22 PSDC23 PSDC24 PSDC25 PSDC26 PSDC27 PSDC28 PSDC29 PSDC30 PSDC31 PSDC32 PSDC33 PSDC34 PSDC35 PSDC36 PSDC37 PSDC38 PSDC39 PSDC40 PSDC41 PSDC42 PSDC43 PSDC44 PSDC45 PSDC46 PSDC47
+#AnalyzerSDGroup SDC0 SDC1 SDC2
+#AnalyzerFocusMode ENERGY
+#Fixed       All devices are free
+#ScanDescr   Scan:SubID=11804:JType=MOTOR:Npts=1:Counts=77364.0:Prefac=1.0:DetectorType=Detector:CountType=Monitor:Filename=ssscrew:HoldScan=0.0:Range=A4=26.0 26.0 s:Title=SSScrewA4_26
+#Columns             QX            QY            QZ             E            A4          Time          Temp       Monitor      Detector        DFMRot            A2            A3            A5            A6           DFM            A1 AnalyzerBlade01 AnalyzerBlade02 AnalyzerBlade03 AnalyzerBlade04 AnalyzerBlade05 AnalyzerBlade06 AnalyzerBlade07 AnalyzerBlade08 AnalyzerBlade09 AnalyzerBlade10 AnalyzerBlade11 AnalyzerBlade12 AnalyzerBlade13 AnalyzerRotation     ApertHori     ApertVert     BkSltHght     BkSltWdth          DDC0          DDC1          DDC2       DiffDet          FLIP        FilRot       FilTilt       FilTran       FocusCu       FocusPG             H           HKL             K             L      Monitor2   MonoBlade01   MonoBlade02   MonoBlade03   MonoBlade04   MonoBlade05   MonoBlade06   MonoBlade07   MonoBlade08   MonoBlade09   MonoBlade10      MonoElev     MonoTrans        PSDC00        PSDC01        PSDC02        PSDC03        PSDC04        PSDC05        PSDC06        PSDC07        PSDC08        PSDC09        PSDC10        PSDC11        PSDC12        PSDC13        PSDC14        PSDC15        PSDC16        PSDC17        PSDC18        PSDC19        PSDC20        PSDC21        PSDC22        PSDC23        PSDC24        PSDC25        PSDC26        PSDC27        PSDC28        PSDC29        PSDC30        PSDC31        PSDC32        PSDC33        PSDC34        PSDC35        PSDC36        PSDC37        PSDC38        PSDC39        PSDC40        PSDC41        PSDC42        PSDC43        PSDC44        PSDC45        PSDC46        PSDC47         PSDet   PostAnaColl  PostMonoColl    PreAnaColl   PreMonoColl            RC            SC          SDC0          SDC1          SDC2     SingleDet      SmplElev     SmplGFRot     SmplLTilt      SmplLTrn     SmplUTilt      SmplUTrn         TDC00         TDC01         TDC02         TDC03         TDC04         TDC05         TDC06         TDC07         TDC08         TDC09         TDC10 TemperatureControlReading TemperatureSetpoint TemperatureHeaterPower TemperatureSensor1    timestamp
+                    N/A           N/A           N/A           N/A       25.9999       60.0644        50.661         77364        110877        20.589        41.177       41.1999       20.5885            -0       20.5885       20.5885       -8.8753      -9.28333       -9.6837      -10.0913      -10.5163      -10.9423      -11.3924      -11.8503      -12.3163      -12.7913      -13.2914      -13.8003      -14.3194       31.9791       79.9998       151.995       99.9965       99.9993            13            10             6           205             A        -0.805       -1.9496            IN          9000          1026           N/A           N/A           N/A           N/A             0             0             0             0             0             0             0             0             0             0             0             0         2.484          1566          1383          1749          2015          2131          2034          2008          2511          2378          2368          2481          2568          2347          2391          1867          2263          2105          1504          1564          1458          1640          1305          1644          1501          1690          1449          1328          1145          1491          1389          1727          1817          2060          2207          2912          3780          4118          3655          3461          4006          3901          3481          3659          3595          3524          2896          2399          2406            -0           N/A           N/A           N/A          OPEN       257.004       66.9498             7            22            16           145        -1e-04       103.335             0             0             0       17.5998            66           526           667           622           509           500           576           986          1105           795            58 50.662 50.0 4.5 51.021    1203712295.4043651
