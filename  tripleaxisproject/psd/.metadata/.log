@@ -31,3 +31,13 @@ org.osgi.framework.BundleException: Cannot attach fragment bundle "org.eclipse.u
 	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.doResolveBundles(PackageAdminImpl.java:219)
 	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl$1.run(PackageAdminImpl.java:164)
 	at java.lang.Thread.run(Thread.java:595)
+!SESSION 2008-04-10 02:22:40.790 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.5.0_11
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=en_US
+Framework arguments:  C:\tripleaxisproject2\psd\psd\crystalbt7psdbackup2.pro
+Command-line arguments:  -os win32 -ws win32 -arch x86 C:\tripleaxisproject2\psd\psd\crystalbt7psdbackup2.pro
+
+!ENTRY org.eclipse.core.resources 2 10035 2008-04-10 02:22:55.030
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.

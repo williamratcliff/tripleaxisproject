@@ -1,0 +1,46 @@
+!SESSION 2008-04-10 02:20:23.753 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=1.5.0_11
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=en_US
+Framework arguments:  C:\tripleaxisproject2\psd\psd\crystalbt7psdbackup2.pro
+Command-line arguments:  -os win32 -ws win32 -arch x86 C:\tripleaxisproject2\psd\psd\crystalbt7psdbackup2.pro
+
+!ENTRY org.eclipse.equinox.common 4 0 2008-04-10 02:20:26.156
+!MESSAGE 
+!STACK 0
+org.osgi.framework.BundleException: Cannot attach fragment bundle "org.eclipse.equinox.common.nl2" to resolved host "org.eclipse.equinox.common".  Try refreshing the host bundle.
+	at org.eclipse.osgi.framework.internal.core.BundleHost.attachFragment(BundleHost.java:575)
+	at org.eclipse.osgi.framework.internal.core.BundleFragment.addHost(BundleFragment.java:298)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.setResolved(PackageAdminImpl.java:330)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.applyDeltas(PackageAdminImpl.java:345)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.processDelta(PackageAdminImpl.java:425)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.doResolveBundles(PackageAdminImpl.java:219)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl$1.run(PackageAdminImpl.java:164)
+	at java.lang.Thread.run(Thread.java:595)
+
+!ENTRY org.eclipse.equinox.common 4 0 2008-04-10 02:20:26.166
+!MESSAGE 
+!STACK 0
+org.osgi.framework.BundleException: Cannot attach fragment bundle "org.eclipse.equinox.common.nl2" to resolved host "org.eclipse.equinox.common".  Try refreshing the host bundle.
+	at org.eclipse.osgi.framework.internal.core.BundleHost.attachFragment(BundleHost.java:575)
+	at org.eclipse.osgi.framework.internal.core.BundleFragment.addHost(BundleFragment.java:298)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.setResolved(PackageAdminImpl.java:330)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.applyDeltas(PackageAdminImpl.java:345)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.processDelta(PackageAdminImpl.java:425)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.doResolveBundles(PackageAdminImpl.java:219)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl$1.run(PackageAdminImpl.java:164)
+	at java.lang.Thread.run(Thread.java:595)
+
+!ENTRY org.eclipse.update.configurator 4 0 2008-04-10 02:20:26.166
+!MESSAGE 
+!STACK 0
+org.osgi.framework.BundleException: Cannot attach fragment bundle "org.eclipse.update.configurator.nl2a" to resolved host "org.eclipse.update.configurator".  Try refreshing the host bundle.
+	at org.eclipse.osgi.framework.internal.core.BundleHost.attachFragment(BundleHost.java:575)
+	at org.eclipse.osgi.framework.internal.core.BundleFragment.addHost(BundleFragment.java:298)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.setResolved(PackageAdminImpl.java:330)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.applyDeltas(PackageAdminImpl.java:345)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.processDelta(PackageAdminImpl.java:425)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl.doResolveBundles(PackageAdminImpl.java:219)
+	at org.eclipse.osgi.framework.internal.core.PackageAdminImpl$1.run(PackageAdminImpl.java:164)
+	at java.lang.Thread.run(Thread.java:595)
