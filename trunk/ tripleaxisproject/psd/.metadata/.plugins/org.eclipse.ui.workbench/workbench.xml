@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbench progressCount="12" version="2.0">
+<workbenchAdvisor/>
+<window height="768" maximized="true" width="1024" x="235" y="161">
+<fastViewData fastViewLocation="1024"/>
+<perspectiveBar>
+<itemSize x="160"/>
+</perspectiveBar>
+<coolbarLayout locked="0">
+<coolItem id="group.file" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="231" y="22"/>
+<coolItem id="additions" itemType="typeGroupMarker"/>
+<coolItem id="com.rsi.idldt.ui.edit" itemType="typeToolBarContribution" x="131" y="22"/>
+<coolItem id="org.eclipse.search.searchActionSet" itemType="typeToolBarContribution" x="39" y="22"/>
+<coolItem id="group.nav" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.navigate" itemType="typeToolBarContribution" x="183" y="22"/>
+<coolItem id="group.editor" itemType="typeGroupMarker"/>
+<coolItem id="com.rsi.idldt.proeditor.ProEditor" itemType="typeToolBarContribution" x="39" y="22"/>
+<coolItem id="group.help" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.help" itemType="typeToolBarContribution" x="-1" y="-1"/>
+</coolbarLayout>
+<page focus="true" label="Workspace - IDL">
+<editors>
+<editorArea activeWorkbook="DefaultEditorWorkbook">
+<info part="DefaultEditorWorkbook">
+<folder appearance="1" expanded="2">
+<presentation id="org.eclipse.ui.internal.presentations.r33.WorkbenchPresentationFactory_33">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+<part id="3"/>
+</presentation>
+</folder>
+</info>
+</editorArea>
+<editor id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psdbackup3.pro" partName="crystalbt7psdbackup3.pro" path="C:/tripleaxisproject2/psd/psd/crystalbt7psdbackup3.pro" title="crystalbt7psdbackup3.pro" tooltip="psd/crystalbt7psdbackup3.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/psd/crystalbt7psdbackup3.pro"/>
+<editorState selectionHPixel="0" selectionLength="0" selectionOffset="4716"/>
+</editor>
+<editor activePart="true" focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="dave_read_ice.pro" partName="dave_read_ice.pro" title="dave_read_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_read_ice.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_read_ice.pro"/>
+<editorState selectionHPixel="0" selectionLength="57" selectionOffset="1533"/>
+</editor>
+<editor id="com.rsi.idldt.proeditor.ProEditor" name="dave_parse_ice.pro" partName="dave_parse_ice.pro" title="dave_parse_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_parse_ice.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_parse_ice.pro"/>
+<editorState selectionHPixel="0" selectionLength="27" selectionOffset="2683"/>
+</editor>
+<editor id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psdbackup2.pro" partName="crystalbt7psdbackup2.pro" path="C:/tripleaxisproject2/psd/psd/crystalbt7psdbackup2.pro" title="crystalbt7psdbackup2.pro" tooltip="psd/crystalbt7psdbackup2.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/psd/crystalbt7psdbackup2.pro"/>
+<editorState selectionHPixel="0" selectionLength="0" selectionOffset="3832"/>
+</editor>
+</editors>
+<views>
+<view id="org.eclipse.ui.views.TaskList" partName="Tasks"/>
+<view id="com.rsi.idldt.ui.views.CommandLineView" partName="Command Line">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline"/>
+<view id="org.eclipse.debug.ui.VariableView" partName="Variables">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.console.ConsoleView" partName="Console">
+<viewState/>
+</view>
+<view id="org.eclipse.debug.ui.DebugView" partName="Debug">
+<viewState/>
+</view>
+<view id="com.rsi.idldt.ui.views.ProfilerView" partName="Profiler"/>
+<view id="org.eclipse.ui.navigator.ProjectExplorer" partName="Project Explorer">
+<viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
+</view>
+<view id="org.eclipse.debug.ui.BreakpointView" partName="Breakpoints"/>
+<view id="org.eclipse.ui.views.ProblemView" partName="Problems">
+<viewState columnWidth0="250" columnWidth1="75" columnWidth2="150" columnWidth3="60" columnWidth4="0" horizontalPosition="0" verticalPosition="0">
+<columnOrder columnOrderIndex="0"/>
+<columnOrder columnOrderIndex="1"/>
+<columnOrder columnOrderIndex="2"/>
+<columnOrder columnOrderIndex="3"/>
+<columnOrder columnOrderIndex="4"/>
+</viewState>
+</view>
+<view id="com.rsi.idldt.ui.views.CommandHistoryView" partName="Command History">
+<viewState columnWidth0="200" showTreeView="1" sortColumn="1" sortDirection="128"/>
+</view>
+</views>
+<perspectives activePart="com.rsi.idldt.proeditor.ProEditor" activePerspective="com.rsi.idldt.ui.IDLPerspective">
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="org.eclipse.debug.internal.ui.DebugPerspectiveFactory" id="org.eclipse.debug.ui.DebugPerspective" label="Debug"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.CmdLine"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.File"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.Run"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.Wizard"/>
+<alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.WorkingSetActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.update.ui.softwareUpdates"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.launchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.NavigateActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
+<show_view_action id="org.eclipse.debug.ui.DebugView"/>
+<show_view_action id="org.eclipse.debug.ui.VariableView"/>
+<show_view_action id="org.eclipse.debug.ui.BreakpointView"/>
+<show_view_action id="org.eclipse.debug.ui.ExpressionView"/>
+<show_view_action id="org.eclipse.ui.views.ContentOutline"/>
+<show_view_action id="org.eclipse.ui.console.ConsoleView"/>
+<show_view_action id="org.eclipse.ui.views.TaskList"/>
+<show_view_action id="com.rsi.idldt.ui.views.CommandLineView"/>
+<show_view_action id="com.rsi.idldt.ui.views.CommandHistoryView"/>
+<show_view_action id="com.rsi.idldt.ui.views.ProfilerView"/>
+<perspective_action id="com.rsi.idldt.ui.IDLPerspective"/>
+<view id="org.eclipse.ui.console.ConsoleView"/>
+<view id="org.eclipse.ui.views.TaskList"/>
+<view id="com.rsi.idldt.ui.views.ProfilerView"/>
+<view id="org.eclipse.debug.ui.DebugView"/>
+<view id="org.eclipse.debug.ui.VariableView"/>
+<view id="org.eclipse.debug.ui.BreakpointView"/>
+<view id="org.eclipse.ui.views.ContentOutline"/>
+<view id="com.rsi.idldt.ui.views.CommandLineView"/>
+<fastViewBars/>
+<viewLayoutRec id="com.rsi.idldt.ui.views.CommandLineView" showTitle="true" standalone="true"/>
+<layout>
+<mainWindow>
+<info folder="true" part="org.eclipse.debug.internal.ui.NavigatorFolderView">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
+<page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="756" ratioRight="252" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+<page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.debug.internal.ui.ConsoleFolderView" ratio="0.7492918" ratioLeft="529" ratioRight="177" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<page content="org.eclipse.ui.views.TaskList" label="Tasks"/>
+<page content="org.eclipse.ui.views.BookmarkView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.views.PropertySheet" label="LabelNotFound"/>
+<page content="com.rsi.idldt.ui.views.ProfilerView" label="Profiler"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1f11e0f" ratio="0.76836157" ratioLeft="136" ratioRight="41" relationship="4" relative="org.eclipse.debug.internal.ui.ConsoleFolderView">
+<folder appearance="3" expanded="2">
+<page content="com.rsi.idldt.ui.views.CommandLineView" label="Command Line"/>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.44990548" ratioLeft="238" ratioRight="291" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView"/>
+<info folder="true" part="org.eclipse.debug.internal.ui.OutlineFolderView" ratio="0.75" ratioLeft="756" ratioRight="252" relationship="2" relative="org.eclipse.ui.editorss">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.debug.internal.ui.ToolsFolderView" ratio="0.5" ratioLeft="504" ratioRight="504" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
+<page content="org.eclipse.debug.ui.BreakpointView" label="Breakpoints"/>
+<page content="org.eclipse.debug.ui.ExpressionView" label="LabelNotFound"/>
+<page content="org.eclipse.debug.ui.RegisterView" label="LabelNotFound"/>
+</folder>
+</info>
+</mainWindow>
+</layout>
+</perspective>
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="com.rsi.idldt.internal.ui.IDLPerspectiveFactory" id="com.rsi.idldt.ui.IDLPerspective" label="IDL"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.CmdLine"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.File"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.Run"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.Wizard"/>
+<alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.WorkingSetActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.update.ui.softwareUpdates"/>
+<alwaysOnActionSet id="org.eclipse.ui.NavigateActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
+<show_view_action id="org.eclipse.debug.ui.BreakpointView"/>
+<show_view_action id="org.eclipse.debug.ui.DebugView"/>
+<show_view_action id="com.rsi.idldt.ui.views.CommandLineView"/>
+<show_view_action id="org.eclipse.ui.console.ConsoleView"/>
+<show_view_action id="com.rsi.idldt.ui.views.CommandHistoryView"/>
+<show_view_action id="org.eclipse.search.ui.views.SearchView"/>
+<show_view_action id="org.eclipse.ui.views.ProblemView"/>
+<show_view_action id="com.rsi.idldt.ui.views.ProfilerView"/>
+<show_view_action id="org.eclipse.ui.navigator.ProjectExplorer"/>
+<show_view_action id="org.eclipse.ui.views.ContentOutline"/>
+<show_view_action id="org.eclipse.ui.views.TaskList"/>
+<show_view_action id="org.eclipse.ui.views.BookmarkView"/>
+<show_view_action id="org.eclipse.debug.ui.VariableView"/>
+<new_wizard_action id="com.rsi.idldt.core.ui.newUntitledProWizard"/>
+<new_wizard_action id="com.rsi.idldt.core.ui.newProjectWizard"/>
+<new_wizard_action id="org.eclipse.ui.wizards.new.folder"/>
+<perspective_action id="org.eclipse.debug.ui.DebugPerspective"/>
+<perspective_action id="com.rsi.idldt.ui.IDLPerspective"/>
+<view id="org.eclipse.ui.console.ConsoleView"/>
+<view id="org.eclipse.ui.views.TaskList"/>
+<view id="org.eclipse.debug.ui.VariableView"/>
+<view id="org.eclipse.ui.views.ProblemView"/>
+<view id="org.eclipse.ui.navigator.ProjectExplorer"/>
+<view id="org.eclipse.ui.views.ContentOutline"/>
+<view id="com.rsi.idldt.ui.views.CommandLineView"/>
+<view id="com.rsi.idldt.ui.views.CommandHistoryView"/>
+<fastViewBars/>
+<viewLayoutRec id="com.rsi.idldt.ui.views.CommandLineView" showTitle="true" standalone="true"/>
+<layout>
+<mainWindow>
+<info folder="true" part="left">
+<folder activePageID="org.eclipse.ui.navigator.ProjectExplorer" appearance="2" expanded="2">
+<page content="org.eclipse.ui.navigator.ProjectExplorer" label="Project Explorer"/>
+<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+<page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
+<page content="org.eclipse.debug.ui.DebugView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.internal.presentations.r33.WorkbenchPresentationFactory_33">
+<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="756" ratioRight="252" relationship="2" relative="left">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+<page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
+</folder>
+</info>
+<info folder="true" part="bottom" ratio="0.5991501" ratioLeft="423" ratioRight="283" relationship="4" relative="left">
+<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
+<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<page content="org.eclipse.ui.views.TaskList" label="Tasks"/>
+<page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
+<page content="org.eclipse.ui.views.ProblemView" label="Problems"/>
+<page content="*" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.internal.presentations.r33.WorkbenchPresentationFactory_33">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+<part id="3"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1b2b450" ratio="0.7667844" ratioLeft="217" ratioRight="66" relationship="4" relative="bottom">
+<folder activePageID="com.rsi.idldt.ui.views.CommandLineView" appearance="3" expanded="2">
+<page content="com.rsi.idldt.ui.views.CommandLineView" label="Command Line"/>
+<presentation id="org.eclipse.ui.internal.presentations.r33.WorkbenchPresentationFactory_33">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="bottom_right" ratio="0.6994048" ratioLeft="705" ratioRight="303" relationship="2" relative="bottom">
+<folder activePageID="com.rsi.idldt.ui.views.CommandHistoryView" appearance="2" expanded="2">
+<page content="com.rsi.idldt.ui.views.CommandHistoryView" label="Command History"/>
+<presentation id="org.eclipse.ui.internal.presentations.r33.WorkbenchPresentationFactory_33">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.25" ratioLeft="252" ratioRight="756" relationship="2" relative="left"/>
+</mainWindow>
+</layout>
+</perspective>
+</perspectives>
+<workingSets/>
+<navigationHistory>
+<editors>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/psd/crystalbt7psdbackup3.pro"/>
+<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_read_ice.pro"/>
+<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_parse_ice.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/psd/crystalbt7psdbackup2.pro"/>
+<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/is_ice.pro"/>
+</editors>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2630" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2678" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2734" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2778" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2830" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2956" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2999" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="15330" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="5330" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2037" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="2052" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="5137" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3275" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="5137" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3874" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3739" y="0"/>
+</item>
+<item historyLabel="dave_read_ice.pro" index="1">
+<position info="not_deleted" x="1533" y="57"/>
+</item>
+<item historyLabel="dave_parse_ice.pro" index="2">
+<position info="not_deleted" x="2683" y="27"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3739" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3770" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3772" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3873" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3766" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup2.pro" index="3">
+<position/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3766" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3764" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3766" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3829" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="5167" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup2.pro" index="3">
+<position info="not_deleted" x="4566" y="70"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="5167" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3842" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3226" y="0"/>
+</item>
+<item historyLabel="dave_read_ice.pro" index="1">
+<position info="not_deleted" x="1533" y="57"/>
+</item>
+<item historyLabel="crystalbt7psdbackup2.pro" index="3">
+<position info="not_deleted" x="6413" y="64"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3226" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3705" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3705" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3705" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3991" y="0"/>
+</item>
+<item historyLabel="dave_parse_ice.pro" index="2">
+<position info="not_deleted" x="2683" y="27"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3194" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup2.pro" index="3">
+<position info="not_deleted" x="5885" y="10"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3420" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup2.pro" index="3">
+<position info="not_deleted" x="3832" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="3420" y="0"/>
+</item>
+<item historyLabel="crystalbt7psdbackup3.pro" index="0">
+<position info="not_deleted" x="4716" y="0"/>
+</item>
+<item historyLabel="dave_read_ice.pro" index="1">
+<position info="not_deleted" x="1533" y="57"/>
+</item>
+<item historyLabel="is_ice.pro" index="4">
+<position/>
+</item>
+<item active="true" historyLabel="dave_read_ice.pro" index="1">
+<position info="not_deleted" x="1533" y="57"/>
+</item>
+</navigationHistory>
+<input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
+</page>
+<workbenchWindowAdvisor/>
+<actionBarAdvisor/>
+<trimLayout>
+<trimArea IMemento.internal.id="128">
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.WorkbenchWindow.topBar"/>
+</trimArea>
+<trimArea IMemento.internal.id="1024">
+<trimItem IMemento.internal.id="org.eclise.ui.internal.FastViewBar"/>
+<trimItem IMemento.internal.id="org.eclipse.jface.action.StatusLineManager"/>
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.progress.ProgressRegion"/>
+</trimArea>
+</trimLayout>
+</window>
+<mruList>
+<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="is_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\is_ice.pro">
+<persistable uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/is_ice.pro"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psdbackup2.pro" tooltip="psd/crystalbt7psdbackup2.pro">
+<persistable path="/psd/crystalbt7psdbackup2.pro"/>
+</file>
+<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="dave_parse_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_parse_ice.pro">
+<persistable uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_parse_ice.pro"/>
+</file>
+<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="dave_read_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_read_ice.pro">
+<persistable uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_read_ice.pro"/>
+</file>
+</mruList>
+</workbench>
