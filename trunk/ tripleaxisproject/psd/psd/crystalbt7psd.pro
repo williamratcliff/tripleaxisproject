@@ -26,164 +26,156 @@ pro load_psd_data, event
 			'PSDC32', 'PSDC33', 'PSDC34', 'PSDC35', 'PSDC36', 'PSDC37', 'PSDC38', 'PSDC39',  $
 			'PSDC40', 'PSDC41', 'PSDC42', 'PSDC43', 'PSDC44', 'PSDC45', 'PSDC46', 'PSDC47',  $
 			'PSDet', 'PostAnaColl', 'PostMonoColl', 'PreAnaColl', 'PreMonoColl', 'RC', 'SC']
-	varname = ['QX', 'QY', 'QZ', 'E', 'A3', 'A4','H','K','L']
-	fn = dialog_pickfile(filter='*.bt7',title='Select your data file:')
-    if fn ne '' then begin
-		nlines = file_lines(fn)
-		; creat all the tage names
-		name=sindgen(48)
-		for n = 0, 47 do begin
-			if n lt 10 then name[n]='PSDC0'+string(strtrim(n,2))
-		    if n ge 10 then	name[n]='PSDC'+string(strtrim(n,2))
-		endfor
-		if fn ne '' then begin
-    		;CHECK HOW MANY LINES ARE IN THE FILE AND READ THE FILE.
-	        s = strarr(nlines)
-	        openr,lun,fn,/get_lun
-	        readf,lun,s
-	        free_lun,lun
-	        tagline = 0
-	        indepvarline=0
-	        referline = 0
-	        for i=0,nlines-1 do begin
-	        	if stregex(s[i],'#Npoints',/boolean) gt 0 then npoint =i
-	        	if stregex(s[i],'#Reference',/boolean) gt 0 then referline =i
-	        	if stregex(s[i],'#Scan  ',/boolean) gt 0 then indepvarline = i
-	        	if stregex(s[i],'#FixedE  ',/boolean) gt 0 then fixedeline = i
-	        	if stregex(s[i],'#Lattice ',/boolean) gt 0 then latticeline = i
-	        	if stregex(s[i],'#Orient  ',/boolean) gt 0 then orientline = i
-				if stregex(s[i],'#MonoSpacing ',/boolean) gt 0 then monspaceline =i
-				if stregex(s[i],'#Columns',/boolean) gt 0 then tagline =i
-	        endfor
-			npot = strsplit(s[npoint],/extract)
-			(*pstate).npoints = npot(1)
-			refer = strsplit(s[referline],/extract)
-	       	indepvar = strsplit(s[indepvarline],/extract)
-	       	segs = strsplit(s[tagline],/extract)
-	       	if (*pstate).npoints ge (nlines-tagline) then (*pstate).npoints=(nlines-tagline)-1
-	       	headnumb = indgen(2)
-	       	headnumb(0) = indepvar(1)
-	   		headnumb(1) = refer(1)
-			colname = header(headnumb(0)-1)
-			varname = [colname,varname]
-			refername = header(headnumb(1)-1)
-			(*pstate).unitname = refername
-			fixe=strsplit(s[fixedeline],/extract)
-			sze=size(fixe)
-			;print, 'szie ef is ',sze
-			;(*pstate).ef = long(fixe(sze(1)))
-			(*pstate).ef = 14.7
-			latt=strsplit(s[latticeline],/extract)
-			(*pstate).lattice = latt(1:6)
-			ori=strsplit(s[orientline],/extract)
-			(*pstate).orient = ori(1:6)
-			mond=strsplit(s[monspaceline],/extract)
-			(*pstate).monspacing = double(mond[1])
-			ntags = n_elements(segs)-1
-	        tags = segs[1:ntags]
-	        nvar=size(varname)
-	        data=dblarr(48,(*pstate).npoints)
-	        vardata=dblarr(nvar(1),(*pstate).npoints)
-	        raw_data= dblarr(48,(*pstate).npoints)
-			;look for the reference unit
-			wh = where(strlowcase(tags) eq strlowcase(refername),count)
-			if count ne 0 then begin
-               segs = strsplit(s[tagline+1],/extract)
-               (*pstate).unit = double(segs[wh])
-            endif else begin
-               void = dialog_message('That reference was not found in the file!')
-               print,  reference
-            endelse
+	varname = strupcase(['QX', 'QY', 'QZ', 'E', 'A3', 'A4','H','K','L'])
+	mypath=(*pstate).data_directory
+	filename = dialog_pickfile(filter='*.bt7',title='Select your data file:',PATH=mypath)	
+    if filename ne '' then begin
+    try_read=dave_read_ice(filename,dstring = dstring,errmsg = errmsg)
+    if try_read eq 1 then begin
+    try_parse=dave_parse_ice(dstring,dstruct    $
+                            ,header=header_string $
+                            ,indep_var_pos=indep_var_pos $
+                            ,dep_var_pos=dep_var_pos $
+                            ,lattice=lattice $
+                            ,fixedEType=fixedEType $
+                            ,fixedEValue=fixedEValue $
+                            ,dSpaceM=dSpaceM $
+                            ,dSpaceA=dSpaceA $
+                            ,orientation=orientation $
+                            ,sdesc=sdesc $
+                            ,anaPkgStr=anaPkgStr $
+                            ,errmsg = errmsg)
+    ;print, 'try_parse ',try_parse
+    ;print, 'anapkg', anapkgstr 
+    dstruct_members=tag_names(dstruct)
+    ;print, 'tag names ', dstruct_members
+    ch0=where(dstruct_members eq 'PSDC00')
+    ch47=where(dstruct_members eq 'PSDC47')
+    mon_pos=where(strlowcase(dstruct_members) eq 'monitor')
+    temp_pos=where(strlowcase(dstruct_members) eq 'temp')
+    magfield_pos=where(strlowcase(dstruct_members) eq 'magfield')
+    nvar=n_elements(varname)
+    npts=n_elements(*dstruct.(ch0))
+    ;print, 'npts=',npts
+    colname=dstruct_members(indep_var_pos)
+    (*pstate).npoints=npts
+    vardata=dblarr(nvar,(*pstate).npoints)
+    for l=0,nvar-1 do begin
+      var_pos=where(strlowcase(dstruct_members) eq strlowcase(varname(l)))
+      if var_pos ne -1 then begin
+      vardata(l,*)=*dstruct.(var_pos)
+      print, varname(l),' var_pos=',var_pos
+      endif
+    endfor
+    ;print, 'ch0=',ch0,' ch47=',ch47
+    if  (*pstate).npoints lt 1 then begin
+              void = dialog_message('The Data File is Empty!')
+              return
+    endif
+    raw_data= dblarr(48,(*pstate).npoints)
 
-    		;FIND THE POSITION OF THE INPUT COLUMN NAME
+    
 
-			for j = 0, 47 do begin
-               	wh = where(strlowcase(tags) eq strlowcase(name(j)),count)
-               	if count ne 0 then begin
-   					;EXTRACT THE DATA IF THE COLUMN IS AVAILABLE.
-                    for i=tagline+1,(tagline+(*pstate).npoints) do begin
-                        segs = strsplit(s[i],/extract)
-                        raw_data(j,i-tagline-1) = double(segs[wh])
-                    endfor;i
-               	endif else begin
-                   	void = dialog_message('That column name was not found in the file!')
-                   	print,  name(j)
-           		endelse
 
- 			endfor;j
-
-			;Extarct all the variable for the second data file
-			for j = 0, nvar(1)-1 do begin
-               	wh = where(strlowcase(tags) eq strlowcase(varname(j)),count)
-               	if count ne 0 then begin
-   			        for i=tagline+1,(tagline+(*pstate).npoints) do begin
-                        segs = strsplit(s[i],/extract)
-                        vardata(j,i-tagline-1) = double(segs[wh])
-                    endfor;i
-               	endif else begin
-                   	void = dialog_message('That column name was not found in the file!')
-                   	print,  varname(j)
-           		endelse
-
- 			endfor;j
-
-		endif
-	if colname eq 'A4' || colname eq 'Temp' then daxis_Correct_data, raw_data, data=data
-	if colname eq 'E'  then triaxis_Correct_data, raw_data, data=data
-	if colname eq 'PSDet' then daxis_Correct_data, raw_data, data=data
-
-	;data=raw_data
-	;print,'data file', data(0,0),data(0,47)
-	*(*pstate).data = data
+    ;for i = 0,npts-1 do begin
+    for j=0,47 do begin
+      raw_data(j,*) = *dstruct.(j+ch0)
+    
+    endfor
+    ;endfor
+    ;print, 'channel0', raw_data(0,*)
+    endif ; succesfully read file
+    
+    
+    
+    
+    endif
+;          (*pstate).npoints = fix(npot(1))
+;	       	if (*pstate).npoints ge (nlines-tagline) then (*pstate).npoints=(nlines-tagline)-1
+;	       	if  (*pstate).npoints lt 1 then begin
+;              void = dialog_message('The Data File is Empty!')
+;              return
+;          endif
+;          (*pstate).unitname = refername
+;           if sze lt 2 then begin
+;            (*pstate).ef = 0
+;            endif else begin
+;              (*pstate).ef = float(fixe(1))
+;          endelse
+;          (*pstate).lattice = latt(1:6)
+;          (*pstate).orient = ori(1:6)
+;          (*pstate).monspacing = double(mond[1])
+; 	        vardata=dblarr(nvar(1),(*pstate).npoints)
+;	        raw_data= dblarr(48,(*pstate).npoints)
+;			;look for the reference unit
+;    		;FIND THE POSITION OF THE INPUT COLUMN NAME
+;                        raw_data(j,i-tagline-1) = double(segs[wh])
+; 
+;			;Extarct all the variable for the second data file
+;	                       vardata(j,i-tagline-1) = double(segs[wh])
+  	if colname eq 'A4' || colname eq 'Temp' then daxis_Ch_Eff, event
+;  if colname eq 'E'  then triaxis_Ch_Eff, event
+;  if colname eq 'PSDet' then daxis_Ch_Eff, event
+ 	*(*pstate).data = raw_data
 	*(*pstate).vardata = vardata
 	(*pstate).colname = colname
-;	print, (*pstate).orient[3:5]
-
-	sz = size(data)
+	;stop
+	*(*pstate).varname=varname
+	sz = size(raw_data)
 	nvars = sz[2]
 	widget_control,(*pstate).var_slider,set_slider_max=nvars-1
 
-	endif;fn ne ''
+;	endif;fn ne ''
 
 end ;Load_psd_data
-
+;********************************************************
+pro Exclude_PSD_Ch, event
+	widget_control,event.top,get_uvalue = pstate
+	widget_control,(*pstate).BadCh, get_value=BadCh
+	if (*pstate).colname eq 'A4' || (*pstate).colname eq 'Temp' then daxis_Ch_Eff, event
+  if (*pstate).colname eq 'E'  then triaxis_Ch_Eff, event
+  if (*pstate).colname eq 'PSDet' then daxis_Ch_Eff, event
+	if strlen(BadCh) gt 0 then begin
+	  BadCh = strsplit(BadCh,',',/extract)
+    for i=0,size(BadCh,/n_elements)-1 do	(*pstate).Ch_axis_Eff(fix(BadCh(i)))=0
+  endif
+end;Exclude_PSD_CH
 ;**********************************************
 ;this function does the channel efficience correction
-pro daxis_Correct_data, raw_data, data=data
-	sz = size(raw_data)
-	data = findgen(sz(1), sz(2))
+pro daxis_Ch_Eff,event
+	widget_control,event.top,get_uvalue = pstate
 	Ch_Eff = findgen(48)
-	fn = 'c:\PSD\PSD_Channeal_Eff.dat'
+	fn = (*pstate).psd_channel_eff
+	print, 'daxis ',fn
+	if (fn eq '') then channel_handler, event
+  if fn eq '' then return 
 	if fn ne '' then begin
 		openr, fun, fn, /get_lun
 		readf, fun, Ch_Eff
 		free_lun, fun
 
 	endif
-	print, 'Eff is ',Ch_Eff
-	for i =0, 47 do begin
-		data(i, *) = raw_data(i, *)*Ch_Eff(i)
-	endfor
+   (*pstate).Ch_axis_Eff=Ch_Eff
 
 end; Correct_data
 
 ;**********************************************
 ;this function does the channel efficience correction while using PSD
-pro triaxis_Correct_data, raw_data, data=data
-	sz = size(raw_data)
-	data = findgen(sz(1), sz(2))
+pro triaxis_Ch_Eff, event
+	widget_control,event.top,get_uvalue = pstate
 	Ch_dE = findgen(48)
 	Ch_Eff = findgen(48)
-	fn = 'c:\PSD\psd_Ef_spacing.dat'
+	Ch_Eff = findgen(48)
+	fn = (*pstate).psd_Ef_spacing
+	if (fn eq '') then ef_handler, event
+  if fn eq '' then return 
 	if fn ne '' then begin
 		openr, fun, fn, /get_lun
 		readf, fun, Ch_dE,Ch_eff
 		free_lun, fun
 	endif
-	for i =0, 47 do begin
-		data(i, *) = raw_data(i, *)*Ch_Eff(i)
-	endfor
-
+	(*pstate).Ch_axis_Eff=Ch_Eff
+	(*pstate).Ch_Eng_Eff=Ch_dE
 end; Correct_data
 
 
@@ -276,7 +268,9 @@ pro wherespectrometer, event,H=H,K=K,L=L,dE=dE
 	Efpsd=findgen(48)
 	Ch_eff=findgen(48)
 	dA4=findgen(48)
-	fn = 'c:\PSD\psd_Ef_spacing.dat'
+	fn = (*pstate).psd_Ef_spacing
+	if (fn eq '') then ef_handler, event
+  if fn eq '' then return 
 	if fn ne '' then begin
 		openr, fun, fn, /get_lun
 		readf, fun, Efpsd,Ch_eff
@@ -447,6 +441,7 @@ pro PSD_event,event
 		'QUIT':  widget_control,event.top,/destroy
 		'PSD_CH': 	PSD_Ch_Plot,event
 		'VAR':		PSD_Var_Plot, event
+		'ExcludeCh':Exclude_PSD_Ch,event
 		'SUM': 	PSD_Sum_Plot, event
 		'STICH': PSD_Stitch_Plot, event
 		'SaveStich': Save_PSD_Data, event
@@ -458,8 +453,9 @@ end
 ;Plot the each channel vs the independent variable
 pro PSD_Ch_Plot,event
 	widget_control,event.top,get_uvalue = pstate
+	Ch_Eff=findgen(48)
+	Ch_Eff=(*pstate).Ch_axis_Eff
 	datasize = size(*((*pstate).data))
-
 	if datasize(1) le 0 then begin
 		void = dialog_message('The Data File is Empty!')
 		return
@@ -468,8 +464,7 @@ pro PSD_Ch_Plot,event
 	vardata = *((*pstate).vardata)
 	final_data = *((*pstate).data)
 	x = vardata(0,*)
-	y = final_data(slval,*)
-
+	y = final_data(slval,*)*Ch_Eff(slval)
 	(*pstate).plot_title = 'PSD channel Plot, Channel = '   $
 	 		+strtrim(string(slval,format = '(I3)'),2)
 	(*pstate).xtitle = 'Independent Varialbe  '+ (*pstate).colname
@@ -489,13 +484,13 @@ pro PSD_Ch_Plot,event
 	sz=size(y)
 	Gauss_Init_Guess, x, y, (sz(2)-1), p = p
 	PSD_Gauss_Fit, event,x, y, p = p
-	;image = tvrd(true=1)
+	image = tvrd(true=1)
 	(*pstate).image = ptr_new(image)
 	(*pstate).zoomImage=ptr_new(image)
 	(*pstate).imageflage = 1
 	xrdata=findgen(3,sz(2))
-    for k = 0, sz(2)-1 do begin
-		xrdata(0, k) = x(k)
+  for k = 0, sz(2)-1 do begin
+	  xrdata(0, k) = x(k)
 		xrdata(1, k) = y(k)
 		xrdata(2, k) = sqrt(y(k))
 	endfor
@@ -506,6 +501,8 @@ end; PSD_Ch_Plot
 ;Plot all the psd channel at each indeendent variable step
 pro PSD_Var_Plot,event
 	widget_control,event.top,get_uvalue = pstate
+	Ch_Eff = findgen(48)
+	Ch_Eff=(*pstate).Ch_axis_Eff
 	datasize = size(*((*pstate).data))
 	if datasize(1) le 0 then begin
 		void = dialog_message('The Data File is Empty!')
@@ -520,12 +517,12 @@ pro PSD_Var_Plot,event
 	A4=(*(*pstate).vardata)(6,slval)
 	ch_space=findgen(48)
 	ch_position=findgen(48)
-	fn = 'c:\PSD\PSD_A4_Spacing.dat'
-	if fn ne '' then begin
-		openr, fun, fn, /get_lun
-		readf, fun, ch_position
-		free_lun, fun
-	endif
+	fn = (*pstate).PSD_A4_Spacing
+	if (fn eq '') then a4_handler, event
+  if fn eq '' then return 
+	openr, fun, fn, /get_lun
+	readf, fun, ch_position
+	free_lun, fun
 	;Now calculate the spacing between every channel and the specified center channel
 
 
@@ -547,25 +544,22 @@ pro PSD_Var_Plot,event
 		xrdata(2, k) = sqrt(y(k))
 	endfor
 	*(*pstate).stitchdata = xrdata
-
-
 	minx = min(ch_space, max=maxx)
 	miny = min(y, max=maxy)
-
 	(*pstate).plot_title = 'PSD Variable Plot,'$
 		 +strtrim(string((*pstate).colname), 2) + ' = ' $
 	     +strtrim(string(vardata(0,slval),format = '(f10.3)'),2)
 	(*pstate).xtitle = 'A4 '
 	(*pstate).ytitle ='Neutron ( '+ string(strtrim((*pstate).unit, 2))+'/'+(*pstate).unitname +' )'
 	plot,ch_space,y,psym = 4,thick = 4.0, ymargin=[5, 3],subtitle = (*pstate).plot_title, xtitle=(*pstate).xtitle, $
-		xrange = [minx, maxx], yrange = [miny, maxy], ytitle=(*pstate).ytitle
+		xrange = [minx, maxx], yrange = [miny, maxy], ytitle=(*pstate).ytitle,xstyle=1
 	errplot, ch_space, (y-sqrt(y)),(y+sqrt(y))
-	axis, xaxis=1, xrange=[47,0], xtitl='PSD Channel Number'
+	axis, xaxis=1, xrange=[47,0], xtitl='PSD Channel Number',xstyle=1
 	p = findgen(4)
 	sz=size(y)
 	Gauss_Init_Guess, ch_space, y, (sz(1)-1), p = p
 	PSD_Gauss_Fit, event,ch_space, y, p=p
-	;image = tvrd(true=1)
+	image = tvrd(true=1)
 	(*pstate).image = ptr_new(image)
 	(*pstate).zoomImage=ptr_new(image)
 	(*pstate).imageflage = 1
@@ -583,6 +577,10 @@ pro PSD_Sum_Plot, event
 	endif
 	widget_control,(*pstate).PsdLeft, get_value=leftch
 	widget_control,(*pstate).PsdRight, get_value=rightch
+
+	Ch_eff=findgen(48)
+	Ch_eff=(*pstate).Ch_2axis_Eff
+
 	minch=leftch
 	maxch=rightch
 	range=indgen(2)
@@ -690,103 +688,144 @@ pro PSD_Stitch_Plot, event
 	endif
 
 	Ch_eff=findgen(48)
-	fn = 'c:\PSD\PSD_Channeal_Eff.dat'
-	if fn ne '' then begin
-		openr, fun, fn, /get_lun
-		readf, fun, Ch_eff
-		free_lun, fun
-	endif
+	;fn = strjoin([mydirectory,'PSD_Channeal_Eff.dat'])
+	;if fn ne '' then begin
+;		openr, fun, fn, /get_lun
+;		readf, fun, Ch_eff
+;		free_lun, fun
+;	endif
+	Ch_eff=(*pstate).Ch_axis_Eff
 	if (*pstate).colname eq 'A4' then begin
 		data = (*(*pstate).data)
 		var =(*(*pstate).vardata)
 		sz = size(data)
 		data_err = dindgen(sz(1), sz(2))
 		data_err = sqrt(data)
-
-		A4_begin = var(0, 0)
-		A4_end = var(0, sz(2)-1)
-
+		varname=*(*pstate).varname
+    var_pos=where(strlowcase(varname) eq strlowcase('A4'))
+    var_pos=var_pos[0]
+		A4_begin = var(var_pos, 0)
+		A4_end = var(var_pos, sz(2)-1)
 		if A4_begin eq A4_end then begin
 			void = dialog_message('The step size of A4 is 0, could not stitch !')
 			return
 		endif
 		output_width = 0.1
 		output_npt = round(abs(A4_end-A4_begin)/output_width)
-		output_data = dindgen(output_npt)
-		output_data_err = dindgen(output_npt)
+		output_data = dblarr(output_npt)
+		data_norm=dblarr(output_npt)+1
+		output_data_err = dblarr(output_npt)
 		output_data_left = findgen(output_npt+1)
 		output_data_right = findgen(output_npt)
-		data_plus_count = findgen(output_npt)
-		dis = dindgen(48, output_npt)
-		frac = dindgen(48, output_npt)
-		z_in = dindgen(48)
-		dz_in = dindgen(48)
-
-		for i = 0, (output_npt-1) do begin
-			if A4_begin lt A4_end then begin
-				output_data_left(i) = A4_begin + i * output_width
-			endif
-			if A4_begin gt A4_end then begin
-				output_data_left(i) = A4_begin - i * output_width
-			endif
-		endfor
-		output_data_left(output_npt) = A4_end
+		;data_plus_count = findgen(output_npt)
+		dis = dblarr(48, output_npt)
+		frac = dblarr(48, output_npt)
+		z_in = dblarr(48)
+		dz_in = dblarr(48)
+		output_data_left=min([A4_begin,A4_end])+output_data_left*output_width
+		;for i = 0, (output_npt-1) do begin
+		;	if A4_begin lt A4_end then begin
+		;		output_data_left(i) = A4_begin + i * output_width
+		;	endif
+		;	if A4_begin gt A4_end then begin
+		;		output_data_left(i) = A4_begin - i * output_width
+		;	endif
+		;endfor
+		output_data_left(output_npt) = max([A4_begin,A4_end])
 		output_data_right = output_data_left(1:output_npt)
-
+		;output_data_left=reverse(output_data_left)
 		;Now open the A4 spacing calibration file and readout
 		ch_position = dindgen(48)
 		ch_space = dindgen(48)
-		fn = 'c:\PSD\PSD_A4_Spacing.dat'
+		fn = (*pstate).PSD_A4_Spacing
+		if (fn eq '') then a4_handler, event
+		if fn eq '' then return 
 		if fn ne '' then begin
 			openr, fun, fn, /get_lun
 			readf, fun, ch_position
 			free_lun, fun
 		endif
 		;Now calculate the spacing between every channel and the specified center channel
-		for k = 0, 47 do begin
-			ch_space(k) = ch_position(range(1))-ch_position(k)
-		endfor
+		;for k = 0, 47 do begin
+		;	ch_space(k) = ch_position(range(1))-ch_position(k)
+		;endfor
+		ch_space=ch_position(range(1))-ch_position
+		ch_space_extend=fltarr(49)
+		ch_space_extend(0:47)=ch_space
+		ch_space_extend(48)=ch_space_extend(47)
+		ch_space=ch_space_extend
 		; After align the middle of PSD with the every A4 position and then build
 		; the left and right coordinate for every psd position
-		ch_left = dindgen(49)
-		ch_right =dindgen(48)
-		for i = 0, output_npt-1 do begin
-			data_plus_count(i) = 0.0
-		endfor
-		for i = 0, sz(2)-1 do begin
-			ch_left(0) = ch_space(0) + 0.5*(ch_space(0) - ch_space(1)) +var(0, i)
-			for j = 1, 47 do begin
-				ch_left(j) = ch_space(j) + 0.5*(ch_space(j-1) -ch_space(j))+var(0,i)
-			endfor
-			ch_left(48) = ch_space(47) - 0.5*(ch_space(46)-ch_space(47)) + var(0, i)
-			ch_right = ch_left(1:48)
-			z_in = data(*, i)
-			dz_in = data_err(*,i)
-			for j = range(0), range(2) do begin
-				for k = 0, output_npt-1 do begin
-					min_dis_righ = min([ch_left(j), output_data_right(k)])
-					max_dis_left = max([ch_right(j), output_data_left(k)])
-					dis(j, k) = max([0, (min_dis_righ-max_dis_left)])
-					frac(j, k) = dis(j, k)/abs(ch_left(j+1)-ch_left(j))
-
-					output_data(k) = output_data(k)+z_in(j)*frac(j, k)
-					output_data_err(k)= output_data_err(k) + (dz_in(j))^2*frac(j,k)
-					if Ch_eff(j) gt 1E-2 then begin
-						;print,j,Ch_eff(j)
-						 data_plus_count(k) = data_plus_count(k) +frac(j, k)
-					endif
-				endfor
-			endfor
-		endfor; i
-
-		for k = 0, output_npt-1 do begin
-			if data_plus_count(k) eq 0 then begin
-				print, 'Frac(', k,')=', 0
-				continue
+		ch_left = dblarr(49)
+		ch_right =dblarr(48)
+		;for i = 0, output_npt-1 do begin
+		;	data_plus_count(i) = 0.0
+		;endfor
+		data_plus_count=dblarr(output_npt)
+		mon_in=ch_left(0:47)+1.0
+		for l=0,47 do begin
+			if Ch_eff(l) lt 1E-2 then begin
+			mon_in(l)=0
 			endif
-			output_data(k) = output_data(k)/data_plus_count(k)
-			output_data_err(k)=sqrt(output_data_err(k))/data_plus_count(k)
-		endfor
+			endfor ; for
+		output_tmp=data_plus_count
+		dz_output_tmp=data_plus_count
+		output_mon=data_plus_count
+		dz_output_mon=data_plus_count
+		;print,'sz=',sz(2)
+		for i = 0, sz(2)-1 do begin
+			;for j = 1, 47 do begin
+			;	ch_left(j) = ch_space(j) + 0.5*(ch_space(j-1) -ch_space(j))+var(0,i)
+			;endfor
+			ch_left=ch_space+0.5*(-ch_space+shift(ch_space,1))+var(var_pos,i)
+			ch_left(0) = ch_space(0) + 0.5*(ch_space(0) - ch_space(1)) +var(var_pos, i)
+			ch_left(48) = ch_space(47) - 1.0*(ch_space(46)-ch_space(47)) + var(var_pos, i)
+			ch_right = ch_left(1:48)
+			z_in = data(*, i)*Ch_eff
+			dz_in = data_err(*,i)*Ch_eff
+			;help,ch_left, z_in,dz_in,output_data_left
+			ch_left=reverse(ch_left)
+			z_in=reverse(z_in)
+			dz_in=reverse(dz_in)
+			;output_data_left=reverse(output_data_left)
+			drebin,ch_left,z_in,dz_in,output_data_left,output_tmp,dz_output_tmp,/histogram,/to_histogram,err=err,emsg=emsg
+			print, emsg
+			drebin,ch_left,mon_in,mon_in,output_data_left,output_mon,dz_output_mon,/histogram,/to_histogram,err=err,emsg=emsg
+			output_data=output_data+output_tmp*output_mon
+			output_data_err=output_data_err+dz_output_tmp*output_mon
+			data_norm=data_norm+output_mon
+			;print, 'emsg2 ',emsg
+			;print,'output_mon ',n_elements(output_mon)
+			;print,'output_tmp ',n_elements(output_tmp)
+			;print,'ch_left',(ch_left)
+			;print,'data',n_elements(z_in)
+			;drebin_histo,x_in,z_in,dz_in,x_out,z_out,dz_out
+			;for j = range(0), range(2) do begin
+			;	for k = 0, output_npt-1 do begin
+			;		min_dis_righ = min([ch_left(j), output_data_right(k)])
+			;		max_dis_left = max([ch_right(j), output_data_left(k)])
+			;		dis(j, k) = max([0, (min_dis_righ-max_dis_left)])
+			;		frac(j, k) = dis(j, k)/abs(ch_left(j+1)-ch_left(j))
+;
+;					output_data(k) = output_data(k)+z_in(j)*frac(j, k)
+;					output_data_err(k)= output_data_err(k) + (dz_in(j))^2*frac(j,k)
+;					if Ch_eff(j) gt 1E-2 then begin
+;						;print,j,Ch_eff(j)
+;						 data_plus_count(k) = data_plus_count(k) +frac(j, k)
+;					endif
+;				endfor
+;			endfor
+		endfor; i
+		output_data=output_data/data_norm
+		output_data_err=output_data_err/data_norm
+		;for k = 0, output_npt-1 do begin
+		;	if data_plus_count(k) eq 0 then begin
+		;		print, 'Frac(', k,')=', 0
+		;		continue
+		;	endif
+		;	output_data(k) = output_data(k)/data_plus_count(k)
+		;	output_data_err(k)=sqrt(output_data_err(k))/data_plus_count(k)
+		;endfor
 		xrdata = dindgen(3, output_npt)
 		for k = 0, output_npt-1 do begin
 			xrdata(0, k) = output_data_left(k)
@@ -841,7 +880,8 @@ pro Save_PSD_Data, event
 		return
 	endif
 	xrdata = (*(*pstate).stitchdata)
-	fn = dialog_pickfile(default_extension='dat',/write, title='Select the data file to save XRD pattern:')
+	mypath=(*pstate).working_directory
+	fn = dialog_pickfile(default_extension='dat',/write, title='Select the data file to save XRD pattern:',path=mypath)
    	if (*pstate).colname eq 'A4' then begin
    		if fn ne '' then begin
        		openw,lun,fn,/get_lun
@@ -866,6 +906,115 @@ pro Save_PSD_Data, event
 		endif
 	endif
 end;save_psd_data
+
+
+; used to save data in dave format
+
+pro psd_export_to_dave_dave_handler, event
+  widget_control,event.top,get_uvalue = pstate
+  datasize = size(*((*pstate).stitchdata))
+  if datasize(1) le 0 then begin
+    void = dialog_message('The Stitched Data File is Empty!')
+    return
+  endif
+  xrdata = (*(*pstate).stitchdata)
+  mypath=(*pstate).working_directory
+  fn = dialog_pickfile(default_extension='dave',/write, title='Select a DAVE filename for the stitched data:',path=mypath)  
+  x=reform(xrdata[0,*])
+  y=0.0
+  qty=reform(xrdata[1,*])
+  err=reform(xrdata[2,*])
+  xlabel=(*pstate).colname
+  QTlabel='Intensity'
+  treatment=''
+  instrument='bt7'  
+  
+  
+  RET_VAL = CREATE_DAVE_POINTER(daveptr,          $
+                  INSTRUMENT = instrument,  $
+                  QTY = qty,                          $
+                  ERR = err,                          $
+                  XLABEL = xlabel,                 $
+                  QTLABEL = qtlabel,                $
+                  YVALS = y,                          $
+                  XVALS = x,                          $
+                  XTYPE = 'POINTS',                   $
+                  YTYPE = 'POINTS',                   $
+                  TREATMENT = treatment)
+        
+  save,daveptr,filename=fn,/compress 
+  
+  heap_free, daveptr  
+end;save_psd_data
+
+
+
+
+
+
+
+
+
+
+
+
+; send data to pan
+
+pro psd_send_to_pan_handler, event
+  widget_control,event.top,get_uvalue = pstate
+thisEvent = tag_names(event,/structure_name)
+case thisEvent of
+'WIDGET_BUTTON': begin
+  datasize = size(*((*pstate).stitchdata))
+  if datasize(1) le 0 then begin
+    void = dialog_message('The Stitched Data File is Empty!')
+    return
+  endif
+  xrdata = (*(*pstate).stitchdata)
+  mypath=(*pstate).working_directory
+ 
+  x=reform(xrdata[0,*])
+  y=0.0
+  qty=reform(xrdata[1,*])
+  err=reform(xrdata[2,*])
+  xlabel=(*pstate).colname
+  QTlabel='Intensity'
+  treatment=''
+  instrument='bt7'  
+  
+  
+  RET_VAL = CREATE_DAVE_POINTER(daveptr,          $
+                  INSTRUMENT = instrument,  $
+                  QTY = qty,                          $
+                  ERR = err,                          $
+                  XLABEL = xlabel,                 $
+                  QTLABEL = qtlabel,                $
+                  YVALS = y,                          $
+                  XVALS = x,                          $
+                  XTYPE = 'POINTS',                   $
+                  YTYPE = 'POINTS',                   $
+                  TREATMENT = treatment)
+  (*pstate).daveptr=daveptr      
+  o = obj_new('opan',notifyId = [event.id,event.top], $
+                         group_leader = event.top, $
+                           davePtr = davePtr,   $
+                           workdir =(*pstate).working_directory)  
+  
+end
+'OPANEVENT': $
+  begin
+    obj = event.object  ; This is the object that just quit
+   obj_destroy,obj
+   heap_free, (*pstate).daveptr 
+  end  
+  
+  endcase 
+end;pan_psd_data
+
+
+
+
+
 
 ;*************************************************
 pro Gauss_Init_Guess, x, y, loop, p=p
@@ -990,12 +1139,201 @@ pro Psd_plot_refresh, event
 end; psd_plot_refresh,
 ;*******************************************************
 
-pro crystalbt7psd,group_leader = group_leader
+
+;===============================================================================
+; a4_handler
+;
+; PURPOSE:
+;   Event handler. Let user specify the psd_a4_channel_spacing file. The specified
+;   value is stored in a global variable and also saved for future DAVE
+;   sessions.
+;
+; PARAMETERS:
+;   event [in] - event structure.
+;
+pro a4_handler,event
+widget_control, event.top, get_uvalue=pstate
+dave_defs=*!dave_defaults
+old_file=dave_defs.psd_a4_spacing
+old_path=file_dirname(old_file)
+calib_file = DIALOG_PICKFILE(title = 'Select a4 spacing file',path=old_path)
+if (calib_file eq '') then return
+dave_defs.psd_a4_spacing=calib_file
+pdd=!dave_defaults
+ptr_free,pdd
+pdd=ptr_new(dave_defs)
+
+  ;LRK 051507
+  ;ADDING THE CHECKING BECAUSE OF POTENTIAL NETWORK DRIVE INACCESSIBLE ISSUES
+  if file_test(!defaults_file,/write) eq 0 then begin
+
+    yn = dialog_message('Your chosen home directory appears to be inaccessible.  Would you like to choose a new one?',/question)
+    print,yn
+
+    if strupcase(yn) eq 'YES' then begin
+      print,'!defaults_file=',!defaults_file
+      hmdir = dialog_pickfile(/directory)
+
+      if hmdir ne '' then begin
+        !defaults_file = hmdir+path_sep()+file_basename(!defaults_file)
+        save,filename=!defaults_file,pdd
+      endif
+    endif
+
+  endif else begin
+    save,filename=!defaults_file,pdd
+  endelse
+; LRK 051507 COMMENTED THE FOLLOWING LINE
+; save,filename=!defaults_file,pdd
+defsysv,'!dave_defaults',pdd
+(*pstate).psd_a4_spacing=calib_file
+if (old_file ne calib_file) then $
+  x=dialog_message("The new a4 channel spacing calibration file is "+(*!dave_defaults).psd_a4_spacing,/information)
+return
+end
+;-------------------------------------------------------------------------------
+
+
+;===============================================================================
+; psd_channel_Eff_handler
+;
+; PURPOSE:
+;   Event handler. Let user specify the psd_channel_efficiency file. The specified
+;   value is stored in a global variable and also saved for future DAVE
+;   sessions.
+;
+; PARAMETERS:
+;   event [in] - event structure.
+;
+pro channel_handler,event
+widget_control, event.top, get_uvalue=pstate
+dave_defs=*!dave_defaults
+old_file=dave_defs.psd_channel_Eff
+old_path=file_dirname(old_file)
+calib_file = DIALOG_PICKFILE(title = 'Select channel efficiciency calibration file',path=old_path)
+if (calib_file eq '') then return
+dave_defs.psd_channel_Eff=calib_file
+pdd=!dave_defaults
+ptr_free,pdd
+pdd=ptr_new(dave_defs)
+
+  ;LRK 051507
+  ;ADDING THE CHECKING BECAUSE OF POTENTIAL NETWORK DRIVE INACCESSIBLE ISSUES
+  if file_test(!defaults_file,/write) eq 0 then begin
+
+    yn = dialog_message('Your chosen home directory appears to be inaccessible.  Would you like to choose a new one?',/question)
+    print,yn
+
+    if strupcase(yn) eq 'YES' then begin
+      print,'!defaults_file=',!defaults_file
+      hmdir = dialog_pickfile(/directory)
+
+      if hmdir ne '' then begin
+        !defaults_file = hmdir+path_sep()+file_basename(!defaults_file)
+        save,filename=!defaults_file,pdd
+      endif
+    endif
+
+  endif else begin
+    save,filename=!defaults_file,pdd
+  endelse
+; LRK 051507 COMMENTED THE FOLLOWING LINE
+; save,filename=!defaults_file,pdd
+defsysv,'!dave_defaults',pdd
+(*pstate).psd_channel_Eff=calib_file
+if (old_file ne calib_file) then $
+  x=dialog_message("The new channel efficiency calibration file is "+(*!dave_defaults).psd_channel_Eff,/information)
+return
+end
+;-------------------------------------------------------------------------------
+
+
+
+
+;===============================================================================
+; psd_ef_handler
+;
+; PURPOSE:
+;   Event handler. Let user specify the psd_Ef_spacing file. The specified
+;   value is stored in a global variable and also saved for future DAVE
+;   sessions.
+;
+; PARAMETERS:
+;   event [in] - event structure.
+;
+pro ef_handler,event
+widget_control, event.top, get_uvalue=pstate
+dave_defs=*!dave_defaults
+old_file=dave_defs.psd_Ef_spacing
+old_path=file_dirname(old_file)
+calib_file = DIALOG_PICKFILE(title = 'Select Ef spacing calibration file',path=old_path)
+if (calib_file eq '') then return
+dave_defs.psd_Ef_spacing=calib_file
+pdd=!dave_defaults
+ptr_free,pdd
+pdd=ptr_new(dave_defs)
+
+  ;LRK 051507
+  ;ADDING THE CHECKING BECAUSE OF POTENTIAL NETWORK DRIVE INACCESSIBLE ISSUES
+  if file_test(!defaults_file,/write) eq 0 then begin
+
+    yn = dialog_message('Your chosen home directory appears to be inaccessible.  Would you like to choose a new one?',/question)
+    print,yn
+
+    if strupcase(yn) eq 'YES' then begin
+      print,'!defaults_file=',!defaults_file
+      hmdir = dialog_pickfile(/directory)
+
+      if hmdir ne '' then begin
+        !defaults_file = hmdir+path_sep()+file_basename(!defaults_file)
+        save,filename=!defaults_file,pdd
+      endif
+    endif
+
+  endif else begin
+    save,filename=!defaults_file,pdd
+  endelse
+; LRK 051507 COMMENTED THE FOLLOWING LINE
+; save,filename=!defaults_file,pdd
+defsysv,'!dave_defaults',pdd
+(*pstate).psd_Ef_spacing=calib_file
+if (old_file ne calib_file) then $
+  x=dialog_message("The new Ef channel calibration file is "+(*!dave_defaults).psd_Ef_spacing,/information)
+return
+end
+;-------------------------------------------------------------------------------
+
+
+pro calview_handler,event
+widget_control, event.top, get_uvalue=pstate
+
+
+a4_file=(*pstate).psd_a4_spacing
+channel_file=(*pstate).psd_channel_Eff
+ef_file=(*pstate).psd_Ef_spacing
+
+msg_arr=['The current settings are:','A4 file='+a4_file,'channel efficiency file='+channel_file,$
+         'Ef calibration file='+ef_file]
+
+x=dialog_message(msg_arr,/information)
+end
+;-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+pro crystalbt7psd,group_leader = group_leader,workDir=workDir,dataDir=dataDir
 
 	if n_elements(group_leader) eq 0 then group_leader = 0L
 
 	if xregistered('PSD_plot') then return
-	tlb = widget_base(/row,title = 'BT7 PSD data reduction', group_leader = group_leader)
+	tlb = widget_base(/row,title = 'BT7 PSD data reduction', group_leader = group_leader,mbar=menubar)
 	col_base = widget_base(tlb,/col, space =2)
 	void = widget_button(col_base, value = 'Load Data File', font ='8', uname='LoadDat')
 	void = widget_label(col_base, /align_center, font='8', Value = 'View Raw Data')
@@ -1015,12 +1353,27 @@ pro crystalbt7psd,group_leader = group_leader
  	rightrow_base = widget_base(col_base, /row, space=32)
 	void=widget_label(rightrow_base,/align_center,value = 'Right Channel')
 	PsdRight  = widget_text(rightrow_base,value='47',/editable,xsize = 10, uname='Psd_Right')
+	void = widget_button(col_base,/align_center, font='8',value = 'Exclude PSD Channels',uname='ExcludeCh')
+	BadCh  = widget_text(col_base, value='',/editable,xsize = 10, uname='BadChannel')
 	void = widget_button(col_base,value = 'Sum Channel', font='8',uname = 'SUM')
 	void = widget_button(col_base,value = 'Stich Pattern', font='8',uname = 'STICH')
 	void = widget_button(col_base, value = 'Save Stitch Pattern', font='8',uname = 'SaveStich')
 	void = widget_button(col_base,value = 'Quit', font='8',uname = 'QUIT')
 	win = widget_draw(tlb,xsize = 700,ysize = 700, $
 			/motion_events,/button_events,/tracking_events,	uname = 'WIN')
+			
+	fileId=widget_button(menubar,value='File')
+	file_item=widget_button(fileId,value='Set A4 Spacing File',event_pro='a4_handler')
+	file_item=widget_button(fileId,value='Set Channel Efficiency File',event_pro='channel_handler')
+	file_item=widget_button(fileId,value='Set Ef Spacing File',event_pro='ef_handler')
+	file_item=widget_button(fileId,value='View Calibration File Locations',event_pro='calview_handler')
+	
+	exportId=widget_button(menubar,value='Export')
+	export_item=widget_button(exportId,value='Save As Dave File',event_pro='psd_export_to_dave_dave_handler')
+	export_item=widget_button(exportId,value='Send data to Pan',event_pro='psd_send_to_pan_handler')
+	
+	
+	
 	widget_control,tlb,/realize
 	widget_control,win,get_value = winvis
 	window,/free,/pixmap,xsize = 500,ysize = 500
@@ -1028,6 +1381,7 @@ pro crystalbt7psd,group_leader = group_leader
 	stitchdata = ptr_new(/allocate_heap)
 	data=ptr_new(/allocate_heap)
 	vardata = ptr_new(/allocate_heap)
+	varname = ptr_new(/allocate_heap)
 	state =  {  winvis:		winvis,     $
             winpix:			winpix,     $
             win:			win,		$
@@ -1035,11 +1389,12 @@ pro crystalbt7psd,group_leader = group_leader
             colname: 		''        , $ ;the independent variable name after #Scan
             unit: 			0L		  , $ ;time or monitor after #reference
             unitname: 		'',			$ ;
-			ef:				14.7, 		$ ;
-			lattice:		findgen(6), $ ; The lattice parameter and angles
-			orient:         indgen(6),	$ ; the orientation plane
-			monspacing:     0L,			$ ;The d-spacing of the monochromator
-
+            ef:				14.7, 		$ ;
+            lattice:		findgen(6), $ ; The lattice parameter and angles
+            orient:         indgen(6),	$ ; the orientation plane
+            monspacing:     0L,			$ ;The d-spacing of the monochromator
+            Ch_axis_Eff:	findgen(48),$ ; instore the channel efficiency
+            Ch_Eng_Eff:		findgen(48),$ ; Instore the engery diffence for every channel in 3-axis mode
             plot_title: 	'',         $
             xtitle:			'',			$
             ytitle:			'',			$
@@ -1050,29 +1405,40 @@ pro crystalbt7psd,group_leader = group_leader
             PsdCenter:		PsdCenter,  $
             PsdLeft: 		PsdLeft,  	$
             PsdRight: 		PsdRight,  	$
+            BadCh:			BadCh,      $
             stitchdata: 	stitchdata, $
             imageflage:		0,			$   ;image flage =1 if there is a actived image in draw window
             image:			ptr_new(/allocate_heap),$
             zoomImage: 		ptr_new(/allocate_heap), $
             xptr:			ptr_new(!x),$	;KEEP TRACK OF AXES SYSTEM VARIABLES
-			yptr:			ptr_new(!y),$
+            yptr:			ptr_new(!y),$
             press:			0,			$	;THIS IS THE WAY TO KEEP TRACK OF DRAGGING
-			pressx:			0,			$	;KEEP TRACK OF POSITION OF MOUSE PRESS
-			pressy:			0,			$
-			currentx:		0,			$	;KEEP TRACK OF POSITION OF CURRENT MOUSE POSITION
-			currenty:		0,			$
-			zoomed:			0,			$;KEEP TRACK OF WHETHER PLOT IS CURRENTLY ZOOMED.
-			xdata:			ptr_new(/allocate_heap), $  ;the x, y data used to draw the current graph
-			ydata:			ptr_new(/allocate_heap), $
-			errdata:		ptr_new(/allocate_heap), $
-			zdata:			ptr_new(/allocate_heap), $
-			intdata:		ptr_new(/allocate_heap)		  }
-
-
-
+            pressx:			0,			$	;KEEP TRACK OF POSITION OF MOUSE PRESS
+            pressy:			0,			$
+            currentx:		0,			$	;KEEP TRACK OF POSITION OF CURRENT MOUSE POSITION
+            currenty:		0,			$
+            zoomed:			0,			$;KEEP TRACK OF WHETHER PLOT IS CURRENTLY ZOOMED.
+            xdata:			ptr_new(/allocate_heap), $  ;the x, y data used to draw the current graph
+            ydata:			ptr_new(/allocate_heap), $
+            errdata:		ptr_new(/allocate_heap), $
+            zdata:			ptr_new(/allocate_heap), $
+            psd_a4_spacing:  (*!dave_defaults).psd_a4_spacing,$
+            psd_channel_Eff: (*!dave_defaults).psd_channel_Eff,$
+            psd_Ef_spacing:(*!dave_defaults).psd_Ef_spacing, $      
+            varname: varname,$
+            working_directory: workDir, $
+            data_directory:dataDir,$
+            daveptr:ptr_new(/allocate_heap),$
+            intdata:		ptr_new(/allocate_heap)		  }
 	pstate = ptr_new(state)
 	widget_control,tlb,set_uvalue = pstate
 
 	xmanager,'getbt7psd',tlb,/no_block, event_handler = 'PSD_event', cleanup = 'PSD_cleanup'
 
 end; getbt7psd
+
+
+
+
+
+
