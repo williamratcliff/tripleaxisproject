@@ -20,4 +20,7 @@ if __name__=='__main__':
         myfilestr=r'C:\13165\PSD_A4_SpacingApr1108.dat'
         a4_pos=N.loadtxt(myfilestr, unpack=True)
         print a4_pos.T.flatten()
+        myfilestr=r'C:\13165\PSD_A4_SpacingApr1108.dat'
+        ch_eff=N.loadtxt(myfilestr, unpack=True)
+        print a4_pos.T.flatten()
 
