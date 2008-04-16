@@ -37,3 +37,5 @@ if __name__=='__main__':
         ch_boundary[0]=(ch_a4[0]-ch_a4[mypsd.center])-0.5*(ch_a4[1]-ch_a4[0])
         print ch_boundary
 
+        pylab.plot(N.arange(ch_eff.size),ch_eff,'ro')
+        pylab.show()
