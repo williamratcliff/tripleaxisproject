@@ -789,6 +789,7 @@ if __name__=='__main__':
         #myfilestr=r'c:\12436\data\LaOFeAs56413.bt7'
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\fpx53418.bt7'
+        myfilestr=r'c:\13165\13165\data\MagHigh56784.bt7'
         mydatareader=datareader()
         #mydata=mydatareader.readbuffer(myfilestr,lines=91)
         mydata=mydatareader.readbuffer(myfilestr)
@@ -796,6 +797,8 @@ if __name__=='__main__':
         #mywriter=writebt7.datawriter()
         #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
         print mydata.data['timestamp']
+        print mydata.data['magfield']
+        print mydata.data.keys()
         print 'done'
         #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
         #print N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])

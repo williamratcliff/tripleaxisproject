@@ -5,17 +5,31 @@ import readncnr2 as readncnr
 import sys,os
 threshold=1.0e-1
 
+#plus refers to a flipper state that is on
+#minus refers to a flipper state that is off
+
+class pol_info:
+    def __init__(self):
+        self.data=[]
+        self.files=[]
+        return
+
+
+class catalog:
+    def __init__(self):
+        self.pp=pol_info()
+        self.pm=pol_info()
+        self.mp=pol_info()
+        self.mm=pol_info()
+        return
+
 def readfiles(mydirectory,myfilebase,myend):
     myfilebaseglob=myfilebase+'*.'+myend
     #print myfilebaseglob
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     #SU.printr(flist)
     mydatareader=readncnr.datareader()
-    catalog={}
-    catalog['pp']=[]
-    catalog['mm']=[]
-    catalog['pm']=[]
-    catalog['mp']=[]
+    mycatalog=catalog()
     half_polarized=0
     for currfile in flist:
         #print currfile
@@ -42,13 +56,34 @@ def readfiles(mydirectory,myfilebase,myend):
         key=key_i+key_f
         fully_polarized=ei_exists*ef_exists  #is 1 if both cells are present
         data={}
-        data['filename']=currfile
+        data['absolute_filename']=currfile
         data['fully_polarized']=fully_polarized
         data['hsample']=hsample
         data['vsample']=vsample
-        catalog[key].append(data)
+        pattern = re.compile('^(?P<base>[^.]*?)(?P<seq>[0-9]*)(?P<ext>[.].*)?$')
+        filename=os.path.split(currfile)[-1]
+        #print filename
+        match = pattern.match(filename)
+        dict((a,match.group(a)+"") for a in ['base','seq','ext'])
+        data['filebase']=match.group('base')
+        data['fileseq_number']=match.group('seq')
+        data['filename']=data['filebase']+data['fileseq_number']
+
+        if key=='pp':
+            mycatalog.pp.data.append(data)
+            mycatalog.pp.files.append(data['filename'])
+        elif key=='pm':
+            mycatalog.pm.data.append(data)
+            mycatalog.pm.files.append(data['filename'])
+        elif key=='mp':
+            mycatalog.mp.data.append(data)
+            mycatalog.mp.files.append(data['filename'])
+        elif key=='mm':
+            mycatalog.mm.data.append(data)
+            mycatalog.mm.files.append(data['filename'])
+
         #print currfile, key
-    return catalog
+    return mycatalog
 
 
 
@@ -56,4 +91,5 @@ if __name__=='__main__':
     myend='bt7'
     mydirectory=r'c:\bifeo3xtal\jan8_2008\9175'
     myfilebase=''
-    catalog=readfiles(mydirectory,myfilebase,myend)
+    mycatalog=readfiles(mydirectory,myfilebase,myend)
+    print mycatalog.pm.files
