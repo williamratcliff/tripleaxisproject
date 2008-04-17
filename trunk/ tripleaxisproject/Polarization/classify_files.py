@@ -23,10 +23,7 @@ class catalog:
         self.mm=pol_info()
         return
 
-def readfiles(mydirectory,myfilebase,myend):
-    myfilebaseglob=myfilebase+'*.'+myend
-    #print myfilebaseglob
-    flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
+def readfiles(flist):
     #SU.printr(flist)
     mydatareader=readncnr.datareader()
     mycatalog=catalog()
@@ -91,5 +88,8 @@ if __name__=='__main__':
     myend='bt7'
     mydirectory=r'c:\bifeo3xtal\jan8_2008\9175'
     myfilebase=''
-    mycatalog=readfiles(mydirectory,myfilebase,myend)
+    myfilebaseglob=myfilebase+'*.'+myend
+    #print myfilebaseglob
+    flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
+    mycatalog=readfiles(flist)
     print mycatalog.pm.files
