@@ -2,6 +2,7 @@ import wx
 import  wx.grid as  gridlib
 import sys,os
 import classify_files
+import numpy as N
 
 class MyApp(wx.App):
     def __init__(self, redirect=False, filename=None, useBestVisual=False, clearSigInt=True):
@@ -19,32 +20,38 @@ class MyApp(wx.App):
 class CustomDataTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['off off', 'Hsample', 'Vample', 'off on','H', 'V', 'on off','H', 'V', 'on on','H', 'V']
+        self.colLabels = ['off off', 'Hsample', 'Vsample', 'off on','H', 'V', 'on off','H', 'V', 'on on','H', 'V']
+        self.rowLabels=['Group 0']
         self.dataTypes = [gridlib.GRID_VALUE_STRING, #off off
-                          gridlib.GRID_VALUE_FLOAT,
-                          gridlib.GRID_VALUE_FLOAT,
+                          gridlib.GRID_VALUE_STRING,
+                          gridlib.GRID_VALUE_STRING,
                           gridlib.GRID_VALUE_STRING, #off on
-                          gridlib.GRID_VALUE_FLOAT,
-                          gridlib.GRID_VALUE_FLOAT,
+                          gridlib.GRID_VALUE_STRING,
+                          gridlib.GRID_VALUE_STRING,
                           gridlib.GRID_VALUE_STRING, #on off
-                          gridlib.GRID_VALUE_FLOAT,
-                          gridlib.GRID_VALUE_FLOAT,
+                          gridlib.GRID_VALUE_STRING,
+                          gridlib.GRID_VALUE_STRING,
                           gridlib.GRID_VALUE_STRING, #on on
-                          gridlib.GRID_VALUE_FLOAT,
-                          gridlib.GRID_VALUE_FLOAT,
+                          gridlib.GRID_VALUE_STRING,
+                          gridlib.GRID_VALUE_STRING
                           ]
         self.data = []
-
-            [1010, "The foo doesn't bar", "major", 1, 'MSW', 1, 1, 1, 1.12],
-            [1011, "I've got a wicket in my wocket", "wish list", 2, 'other', 0, 0, 0, 1.50],
-            [1012, "Rectangle() returns a triangle", "critical", 5, 'all', 0, 0, 0, 1.56]
-            ]
+        self.data.append(['','','',\
+                            '','','',\
+                            '','','',\
+                            '','',''\
+                            ])
+        return
+            #[1010, "The foo doesn't bar", "major", 1, 'MSW', 1, 1, 1, 1.12],
+            #[1011, "I've got a wicket in my wocket", "wish list", 2, 'other', 0, 0, 0, 1.50],
+            #[1012, "Rectangle() returns a triangle", "critical", 5, 'all', 0, 0, 0, 1.56]
+            #]
     #--------------------------------------------------
     # required methods for the wxPyGridTableBase interface
     def GetNumberRows(self):
-        return len(self.data) + 1
+        return len(self.data) + 0
     def GetNumberCols(self):
-        return len(self.data[0])
+        return len(self.colLabels)
     def IsEmptyCell(self, row, col):
         try:
             return not self.data[row][col]
@@ -65,18 +72,28 @@ class CustomDataTable(gridlib.PyGridTableBase):
         except IndexError:
             # add a new row
             self.data.append([''] * self.GetNumberCols())
-            self.SetValue(row, col, value)
+            self.rowLabels.append('Group '+str(len(self.rowLabels)))
+            #print 'setting row ',row,' col ',col, ' val ',value
+            #print self.__dict__
+            #self.SetValue(row, col, value)
+            self.data[row][col] = value
+            #print 'set'
+
             # tell the grid we've added a row
             msg = gridlib.GridTableMessage(self,            # The table
                     gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED, # what we did to it
                     1                                       # how many
                     )
             self.GetView().ProcessTableMessage(msg)
+        return
     #--------------------------------------------------
     # Some optional methods
     # Called when the grid needs to display labels
     def GetColLabelValue(self, col):
         return self.colLabels[col]
+    # Called when the grid needs to display labels
+    def GetRowLabelValue(self, row):
+        return self.rowLabels[row]
     # Called to determine the kind of editor/renderer to use by
     # default, doesn't necessarily have to be the same type used
     # natively by the editor/renderer if they know how to convert.
@@ -102,36 +119,17 @@ class CustTableGrid(gridlib.Grid):
         # table and will destroy it when done.  Otherwise you would need to keep
         # a reference to it and call it's Destroy method later.
         self.SetTable(table, True)
-        self.SetRowLabelSize(0)
+        #self.SetRowLabelSize(0)
         self.SetMargins(0,0)
-        self.AutoSizeColumns(False)
+        self.AutoSize()
+        #gridlib.Grid.SetSelectionMode(self,gridlib.Grid.SelectRows)
+        gridlib.Grid.EnableEditing(self,False)
         gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
     # I do this because I don't like the default behaviour of not starting the
     # cell editor on double clicks, but only a second click.
     def OnLeftDClick(self, evt):
         if self.CanEnableCellControl():
             self.EnableCellEditControl()
-#---------------------------------------------------------------------------
-class TestFrame(wx.Frame):
-    def __init__(self, parent, log):
-        wx.Frame.__init__(
-            self, parent, -1, "Custom Table, data driven Grid  Demo", size=(640,480)
-            )
-        p = wx.Panel(self, -1, style=0)
-        grid = CustTableGrid(p, log)
-        b = wx.Button(p, -1, "Another Control...")
-        b.SetDefault()
-        self.Bind(wx.EVT_BUTTON, self.OnButton, b)
-        b.Bind(wx.EVT_SET_FOCUS, self.OnButtonFocus)
-        bs = wx.BoxSizer(wx.VERTICAL)
-        bs.Add(grid, 1, wx.GROW|wx.ALL, 5)
-        bs.Add(b)
-        p.SetSizer(bs)
-    def OnButton(self, evt):
-        print "button selected"
-    def OnButtonFocus(self, evt):
-        print "button focus"
-#---------------------------------------------------------------------------
 
 
 class CatalogFrame(wx.Frame):
@@ -139,6 +137,12 @@ class CatalogFrame(wx.Frame):
         wx.Frame.__init__(self,parent,id,'File Catalog',size=(340,200))
         self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
         self.createMenuBar()
+        p = wx.Panel(self, -1, style=0)
+        grid = CustTableGrid(p)
+        bs = wx.BoxSizer(wx.VERTICAL)
+        bs.Add(grid, 1, wx.GROW|wx.ALL, 5)
+        p.SetSizer(bs)
+        self.grid=grid
 
     def menuData(self):
         return(("&File",\
@@ -203,8 +207,29 @@ class CatalogFrame(wx.Frame):
 
 
         self.catalog=classify_files.readfiles(self.files)
+        #print 'opening:'
         #print self.catalog.pm.files
+        for row in range(len(self.catalog.mm.files)):
+            gridlib.Grid.SetCellValue(self.grid,row,0,self.catalog.mm.files[row])
+            gridlib.Grid.SetCellValue(self.grid,row,1,str(self.catalog.mm.data[row]['hsample']))
+            gridlib.Grid.SetCellValue(self.grid,row,2,str(self.catalog.mm.data[row]['vsample']))
 
+        for row in range(len(self.catalog.mp.files)):
+            gridlib.Grid.SetCellValue(self.grid,row,3,self.catalog.mp.files[row])
+            gridlib.Grid.SetCellValue(self.grid,row,4,str(self.catalog.mp.data[row]['hsample']))
+            gridlib.Grid.SetCellValue(self.grid,row,5,str(self.catalog.mp.data[row]['vsample']))
+        for row in range(len(self.catalog.pm.files)):
+            gridlib.Grid.SetCellValue(self.grid,row,6,self.catalog.pm.files[row])
+            gridlib.Grid.SetCellValue(self.grid,row,7,str(self.catalog.pm.data[row]['hsample']))
+            gridlib.Grid.SetCellValue(self.grid,row,8,str(self.catalog.pm.data[row]['vsample']))
+
+        for row in range(len(self.catalog.pp.files)):
+            gridlib.Grid.SetCellValue(self.grid,row,9,self.catalog.pp.files[row])
+            gridlib.Grid.SetCellValue(self.grid,row,10,str(self.catalog.pp.data[row]['hsample']))
+            gridlib.Grid.SetCellValue(self.grid,row,11,str(self.catalog.pp.data[row]['vsample']))
+
+        gridlib.Grid.AutoSize(self.grid)
+        gridlib.Grid.ForceRefresh(self.grid)
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
         dlg.Destroy()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="12" version="2.0">
+<workbench progressCount="13" version="2.0">
 <workbenchAdvisor/>
-<window height="768" maximized="true" width="1024" x="235" y="161">
+<window height="768" maximized="true" minimized="true" width="1024" x="235" y="161">
 <fastViewData fastViewLocation="1024"/>
 <perspectiveBar>
 <itemSize x="160"/>
@@ -29,17 +29,18 @@
 <part id="1"/>
 <part id="2"/>
 <part id="3"/>
+<part id="4"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psdbackup3.pro" partName="crystalbt7psdbackup3.pro" path="C:/tripleaxisproject2/psd/psd/crystalbt7psdbackup3.pro" title="crystalbt7psdbackup3.pro" tooltip="psd/crystalbt7psdbackup3.pro" workbook="DefaultEditorWorkbook">
+<editor focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psdbackup3.pro" partName="crystalbt7psdbackup3.pro" path="C:/tripleaxisproject2/psd/psd/crystalbt7psdbackup3.pro" title="crystalbt7psdbackup3.pro" tooltip="psd/crystalbt7psdbackup3.pro" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/psd/crystalbt7psdbackup3.pro"/>
-<editorState selectionHPixel="0" selectionLength="0" selectionOffset="4716"/>
+<editorState selectionHPixel="0" selectionLength="0" selectionOffset="0"/>
 </editor>
-<editor activePart="true" focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="dave_read_ice.pro" partName="dave_read_ice.pro" title="dave_read_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_read_ice.pro" workbook="DefaultEditorWorkbook">
+<editor id="com.rsi.idldt.proeditor.ProEditor" name="dave_read_ice.pro" partName="dave_read_ice.pro" title="dave_read_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_read_ice.pro" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_read_ice.pro"/>
-<editorState selectionHPixel="0" selectionLength="57" selectionOffset="1533"/>
+<editorState selectionHPixel="0" selectionLength="0" selectionOffset="0"/>
 </editor>
 <editor id="com.rsi.idldt.proeditor.ProEditor" name="dave_parse_ice.pro" partName="dave_parse_ice.pro" title="dave_parse_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_parse_ice.pro" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_parse_ice.pro"/>
@@ -49,13 +50,19 @@
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/psd/crystalbt7psdbackup2.pro"/>
 <editorState selectionHPixel="0" selectionLength="0" selectionOffset="3832"/>
 </editor>
+<editor id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psd.pro" partName="crystalbt7psd.pro" path="C:/dave_dev_src_2008-04-14/dave/programs/tas/bt7_psd/crystalbt7psd.pro" title="crystalbt7psd.pro" tooltip="dave/tas/bt7_psd/crystalbt7psd.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/dave/tas/bt7_psd/crystalbt7psd.pro"/>
+<editorState selectionHPixel="0" selectionLength="0" selectionOffset="0"/>
+</editor>
 </editors>
 <views>
 <view id="org.eclipse.ui.views.TaskList" partName="Tasks"/>
 <view id="com.rsi.idldt.ui.views.CommandLineView" partName="Command Line">
 <viewState/>
 </view>
-<view id="org.eclipse.ui.views.ContentOutline" partName="Outline"/>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
+<viewState/>
+</view>
 <view id="org.eclipse.debug.ui.VariableView" partName="Variables">
 <viewState/>
 </view>
@@ -70,6 +77,9 @@
 <viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
 </view>
 <view id="org.eclipse.debug.ui.BreakpointView" partName="Breakpoints"/>
+<view id="com.rsi.idldt.ui.views.CommandHistoryView" partName="Command History">
+<viewState columnWidth0="200" showTreeView="1" sortColumn="1" sortDirection="128"/>
+</view>
 <view id="org.eclipse.ui.views.ProblemView" partName="Problems">
 <viewState columnWidth0="250" columnWidth1="75" columnWidth2="150" columnWidth3="60" columnWidth4="0" horizontalPosition="0" verticalPosition="0">
 <columnOrder columnOrderIndex="0"/>
@@ -79,11 +89,8 @@
 <columnOrder columnOrderIndex="4"/>
 </viewState>
 </view>
-<view id="com.rsi.idldt.ui.views.CommandHistoryView" partName="Command History">
-<viewState columnWidth0="200" showTreeView="1" sortColumn="1" sortDirection="128"/>
-</view>
 </views>
-<perspectives activePart="com.rsi.idldt.proeditor.ProEditor" activePerspective="com.rsi.idldt.ui.IDLPerspective">
+<perspectives activePart="org.eclipse.ui.navigator.ProjectExplorer" activePerspective="com.rsi.idldt.ui.IDLPerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.eclipse.debug.internal.ui.DebugPerspectiveFactory" id="org.eclipse.debug.ui.DebugPerspective" label="Debug"/>
 <alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.CmdLine"/>
@@ -124,44 +131,30 @@
 <view id="com.rsi.idldt.ui.views.CommandLineView"/>
 <fastViewBars/>
 <viewLayoutRec id="com.rsi.idldt.ui.views.CommandLineView" showTitle="true" standalone="true"/>
-<layout>
-<mainWindow>
-<info folder="true" part="org.eclipse.debug.internal.ui.NavigatorFolderView">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
 <page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="756" ratioRight="252" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="756" ratioRight="252" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 <page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.debug.internal.ui.ConsoleFolderView" ratio="0.7492918" ratioLeft="529" ratioRight="177" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<info folder="true" part="org.eclipse.debug.internal.ui.ConsoleFolderView" ratio="0.7492918" ratioLeft="529" ratioRight="177" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.ui.views.TaskList" label="Tasks"/>
 <page content="org.eclipse.ui.views.BookmarkView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.views.PropertySheet" label="LabelNotFound"/>
 <page content="com.rsi.idldt.ui.views.ProfilerView" label="Profiler"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1f11e0f" ratio="0.76836157" ratioLeft="136" ratioRight="41" relationship="4" relative="org.eclipse.debug.internal.ui.ConsoleFolderView">
-<folder appearance="3" expanded="2">
-<page content="com.rsi.idldt.ui.views.CommandLineView" label="Command Line"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1f11e0f" ratio="0.76836157" ratioLeft="136" ratioRight="41" relationship="4" relative="org.eclipse.debug.internal.ui.ConsoleFolderView">&#x0A;<folder appearance="3" expanded="2">&#x0A;<page content="com.rsi.idldt.ui.views.CommandLineView" label="Command Line"/>
 </folder>
 </info>
 <info part="org.eclipse.ui.editorss" ratio="0.44990548" ratioLeft="238" ratioRight="291" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView"/>
-<info folder="true" part="org.eclipse.debug.internal.ui.OutlineFolderView" ratio="0.75" ratioLeft="756" ratioRight="252" relationship="2" relative="org.eclipse.ui.editorss">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+<info folder="true" part="org.eclipse.debug.internal.ui.OutlineFolderView" ratio="0.75" ratioLeft="756" ratioRight="252" relationship="2" relative="org.eclipse.ui.editorss">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.debug.internal.ui.ToolsFolderView" ratio="0.5" ratioLeft="504" ratioRight="504" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
+<info folder="true" part="org.eclipse.debug.internal.ui.ToolsFolderView" ratio="0.5" ratioLeft="504" ratioRight="504" relationship="2" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="Breakpoints"/>
 <page content="org.eclipse.debug.ui.ExpressionView" label="LabelNotFound"/>
 <page content="org.eclipse.debug.ui.RegisterView" label="LabelNotFound"/>
@@ -281,22 +274,10 @@
 <editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_parse_ice.pro"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/psd/crystalbt7psdbackup2.pro"/>
 <editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/is_ice.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/psd/crystalbt7psd.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/dave/tas/bt7_psd/crystalbt7psd.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/psd/crystalbt7psdbackup3.pro"/>
 </editors>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="2630" y="0"/>
-</item>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="2678" y="0"/>
-</item>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="2734" y="0"/>
-</item>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="2778" y="0"/>
-</item>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="2830" y="0"/>
-</item>
 <item historyLabel="crystalbt7psdbackup3.pro" index="0">
 <position info="not_deleted" x="2956" y="0"/>
 </item>
@@ -429,8 +410,23 @@
 <item historyLabel="is_ice.pro" index="4">
 <position/>
 </item>
-<item active="true" historyLabel="dave_read_ice.pro" index="1">
+<item historyLabel="dave_read_ice.pro" index="1">
 <position info="not_deleted" x="1533" y="57"/>
+</item>
+<item historyLabel="crystalbt7psd.pro" index="5">
+<position info="not_deleted" x="41526" y="15"/>
+</item>
+<item historyLabel="crystalbt7psd.pro" index="5">
+<position info="not_deleted" x="22738" y="15"/>
+</item>
+<item historyLabel="dave_read_ice.pro" index="1">
+<position/>
+</item>
+<item historyLabel="crystalbt7psd.pro" index="6">
+<position/>
+</item>
+<item active="true" historyLabel="crystalbt7psdbackup3.pro" index="7">
+<position/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -449,6 +445,9 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psd.pro" tooltip="dave/tas/bt7_psd/crystalbt7psd.pro">
+<persistable path="/dave/tas/bt7_psd/crystalbt7psd.pro"/>
+</file>
 <file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="is_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\is_ice.pro">
 <persistable uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/is_ice.pro"/>
 </file>
