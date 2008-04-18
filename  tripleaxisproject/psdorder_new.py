@@ -33,6 +33,7 @@ if __name__=='__main__':
         #ch_space+0.5*(-ch_space+shift(ch_space,1))+var(var_pos,i)
 
         mypsd=psd()
+        #print (ch_a4-ch_a4[mypsd.center])
         ch_boundary=(ch_a4-ch_a4[mypsd.center])+0.5*N.concatenate((N.array([0]),N.diff(ch_a4)))
         ch_boundary[0]=(ch_a4[0]-ch_a4[mypsd.center])-0.5*(ch_a4[1]-ch_a4[0])
         print ch_boundary

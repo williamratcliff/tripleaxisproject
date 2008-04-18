@@ -1,4 +1,4 @@
-#Thu Apr 10 02:34:43 EDT 2008
+#Wed Apr 16 18:29:19 EDT 2008
 IDL_DEVICE=WIN
 IDL_VALUES=true
 CHROMACODING_VALUES=true
@@ -6,7 +6,7 @@ IDL_DATAFILE_USER_COMMENTS=1
 IDLDT_VALUES=true
 IDL_RBUF_PERSIST=1
 IDL_QUIET=0
-IDL_PATH=<IDL_DEFAULT>;+C\:\\tripleaxisproject2\\psd\\psd\\Default;+C\:\\tripleaxisproject2\\psd\\psd;+C\:\\tripleaxisproject2\\psd\\Default;+C\:\\Temp\\dave_dev_src_2008-04-09\\dave\\programs\\tas\\dave_tas
+IDL_PATH=<IDL_DEFAULT>;+C\:\\tripleaxisproject2\\psd\\psd\\Default;+C\:\\tripleaxisproject2\\psd\\Default;+C\:\\Temp\\dave_dev_src_2008-04-09\\dave\\programs\\tas\\dave_tas;+C\:\\dave_dev_src_2008-04-14\\dave\\programs
 eclipse.preferences.version=1
 IDL_CPU_VECTOR_ENABLE=1
 IDL_PATH_CACHE_DISABLE=0
