@@ -140,7 +140,7 @@ class CatalogFrame(wx.Frame):
         p = wx.Panel(self, -1, style=0)
         grid = CustTableGrid(p)
         bs = wx.BoxSizer(wx.VERTICAL)
-        bs.Add(grid, 1, wx.GROW|wx.ALL, 5)
+        bs.Add(grid, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
         p.SetSizer(bs)
         self.grid=grid
 
