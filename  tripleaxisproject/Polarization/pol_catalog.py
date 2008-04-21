@@ -236,11 +236,3 @@ class CatalogFrame(wx.Frame):
 
 
 
-
-
-
-if __name__=='__main__':
-    app=MyApp()
-    frame=CatalogFrame(parent=None,id=-1)
-    frame.Show()
-    app.MainLoop()
