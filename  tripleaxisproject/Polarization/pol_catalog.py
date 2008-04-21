@@ -3,6 +3,7 @@ import  wx.grid as  gridlib
 import sys,os
 import classify_files
 import numpy as N
+import gridbar
 
 class MyApp(wx.App):
     def __init__(self, redirect=False, filename=None, useBestVisual=False, clearSigInt=True):
@@ -20,7 +21,7 @@ class MyApp(wx.App):
 class CustomDataTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['off off', 'Hsample', 'Vsample', 'off on','H', 'V', 'on off','H', 'V', 'on on','H', 'V']
+        self.colLabels = ['off off', 'Hsample', 'Vsample', 'off on','H', 'V', 'on off','H', 'V', 'on on','H', 'V', 'Bar']
         self.rowLabels=['Group 0']
         self.dataTypes = [gridlib.GRID_VALUE_STRING, #off off
                           gridlib.GRID_VALUE_STRING,
@@ -33,13 +34,16 @@ class CustomDataTable(gridlib.PyGridTableBase):
                           gridlib.GRID_VALUE_STRING,
                           gridlib.GRID_VALUE_STRING, #on on
                           gridlib.GRID_VALUE_STRING,
-                          gridlib.GRID_VALUE_STRING
+                          gridlib.GRID_VALUE_STRING,
+                          gridbar.GRID_VALUE_BAR,
+                          #gridlib.GRID_VALUE_STRING,
                           ]
         self.data = []
-        self.data.append(['','','',\
-                            '','','',\
-                            '','','',\
-                            '','',''\
+        self.data.append(['','','',
+                            '','','',
+                            '','','',
+                            '','','',
+                            gridbar.Bar(5,6,(0,10)),
                             ])
         return
             #[1010, "The foo doesn't bar", "major", 1, 'MSW', 1, 1, 1, 1.12],
@@ -115,10 +119,18 @@ class CustTableGrid(gridlib.Grid):
     def __init__(self, parent):
         gridlib.Grid.__init__(self, parent, -1)
         table = CustomDataTable()
+
+        gridbar.register(self)
         # The second parameter means that the grid is to take ownership of the
         # table and will destroy it when done.  Otherwise you would need to keep
         # a reference to it and call it's Destroy method later.
         self.SetTable(table, True)
+        #attr = gridlib.GridCellAttr()
+        #attr.SetReadOnly(True)
+        #attr.SetRenderer(gridbar.GridCellBarRenderer())
+        #self.SetColAttr(13, attr)
+        #self.SetCellValue(1,13,'q')
+        #self.SetCellRenderer(1,13,gridbar.GridCellBarRenderer)
         #self.SetRowLabelSize(0)
         self.SetMargins(0,0)
         self.AutoSize()
@@ -134,7 +146,7 @@ class CustTableGrid(gridlib.Grid):
 
 class CatalogFrame(wx.Frame):
     def __init__(self,parent,id):
-        wx.Frame.__init__(self,parent,id,'File Catalog',size=(340,200))
+        wx.Frame.__init__(self,parent,id,'File Catalog',size=(640,200))
         self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
         self.createMenuBar()
         p = wx.Panel(self, -1, style=0)
@@ -142,6 +154,7 @@ class CatalogFrame(wx.Frame):
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(grid, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
         p.SetSizer(bs)
+        #p.Fit()
         self.grid=grid
 
     def menuData(self):
@@ -236,3 +249,11 @@ class CatalogFrame(wx.Frame):
 
 
 
+
+
+
+if __name__=='__main__':
+    app=MyApp()
+    frame=CatalogFrame(parent=None,id=-1)
+    frame.Show()
+    app.MainLoop()
