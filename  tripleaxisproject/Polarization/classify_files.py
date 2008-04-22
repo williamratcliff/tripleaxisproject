@@ -210,31 +210,8 @@ def readfiles(flist):
         if key=='pp':
             mycatalog.pp.data.append(data)
             mycatalog.pp.files.append(data['filename'])
+            curr_catalog=mycatalog.pp
             if data.has_key('h'):
-                mycatalog.pp.h_range.max=max(mycatalog.pp.h_range.max,data['h']['max'])
-                mycatalog.pp.h_range.min=min(mycatalog.pp.h_range.min,data['h']['min'])
-            if data.has_key('k'):
-                mycatalog.pp.k_range.max=max(mycatalog.pp.k_range.max,data['k']['max'])
-                mycatalog.pp.k_range.min=min(mycatalog.pp.k_range.min,data['k']['min'])
-            if data.has_key('l'):
-                mycatalog.pp.l_range.max=max(mycatalog.pp.l_range.max,data['l']['max'])
-                mycatalog.pp.l_range.min=min(mycatalog.pp.l_range.min,data['l']['min'])
-            if data.has_key('e'):
-                mycatalog.pp.e_range.max=max(mycatalog.pp.e_range.max,data['e']['max'])
-                mycatalog.pp.e_range.min=min(mycatalog.pp.e_range.min,data['e']['min'])
-            if data.has_key('temp'):
-                mycatalog.pp.temp_range.max=max(mycatalog.pp.temp_range.max,data['temp']['max'])
-                mycatalog.pp.temp_range.min=min(mycatalog.pp.temp_range.min,data['temp']['min'])
-            if data.has_key('magfield'):
-                mycatalog.pp.magfield_range.max=max(mycatalog.pp.magfield_range.max,data['magfield']['max'])
-                mycatalog.pp.magfield_range.min=min(mycatalog.pp.magfield_range.min,data['magfield']['min'])
-
-
-        elif key=='pm':
-            mycatalog.pm.data.append(data)
-            mycatalog.pm.files.append(data['filename'])
-            if data.has_key('h'):
-                curr_catalog=mycatalog.pm
                 if curr_catalog.h_range.max==None:
                     curr_catalog.h_range.max=data['h']['max']
                 else:
@@ -243,51 +220,335 @@ def readfiles(flist):
                     curr_catalog.h_range.min=data['h']['min']
                 else:
                     curr_catalog.h_range.min=min(data['h']['min'],curr_catalog.h_range.min)
+            if data.has_key('k'):
+                if curr_catalog.k_range.max==None:
+                    curr_catalog.k_range.max=data['k']['max']
+                else:
+                    curr_catalog.k_range.max=max(data['k']['max'],curr_catalog.k_range.max)
+                if curr_catalog.k_range.min==None:
+                    curr_catalog.k_range.min=data['k']['min']
+                else:
+                    curr_catalog.k_range.min=min(data['k']['min'],curr_catalog.k_range.min)
+            if data.has_key('l'):
+                if curr_catalog.l_range.max==None:
+                    curr_catalog.l_range.max=data['l']['max']
+                else:
+                    curr_catalog.l_range.max=max(data['l']['max'],curr_catalog.l_range.max)
+                if curr_catalog.l_range.min==None:
+                    curr_catalog.l_range.min=data['l']['min']
+                else:
+                    curr_catalog.l_range.min=min(data['l']['min'],curr_catalog.l_range.min)
+
+            if data.has_key('e'):
+                if curr_catalog.e_range.max==None:
+                    curr_catalog.e_range.max=data['e']['max']
+                else:
+                    curr_catalog.e_range.max=max(data['e']['max'],curr_catalog.e_range.max)
+                if curr_catalog.e_range.min==None:
+                    curr_catalog.e_range.min=data['e']['min']
+                else:
+                    curr_catalog.e_range.min=min(data['e']['min'],curr_catalog.e_range.min)
+
+            if data.has_key('a3'):
+                if curr_catalog.a3_range.max==None:
+                    curr_catalog.a3_range.max=data['a3']['max']
+                else:
+                    curr_catalog.a3_range.max=max(data['a3']['max'],curr_catalog.a3_range.max)
+                if curr_catalog.a3_range.min==None:
+                    curr_catalog.a3_range.min=data['a3']['min']
+                else:
+                    curr_catalog.a3_range.min=min(data['a3']['min'],curr_catalog.a3_range.min)
+
+
+            if data.has_key('a4'):
+                if curr_catalog.a4_range.max==None:
+                    curr_catalog.a4_range.max=data['a4']['max']
+                else:
+                    curr_catalog.a4_range.max=max(data['a4']['max'],curr_catalog.a4_range.max)
+                if curr_catalog.a4_range.min==None:
+                    curr_catalog.a4_range.min=data['a4']['min']
+                else:
+                    curr_catalog.a4_range.min=min(data['a4']['min'],curr_catalog.a4_range.min)
+
+
+            if data.has_key('temp'):
+                if curr_catalog.temp_range.max==None:
+                    curr_catalog.temp_range.max=data['temp']['max']
+                else:
+                    curr_catalog.temp_range.max=max(data['temp']['max'],curr_catalog.temp_range.max)
+                if curr_catalog.temp_range.min==None:
+                    curr_catalog.temp_range.min=data['temp']['min']
+                else:
+                    curr_catalog.temp_range.min=min(data['temp']['min'],curr_catalog.temp_range.min)
+
+            if data.has_key('magfield'):
+                if curr_catalog.magfield_range.max==None:
+                    curr_catalog.magfield_range.max=data['magfield']['max']
+                else:
+                    curr_catalog.magfield_range.max=max(data['magfield']['max'],curr_catalog.magfield_range.max)
+                if curr_catalog.magfield_range.min==None:
+                    curr_catalog.magfield_range.min=data['magfield']['min']
+                else:
+                    curr_catalog.magfield_range.min=min(data['magfield']['min'],curr_catalog.magfield_range.min)
+
+
+
+        elif key=='pm':
+            mycatalog.pm.data.append(data)
+            mycatalog.pm.files.append(data['filename'])
+            curr_catalog=mycatalog.pm
+            if data.has_key('h'):
+                if curr_catalog.h_range.max==None:
+                    curr_catalog.h_range.max=data['h']['max']
+                else:
+                    curr_catalog.h_range.max=max(data['h']['max'],curr_catalog.h_range.max)
+                if curr_catalog.h_range.min==None:
+                    curr_catalog.h_range.min=data['h']['min']
+                else:
+                    curr_catalog.h_range.min=min(data['h']['min'],curr_catalog.h_range.min)
+            if data.has_key('k'):
+                if curr_catalog.k_range.max==None:
+                    curr_catalog.k_range.max=data['k']['max']
+                else:
+                    curr_catalog.k_range.max=max(data['k']['max'],curr_catalog.k_range.max)
+                if curr_catalog.k_range.min==None:
+                    curr_catalog.k_range.min=data['k']['min']
+                else:
+                    curr_catalog.k_range.min=min(data['k']['min'],curr_catalog.k_range.min)
+            if data.has_key('l'):
+                if curr_catalog.l_range.max==None:
+                    curr_catalog.l_range.max=data['l']['max']
+                else:
+                    curr_catalog.l_range.max=max(data['l']['max'],curr_catalog.l_range.max)
+                if curr_catalog.l_range.min==None:
+                    curr_catalog.l_range.min=data['l']['min']
+                else:
+                    curr_catalog.l_range.min=min(data['l']['min'],curr_catalog.l_range.min)
+
+            if data.has_key('e'):
+                if curr_catalog.e_range.max==None:
+                    curr_catalog.e_range.max=data['e']['max']
+                else:
+                    curr_catalog.e_range.max=max(data['e']['max'],curr_catalog.e_range.max)
+                if curr_catalog.e_range.min==None:
+                    curr_catalog.e_range.min=data['e']['min']
+                else:
+                    curr_catalog.e_range.min=min(data['e']['min'],curr_catalog.e_range.min)
+
+            if data.has_key('a3'):
+                if curr_catalog.a3_range.max==None:
+                    curr_catalog.a3_range.max=data['a3']['max']
+                else:
+                    curr_catalog.a3_range.max=max(data['a3']['max'],curr_catalog.a3_range.max)
+                if curr_catalog.a3_range.min==None:
+                    curr_catalog.a3_range.min=data['a3']['min']
+                else:
+                    curr_catalog.a3_range.min=min(data['a3']['min'],curr_catalog.a3_range.min)
+
+
+            if data.has_key('a4'):
+                if curr_catalog.a4_range.max==None:
+                    curr_catalog.a4_range.max=data['a4']['max']
+                else:
+                    curr_catalog.a4_range.max=max(data['a4']['max'],curr_catalog.a4_range.max)
+                if curr_catalog.a4_range.min==None:
+                    curr_catalog.a4_range.min=data['a4']['min']
+                else:
+                    curr_catalog.a4_range.min=min(data['a4']['min'],curr_catalog.a4_range.min)
+
+
+            if data.has_key('temp'):
+                if curr_catalog.temp_range.max==None:
+                    curr_catalog.temp_range.max=data['temp']['max']
+                else:
+                    curr_catalog.temp_range.max=max(data['temp']['max'],curr_catalog.temp_range.max)
+                if curr_catalog.temp_range.min==None:
+                    curr_catalog.temp_range.min=data['temp']['min']
+                else:
+                    curr_catalog.temp_range.min=min(data['temp']['min'],curr_catalog.temp_range.min)
+
+            if data.has_key('magfield'):
+                if curr_catalog.magfield_range.max==None:
+                    curr_catalog.magfield_range.max=data['magfield']['max']
+                else:
+                    curr_catalog.magfield_range.max=max(data['magfield']['max'],curr_catalog.magfield_range.max)
+                if curr_catalog.magfield_range.min==None:
+                    curr_catalog.magfield_range.min=data['magfield']['min']
+                else:
+                    curr_catalog.magfield_range.min=min(data['magfield']['min'],curr_catalog.magfield_range.min)
+
+
 
 
         elif key=='mp':
             mycatalog.mp.data.append(data)
             mycatalog.mp.files.append(data['filename'])
+            curr_catalog=mycatalog.mp
             if data.has_key('h'):
-                mycatalog.mp.h_range.max=max(mycatalog.mp.h_range.max,data['h']['max'])
-                mycatalog.mp.h_range.min=min(mycatalog.mp.h_range.min,data['h']['min'])
+                if curr_catalog.h_range.max==None:
+                    curr_catalog.h_range.max=data['h']['max']
+                else:
+                    curr_catalog.h_range.max=max(data['h']['max'],curr_catalog.h_range.max)
+                if curr_catalog.h_range.min==None:
+                    curr_catalog.h_range.min=data['h']['min']
+                else:
+                    curr_catalog.h_range.min=min(data['h']['min'],curr_catalog.h_range.min)
             if data.has_key('k'):
-                mycatalog.mp.k_range.max=max(mycatalog.mp.k_range.max,data['k']['max'])
-                mycatalog.mp.k_range.min=min(mycatalog.mp.k_range.min,data['k']['min'])
+                if curr_catalog.k_range.max==None:
+                    curr_catalog.k_range.max=data['k']['max']
+                else:
+                    curr_catalog.k_range.max=max(data['k']['max'],curr_catalog.k_range.max)
+                if curr_catalog.k_range.min==None:
+                    curr_catalog.k_range.min=data['k']['min']
+                else:
+                    curr_catalog.k_range.min=min(data['k']['min'],curr_catalog.k_range.min)
             if data.has_key('l'):
-                mycatalog.mp.l_range.max=max(mycatalog.mp.l_range.max,data['l']['max'])
-                mycatalog.mp.l_range.min=min(mycatalog.mp.l_range.min,data['l']['min'])
+                if curr_catalog.l_range.max==None:
+                    curr_catalog.l_range.max=data['l']['max']
+                else:
+                    curr_catalog.l_range.max=max(data['l']['max'],curr_catalog.l_range.max)
+                if curr_catalog.l_range.min==None:
+                    curr_catalog.l_range.min=data['l']['min']
+                else:
+                    curr_catalog.l_range.min=min(data['l']['min'],curr_catalog.l_range.min)
+
             if data.has_key('e'):
-                mycatalog.mp.e_range.max=max(mycatalog.mp.e_range.max,data['e']['max'])
-                mycatalog.mp.e_range.min=min(mycatalog.mp.e_range.min,data['e']['min'])
+                if curr_catalog.e_range.max==None:
+                    curr_catalog.e_range.max=data['e']['max']
+                else:
+                    curr_catalog.e_range.max=max(data['e']['max'],curr_catalog.e_range.max)
+                if curr_catalog.e_range.min==None:
+                    curr_catalog.e_range.min=data['e']['min']
+                else:
+                    curr_catalog.e_range.min=min(data['e']['min'],curr_catalog.e_range.min)
+
+            if data.has_key('a3'):
+                if curr_catalog.a3_range.max==None:
+                    curr_catalog.a3_range.max=data['a3']['max']
+                else:
+                    curr_catalog.a3_range.max=max(data['a3']['max'],curr_catalog.a3_range.max)
+                if curr_catalog.a3_range.min==None:
+                    curr_catalog.a3_range.min=data['a3']['min']
+                else:
+                    curr_catalog.a3_range.min=min(data['a3']['min'],curr_catalog.a3_range.min)
+
+
+            if data.has_key('a4'):
+                if curr_catalog.a4_range.max==None:
+                    curr_catalog.a4_range.max=data['a4']['max']
+                else:
+                    curr_catalog.a4_range.max=max(data['a4']['max'],curr_catalog.a4_range.max)
+                if curr_catalog.a4_range.min==None:
+                    curr_catalog.a4_range.min=data['a4']['min']
+                else:
+                    curr_catalog.a4_range.min=min(data['a4']['min'],curr_catalog.a4_range.min)
+
+
             if data.has_key('temp'):
-                mycatalog.mp.temp_range.max=max(mycatalog.mp.temp_range.max,data['temp']['max'])
-                mycatalog.mp.temp_range.min=min(mycatalog.mp.temp_range.min,data['temp']['min'])
+                if curr_catalog.temp_range.max==None:
+                    curr_catalog.temp_range.max=data['temp']['max']
+                else:
+                    curr_catalog.temp_range.max=max(data['temp']['max'],curr_catalog.temp_range.max)
+                if curr_catalog.temp_range.min==None:
+                    curr_catalog.temp_range.min=data['temp']['min']
+                else:
+                    curr_catalog.temp_range.min=min(data['temp']['min'],curr_catalog.temp_range.min)
+
             if data.has_key('magfield'):
-                mycatalog.mp.magfield_range.max=max(mycatalog.mp.magfield_range.max,data['magfield']['max'])
-                mycatalog.mp.magfield_range.min=min(mycatalog.mp.magfield_range.min,data['magfield']['min'])
+                if curr_catalog.magfield_range.max==None:
+                    curr_catalog.magfield_range.max=data['magfield']['max']
+                else:
+                    curr_catalog.magfield_range.max=max(data['magfield']['max'],curr_catalog.magfield_range.max)
+                if curr_catalog.magfield_range.min==None:
+                    curr_catalog.magfield_range.min=data['magfield']['min']
+                else:
+                    curr_catalog.magfield_range.min=min(data['magfield']['min'],curr_catalog.magfield_range.min)
+
 
         elif key=='mm':
             mycatalog.mm.data.append(data)
             mycatalog.mm.files.append(data['filename'])
+            curr_catalog=mycatalog.mm
             if data.has_key('h'):
-                mycatalog.mm.h_range.max=max(mycatalog.mm.h_range.max,data['h']['max'])
-                mycatalog.mm.h_range.min=min(mycatalog.mm.h_range.min,data['h']['min'])
+                if curr_catalog.h_range.max==None:
+                    curr_catalog.h_range.max=data['h']['max']
+                else:
+                    curr_catalog.h_range.max=max(data['h']['max'],curr_catalog.h_range.max)
+                if curr_catalog.h_range.min==None:
+                    curr_catalog.h_range.min=data['h']['min']
+                else:
+                    curr_catalog.h_range.min=min(data['h']['min'],curr_catalog.h_range.min)
             if data.has_key('k'):
-                mycatalog.mm.k_range.max=max(mycatalog.mm.k_range.max,data['k']['max'])
-                mycatalog.mm.k_range.min=min(mycatalog.mm.k_range.min,data['k']['min'])
+                if curr_catalog.k_range.max==None:
+                    curr_catalog.k_range.max=data['k']['max']
+                else:
+                    curr_catalog.k_range.max=max(data['k']['max'],curr_catalog.k_range.max)
+                if curr_catalog.k_range.min==None:
+                    curr_catalog.k_range.min=data['k']['min']
+                else:
+                    curr_catalog.k_range.min=min(data['k']['min'],curr_catalog.k_range.min)
             if data.has_key('l'):
-                mycatalog.mm.l_range.max=max(mycatalog.mm.l_range.max,data['l']['max'])
-                mycatalog.mm.l_range.min=min(mycatalog.mm.l_range.min,data['l']['min'])
+                if curr_catalog.l_range.max==None:
+                    curr_catalog.l_range.max=data['l']['max']
+                else:
+                    curr_catalog.l_range.max=max(data['l']['max'],curr_catalog.l_range.max)
+                if curr_catalog.l_range.min==None:
+                    curr_catalog.l_range.min=data['l']['min']
+                else:
+                    curr_catalog.l_range.min=min(data['l']['min'],curr_catalog.l_range.min)
+
             if data.has_key('e'):
-                mycatalog.mm.e_range.max=max(mycatalog.mm.e_range.max,data['e']['max'])
-                mycatalog.mm.e_range.min=min(mycatalog.mm.e_range.min,data['e']['min'])
+                if curr_catalog.e_range.max==None:
+                    curr_catalog.e_range.max=data['e']['max']
+                else:
+                    curr_catalog.e_range.max=max(data['e']['max'],curr_catalog.e_range.max)
+                if curr_catalog.e_range.min==None:
+                    curr_catalog.e_range.min=data['e']['min']
+                else:
+                    curr_catalog.e_range.min=min(data['e']['min'],curr_catalog.e_range.min)
+
+            if data.has_key('a3'):
+                if curr_catalog.a3_range.max==None:
+                    curr_catalog.a3_range.max=data['a3']['max']
+                else:
+                    curr_catalog.a3_range.max=max(data['a3']['max'],curr_catalog.a3_range.max)
+                if curr_catalog.a3_range.min==None:
+                    curr_catalog.a3_range.min=data['a3']['min']
+                else:
+                    curr_catalog.a3_range.min=min(data['a3']['min'],curr_catalog.a3_range.min)
+
+
+            if data.has_key('a4'):
+                if curr_catalog.a4_range.max==None:
+                    curr_catalog.a4_range.max=data['a4']['max']
+                else:
+                    curr_catalog.a4_range.max=max(data['a4']['max'],curr_catalog.a4_range.max)
+                if curr_catalog.a4_range.min==None:
+                    curr_catalog.a4_range.min=data['a4']['min']
+                else:
+                    curr_catalog.a4_range.min=min(data['a4']['min'],curr_catalog.a4_range.min)
+
+
             if data.has_key('temp'):
-                mycatalog.mm.temp_range.max=max(mycatalog.mm.temp_range.max,data['temp']['max'])
-                mycatalog.mm.temp_range.min=min(mycatalog.mm.temp_range.min,data['temp']['min'])
+                if curr_catalog.temp_range.max==None:
+                    curr_catalog.temp_range.max=data['temp']['max']
+                else:
+                    curr_catalog.temp_range.max=max(data['temp']['max'],curr_catalog.temp_range.max)
+                if curr_catalog.temp_range.min==None:
+                    curr_catalog.temp_range.min=data['temp']['min']
+                else:
+                    curr_catalog.temp_range.min=min(data['temp']['min'],curr_catalog.temp_range.min)
+
             if data.has_key('magfield'):
-                mycatalog.mm.magfield_range.max=max(mycatalog.mm.magfield_range.max,data['magfield']['max'])
-                mycatalog.mm.magfield_range.min=min(mycatalog.mm.magfield_range.min,data['magfield']['min'])
+                if curr_catalog.magfield_range.max==None:
+                    curr_catalog.magfield_range.max=data['magfield']['max']
+                else:
+                    curr_catalog.magfield_range.max=max(data['magfield']['max'],curr_catalog.magfield_range.max)
+                if curr_catalog.magfield_range.min==None:
+                    curr_catalog.magfield_range.min=data['magfield']['min']
+                else:
+                    curr_catalog.magfield_range.min=min(data['magfield']['min'],curr_catalog.magfield_range.min)
+
 
         #print currfile, key
     return mycatalog
