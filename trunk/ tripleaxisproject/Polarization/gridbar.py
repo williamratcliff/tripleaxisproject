@@ -1,5 +1,6 @@
 import wx
 import wx.grid
+import copy
 
 class Bar:
     def __init__(self,low,high,range):
@@ -21,11 +22,21 @@ class GridCellBarRenderer(wx.grid.PyGridCellRenderer):
         print 'Drawing'
         range = grid.GetCellValue(row, col)
         #dc=wx.DC
-        #dc.Clear()
+        dc.Clear()
         #dc.BeginDrawing()
+        cell_height=rect.height
+        cell_width=rect.width
+        cell_x=rect.x
+        cell_y=rect.y
+        rect.height=rect.height/4
+        rect.width=rect.width/3
+        rect.y=rect.y+2*rect.height
+        rect.x=cell_x+cell_width/4
         dc.SetBrush(wx.Brush("navy",wx.SOLID))
-        dc.SetPen(wx.Pen("red"))
+        dc.SetPen(wx.Pen("navy"))
         dc.DrawRectangleRect(rect)
+        dc.DrawText('h',cell_x,cell_y)
+        print rect.x, rect.y
         #dc.EndDrawing()
         print rect
 
