@@ -663,6 +663,18 @@ class datareader:
             if self.header==None:
                 self.header=[]
             mydata=Data(self.metadata,self.columndict,self.header,self.additional_metadata)
+            #repair ice files with missing file names
+            if mydata.metadata['file_info']['filename']==None:
+                filename=os.path.split(myfilestr)[-1]
+                self.metadata['file_info']['filename']=filename
+                #print 'filename ', tokenized[1]
+                pattern = re.compile('^(?P<base>[^.]*?)(?P<seq>[0-9]*)(?P<ext>[.].*)?$')
+                match = pattern.match(filename)
+                dict((a,match.group(a)+"") for a in ['base','seq','ext'])
+                #print 'filebase ',match.group('base')
+                self.metadata['file_info']['filebase']=match.group('base')
+                self.metadata['file_info']['fileseq_number']=match.group('seq')
+
         return mydata
 
 
@@ -789,7 +801,7 @@ if __name__=='__main__':
         #myfilestr=r'c:\12436\data\LaOFeAs56413.bt7'
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\fpx53418.bt7'
-        myfilestr=r'c:\13165\13165\data\MagHigh56784.bt7'
+        #myfilestr=r'c:\13165\13165\data\MagHigh56784.bt7'
         mydatareader=datareader()
         #mydata=mydatareader.readbuffer(myfilestr,lines=91)
         mydata=mydatareader.readbuffer(myfilestr)
@@ -797,7 +809,7 @@ if __name__=='__main__':
         #mywriter=writebt7.datawriter()
         #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
         print mydata.data['timestamp']
-        print mydata.data['magfield']
+        #print mydata.data['magfield']
         print mydata.data.keys()
         print 'done'
         #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
