@@ -143,6 +143,7 @@ class CustTableGrid(gridlib.Grid):
         #self.SetRowLabelSize(0)
         self.SetMargins(0,0)
         self.AutoSize()
+        self.sorted=False
         #gridlib.Grid.SetSelectionMode(self,gridlib.Grid.SelectRows)
         gridlib.Grid.EnableEditing(self,True)
         attr=gridlib.GridCellAttr()
@@ -164,8 +165,25 @@ class CustTableGrid(gridlib.Grid):
     def onLeftDClickRowCell(self,evt):
         col=evt.GetCol()
         table=self.GetTable()
+        data=N.array(table.data)
+        #print data.shape
+        g=data.argsort(axis=0)
+        g_col=g[:,col]
+        if self.sorted==False:
+            self.sorted=True
+        else:
+            g_col=g_col[::-1]
+            self.sorted=False
+        #print 'col=',col
+        #print 'sort '
+        #print g
+        for i in range(data.shape[1]-1):
+            data[:,i]=data[g_col,i]
+        table.data=data
+        gridlib.Grid.AutoSize(self)
+        gridlib.Grid.ForceRefresh(self)
 
-        print 'col=',col
+
 
 
 class CatalogFrame(wx.Frame):
@@ -251,6 +269,7 @@ class CatalogFrame(wx.Frame):
             table=self.grid.GetTable()
             table.data=[]
             #table.Update()
+            self.grid.sorted=False
             for row in range(len(self.catalog.files)):
                 gridlib.Grid.SetCellValue(self.grid,row,1,self.catalog.files[row])
                 gridlib.Grid.SetCellValue(self.grid,row,2,str(self.catalog.data[row]['polarization state']))

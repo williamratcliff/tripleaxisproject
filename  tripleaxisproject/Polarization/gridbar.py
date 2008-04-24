@@ -20,11 +20,21 @@ class Bar:
     def __init__(self,low,high,myrange):
         self.low=low
         self.high=high
+        self.center=(self.low+self.high)/2
         self.range=myrange
 
 
     def __str__(self):
         return "Bar(%g,%g)"%(self.low,self.high)
+
+    def __cmp__(self,other):
+        if self.center <other.center:
+            return -1
+        elif self.center > other.center:
+            return 1
+        elif self.center==other.center:
+            return 0
+
 
 GRID_VALUE_BAR=Bar.__name__
 
