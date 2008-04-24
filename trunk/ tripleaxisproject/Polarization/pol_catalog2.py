@@ -163,6 +163,8 @@ class CustTableGrid(gridlib.Grid):
 
     def onLeftDClickRowCell(self,evt):
         col=evt.GetCol()
+        table=self.GetTable()
+
         print 'col=',col
 
 
