@@ -28,12 +28,13 @@ class Bar:
         return "Bar(%g,%g)"%(self.low,self.high)
 
     def __cmp__(self,other):
-        if self.center <other.center:
+        if not isinstance(other,Bar): return -1
+        if self.low <other.low:
             return -1
-        elif self.center > other.center:
+        elif self.low > other.low:
             return 1
-        elif self.center==other.center:
-            return 0
+        elif self.low==other.low:
+            return cmp(self.high,other.high)
 
 
 GRID_VALUE_BAR=Bar.__name__
@@ -67,19 +68,22 @@ class GridCellBarRenderer(wx.grid.PyGridCellRenderer):
         rect.height=rect.height/4
         rect.y=rect.y+2*rect.height
         rect_b=copy.deepcopy(rect)
-        dc.SetBrush(wx.Brush("white",wx.SOLID))
-        dc.SetPen(wx.Pen("navy"))
+        fill=attr.GetTextColour()
+        background="white"
+        outline=background#"Navy"
+        dc.SetBrush(wx.Brush(background,wx.SOLID))
+        dc.SetPen(wx.Pen(outline))
         dc.DrawRectangleRect(rect_b)
         rangefinder=Range(bar_range)
-        low_mapped=rangefinder.map(low)
-        high_mapped=rangefinder.map(high)
-        rect.width=(high_mapped-low_mapped)*cell_width
-        if rect.width<threshold:
-            rect.width=cell_width/10
-        rect.x=cell_x+low_mapped*rect.width
+        low_px=rangefinder.map(low)*cell_width
+        high_px=rangefinder.map(high)*cell_width
+        rect.width=(high_px-low_px)
+        if rect.width<1:
+            rect.width=1
+        rect.x=cell_x+low_px
         #print 'low_mapped',low_mapped,'high_mapped',high_mapped,'width',rect.width,'rect.x',rect.x
-        dc.SetBrush(wx.Brush("navy",wx.SOLID))
-        dc.SetPen(wx.Pen("navy"))
+        dc.SetBrush(wx.Brush(fill,wx.SOLID))
+        dc.SetPen(wx.Pen(fill))
         dc.DrawRectangleRect(rect)
         s1='%4.3f'%(low,)
         s2='%4.3f'%(high,)
@@ -90,9 +94,10 @@ class GridCellBarRenderer(wx.grid.PyGridCellRenderer):
         #dc.DrawText(s2,cell_x+cell_width-text_width,cell_y)
 
     def Draw(self, grid, attr, dc, rect, row, col, isSelected):
+        colour=attr.GetBackgroundColour()
 
-        dc.SetBrush(wx.Brush("white",wx.SOLID))
-        dc.SetPen(wx.Pen("white"))
+        dc.SetBrush(wx.Brush(colour,wx.SOLID))
+        dc.SetPen(wx.Pen(colour))
         dc.DrawRectangleRect(rect)
         self.DrawBar(grid, attr, dc, rect, row, col, isSelected)
 

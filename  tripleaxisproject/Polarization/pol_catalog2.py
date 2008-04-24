@@ -21,11 +21,12 @@ class MyApp(wx.App):
 class CustomDataTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['Select?', 'filename', 'polarization state','hsample','vsample','h','k','l','e','a3','a4','temp','magfield']
+        self.colLabels = ['Select?', 'filename','seq #', 'polarization state','hsample','vsample','h','k','l','e','a3','a4','temp','magfield']
         self.rowLabels=['Group 0']
 
         self.dataTypes = [gridlib.GRID_VALUE_BOOL, #selected
                           gridlib.GRID_VALUE_STRING,#filename
+                          gridlib.GRID_VALUE_STRING,#sequence number
                           gridlib.GRID_VALUE_STRING, #polarization state
                           gridlib.GRID_VALUE_STRING, #hsample
                           gridlib.GRID_VALUE_STRING, #vsample
@@ -42,6 +43,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
         self.data = []
         self.data.append([1, #selected
                         '', #filename
+                        '', #sequence number
                         '', #polarization state
                         '', #hsample
                         '', #vsample
@@ -62,7 +64,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
     #--------------------------------------------------
     # required methods for the wxPyGridTableBase interface
     def GetNumberRows(self):
-        return len(self.data) + 0
+        return len(self.data)+0
     def GetNumberCols(self):
         return len(self.colLabels)
     def IsEmptyCell(self, row, col):
@@ -98,6 +100,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
                     1                                       # how many
                     )
             self.GetView().ProcessTableMessage(msg)
+            #self.data[row][col] = value
         return
     #--------------------------------------------------
     # Some optional methods
@@ -149,9 +152,11 @@ class CustTableGrid(gridlib.Grid):
         attr=gridlib.GridCellAttr()
         attr.SetReadOnly(False)
         self.SetColAttr(0,attr)
-        for col in range(1,13):
+        for col in range(1,14):
             attr=gridlib.GridCellAttr()
             attr.SetReadOnly(True)
+            #attr.SetBackgroundColour('grey' if col%2 else (139, 139, 122))
+            #attr.SetTextColour((167,167,122) if col%2 else (139, 139, 122))
             self.SetColAttr(col,attr)
         gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
         gridlib.EVT_GRID_LABEL_LEFT_DCLICK(self,self.onLeftDClickRowCell)
@@ -167,21 +172,22 @@ class CustTableGrid(gridlib.Grid):
         table=self.GetTable()
         data=N.array(table.data)
         #print data.shape
-        g=data.argsort(axis=0)
-        g_col=g[:,col]
-        if self.sorted==False:
-            self.sorted=True
-        else:
-            g_col=g_col[::-1]
-            self.sorted=False
-        #print 'col=',col
-        #print 'sort '
-        #print g
-        for i in range(data.shape[1]-1):
-            data[:,i]=data[g_col,i]
-        table.data=data
-        gridlib.Grid.AutoSize(self)
-        gridlib.Grid.ForceRefresh(self)
+        col_to_sort=[(i,s) for i,s in enumerate(data[:,col])]
+        col_to_sort.sort(lambda x,y: cmp(x[1],y[1]))
+        g_col = [i for (i,s) in col_to_sort]
+        #print col_to_sort
+        if col >=0:
+            if (N.diff(g_col)>0).all():
+                g_col=g_col[::-1]
+
+            #print 'col=',col
+            #print 'sort '
+            #print g
+            for i in range(data.shape[1]-1):
+                data[:,i]=data[g_col,i]
+            table.data=data
+            gridlib.Grid.AutoSize(self)
+            gridlib.Grid.ForceRefresh(self)
 
 
 
@@ -255,7 +261,6 @@ class CatalogFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
-
             #self.log.WriteText('You selected %d files:' % len(paths))
             self.files=paths
             #for path in paths:
@@ -272,51 +277,52 @@ class CatalogFrame(wx.Frame):
             self.grid.sorted=False
             for row in range(len(self.catalog.files)):
                 gridlib.Grid.SetCellValue(self.grid,row,1,self.catalog.files[row])
-                gridlib.Grid.SetCellValue(self.grid,row,2,str(self.catalog.data[row]['polarization state']))
-                gridlib.Grid.SetCellValue(self.grid,row,3,str(self.catalog.data[row]['hsample']))
-                gridlib.Grid.SetCellValue(self.grid,row,4,str(self.catalog.data[row]['vsample']))
+                gridlib.Grid.SetCellValue(self.grid,row,2,str(self.catalog.data[row]['fileseq_number']))
+                gridlib.Grid.SetCellValue(self.grid,row,3,str(self.catalog.data[row]['polarization state']))
+                gridlib.Grid.SetCellValue(self.grid,row,4,str(self.catalog.data[row]['hsample']))
+                gridlib.Grid.SetCellValue(self.grid,row,5,str(self.catalog.data[row]['vsample']))
+                i=6
                 if self.catalog.data[row].has_key('h'):
                     range_column=(self.catalog.h_range.min,self.catalog.h_range.max)
                     range_cell=(self.catalog.data[row]['h']['min'],self.catalog.data[row]['h']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['h']['min'],self.catalog.data[row]['h']['max'],range_column)
-                    table.SetValue(row,5,currbar)
+                    table.SetValue(row,i,currbar); i=i+1
                 if self.catalog.data[row].has_key('k'):
                     range_column=(self.catalog.k_range.min,self.catalog.k_range.max)
                     range_cell=(self.catalog.data[row]['k']['min'],self.catalog.data[row]['k']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['k']['min'],self.catalog.data[row]['k']['max'],range_column)
-                    table.SetValue(row,6,currbar)
+                    table.SetValue(row,i,currbar); i=i+1
                 if self.catalog.data[row].has_key('l'):
                     range_column=(self.catalog.l_range.min,self.catalog.l_range.max)
                     range_cell=(self.catalog.data[row]['l']['min'],self.catalog.data[row]['l']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['l']['min'],self.catalog.data[row]['l']['max'],range_column)
-                    table.SetValue(row,7,currbar)
+                    table.SetValue(row,i,currbar); i=i+1
                 if self.catalog.data[row].has_key('e'):
                     range_column=(self.catalog.e_range.min,self.catalog.e_range.max)
                     range_cell=(self.catalog.data[row]['e']['min'],self.catalog.data[row]['e']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['e']['min'],self.catalog.data[row]['e']['max'],range_column)
-                    table.SetValue(row,8,currbar)
+                    table.SetValue(row,i,currbar); i=i+1
                 if self.catalog.data[row].has_key('a3'):
                     range_column=(self.catalog.a3_range.min,self.catalog.a3_range.max)
                     range_cell=(self.catalog.data[row]['a3']['min'],self.catalog.data[row]['a3']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['a3']['min'],self.catalog.data[row]['a3']['max'],range_column)
-                    table.SetValue(row,9,currbar)
+                    table.SetValue(row,i,currbar); i=i+1
                 if self.catalog.data[row].has_key('a4'):
                     range_column=(self.catalog.a4_range.min,self.catalog.a4_range.max)
                     range_cell=(self.catalog.data[row]['a4']['min'],self.catalog.data[row]['a4']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['a4']['min'],self.catalog.data[row]['a4']['max'],range_column)
-                    table.SetValue(row,10,currbar)
+                    table.SetValue(row,i,currbar); i=i+1
                 if self.catalog.data[row].has_key('temp'):
                     #print 'temp'
                     range_column=(self.catalog.temp_range.min,self.catalog.temp_range.max)
                     range_cell=(self.catalog.data[row]['temp']['min'],self.catalog.data[row]['temp']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['temp']['min'],self.catalog.data[row]['temp']['max'],range_column)
-                    table.SetValue(row,11,currbar)
+                    table.SetValue(row,i,currbar); i=i+1
                 if self.catalog.data[row].has_key('magfield'):
                     range_column=(self.catalog.magfield_range.min,self.catalog.magfield_range.max)
                     range_cell=(self.catalog.data[row]['magfield']['min'],self.catalog.data[row]['magfield']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['magfield']['min'],self.catalog.data[row]['magfield']['max'],range_column)
-                    table.SetValue(row,12,currbar)
-
+                    table.SetValue(row,i,currbar); i=i+1
 
             #table.Update()
             gridlib.Grid.AutoSize(self.grid)
