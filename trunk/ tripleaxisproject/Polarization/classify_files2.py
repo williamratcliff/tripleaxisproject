@@ -106,6 +106,7 @@ def readfiles(flist):
         key=key_i+key_f
         fully_polarized=ei_exists*ef_exists  #is 1 if both cells are present
         data={}
+        data['full_data']=mydata
         data['absolute_filename']=currfile
         data['fully_polarized']=fully_polarized
         data['hsample']=hsample
