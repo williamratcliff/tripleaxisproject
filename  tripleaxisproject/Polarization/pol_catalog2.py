@@ -165,6 +165,9 @@ class CatalogFrame(wx.Frame):
         p.SetSizer(bs)
         #p.Fit()
         self.grid=grid
+        self.bs=bs
+        self.tooltip = ''
+        self.grid.GetGridWindow().Bind(wx.EVT_MOTION, self.onMouseOver)
 
     def menuData(self):
         return(("&File",\
@@ -233,51 +236,51 @@ class CatalogFrame(wx.Frame):
         #print self.catalog.pm.files
         table=self.grid.GetTable()
         for row in range(len(self.catalog.files)):
-            gridlib.Grid.SetCellValue(self.grid,row+1,1,self.catalog.files[row])
-            gridlib.Grid.SetCellValue(self.grid,row+1,2,str(self.catalog.data[row]['polarization state']))
-            gridlib.Grid.SetCellValue(self.grid,row+1,3,str(self.catalog.data[row]['hsample']))
-            gridlib.Grid.SetCellValue(self.grid,row+1,4,str(self.catalog.data[row]['vsample']))
+            gridlib.Grid.SetCellValue(self.grid,row,1,self.catalog.files[row])
+            gridlib.Grid.SetCellValue(self.grid,row,2,str(self.catalog.data[row]['polarization state']))
+            gridlib.Grid.SetCellValue(self.grid,row,3,str(self.catalog.data[row]['hsample']))
+            gridlib.Grid.SetCellValue(self.grid,row,4,str(self.catalog.data[row]['vsample']))
             if self.catalog.data[row].has_key('h'):
                 range_column=(self.catalog.h_range.min,self.catalog.h_range.max)
                 range_cell=(self.catalog.data[row]['h']['min'],self.catalog.data[row]['h']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['h']['min'],self.catalog.data[row]['h']['max'],range_column)
-                table.SetValue(row+1,5,currbar)
+                table.SetValue(row,5,currbar)
             if self.catalog.data[row].has_key('k'):
                 range_column=(self.catalog.k_range.min,self.catalog.k_range.max)
                 range_cell=(self.catalog.data[row]['k']['min'],self.catalog.data[row]['k']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['k']['min'],self.catalog.data[row]['k']['max'],range_column)
-                table.SetValue(row+1,6,currbar)
+                table.SetValue(row,6,currbar)
             if self.catalog.data[row].has_key('l'):
                 range_column=(self.catalog.l_range.min,self.catalog.l_range.max)
                 range_cell=(self.catalog.data[row]['l']['min'],self.catalog.data[row]['l']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['l']['min'],self.catalog.data[row]['l']['max'],range_column)
-                table.SetValue(row+1,7,currbar)
+                table.SetValue(row,7,currbar)
             if self.catalog.data[row].has_key('e'):
                 range_column=(self.catalog.e_range.min,self.catalog.e_range.max)
                 range_cell=(self.catalog.data[row]['e']['min'],self.catalog.data[row]['e']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['e']['min'],self.catalog.data[row]['e']['max'],range_column)
-                table.SetValue(row+1,8,currbar)
+                table.SetValue(row,8,currbar)
             if self.catalog.data[row].has_key('a3'):
                 range_column=(self.catalog.a3_range.min,self.catalog.a3_range.max)
                 range_cell=(self.catalog.data[row]['a3']['min'],self.catalog.data[row]['a3']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['a3']['min'],self.catalog.data[row]['a3']['max'],range_column)
-                table.SetValue(row+1,9,currbar)
+                table.SetValue(row,9,currbar)
             if self.catalog.data[row].has_key('a4'):
                 range_column=(self.catalog.a4_range.min,self.catalog.a4_range.max)
                 range_cell=(self.catalog.data[row]['a4']['min'],self.catalog.data[row]['a4']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['a4']['min'],self.catalog.data[row]['a4']['max'],range_column)
-                table.SetValue(row+1,10,currbar)
+                table.SetValue(row,10,currbar)
             if self.catalog.data[row].has_key('temp'):
                 print 'temp'
                 range_column=(self.catalog.temp_range.min,self.catalog.temp_range.max)
                 range_cell=(self.catalog.data[row]['temp']['min'],self.catalog.data[row]['temp']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['temp']['min'],self.catalog.data[row]['temp']['max'],range_column)
-                table.SetValue(row+1,11,currbar)
+                table.SetValue(row,11,currbar)
             if self.catalog.data[row].has_key('magfield'):
                 range_column=(self.catalog.magfield_range.min,self.catalog.magfield_range.max)
                 range_cell=(self.catalog.data[row]['magfield']['min'],self.catalog.data[row]['magfield']['max'])
                 currbar=gridbar.Bar(self.catalog.data[row]['magfield']['min'],self.catalog.data[row]['magfield']['max'],range_column)
-                table.SetValue(row+1,12,currbar)
+                table.SetValue(row,12,currbar)
 
 
 
@@ -288,6 +291,31 @@ class CatalogFrame(wx.Frame):
         dlg.Destroy()
 
 
+    def onMouseOver(self, event):
+        '''
+        Method to calculate where the mouse is pointing and
+        then set the tooltip dynamically.
+        '''
+
+        # Use CalcUnscrolledPosition() to get the mouse position within the
+        # entire grid including what's offscreen
+        x, y =self.grid.CalcUnscrolledPosition(event.GetX(),event.GetY())
+
+        coords = self.grid.XYToCell(x, y)
+        #coords = grid.XYToCell(x, y)
+        col = coords[1]
+        table=self.grid.GetTable()
+        # Example colum limit to apply the custom tooltip to
+        if col>4:
+            row = coords[0]
+            bar = table.GetValue(row, col)
+            low=bar.low
+            high=bar.high
+            event.GetEventObject().SetToolTipString('range=(%4.3f,%4.3f)'%(low,high))
+            self.tooltip='range=(%4.3f,%4.3f)' %(low,high)
+        else:
+            event.GetEventObject().SetToolTipString('')
+            self.tooltip = ''
 
 
 
