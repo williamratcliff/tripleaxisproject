@@ -34,22 +34,22 @@ def register(grid):
 class GridCellBarRenderer(wx.grid.PyGridCellRenderer):
     def __init__(self,*args, **kwargs):
         wx.grid.PyGridCellRenderer.__init__(self,*args,**kwargs)
-        print 'hello'
+        #print 'hello'
 
     def DrawBar(self, grid, attr, dc, rect, row, col, isSelected):
-        print 'Drawing'
+        #print 'Drawing'
         #print str(grid.GetCellValue(row, col))
         #bar = loads(str(grid.GetCellValue(row, col)))
         #bar = Bar.getcell(int(grid.GetCellValue(row,col)))
         table=grid.GetTable()
         bar = table.GetValue(row,col)
-        print 'bar ',bar
+        #print 'bar ',bar
         if bar=='':
             return
         low=bar.low
         high=bar.high
         bar_range=bar.range
-        print 'low',bar.low,'high',bar.high,' range', bar_range
+        #print 'low',bar.low,'high',bar.high,' range', bar_range
         cell_height=rect.height
         cell_width=rect.width
         cell_x=rect.x
@@ -67,7 +67,7 @@ class GridCellBarRenderer(wx.grid.PyGridCellRenderer):
         if rect.width<threshold:
             rect.width=cell_width/10
         rect.x=cell_x+low_mapped*rect.width
-        print 'low_mapped',low_mapped,'high_mapped',high_mapped,'width',rect.width,'rect.x',rect.x
+        #print 'low_mapped',low_mapped,'high_mapped',high_mapped,'width',rect.width,'rect.x',rect.x
         dc.SetBrush(wx.Brush("navy",wx.SOLID))
         dc.SetPen(wx.Pen("navy"))
         dc.DrawRectangleRect(rect)
