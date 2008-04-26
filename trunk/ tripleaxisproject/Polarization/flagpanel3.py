@@ -15,13 +15,15 @@ class MyApp(wx.App):
 class ConstraintMatrixTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['off off', 'off on', 'on off','on on']
+        self.colLabels = ['selected?','off off', 'off on', 'on off','on on']
         self.rowLabels=['off off', 'off on', 'on off','on on']
 
-        self.dataTypes = [gridlib.GRID_VALUE_FLOAT, #off off
+        self.dataTypes = [gridlib.GRID_VALUE_BOOL,# selected?
+                          gridlib.GRID_VALUE_FLOAT, #off off
                           gridlib.GRID_VALUE_FLOAT,#off on
                           gridlib.GRID_VALUE_FLOAT,#on off
                           gridlib.GRID_VALUE_FLOAT,#on on
+                          gridlib.GRID_VALUE_STRING,#row labels
                           ]
         self.data = []
 #        self.data.append([1, #selected
@@ -141,33 +143,9 @@ class ConstraintMatrixGrid(gridlib.Grid):
             self.EnableCellEditControl()
 
     def onLeftDClickRowCell(self,evt):
-        col=evt.GetCol()
-        table=self.GetTable()
-        data=N.array(table.data)
-        #print data.shape
-        col_to_sort=[(i,s) for i,s in enumerate(data[:,col])]
-        col_to_sort.sort(lambda x,y: cmp(x[1],y[1]))
-        g_col = [i for (i,s) in col_to_sort]
-        #print col_to_sort
-        if col >=0:
-            if (N.diff(g_col)>0).all():
-                g_col=g_col[::-1]
-
-            #print 'col=',col
-            #print 'sort '
-            #print g
-            for i in range(data.shape[1]-1):
-                data[:,i]=data[g_col,i]
-            table.data=data
-            gridlib.Grid.AutoSize(self)
-            gridlib.Grid.ForceRefresh(self)
-
-
-
-
-
-
-
+        pass
+        #col=evt.GetCol()
+        #table=self.GetTable()
 
 
 

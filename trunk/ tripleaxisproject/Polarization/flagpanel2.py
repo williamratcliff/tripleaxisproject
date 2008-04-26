@@ -49,23 +49,8 @@ class FormDialog(sc.SizedDialog):
         # row 1
         wx.StaticText(CountsAdd1Pane, -1, "Summed Cross Sections")
         #wx.StaticText(CountsAdd1Pane, -1, "C1->C1+C2")
-        wx.CheckBox(CountsAdd1Pane, -1, "off off")
-        wx.CheckBox(CountsAdd1Pane, -1, "off on")
-        wx.CheckBox(CountsAdd1Pane, -1, "on off")
-        wx.CheckBox(CountsAdd1Pane, -1, "off off")
-
-
-
-        CountsAdd2Pane = sc.SizedPanel(pane, -1)
-        CountsAdd2Pane.SetSizerType("horizontal")
-        CountsAdd2Pane.SetSizerProps(expand=True)
-        # row 1
-        wx.StaticText(CountsAdd2Pane, -1, "Summed Cross Sections")
-        #wx.StaticText(CountsAdd2Pane, -1, "Ca->Ca+Cb")
-        wx.CheckBox(CountsAdd2Pane, -1, "off off")
-        wx.CheckBox(CountsAdd2Pane, -1, "off on")
-        wx.CheckBox(CountsAdd2Pane, -1, "on off")
-        wx.CheckBox(CountsAdd2Pane, -1, "off off")
+        wx.CheckBox(CountsAdd1Pane, -1, "NSF")
+        wx.CheckBox(CountsAdd1Pane, -1, "SF")
 
 
 
