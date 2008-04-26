@@ -2,6 +2,7 @@ import wx
 import wxaddons.sized_controls as sc
 import  wx.lib.intctrl
 import  wx.grid as  gridlib
+import numpy as N
 
 class MyApp(wx.App):
     def __init__(self, redirect=False, filename=None, useBestVisual=False, clearSigInt=True):
@@ -15,17 +16,27 @@ class MyApp(wx.App):
 class ConstraintMatrixTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['selected?','off off', 'off on', 'on off','on on']
+        self.colLabels = ['selected?','off off', 'off on', 'on off','on on','Original']
         self.rowLabels=['off off', 'off on', 'on off','on on']
 
         self.dataTypes = [gridlib.GRID_VALUE_BOOL,# selected?
-                          gridlib.GRID_VALUE_FLOAT, #off off
-                          gridlib.GRID_VALUE_FLOAT,#off on
-                          gridlib.GRID_VALUE_FLOAT,#on off
-                          gridlib.GRID_VALUE_FLOAT,#on on
+                          gridlib.GRID_VALUE_STRING, #off off
+                          gridlib.GRID_VALUE_STRING,#off on
+                          gridlib.GRID_VALUE_STRING,#on off
+                          gridlib.GRID_VALUE_STRING,#on on
                           gridlib.GRID_VALUE_STRING,#row labels
                           ]
-        self.data = []
+        #data = []
+        data=N.zeros((4,6),'Float64')
+        data=data.tolist()
+        for row in range(4):
+            data[row][row+1]=''
+
+        data[0][5]='off off'
+        data[1][5]='off on'
+        data[2][5]='on off'
+        data[3][5]='on on'
+        self.data=data
 #        self.data.append([1, #selected
 #                        '', #filename
 #                        '', #sequence number
@@ -121,7 +132,6 @@ class ConstraintMatrixGrid(gridlib.Grid):
         #self.SetRowLabelSize(0)
         self.SetMargins(0,0)
         self.AutoSize()
-        self.sorted=False
         #gridlib.Grid.SetSelectionMode(self,gridlib.Grid.SelectRows)
         gridlib.Grid.EnableEditing(self,True)
         attr=gridlib.GridCellAttr()
@@ -129,10 +139,15 @@ class ConstraintMatrixGrid(gridlib.Grid):
         self.SetColAttr(0,attr)
         for col in range(1,14):
             attr=gridlib.GridCellAttr()
-            attr.SetReadOnly(True)
+            attr.SetReadOnly(False)
             #attr.SetBackgroundColour('grey' if col%2 else (139, 139, 122))
             #attr.SetTextColour((167,167,122) if col%2 else (139, 139, 122))
             self.SetColAttr(col,attr)
+        for row in range(table.GetNumberRows()):
+            self.SetReadOnly(row,row+1,True)
+        attr.SetReadOnly(True)
+        self.SetColAttr(table.GetNumberCols()-1,attr)
+
         gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
         gridlib.EVT_GRID_LABEL_LEFT_DCLICK(self,self.onLeftDClickRowCell)
 
@@ -182,108 +197,26 @@ class FormDialog(sc.SizedDialog):
         wx.CheckBox(CountsEnablePane, -1, "off off")
 
 
-        CountsAdd1Pane = sc.SizedPanel(pane, -1)
-        CountsAdd1Pane.SetSizerType("horizontal")
-        CountsAdd1Pane.SetSizerProps(expand=True)
+        CountsAddPane = sc.SizedPanel(pane, -1)
+        CountsAddPane.SetSizerType("horizontal")
+        CountsAddPane.SetSizerProps(expand=True)
         # row 1
-        wx.StaticText(CountsAdd1Pane, -1, "Summed Cross Sections")
+        wx.StaticText(CountsAddPane, -1, "Combine Cross Sections")
+
         #wx.StaticText(CountsAdd1Pane, -1, "C1->C1+C2")
-        wx.CheckBox(CountsAdd1Pane, -1, "off off")
-        wx.CheckBox(CountsAdd1Pane, -1, "off on")
-        wx.CheckBox(CountsAdd1Pane, -1, "on off")
-        wx.CheckBox(CountsAdd1Pane, -1, "off off")
+        wx.CheckBox(CountsAddPane, -1, "NSF")
+        wx.CheckBox(CountsAddPane, -1, "SF")
 
-
-
-        CountsAdd2Pane = sc.SizedPanel(pane, -1)
-        CountsAdd2Pane.SetSizerType("horizontal")
-        CountsAdd2Pane.SetSizerProps(expand=True)
-        # row 1
-        wx.StaticText(CountsAdd2Pane, -1, "Summed Cross Sections")
-        #wx.StaticText(CountsAdd2Pane, -1, "Ca->Ca+Cb")
-        wx.CheckBox(CountsAdd2Pane, -1, "off off")
-        wx.CheckBox(CountsAdd2Pane, -1, "off on")
-        wx.CheckBox(CountsAdd2Pane, -1, "on off")
-        wx.CheckBox(CountsAdd2Pane, -1, "off off")
 
 
 
         ConstraintPane = sc.SizedPanel(pane, -1)
-        ConstraintPane.SetSizerType("horizontal")
+        ConstraintPane.SetSizerType("vertical")
         ConstraintPane.SetSizerProps(expand=True)
         # row 1
-        wx.StaticText(ConstraintPane, -1, "Constrained Cross Sections")
-        #wx.StaticText(CountsAdd2Pane, -1, "Ca->Ca+Cb")
-        wx.CheckBox(ConstraintPane, -1, "off off")
-        wx.CheckBox(ConstraintPane, -1, "off on")
-        wx.CheckBox(ConstraintPane, -1, "on off")
-        wx.CheckBox(ConstraintPane, -1, "off off")
-
-
-        mmConstraintPane = sc.SizedPanel(pane, -1)
-        mmConstraintPane.SetSizerType("horizontal")
-        mmConstraintPane.SetSizerProps(expand=True)
-        # row 1
-        wx.StaticText(mmConstraintPane, -1, "Constraint Coeff off off")
-        #wx.StaticText(CountsAdd2Pane, -1, "Ca->Ca+Cb")
-        wx.StaticText(mmConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(mmConstraintPane, -1)
-        wx.StaticText(mmConstraintPane, -1, "off on")
-        wx.lib.intctrl.IntCtrl(mmConstraintPane, -1)
-        wx.StaticText(mmConstraintPane, -1, "on off")
-        wx.lib.intctrl.IntCtrl(mmConstraintPane, -1)
-        wx.StaticText(mmConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(mmConstraintPane, -1)
-
-
-        mpConstraintPane = sc.SizedPanel(pane, -1)
-        mpConstraintPane.SetSizerType("horizontal")
-        mpConstraintPane.SetSizerProps(expand=True)
-        # row 1
-        wx.StaticText(mpConstraintPane, -1, "Constraint Coeff off on")
-        #wx.StaticText(CountsAdd2Pane, -1, "Ca->Ca+Cb")
-        wx.StaticText(mpConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(mpConstraintPane, -1)
-        wx.StaticText(mpConstraintPane, -1, "off on")
-        wx.lib.intctrl.IntCtrl(mpConstraintPane, -1)
-        wx.StaticText(mpConstraintPane, -1, "on off")
-        wx.lib.intctrl.IntCtrl(mpConstraintPane, -1)
-        wx.StaticText(mpConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(mpConstraintPane, -1)
-
-
-        pmConstraintPane = sc.SizedPanel(pane, -1)
-        pmConstraintPane.SetSizerType("horizontal")
-        pmConstraintPane.SetSizerProps(expand=True)
-        # row 1
-        wx.StaticText(pmConstraintPane, -1, "Constraint Coeff on off")
-        #wx.StaticText(CountsAdd2Pane, -1, "Ca->Ca+Cb")
-        wx.StaticText(pmConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(pmConstraintPane, -1)
-        wx.StaticText(pmConstraintPane, -1, "off on")
-        wx.lib.intctrl.IntCtrl(pmConstraintPane, -1)
-        wx.StaticText(pmConstraintPane, -1, "on off")
-        wx.lib.intctrl.IntCtrl(pmConstraintPane, -1)
-        wx.StaticText(pmConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(pmConstraintPane, -1)
-
-
-        ppConstraintPane = sc.SizedPanel(pane, -1)
-        ppConstraintPane.SetSizerType("horizontal")
-        ppConstraintPane.SetSizerProps(expand=True)
-        # row 1
-        wx.StaticText(ppConstraintPane, -1, "Constraint Coeff on on")
-        #wx.StaticText(CountsAdd2Pane, -1, "Ca->Ca+Cb")
-        wx.StaticText(ppConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(ppConstraintPane, -1)
-        wx.StaticText(ppConstraintPane, -1, "off on")
-        wx.lib.intctrl.IntCtrl(ppConstraintPane, -1)
-        wx.StaticText(ppConstraintPane, -1, "on off")
-        wx.lib.intctrl.IntCtrl(ppConstraintPane, -1)
-        wx.StaticText(ppConstraintPane, -1, "off off")
-        wx.lib.intctrl.IntCtrl(ppConstraintPane, -1)
-
-
+        wx.StaticText(ConstraintPane, -1, "Constraint Matrix")
+        grid = ConstraintMatrixGrid(ConstraintPane)
+        self.grid=grid
 
         # add dialog buttons
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL))
