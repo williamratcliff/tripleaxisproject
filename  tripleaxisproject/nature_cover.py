@@ -85,7 +85,7 @@ def spe_write(T,a4,I,outputfile=None):
     s=''
     count=2
     for l in range(len(T)):
-        s='###Data'
+        s='###Intensity (arb. units)'
         print s
         myfile.write(s+'\n')
         s=''
