@@ -174,6 +174,11 @@ class FormDialog(sc.SizedDialog):
         pane.SetSizerType("vertical")
 
 
+        FilePane = sc.SizedPanel(pane, -1)
+        FilePane.SetSizerType("horizontal")
+        FilePane.SetSizerProps(expand=True)
+
+
 
         monitorPane = sc.SizedPanel(pane, -1)
         monitorPane.SetSizerType("horizontal")
@@ -227,6 +232,39 @@ class FormDialog(sc.SizedDialog):
         self.SetMinSize(self.GetSize())
 
 
+
+
+    def OnOpen(self,event):
+        # Create the dialog. In this case the current directory is forced as the starting
+        # directory for the dialog, and no default file name is forced. This can easilly
+        # be changed in your program. This is an 'open' dialog, and allows multitple
+        # file selections as well.
+        #
+        # Finally, if the directory is changed in the process of getting files, this
+        # dialog is set up to change the current working directory to the path chosen.
+
+        defaultDir=os.getcwd()
+        defaultDir=r'c:\bifeo3xtal\jan8_2008\9175'
+        wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
+        dlg = wx.FileDialog(
+            self, message="Choose a file",
+            defaultDir=defaultDir,
+            defaultFile="",
+            wildcard=wildcard,
+            style=wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR
+            )
+
+        # Show the dialog and retrieve the user response. If it is the OK response,
+        # process the data.
+        if dlg.ShowModal() == wx.ID_OK:
+            # This returns a Python list of files that were selected.
+            paths = dlg.GetPaths()
+            #self.log.WriteText('You selected %d files:' % len(paths))
+            self.files=paths
+
+        # Destroy the dialog. Don't do this until you are done with it!
+        # BAD things can happen otherwise!
+        dlg.Destroy()
 
 
 
