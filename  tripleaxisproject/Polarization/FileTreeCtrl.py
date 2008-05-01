@@ -1,9 +1,13 @@
-import wx
+import wx,wx.gizmos
 import string
-import os
+import os,sys
 import wx.lib.colourselect as csel
 import wx.lib.customtreectrl as CT
-import images
+#import images
+try:
+    import treemixin
+except ImportError:
+    from wx.lib.mixins import treemixin
 
 
 penstyle = ["wx.SOLID", "wx.TRANSPARENT", "wx.DOT", "wx.LONG_DASH", "wx.DOT_DASH", "wx.USER_DASH",
@@ -156,6 +160,13 @@ keyMap = {
     wx.WXK_NUMPAD_DIVIDE : "WXK_NUMPAD_DIVIDE"
     }
 
+class MyApp(wx.App):
+    def __init__(self, redirect=False, filename=None, useBestVisual=False, clearSigInt=True):
+        wx.App.__init__(self,redirect,filename,clearSigInt)
+
+
+    def OnInit(self):
+        return True
 
 
 #---------------------------------------------------------------------------
@@ -190,7 +201,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             bmp = wx.ArtProvider_GetBitmap(eval(items), wx.ART_TOOLBAR, (16, 16))
             il.Add(bmp)
 
-        smileidx = il.Add(images.getSmilesBitmap())
+        #smileidx = il.Add(images.getSmilesBitmap())
         numicons = il.GetImageCount()
 
         self.AssignImageList(il)
@@ -864,3 +875,26 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         self.log.write("CHOICE FROM COMBOBOX: You Chose '" + selection + "'\n")
         event.Skip()
 
+class FileTreeFrame(wx.Frame):
+    def __init__(self,parent,id):
+        wx.Frame.__init__(self,parent,id,'File Catalog',size=(640,200))
+        self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
+        #p = wx.Panel(self, -1, style=0)
+        mytree=CustomTreeCtrl(self,-1,log=sys.stdout)
+        bs = wx.BoxSizer(wx.VERTICAL)
+        bs.Add(mytree, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
+        self.SetSizer(bs)
+        #p.Fit()
+        self.tooltip = ''
+        self.tree=mytree
+
+    def OnCloseWindow(self,event):
+        self.Destroy()
+
+
+
+if __name__=='__main__':
+    app=MyApp()
+    frame=FileTreeFrame(parent=None,id=-1)
+    frame.Show()
+    app.MainLoop()

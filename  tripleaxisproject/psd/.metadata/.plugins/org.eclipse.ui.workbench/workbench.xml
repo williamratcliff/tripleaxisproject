@@ -29,15 +29,10 @@
 <part id="1"/>
 <part id="2"/>
 <part id="3"/>
-<part id="4"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psdbackup3.pro" partName="crystalbt7psdbackup3.pro" path="C:/tripleaxisproject2/psd/psd/crystalbt7psdbackup3.pro" title="crystalbt7psdbackup3.pro" tooltip="psd/crystalbt7psdbackup3.pro" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/psd/crystalbt7psdbackup3.pro"/>
-<editorState selectionHPixel="0" selectionLength="0" selectionOffset="0"/>
-</editor>
 <editor id="com.rsi.idldt.proeditor.ProEditor" name="dave_read_ice.pro" partName="dave_read_ice.pro" title="dave_read_ice.pro" tooltip="C:\Temp\dave_dev_src_2008-04-09\dave\programs\tas\dave_tas\dave_read_ice.pro" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_read_ice.pro"/>
 <editorState selectionHPixel="0" selectionLength="0" selectionOffset="0"/>
@@ -46,13 +41,13 @@
 <input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_parse_ice.pro"/>
 <editorState selectionHPixel="0" selectionLength="27" selectionOffset="2683"/>
 </editor>
-<editor id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psdbackup2.pro" partName="crystalbt7psdbackup2.pro" path="C:/tripleaxisproject2/psd/psd/crystalbt7psdbackup2.pro" title="crystalbt7psdbackup2.pro" tooltip="psd/crystalbt7psdbackup2.pro" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/psd/crystalbt7psdbackup2.pro"/>
-<editorState selectionHPixel="0" selectionLength="0" selectionOffset="3832"/>
-</editor>
-<editor id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psd.pro" partName="crystalbt7psd.pro" path="C:/dave_dev_src_2008-04-14/dave/programs/tas/bt7_psd/crystalbt7psd.pro" title="crystalbt7psd.pro" tooltip="dave/tas/bt7_psd/crystalbt7psd.pro" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/dave/tas/bt7_psd/crystalbt7psd.pro"/>
+<editor id="com.rsi.idldt.proeditor.ProEditor" name="dtas_reduce__define.pro" partName="dtas_reduce__define.pro" path="C:/dave_dev_src_2008-04-14/dave/programs/tas/dave_tas/dtas_reduce__define.pro" title="dtas_reduce__define.pro" tooltip="dave/tas/dave_tas/dtas_reduce__define.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/dave/tas/dave_tas/dtas_reduce__define.pro"/>
 <editorState selectionHPixel="0" selectionLength="0" selectionOffset="0"/>
+</editor>
+<editor activePart="true" focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="dtas_data__define.pro" partName="dtas_data__define.pro" path="C:/dave_dev_src_2008-04-14/dave/programs/tas/dave_tas/dtas_data__define.pro" title="dtas_data__define.pro" tooltip="dave/tas/dave_tas/dtas_data__define.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/dave/tas/dave_tas/dtas_data__define.pro"/>
+<editorState selectionHPixel="0" selectionLength="32" selectionOffset="31863"/>
 </editor>
 </editors>
 <views>
@@ -90,7 +85,7 @@
 </viewState>
 </view>
 </views>
-<perspectives activePart="org.eclipse.ui.navigator.ProjectExplorer" activePerspective="com.rsi.idldt.ui.IDLPerspective">
+<perspectives activePart="com.rsi.idldt.proeditor.ProEditor" activePerspective="com.rsi.idldt.ui.IDLPerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.eclipse.debug.internal.ui.DebugPerspectiveFactory" id="org.eclipse.debug.ui.DebugPerspective" label="Debug"/>
 <alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.CmdLine"/>
@@ -212,7 +207,7 @@
 <layout>
 <mainWindow>
 <info folder="true" part="left">
-<folder activePageID="org.eclipse.ui.navigator.ProjectExplorer" appearance="2" expanded="2">
+<folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">
 <page content="org.eclipse.ui.navigator.ProjectExplorer" label="Project Explorer"/>
 <page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
 <page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
@@ -277,19 +272,10 @@
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/psd/crystalbt7psd.pro"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/dave/tas/bt7_psd/crystalbt7psd.pro"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/psd/crystalbt7psdbackup3.pro"/>
+<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" uri="file:/C:/Temp/dave_dev_src_2008-04-09/dave/programs/tas/dave_tas/dave_read_ice.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/dave/tas/dave_tas/dtas_reduce__define.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/dave/tas/dave_tas/dtas_data__define.pro"/>
 </editors>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="2956" y="0"/>
-</item>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="2999" y="0"/>
-</item>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="15330" y="0"/>
-</item>
-<item historyLabel="crystalbt7psdbackup3.pro" index="0">
-<position info="not_deleted" x="5330" y="0"/>
-</item>
 <item historyLabel="crystalbt7psdbackup3.pro" index="0">
 <position info="not_deleted" x="2037" y="0"/>
 </item>
@@ -425,8 +411,20 @@
 <item historyLabel="crystalbt7psd.pro" index="6">
 <position/>
 </item>
-<item active="true" historyLabel="crystalbt7psdbackup3.pro" index="7">
+<item historyLabel="crystalbt7psdbackup3.pro" index="7">
 <position/>
+</item>
+<item historyLabel="dave_read_ice.pro" index="8">
+<position/>
+</item>
+<item historyLabel="dtas_reduce__define.pro" index="9">
+<position/>
+</item>
+<item historyLabel="dtas_data__define.pro" index="10">
+<position info="not_deleted" x="27205" y="36"/>
+</item>
+<item active="true" historyLabel="dtas_data__define.pro" index="10">
+<position info="not_deleted" x="31863" y="32"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -445,6 +443,12 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="dtas_data__define.pro" tooltip="dave/tas/dave_tas/dtas_data__define.pro">
+<persistable path="/dave/tas/dave_tas/dtas_data__define.pro"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="dtas_reduce__define.pro" tooltip="dave/tas/dave_tas/dtas_reduce__define.pro">
+<persistable path="/dave/tas/dave_tas/dtas_reduce__define.pro"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="crystalbt7psd.pro" tooltip="dave/tas/bt7_psd/crystalbt7psd.pro">
 <persistable path="/dave/tas/bt7_psd/crystalbt7psd.pro"/>
 </file>

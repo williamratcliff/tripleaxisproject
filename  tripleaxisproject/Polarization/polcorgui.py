@@ -7,27 +7,6 @@ import wx,wx.aui
 from selection import SelectionPanel, EVT_ITEM_SELECT, EVT_ITEM_VIEW
 from polplot import Plotter, Plotter4
 
-# Set up a file extension registry; use this to classify the available
-# datasets in a directory tree, and to mark and load the files in the
-# tree.
-class Registry:
-    def __init__(self): self.registry = None
-    def __in__(self, ext):
-        return ext in self.registry
-    def associate(self,ext,factory):
-        if extension in self.registry:
-            self.registry[ext].insert(0,factory)
-        else:
-            self.registry[ext] = [factory]
-registry = Registry()
-
-#import nexusref, 
-import ncnr_ng1, ncnr_ng7
-for m in [ncnr_ng1, ncnr_ng7]:
-    m.register_extensions(registry)
-
-
-
 class Reduction(wx.Panel):
     def __init__(self, *args, **kw):
         wx.Panel.__init__(self, *args, **kw)
@@ -47,7 +26,7 @@ class Reduction(wx.Panel):
             self.metadata = wx.TextCtrl(left,style=wx.TE_MULTILINE|wx.TE_AUTO_SCROLL)
             self.plotter = Plotter4(right)
             self.slice = Plotter(right)
-            
+
             splitter.SplitVertically(left,right,170)
             left.SplitHorizontally(self.selector,self.metadata,-100)
             right.SplitHorizontally(self.plotter,self.slice,-1)
@@ -69,7 +48,7 @@ class Reduction(wx.Panel):
         sizer = wx.BoxSizer()
         sizer.Add(container, 1, wx.EXPAND)
         self.SetSizer(sizer)
-        
+
         self.selector.Bind(EVT_ITEM_SELECT, self.onSelect)
         self.selector.Bind(EVT_ITEM_VIEW, self.onView)
 
@@ -77,24 +56,18 @@ class Reduction(wx.Panel):
         # Check if it is already loaded
         if filename in self.data:
             return self.data[filename]
-        
-        # Try loading data, guessing format from file extension
-        ext = os.path.splitext(filename)[1]
-        try:
-            if ext in ['.nxs']:
-                data = nxsformat.data(filename)
-            elif ext in ['.na1','.nb1','.nc1','.nd1','.ng1',
-                         '.ca1','.cb1','.cc1','.cd1','.cg1',
-                         '.ng7']:
-                data = icpformat.data(filename)
 
-            if data.prop.polarization == "":
-                # TODO Temporary hack: unpolarized data dumped into ++ 
-                data.prop.polarization = "++"
-            self.data[filename] = data
+        # Try loading data, guessing format from file extension
+        try:
+            data = registry.load(filename)
         except:
             print "unable to laod %s\n  %s"%(filename, sys.exc_value)
             data = None
+        else:
+            if data.prop.polarization == "":
+                # TODO Temporary hack: unpolarized data dumped into ++
+                data.prop.polarization = "++"
+            self.data[filename] = data
         return data
 
     def onView(self, event):
@@ -106,7 +79,7 @@ class Reduction(wx.Panel):
             #   focuswin = wx.Window.FindFocus()
             #   self.metadata.SetFocus()
             #   ...
-            #   if focuswin: focuswin.SetFocus()            
+            #   if focuswin: focuswin.SetFocus()
             #self.metadata.SetFocus()
             pt = self.metadata.GetInsertionPoint()
             self.metadata.Replace(0,self.metadata.GetLastPosition(),data.summary())
@@ -119,8 +92,8 @@ class Reduction(wx.Panel):
             #self.metadata.EmulateKeyPress(kevent)
             #print "Setting point to",pt
             self.metadata.ShowPosition(pt)
-            
- 
+
+
     def onSelect(self, event):
         filename = event.data
         if event.enabled == True:
@@ -149,7 +122,7 @@ def demo():
     reduction = Reduction(frame)
     frame.SetSize((600,400))
     frame.Show()
-    
+
 if __name__ == "__main__":
     app = wx.PySimpleApp(False)
     demo()
