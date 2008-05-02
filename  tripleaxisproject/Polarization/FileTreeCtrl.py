@@ -4,10 +4,10 @@ import os,sys
 import wx.lib.colourselect as csel
 import wx.lib.customtreectrl as CT
 #import images
-try:
-    import treemixin
-except ImportError:
-    from wx.lib.mixins import treemixin
+#try:
+#    import treemixin
+#except ImportError:
+#    from wx.lib.mixins import treemixin
 
 
 penstyle = ["wx.SOLID", "wx.TRANSPARENT", "wx.DOT", "wx.LONG_DASH", "wx.DOT_DASH", "wx.USER_DASH",
@@ -220,55 +220,24 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             self.SetItemImage(self.root, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(self.root, 13, CT.TreeItemIcon_Expanded)
 
-        textctrl = wx.TextCtrl(self, -1, "I Am A Simple\nMultiline wx.TexCtrl", style=wx.TE_MULTILINE)
-        self.gauge = wx.Gauge(self, -1, 50, style=wx.GA_HORIZONTAL|wx.GA_SMOOTH)
-        self.gauge.SetValue(0)
-        combobox = wx.ComboBox(self, -1, choices=["That", "Was", "A", "Nice", "Holyday!"], style=wx.CB_READONLY|wx.CB_DROPDOWN)
 
-        textctrl.Bind(wx.EVT_CHAR, self.OnTextCtrl)
-        combobox.Bind(wx.EVT_COMBOBOX, self.OnComboBox)
 
-        for x in range(15):
-            if x == 1:
-                child = self.AppendItem(self.root, "Item %d" % x + "\nHello World\nHappy wxPython-ing!")
-                self.SetItemBold(child, True)
-            else:
-                child = self.AppendItem(self.root, "Item %d" % x)
-            self.SetPyData(child, None)
-            self.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
-            self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
+        child = self.AppendItem(self.root, "Raw Data")
+        self.SetItemBold(child, True)
+        self.SetPyData(child, None)
+        self.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
+        self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
 
-            for y in range(5):
-                if y == 0 and x == 1:
-                    last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)), ct_type=2, wnd=self.gauge)
-                elif y == 1 and x == 2:
-                    last = self.AppendItem(child, "Item %d-%s" % (x, chr(ord("a")+y)), ct_type=1, wnd=textctrl)
-                elif 2 < y < 4:
-                    last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)))
-                elif y == 4 and x == 1:
-                    last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)), wnd=combobox)
-                else:
-                    last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)), ct_type=2)
-
-                self.SetPyData(last, None)
-                self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
-                self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
-
-                for z in range(5):
-                    if z > 2:
-                        item = self.AppendItem(last,  "item %d-%s-%d" % (x, chr(ord("a")+y), z), ct_type=1)
-                    elif 0 < z <= 2:
-                        item = self.AppendItem(last,  "item %d-%s-%d" % (x, chr(ord("a")+y), z), ct_type=2)
-                    elif z == 0:
-                        item = self.AppendItem(last,  "item %d-%s-%d" % (x, chr(ord("a")+y), z))
-                        self.SetItemHyperText(item, True)
-                    self.SetPyData(item, None)
-                    self.SetItemImage(item, 28, CT.TreeItemIcon_Normal)
-                    self.SetItemImage(item, numicons-1, CT.TreeItemIcon_Selected)
+        child = self.AppendItem(self.root, "Reduced Data")
+        self.SetItemBold(child, True)
+        self.SetPyData(child, None)
+        self.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
+        self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
+        #self.gauge = wx.Gauge(self, -1, 50, style=wx.GA_HORIZONTAL|wx.GA_SMOOTH)
+        #self.gauge.SetValue(0)
 
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDClick)
-        self.Bind(wx.EVT_IDLE, self.OnIdle)
-
+        #self.Bind(wx.EVT_IDLE, self.OnIdle)
         self.eventdict = {'EVT_TREE_BEGIN_DRAG': self.OnBeginDrag, 'EVT_TREE_BEGIN_LABEL_EDIT': self.OnBeginEdit,
                           'EVT_TREE_BEGIN_RDRAG': self.OnBeginRDrag, 'EVT_TREE_DELETE_ITEM': self.OnDeleteItem,
                           'EVT_TREE_END_DRAG': self.OnEndDrag, 'EVT_TREE_END_LABEL_EDIT': self.OnEndEdit,
@@ -280,21 +249,21 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                           'EVT_TREE_KEY_DOWN': self.OnKey, 'EVT_TREE_SEL_CHANGED': self.OnSelChanged,
                           'EVT_TREE_SEL_CHANGING': self.OnSelChanging, "EVT_TREE_ITEM_HYPERLINK": self.OnHyperLink}
 
-        mainframe = wx.GetTopLevelParent(self)
+        #mainframe = wx.GetTopLevelParent(self)
 
-        if not hasattr(mainframe, "leftpanel"):
-            self.Bind(CT.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded)
-            self.Bind(CT.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed)
-            self.Bind(CT.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
-            self.Bind(CT.EVT_TREE_SEL_CHANGING, self.OnSelChanging)
-            self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
-            self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
-        else:
-            for combos in mainframe.treeevents:
-                self.BindEvents(combos)
+        #if not hasattr(mainframe, "leftpanel"):
+        self.Bind(CT.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded)
+        self.Bind(CT.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed)
+        self.Bind(CT.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
+        self.Bind(CT.EVT_TREE_SEL_CHANGING, self.OnSelChanging)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
+        self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
+        #else:
+        #    for combos in mainframe.treeevents:
+        #        self.BindEvents(combos)
 
-        if hasattr(mainframe, "leftpanel"):
-            self.ChangeStyle(mainframe.treestyles)
+        #if hasattr(mainframe, "leftpanel"):
+        #    self.ChangeStyle(mainframe.treestyles)
 
         if not(self.GetTreeStyle() & CT.TR_HIDE_ROOT):
             self.SelectItem(self.root)
@@ -877,14 +846,15 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 class FileTreeFrame(wx.Frame):
     def __init__(self,parent,id):
-        wx.Frame.__init__(self,parent,id,'File Catalog',size=(640,200))
+        wx.Frame.__init__(self,parent,id,'File Groups',size=(100,600),style=wx.DEFAULT_FRAME_STYLE^wx.CLOSE_BOX)
         self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
         #p = wx.Panel(self, -1, style=0)
-        mytree=CustomTreeCtrl(self,-1,log=sys.stdout)
+        mytree=CustomTreeCtrl(self,-1,style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT\
+        | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS,log=sys.stdout)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(mytree, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
         self.SetSizer(bs)
-        #p.Fit()
+        #bs.Fit()
         self.tooltip = ''
         self.tree=mytree
 
