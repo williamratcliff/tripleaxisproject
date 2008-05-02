@@ -61,6 +61,7 @@ class catalog:
     def __init__(self):
         self.data=[]
         self.files=[]
+        self.fileseq=[]
         self.h_range=field_range()
         self.k_range=field_range()
         self.l_range=field_range()
@@ -220,6 +221,7 @@ def readfiles(flist):
         data['polarization state']=key
         mycatalog.data.append(data)
         mycatalog.files.append(data['filename'])
+        mycatalog.fileseq.append(data['fileseq_number'])
         curr_catalog=mycatalog
         if data.has_key('h'):
             if curr_catalog.h_range.max==None:
