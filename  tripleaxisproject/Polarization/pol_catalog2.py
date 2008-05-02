@@ -5,6 +5,8 @@ import classify_files2 as classify_files
 import numpy as N
 import gridbar
 import FileTreeCtrl as FTC
+import wx.lib.customtreectrl as CT
+#import dataplot
 
 
 keyMap = {
@@ -141,7 +143,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
         self.colLabels = ['Select?', 'filename','seq #', 'polarization state','hsample','vsample','h','k','l','e','a3','a4','temp','magfield']
-        self.rowLabels=['Group 0']
+        self.rowLabels=['File 0']
 
         self.dataTypes = [gridlib.GRID_VALUE_BOOL, #selected
                           gridlib.GRID_VALUE_STRING,#filename
@@ -160,7 +162,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
                           #gridlib.GRID_VALUE_STRING,
                           ]
         self.data = []
-        self.data.append([1, #selected
+        self.data.append([0, #selected
                         '', #filename
                         '', #sequence number
                         '', #polarization state
@@ -205,8 +207,8 @@ class CustomDataTable(gridlib.PyGridTableBase):
             self.data[row][col] = value
         except IndexError:
             # add a new row
+            self.rowLabels.append('File '+str(len(self.rowLabels)))
             self.data.append([''] * self.GetNumberCols())
-            self.rowLabels.append('Group '+str(len(self.rowLabels)))
             #print 'setting row ',row,' col ',col, ' val ',value
             #print self.__dict__
             #self.SetValue(row, col, value)
@@ -265,7 +267,6 @@ class CustTableGrid(gridlib.Grid):
         #self.SetRowLabelSize(0)
         self.SetMargins(0,0)
         self.AutoSize()
-        self.sorted=False
         #gridlib.Grid.SetSelectionMode(self,gridlib.Grid.SelectRows)
         gridlib.Grid.EnableEditing(self,True)
         attr=gridlib.GridCellAttr()
@@ -278,19 +279,32 @@ class CustTableGrid(gridlib.Grid):
             #attr.SetTextColour((167,167,122) if col%2 else (139, 139, 122))
             self.SetColAttr(col,attr)
         gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
+        gridlib.EVT_GRID_CELL_CHANGE(self,self.OnCellChange)
         gridlib.EVT_GRID_LABEL_LEFT_DCLICK(self,self.onLeftDClickRowCell)
 
     # I do this because I don't like the default behaviour of not starting the
     # cell editor on double clicks, but only a second click.
     def OnLeftDClick(self, evt):
+        print 'LeftDClick'
         if self.CanEnableCellControl():
             self.EnableCellEditControl()
+        gridlib.Grid.ForceRefresh(self)
+        evt.Skip()
+
+    def OnCellChange(self, evt):
+        print 'Changed'
+        if self.CanEnableCellControl():
+            self.EnableCellEditControl()
+        gridlib.Grid.ForceRefresh(self)
+        evt.Skip()
+
+
 
     def onLeftDClickRowCell(self,evt):
         col=evt.GetCol()
         table=self.GetTable()
         data=N.array(table.data)
-        #print data.shape
+        print 'before ', data[:,0]
         col_to_sort=[(i,s) for i,s in enumerate(data[:,col])]
         col_to_sort.sort(lambda x,y: cmp(x[1],y[1]))
         g_col = [i for (i,s) in col_to_sort]
@@ -302,9 +316,10 @@ class CustTableGrid(gridlib.Grid):
             #print 'col=',col
             #print 'sort '
             #print g
-            for i in range(data.shape[1]-1):
+            for i in range(data.shape[1]):
                 data[:,i]=data[g_col,i]
-            table.data=data
+            table.data=data.tolist()
+            print 'after',data[:,0]
             gridlib.Grid.AutoSize(self)
             gridlib.Grid.ForceRefresh(self)
 
@@ -326,11 +341,14 @@ class CatalogFrame(wx.Frame):
         self.grid=grid
         self.bs=bs
         self.tooltip = ''
+        self.catalog=None
         self.grid.GetGridWindow().Bind(wx.EVT_MOTION, self.onMouseOver)
         #self.grid.GetGridColLabelWindow().Bind(wx.EVT_MOTION, self.onLeftDclick)
-        self.filetree=FTC.FileTreeFrame(self,-1)
-        self.filetree.Show()
-        self.grid.GetGridWindow().Bind(wx.EVT_KEY_DOWN,self.OnKey)
+        self.filetree_frame=FTC.FileTreeFrame(self,-1)
+        self.filetree_frame.Show()
+        #self.grid.GetGridWindow().Bind(wx.EVT_KEY_DOWN,self.OnKey)
+        #self.grid.GetGridWindow().Bind(wx.EVT_KEY_UP,self.OnKeyUp)
+        self.grid.GetGridWindow().Bind(wx.EVT_CHAR,self.OnChar)
 
     def menuData(self):
         return(("&File",\
@@ -399,6 +417,7 @@ class CatalogFrame(wx.Frame):
             #table.Update()
             self.grid.sorted=False
             for row in range(len(self.catalog.files)):
+                table.SetValue(row,0,0) # selected=False
                 gridlib.Grid.SetCellValue(self.grid,row,1,self.catalog.files[row])
                 gridlib.Grid.SetCellValue(self.grid,row,2,str(self.catalog.data[row]['fileseq_number']))
                 gridlib.Grid.SetCellValue(self.grid,row,3,str(self.catalog.data[row]['polarization state']))
@@ -514,12 +533,105 @@ class CatalogFrame(wx.Frame):
             else:
                 keyname = "unknown (%s)" % keycode
 
-        self.log.write("OnKeyDown: You Pressed '" + keyname + "'\n")
+        #self.log.write("OnKeyDown: You Pressed '" + keyname + "'\n")
+        self.keybuff=self.keybuff+keyname
+        event.Skip()
+
+    def OnChar(self, event):
+
+        keycode = event.GetKeyCode()
+        keyname = keyMap.get(keycode, None)
+
+        #if keycode == wx.WXK_BACK:
+        #    self.log.write("OnKeyDown: HAHAHAHA! I Vetoed Your Backspace! HAHAHAHA\n")
+        #    return
+
+        if keyname is None:
+            if "unicode" in wx.PlatformInfo:
+                keycode = event.GetUnicodeKey()
+                if keycode <= 127:
+                    keycode = event.GetKeyCode()
+                keyname = "\"" + unichr(event.GetUnicodeKey()) + "\""
+                if keycode < 27:
+                    keyname = "Ctrl-%s" % chr(ord('A') + keycode-1)
+
+            elif keycode < 256:
+                if keycode == 0:
+                    keyname = "NUL"
+                elif keycode < 27:
+                    keyname = "Ctrl-%s" % chr(ord('A') + keycode-1)
+                else:
+                    keyname = "\"%s\"" % chr(keycode)
+            else:
+                keyname = "unknown (%s)" % keycode
+        #keyname=self.keybuff+keyname
+        if keyname=='Ctrl-R' and self.catalog!=None:
+            self.log.write("OnKeyDown: You Pressed '" + keyname + "'\n")
+            table=self.grid.GetTable()
+            nrows=table.GetNumberRows()
+            ncols=table.GetNumberCols()
+            sequence_selected=[]
+            files_selected=[]
+            fileseq_orig=N.array(self.catalog.fileseq)
+            treenode_data={}
+            treedata=[]
+            for row in range(nrows):
+                gridval=table.GetValue(row,0) #get selected rows
+                if gridval==1:
+                    treenode_data={}
+                    filename=table.GetValue(row,1)
+                    sequence=table.GetValue(row,2)
+                    #print 'file selected',filename
+                    sequence_selected.append(sequence)
+                    files_selected.append(filename)
+                    loc=N.where(fileseq_orig==sequence)[0]
+                    currdata=self.catalog.data[loc]
+                    treenode_data['data']=currdata
+                    treenode_data['filename']=filename
+                    treenode_data['sequence']=sequence
+                    treedata.append(treenode_data)
+                    #print 'loc',loc,treenode_data['filename']
+
+            #print 'selected files', files_selected
+            if len(sequence_selected)>0:
+                CurrentGroup=self.AddGroup()
+                tree=self.filetree_frame.tree
+                for curnode in treedata:
+                    #print 'curnode',curnode['filename']
+                    self.AddItem(CurrentGroup,curnode)
+                tree.SelectItem(self.DataGroup)
+                tree.Expand(self.DataGroup)
+                tree.SelectItem(CurrentGroup)
+                tree.Expand(CurrentGroup)
 
         event.Skip()
 
+    def AddGroup(self):
+        tree=self.filetree_frame.tree
+        root=tree.root
+        DataGroup=tree.GetFirstChild(root)[0]
+        self.DataGroup=DataGroup
+        #print 'DataGroup',DataGroup
+        if tree.HasChildren(DataGroup):
+        #if 0:
+            group_id=tree.GetChildrenCount(DataGroup, recursively=False)
+        else:
+            group_id=0
+        child = tree.AppendItem(DataGroup, "Group"+str(group_id))
+        tree.SetItemBold(child, True)
+        tree.SetPyData(child, None)
+        tree.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
+        tree.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
+        return child
 
-
+    def AddItem(self,CurrentGroup,data):
+        tree=self.filetree_frame.tree
+        #CurrentGroup=tree.GetLastChild(self.DataGroup)[0]
+        child = tree.AppendItem(CurrentGroup,data['filename'],ct_type=1)
+        tree.SetItemBold(child, True)
+        tree.SetPyData(child, data)
+        tree.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
+        tree.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
 
 if __name__=='__main__':
     app=MyApp()

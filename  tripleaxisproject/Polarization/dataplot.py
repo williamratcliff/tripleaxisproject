@@ -255,14 +255,14 @@ class PolarizedPanel1D(PlotPanel):
 
 class TestFrame(wx.Frame):
     def __init__(self,parent,id):
-        wx.Frame.__init__(self,parent,id,'Plot Panel',size=(640,200))
+        wx.Frame.__init__(self,parent,id,'Plot Panel',size=(640,200),style=wx.DEFAULT_FRAME_STYLE^wx.CLOSE_BOX)
         self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
         p = PolarizedPanel1D(self, -1, style=0)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(p, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
 
         self.p=p
-        self.load_data()
+        #self.load_data()
         self.SetSizer(bs)
 
     def OnCloseWindow(self,event):

@@ -3,6 +3,8 @@ import string
 import os,sys
 import wx.lib.colourselect as csel
 import wx.lib.customtreectrl as CT
+import flagpanel4 as flagpanel
+import dataplot
 #import images
 #try:
 #    import treemixin
@@ -353,9 +355,11 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             event.Skip()
             return
 
-        if not self.IsEnabled(item):
-            event.Skip()
-            return
+
+
+        #if not self.IsEnabled(item):
+        #    event.Skip()
+        #    return
 
         # Item Text Appearance
         ishtml = self.IsItemHyperText(item)
@@ -368,13 +372,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         normal = self.GetItemImage(item, CT.TreeItemIcon_Normal)
         selected = self.GetItemImage(item, CT.TreeItemIcon_Selected)
         expanded = self.GetItemImage(item, CT.TreeItemIcon_Expanded)
-        selexp = self.GetItemImage(item, CT.TreeItemIcon_SelectedExpanded)
+        #selexp = self.GetItemImage(item, CT.TreeItemIcon_SelectedExpanded)
 
-        # Enabling/Disabling Windows Associated To An Item
-        haswin = self.GetItemWindow(item)
-
-        # Enabling/Disabling Items
-        enabled = self.IsEnabled(item)
 
         # Generic Item's Info
         children = self.GetChildrenCount(item)
@@ -385,70 +384,48 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         self.current = item
         self.itemdict = {"ishtml": ishtml, "back": back, "fore": fore, "isbold": isbold,
                          "font": font, "normal": normal, "selected": selected, "expanded": expanded,
-                         "selexp": selexp, "haswin": haswin, "children": children,
-                         "itemtype": itemtype, "text": text, "pydata": pydata, "enabled": enabled}
+                         "itemtype": itemtype, "text": text, "pydata": pydata}
 
-        menu = wx.Menu()
 
-        item1 = menu.Append(wx.ID_ANY, "Change Item Background Colour")
-        item2 = menu.Append(wx.ID_ANY, "Modify Item Text Colour")
-        menu.AppendSeparator()
-        if isbold:
-            strs = "Make Item Text Not Bold"
+        DataGroup=self.GetFirstChild(self.GetRootItem())[0]
+        if self.GetItemParent(item)==DataGroup:
+            menu = wx.Menu()
+            item1 = menu.Append(wx.ID_ANY, "Set Reduction Preferences")
+            menu.AppendSeparator()
+            item2 = menu.Append(wx.ID_ANY, "Reduce Group")
+            #item10 = menu.Append(wx.ID_ANY, "Delete Item")
+            #if item == self.GetRootItem():
+            #    item10.Enable(False)
+            #if item in self.GetFirstChild(self.GetRootItem()):
+            #    item10.Enable(False)
+            self.Bind(wx.EVT_MENU, self.OnItemSetReductionPreferences, item1)
+            self.Bind(wx.EVT_MENU, self.OnItemReduceGroup, item2)
+            #self.Bind(wx.EVT_MENU, self.OnItemForeground, item2)
+            #self.Bind(wx.EVT_MENU, self.OnItemBold, item3)
+            #self.Bind(wx.EVT_MENU, self.OnItemFont, item4)
+            #self.Bind(wx.EVT_MENU, self.OnItemHyperText, item5)
+            #self.Bind(wx.EVT_MENU, self.OnEnableWindow, item6)
+            #self.Bind(wx.EVT_MENU, self.OnDisableItem, item7)
+            #self.Bind(wx.EVT_MENU, self.OnItemIcons, item8)
+            #self.Bind(wx.EVT_MENU, self.OnItemInfo, item9)
+            #self.Bind(wx.EVT_MENU, self.OnItemDelete, item10)
+            #self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
+            #self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
+
+            self.PopupMenu(menu)
+            menu.Destroy()
+
+    def OnItemSetReductionPreferences(self,event):
+        dlg=flagpanel.FormDialog(parent=self,id=-1)
+        result=dlg.ShowModal()
+        if result==wx.ID_OK:
+            print "OK"
         else:
-            strs = "Make Item Text Bold"
-        item3 = menu.Append(wx.ID_ANY, strs)
-        item4 = menu.Append(wx.ID_ANY, "Change Item Font")
-        menu.AppendSeparator()
-        if ishtml:
-            strs = "Set Item As Non-Hyperlink"
-        else:
-            strs = "Set Item As Hyperlink"
-        item5 = menu.Append(wx.ID_ANY, strs)
-        menu.AppendSeparator()
-        if haswin:
-            enabled = self.GetItemWindowEnabled(item)
-            if enabled:
-                strs = "Disable Associated Widget"
-            else:
-                strs = "Enable Associated Widget"
-        else:
-            strs = "Enable Associated Widget"
-        item6 = menu.Append(wx.ID_ANY, strs)
+            print "Cancel"
+        dlg.Destroy()
 
-        if not haswin:
-            item6.Enable(False)
-
-        item7 = menu.Append(wx.ID_ANY, "Disable Item")
-
-        menu.AppendSeparator()
-        item8 = menu.Append(wx.ID_ANY, "Change Item Icons")
-        menu.AppendSeparator()
-        item9 = menu.Append(wx.ID_ANY, "Get Other Information For This Item")
-        menu.AppendSeparator()
-
-        item10 = menu.Append(wx.ID_ANY, "Delete Item")
-        if item == self.GetRootItem():
-            item10.Enable(False)
-        item11 = menu.Append(wx.ID_ANY, "Prepend An Item")
-        item12 = menu.Append(wx.ID_ANY, "Append An Item")
-
-        self.Bind(wx.EVT_MENU, self.OnItemBackground, item1)
-        self.Bind(wx.EVT_MENU, self.OnItemForeground, item2)
-        self.Bind(wx.EVT_MENU, self.OnItemBold, item3)
-        self.Bind(wx.EVT_MENU, self.OnItemFont, item4)
-        self.Bind(wx.EVT_MENU, self.OnItemHyperText, item5)
-        self.Bind(wx.EVT_MENU, self.OnEnableWindow, item6)
-        self.Bind(wx.EVT_MENU, self.OnDisableItem, item7)
-        self.Bind(wx.EVT_MENU, self.OnItemIcons, item8)
-        self.Bind(wx.EVT_MENU, self.OnItemInfo, item9)
-        self.Bind(wx.EVT_MENU, self.OnItemDelete, item10)
-        self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
-        self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
-
-        self.PopupMenu(menu)
-        menu.Destroy()
-
+    def OnItemReduceGroup(self,event):
+        print 'Reduce Group'
 
     def OnItemBackground(self, event):
 
@@ -846,17 +823,20 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 class FileTreeFrame(wx.Frame):
     def __init__(self,parent,id):
-        wx.Frame.__init__(self,parent,id,'File Groups',size=(100,600),style=wx.DEFAULT_FRAME_STYLE^wx.CLOSE_BOX)
+        wx.Frame.__init__(self,parent,id,'File Groups',size=(300,600),style=wx.DEFAULT_FRAME_STYLE^wx.CLOSE_BOX)
         self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
         #p = wx.Panel(self, -1, style=0)
         mytree=CustomTreeCtrl(self,-1,style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT\
-        | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS,log=sys.stdout)
+        | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS|CT.TR_EDIT_LABELS,log=sys.stdout)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(mytree, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
         self.SetSizer(bs)
         #bs.Fit()
         self.tooltip = ''
         self.tree=mytree
+        self.dataplot_frame=dataplot.TestFrame(self,-1)
+        self.dataplot_frame.Show()
+
 
     def OnCloseWindow(self,event):
         self.Destroy()

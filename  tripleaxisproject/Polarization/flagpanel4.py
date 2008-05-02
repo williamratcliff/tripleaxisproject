@@ -16,7 +16,7 @@ class MyApp(wx.App):
 class ConstraintMatrixTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['selected?','off off', 'off on', 'on off','on on','Original']
+        self.colLabels = ['selected?','off off', 'off on', 'on off','on on','']
         self.rowLabels=['off off', 'off on', 'on off','on on']
 
         self.dataTypes = [gridlib.GRID_VALUE_BOOL,# selected?
@@ -195,7 +195,7 @@ class FormDialog(sc.SizedDialog):
         CountsEnablePane.SetSizerType("horizontal")
         CountsEnablePane.SetSizerProps(expand=True)
         # row 1
-        wx.StaticText(CountsEnablePane, -1, "Enabled Cross Sections")
+        wx.StaticText(CountsEnablePane, -1, "Enabled Measured Counts")
         wx.CheckBox(CountsEnablePane, -1, "off off")
         wx.CheckBox(CountsEnablePane, -1, "off on")
         wx.CheckBox(CountsEnablePane, -1, "on off")
@@ -206,7 +206,7 @@ class FormDialog(sc.SizedDialog):
         CountsAddPane.SetSizerType("horizontal")
         CountsAddPane.SetSizerProps(expand=True)
         # row 1
-        wx.StaticText(CountsAddPane, -1, "Combine Cross Sections")
+        wx.StaticText(CountsAddPane, -1, "Combine Measured Counts")
 
         #wx.StaticText(CountsAdd1Pane, -1, "C1->C1+C2")
         wx.CheckBox(CountsAddPane, -1, "NSF")
