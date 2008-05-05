@@ -19,7 +19,7 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
         self.colLabels = ['selected?','off off', 'off on', 'on off','on on']
         self.rowLabels=['off off', 'off on', 'on off','on on']
 
-        self.dataTypes = [gridlib.GRID_VALUE_BOOL,# selected?
+        self.dataTypes = [gridlib.GRID_VALUE_STRING,# selected?
                           gridlib.GRID_VALUE_STRING, #off off
                           gridlib.GRID_VALUE_STRING,#off on
                           gridlib.GRID_VALUE_STRING,#on off
@@ -31,6 +31,7 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
         data=data.tolist()
         for row in range(4):
             data[row][row+1]=''
+            data[0][row]=''
 
         #data[0][5]='off off'
         #data[1][5]='off on'
@@ -135,7 +136,7 @@ class ConstraintMatrixGrid(gridlib.Grid):
         #gridlib.Grid.SetSelectionMode(self,gridlib.Grid.SelectRows)
         gridlib.Grid.EnableEditing(self,True)
         attr=gridlib.GridCellAttr()
-        attr.SetReadOnly(False)
+        attr.SetReadOnly(True)
         self.SetColAttr(0,attr)
         for col in range(1,14):
             attr=gridlib.GridCellAttr()
@@ -148,9 +149,9 @@ class ConstraintMatrixGrid(gridlib.Grid):
             self.SetReadOnly(row,row+1,True)
         #attr.SetReadOnly(True)
         #self.SetColAttr(table.GetNumberCols()-1,attr)
-
-        gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
-        gridlib.EVT_GRID_LABEL_LEFT_DCLICK(self,self.onLeftDClickRowCell)
+        gridlib.EVT_GRID_CELL_LEFT_CLICK(self,self.OnLeftClick)
+        #gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
+        #gridlib.EVT_GRID_LABEL_LEFT_DCLICK(self,self.onLeftDClickRowCell)
 
     # I do this because I don't like the default behaviour of not starting the
     # cell editor on double clicks, but only a second click.
@@ -163,8 +164,42 @@ class ConstraintMatrixGrid(gridlib.Grid):
         #col=evt.GetCol()
         #table=self.GetTable()
 
+    def OnLeftClick(self, evt):
+        print 'LeftClick'
+        col=evt.GetCol()
+        row=evt.GetRow()
+        table=self.GetTable()
+        if col<=0 and row >=0:
+            currval=table.GetValue(row,0)
+            if currval=='':
+                table.SetValue(row,0,'x')
+            else:
+                table.SetValue(row,0,'')
 
 
+        #if self.CanEnableCellControl():
+        #    self.EnableCellEditControl()
+        gridlib.Grid.ForceRefresh(self)
+
+class FormValidator(wx.PyValidator):
+    def __init__(self,data,key):
+        wx.PyValidator.__init__(self)
+        self.data=data
+        self.key=key
+
+    def Clone(self):
+        return FormValidator(data,key)
+
+    def Validate(self,win):
+        return True
+
+    def TransferToWindow(self):
+        return True
+
+    def TransferFromWindow(self):
+        txtctrl=self.GetWindow()
+        self.data[self.key]=txtctrl.GetValue()
+        return True
 
 class FormDialog(sc.SizedDialog):
     def __init__(self, parent, id,individualdata=None,groupdata=None):
@@ -173,7 +208,7 @@ class FormDialog(sc.SizedDialog):
 
         pane = self.GetContentsPane()
         pane.SetSizerType("vertical")
-
+        self.groupdata=groupdata
         self.cellfile=groupdata['cellfile']
         FilePane = sc.SizedPanel(pane, -1)
         FilePane.SetSizerType("horizontal")
@@ -189,10 +224,12 @@ class FormDialog(sc.SizedDialog):
         monitorPane.SetSizerProps(expand=True)
         # row 1
         wx.StaticText(monitorPane, -1, "Monitor Position")
-        wx.CheckBox(monitorPane, -1, "PrePolarizer")
-        wx.CheckBox(monitorPane, -1, "PostPolarizer")
+        prepolarizer=wx.CheckBox(monitorPane, -1, "PrePolarizer")
+        postpolarizer=wx.CheckBox(monitorPane, -1, "PostPolarizer")
         #textCtrl = wx.TextCtrl(pane, -1, "Your name here")
         #textCtrl.SetSizerProps(expand=True)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtPrePolarizer, prepolarizer)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtPostPolarizer, postpolarizer)
 
 
         CountsEnablePane = sc.SizedPanel(pane, -1)
@@ -200,10 +237,15 @@ class FormDialog(sc.SizedDialog):
         CountsEnablePane.SetSizerProps(expand=True)
         # row 1
         wx.StaticText(CountsEnablePane, -1, "Enabled Measured Counts")
-        wx.CheckBox(CountsEnablePane, -1, "off off")
-        wx.CheckBox(CountsEnablePane, -1, "off on")
-        wx.CheckBox(CountsEnablePane, -1, "on off")
-        wx.CheckBox(CountsEnablePane, -1, "off off")
+        ce1=wx.CheckBox(CountsEnablePane, -1, "off off")
+        ce2=wx.CheckBox(CountsEnablePane, -1, "off on")
+        ce3=wx.CheckBox(CountsEnablePane, -1, "on off")
+        ce4=wx.CheckBox(CountsEnablePane, -1, "on on")
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_offoff, ce1)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_offon, ce2)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_onoff, ce3)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_onon, ce4)
+
 
 
         CountsAddPane = sc.SizedPanel(pane, -1)
@@ -213,10 +255,11 @@ class FormDialog(sc.SizedDialog):
         wx.StaticText(CountsAddPane, -1, "Combine Measured Counts")
 
         #wx.StaticText(CountsAdd1Pane, -1, "C1->C1+C2")
-        wx.CheckBox(CountsAddPane, -1, "NSF")
-        wx.CheckBox(CountsAddPane, -1, "SF")
+        nsf=wx.CheckBox(CountsAddPane, -1, "NSF")
+        sf=wx.CheckBox(CountsAddPane, -1, "SF")
 
-
+        self.Bind(wx.EVT_CHECKBOX, self.EvtNSF, nsf)
+        self.Bind(wx.EVT_CHECKBOX, self.EvtSF, sf)
 
 
         ConstraintPane = sc.SizedPanel(pane, -1)
@@ -235,7 +278,11 @@ class FormDialog(sc.SizedDialog):
         self.Fit()
         self.SetMinSize(self.GetSize())
 
+    def EvtPrePolarizer(self,evt):
+        self.groupdata['pbflags'].MonitorCorrect=evt.IsChecked()
 
+    def EvtPostPolarizer(self,evt):
+        self.groupdata['pbflags'].PolMonitorCorrect=evt.IsChecked()
 
 
     def OnOpen(self,event):
@@ -264,7 +311,7 @@ class FormDialog(sc.SizedDialog):
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
             #self.log.WriteText('You selected %d files:' % len(paths))
-            self.cellfile=paths
+            self.groupdata['cellfile']=paths
 
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!

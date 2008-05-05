@@ -196,13 +196,13 @@ class CustomDataTable(gridlib.PyGridTableBase):
     def SetValue(self, row, col, value):
         try:
             self.data[row][col] = value
-            print 'SetValue works',self.GetNumberRows(),self.data[row][1]
+            #print 'SetValue works',self.GetNumberRows(),self.data[row][1]
         except IndexError:
             # add a new row
-            print 'IndexError in SetValue',self.GetNumberRows()
+            #print 'IndexError in SetValue',self.GetNumberRows()
             self.AppendRow()
             self.data[row][col]=value
-            print 'IndexError in SetValue after SetValue',self.GetNumberRows()
+            #print 'IndexError in SetValue after SetValue',self.GetNumberRows()
             #print 'setting row ',row,' col ',col, ' val ',value
             #print self.__dict__
             #self.SetValue(row, col, value)
@@ -210,7 +210,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
 
     def AppendRow(self):
             self.data.append([''] * self.GetNumberCols())
-            print 'After Append SetValue',self.GetNumberRows()
+            #print 'After Append SetValue',self.GetNumberRows()
             #self.rowLabels[row]='File '+str(len(self.rowLabels))
             #self.rowLabels.append('File '+str(len(self.rowLabels)))
 
@@ -219,7 +219,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
                     gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED, # what we did to it
                     1                                       # how many
                     )
-            print 'size notified',self.GetNumberRows()
+            #print 'size notified',self.GetNumberRows()
             self.GetView().ProcessTableMessage(msg)
             #print 'self.rowLabels', self.rowLabels
             #self.data[row][col] = value
@@ -445,17 +445,17 @@ class CatalogFrame(wx.Frame):
             #self.grid.ClearGrid()
             table=self.grid.GetTable()
             old_nrows=table.GetNumberRows()
-            print 'old_nrows',old_nrows
+            #print 'old_nrows',old_nrows
             if old_nrows >0:
                 gridlib.Grid.DeleteRows(self.grid,numRows=old_nrows,updateLabels=True)
                 #table.data=[[]]
             # tell the grid we've deleted the old rows
-            print 'newRows', table.GetNumberRows()
+            #print 'newRows', table.GetNumberRows()
 
             #table.Update()
-            print 'files in catalog',self.catalog.files
+            #print 'files in catalog',self.catalog.files
             for row in range(len(self.catalog.files)):
-                print 'row',row
+                #print 'row',row
                 table.SetValue(row,0,'') # selected=False
                 table.SetValue(row,1,self.catalog.files[row])
                 table.SetValue(row,2,str(self.catalog.data[row]['fileseq_number']))
@@ -606,7 +606,7 @@ class CatalogFrame(wx.Frame):
                 keyname = "unknown (%s)" % keycode
         #keyname=self.keybuff+keyname
         if keyname=='Ctrl-R' and self.catalog!=None:
-            self.log.write("OnKeyDown: You Pressed '" + keyname + "'\n")
+            self.log.write("OnChar: You Pressed '" + keyname + "'\n")
             table=self.grid.GetTable()
             nrows=table.GetNumberRows()
             ncols=table.GetNumberCols()
@@ -620,7 +620,7 @@ class CatalogFrame(wx.Frame):
             treedict={}
             for row in range(nrows):
                 gridval=table.GetValue(row,0) #get selected rows
-                if gridval==1:
+                if gridval=='x':
                     treenode_data={}
                     filename=table.GetValue(row,1)
                     sequence=table.GetValue(row,2)
@@ -630,7 +630,7 @@ class CatalogFrame(wx.Frame):
                     files_selected.append(filename)
                     pol_states.append(polstate)
                     loc=N.where(fileseq_orig==sequence)[0]
-                    currdata=self.catalog.data[loc]
+                    currdata=self.catalog.data[loc]['full_data']
                     count_type=currdata.metadata['count_info']['count_type']
                     count_types.append(count_type)
                     MonitorCorrect=0
@@ -648,6 +648,7 @@ class CatalogFrame(wx.Frame):
                     #print 'loc',loc,treenode_data['filename']
 
             #print 'selected files', files_selected
+            #print 'sequences',sequence_selected
             if len(sequence_selected)>0:
                 CurrentGroup=self.AddGroup(PolMonitorCorrect=PolMonitorCorrect,MonitorCorrect=MonitorCorrect)
                 tree=self.filetree_frame.tree
