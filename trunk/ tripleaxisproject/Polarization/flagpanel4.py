@@ -3,6 +3,7 @@ import wxaddons.sized_controls as sc
 import  wx.lib.intctrl
 import  wx.grid as  gridlib
 import numpy as N
+import sys,os
 
 class MyApp(wx.App):
     def __init__(self, redirect=False, filename=None, useBestVisual=False, clearSigInt=True):
@@ -16,15 +17,16 @@ class MyApp(wx.App):
 class ConstraintMatrixTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['selected?','off off', 'off on', 'on off','on on']
-        self.rowLabels=['off off', 'off on', 'on off','on on']
+        #pp mm pm mp
+        self.colLabels = ['selected?','on on', 'off off', 'on off','off on']
+        self.rowLabels=['on on', 'off off', 'on off','off on']
 
         self.dataTypes = [gridlib.GRID_VALUE_STRING,# selected?
                           gridlib.GRID_VALUE_STRING, #off off
                           gridlib.GRID_VALUE_STRING,#off on
                           gridlib.GRID_VALUE_STRING,#on off
                           gridlib.GRID_VALUE_STRING,#on on
-                          gridlib.GRID_VALUE_STRING,#row labels
+                          #gridlib.GRID_VALUE_STRING,#row labels
                           ]
         #data = []
         data=N.zeros((4,5),'Float64')
@@ -70,6 +72,28 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
             return self.data[row][col]
         except IndexError:
             return ''
+
+    def GetRowValues(self,row):
+        rowvalues=[]
+        for col in range(self.GetNumberCols()):
+            try:
+                rowvalues.append(float(self.GetValue(row,col)))
+            except ValueError:
+                rowvalues.append(0)
+        return rowvalues
+
+    def GetColValues(self,col):
+        colvalues=[]
+        for row in range(self.GetNumberRows()):
+            try:
+                colvalues.append(float(self.GetValue(row,col)))
+            except ValueError:
+                colvalues.append(0)
+
+        return colvalues
+
+
+
     def SetValue(self, row, col, value):
         try:
             self.data[row][col] = value
@@ -138,7 +162,7 @@ class ConstraintMatrixGrid(gridlib.Grid):
         attr=gridlib.GridCellAttr()
         attr.SetReadOnly(True)
         self.SetColAttr(0,attr)
-        for col in range(1,14):
+        for col in range(1,5):
             attr=gridlib.GridCellAttr()
             attr.SetReadOnly(False)
             #attr.SetBackgroundColour('grey' if col%2 else (139, 139, 122))
@@ -175,8 +199,8 @@ class ConstraintMatrixGrid(gridlib.Grid):
                 table.SetValue(row,0,'x')
             else:
                 table.SetValue(row,0,'')
-
-
+        else:
+            evt.Skip()
         #if self.CanEnableCellControl():
         #    self.EnableCellEditControl()
         gridlib.Grid.ForceRefresh(self)
@@ -210,13 +234,20 @@ class FormDialog(sc.SizedDialog):
         pane.SetSizerType("vertical")
         self.groupdata=groupdata
         self.cellfile=groupdata['cellfile']
+
         FilePane = sc.SizedPanel(pane, -1)
-        FilePane.SetSizerType("horizontal")
+        FilePane.SetSizerType("vertical")
         FilePane.SetSizerProps(expand=True)
-        wx.StaticText(FilePane, -1, "CellFile:%s"%(self.cellfile,))
-        b = wx.Button(self, -1, "Browse", (50,50))
+        self.cellfilectrl=wx.StaticText(FilePane, -1, "CellFile:%s"%(self.cellfile,))
+        b = wx.Button(FilePane, -1, "Browse", (50,50))
         self.Bind(wx.EVT_BUTTON, self.OnOpen, b)
 
+
+        FilterPane = sc.SizedPanel(pane, -1)
+        FilterPane.SetSizerType("vertical")
+        FilterPane.SetSizerProps(expand=True)
+        filter=wx.CheckBox(FilterPane, -1, "Filter Before Polarizer?")
+        self.Bind(wx.EVT_CHECKBOX, self.EvtFilter, filter)
 
 
         monitorPane = sc.SizedPanel(pane, -1)
@@ -278,11 +309,32 @@ class FormDialog(sc.SizedDialog):
         self.Fit()
         self.SetMinSize(self.GetSize())
 
+
+    def EvtFilter(self,evt):
+        self.groupdata['pbflags'].MonoSelect=evt.IsChecked()
     def EvtPrePolarizer(self,evt):
         self.groupdata['pbflags'].MonitorCorrect=evt.IsChecked()
 
     def EvtPostPolarizer(self,evt):
         self.groupdata['pbflags'].PolMonitorCorrect=evt.IsChecked()
+
+    def EvtCountsEnable_onon(self,evt):
+        self.groupdata['pbflags'].CountsEnable[0]=evt.IsChecked()
+    def EvtCountsEnable_offoff(self,evt):
+        self.groupdata['pbflags'].CountsEnable[1]=evt.IsChecked()
+    def EvtCountsEnable_onoff(self,evt):
+        self.groupdata['pbflags'].CountsEnable[2]=evt.IsChecked()
+    def EvtCountsEnable_offon(self,evt):
+        self.groupdata['pbflags'].CountsEnable[3]=evt.IsChecked()
+
+#pp mm pm mp
+    def EvtNSF(self,evt):
+        self.groupdata['pbflags'].CountsAdd1[0]=evt.IsChecked()
+        self.groupdata['pbflags'].CountsAdd1[1]=evt.IsChecked()
+    def EvtSF(self,evt):
+        self.groupdata['pbflags'].CountsAdd2[2]=evt.IsChecked()
+        self.groupdata['pbflags'].CountsAdd2[3]=evt.IsChecked()
+
 
 
     def OnOpen(self,event):
@@ -311,8 +363,9 @@ class FormDialog(sc.SizedDialog):
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
             #self.log.WriteText('You selected %d files:' % len(paths))
-            self.groupdata['cellfile']=paths
-
+            self.groupdata['cellfile']=paths[0]
+            self.cellfilectrl.SetLabel("CellFile:%s"%(self.groupdata['cellfile'],))
+            #wx.StaticText(FilePane, -1, "CellFile:%s"%(self.groupdata['cellfile'],))
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
         dlg.Destroy()
