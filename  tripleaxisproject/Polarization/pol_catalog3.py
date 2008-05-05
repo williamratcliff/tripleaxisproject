@@ -6,6 +6,7 @@ import numpy as N
 import gridbar
 import FileTreeCtrl as FTC
 import wx.lib.customtreectrl as CT
+import polcorrect3 as polcorrect
 #import dataplot
 
 
@@ -114,16 +115,6 @@ keyMap = {
     wx.WXK_NUMPAD_DECIMAL : "WXK_NUMPAD_DECIMAL",
     wx.WXK_NUMPAD_DIVIDE : "WXK_NUMPAD_DIVIDE"
     }
-
-
-
-
-
-
-
-
-
-
 
 
 class MyApp(wx.App):
@@ -621,29 +612,44 @@ class CatalogFrame(wx.Frame):
             ncols=table.GetNumberCols()
             sequence_selected=[]
             files_selected=[]
+            pol_states=[]
+            count_types=[]
             fileseq_orig=N.array(self.catalog.fileseq)
             treenode_data={}
             treedata=[]
+            treedict={}
             for row in range(nrows):
                 gridval=table.GetValue(row,0) #get selected rows
                 if gridval==1:
                     treenode_data={}
                     filename=table.GetValue(row,1)
                     sequence=table.GetValue(row,2)
+                    polstate=table.GetValue(row,3)
                     #print 'file selected',filename
                     sequence_selected.append(sequence)
                     files_selected.append(filename)
+                    pol_states.append(polstate)
                     loc=N.where(fileseq_orig==sequence)[0]
                     currdata=self.catalog.data[loc]
+                    count_type=currdata.metadata['count_info']['count_type']
+                    count_types.append(count_type)
+                    MonitorCorrect=0
+                    PolMonitorCorrect=1
+                    if count_type=='time':
+                        PolMonitorCorrect=0
+                        MonitorCorrect=0
                     treenode_data['data']=currdata
                     treenode_data['filename']=filename
                     treenode_data['sequence']=sequence
+                    treenode_data['polstate']=polstate
+                    #treenode_data['flags']=polcorrect.PBflags()
                     treedata.append(treenode_data)
+                    treedict[polstate]=treenode_data
                     #print 'loc',loc,treenode_data['filename']
 
             #print 'selected files', files_selected
             if len(sequence_selected)>0:
-                CurrentGroup=self.AddGroup()
+                CurrentGroup=self.AddGroup(PolMonitorCorrect=PolMonitorCorrect,MonitorCorrect=MonitorCorrect)
                 tree=self.filetree_frame.tree
                 for curnode in treedata:
                     #print 'curnode',curnode['filename']
@@ -655,7 +661,7 @@ class CatalogFrame(wx.Frame):
 
         event.Skip()
 
-    def AddGroup(self):
+    def AddGroup(self,MonitorCorrect=0,PolMonitorCorrect=1):
         tree=self.filetree_frame.tree
         root=tree.root
         DataGroup=tree.GetFirstChild(root)[0]
@@ -668,7 +674,27 @@ class CatalogFrame(wx.Frame):
             group_id=0
         child = tree.AppendItem(DataGroup, "Group"+str(group_id))
         tree.SetItemBold(child, True)
-        tree.SetPyData(child, None)
+        pbflags=polcorrect.PBflags()
+        pbflags.MonitorCorrect=MonitorCorrect
+        pbflags.PolMonitorCorrect=PolMonitorCorrect
+        pbflags.MonoSelect=1
+        pbflags.Debug=0
+        pbflags.SimFlux=0
+        pbflags.SimDeviate=0
+        pbflags.NoNegativeCS=0
+        pbflags.HalfPolarized=0
+        pbflags.CountsEnable=[0,0,0,0]
+        pbflags.CountsAdd1=[0,0,0,0]
+        pbflags.CountsAdd2=[0,0,0,0]
+        pbflags.Sconstrain=[0,0,0,0]
+        pbflags.Spp=[0,0,0,0]
+        pbflags.Smm=[0,0,0,0]
+        pbflags.Spm=[0,0,0,0]
+        pbflags.Smp=[0,0,0,0]
+        groupdata={}
+        groupdata['pbflags']=pbflags
+        groupdata['cellfile']=''
+        tree.SetPyData(child, groupdata)
         tree.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
         tree.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
         return child
