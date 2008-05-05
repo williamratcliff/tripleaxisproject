@@ -417,9 +417,9 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
     def OnItemSetReductionPreferences(self,event):
         current_selected=self.current
-        pydata=self.item['pydata']
-        children_data=GetChildData(self.current)
-        dlg=flagpanel.FormDialog(parent=self,id=-1)
+        pydata=self.itemdict['pydata']
+        children_data=self.GetChildData(self.current)
+        dlg=flagpanel.FormDialog(parent=self,id=-1,groupdata=pydata,individualdata=children_data)
         result=dlg.ShowModal()
         if result==wx.ID_OK:
             print "OK"
@@ -437,7 +437,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             while item:
                 treedata.append(self.GetPyData(item))
                 item, cookie=self.GetNextChild(self.current,cookie)
-            return result
+            return treedata
         else:
             return None
 
