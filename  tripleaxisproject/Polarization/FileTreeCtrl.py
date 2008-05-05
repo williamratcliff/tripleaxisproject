@@ -458,7 +458,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                 files[key]=currdata['filename']
             print files
             self.files=files
-            self.groupdata=groupdata
+            self.groupdata=dlg.groupdata
 
         else:
             print "Cancel"
@@ -467,11 +467,12 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
     def OnItemReduceGroup(self,event):
         print 'Reduce Group'
         files=self.files
-        text=self.itemdict['text']
+        text=self.itemdict['text']+'.polcor'
+        print 'driver file', text
         cellfile=self.groupdata['cellfile']
         flags=self.groupdata['pbflags']
         if cellfile !='':
-             f=open(cellfile,'wt')
+             f=open(text,'wt')
              s='#absolute'
              f.write(s+'\n')
              s='#cellfile %s'%(cellfile,)
@@ -508,18 +509,18 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
              s='#Spm %2.3f %2.3f %2.3f %2.3f'%(flags.Spm[0],flags.Spm[1],
                                         flags.Spm[2],flags.Spm[3])
              f.write(s+'\n')
-             s='#directory %s'(os.getcwd(),)
-             f.write(s,'\n')
+             s='#directory %s'%(os.getcwd(),)
+             f.write(s+'\n')
              s='#begin'
              f.write(s+'\n')
              keylist=['pp','mm','pm','mp']
              s=''
-             for key in keys:
-                 if files.haskey(key):
+             for key in keylist:
+                 if files.has_key(key):
                      s=s+'%s=%s\n'%(key,files[key])
              f.write(s)
              s='#end'
-             f.write(s+'\n')
+             f.write(s)
              f.close()
 
 
