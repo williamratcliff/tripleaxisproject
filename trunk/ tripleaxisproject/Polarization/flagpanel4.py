@@ -16,7 +16,7 @@ class MyApp(wx.App):
 class ConstraintMatrixTable(gridlib.PyGridTableBase):
     def __init__(self):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['selected?','off off', 'off on', 'on off','on on','']
+        self.colLabels = ['selected?','off off', 'off on', 'on off','on on']
         self.rowLabels=['off off', 'off on', 'on off','on on']
 
         self.dataTypes = [gridlib.GRID_VALUE_BOOL,# selected?
@@ -27,15 +27,15 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
                           gridlib.GRID_VALUE_STRING,#row labels
                           ]
         #data = []
-        data=N.zeros((4,6),'Float64')
+        data=N.zeros((4,5),'Float64')
         data=data.tolist()
         for row in range(4):
             data[row][row+1]=''
 
-        data[0][5]='off off'
-        data[1][5]='off on'
-        data[2][5]='on off'
-        data[3][5]='on on'
+        #data[0][5]='off off'
+        #data[1][5]='off on'
+        #data[2][5]='on off'
+        #data[3][5]='on on'
         self.data=data
 #        self.data.append([1, #selected
 #                        '', #filename
@@ -143,10 +143,11 @@ class ConstraintMatrixGrid(gridlib.Grid):
             #attr.SetBackgroundColour('grey' if col%2 else (139, 139, 122))
             #attr.SetTextColour((167,167,122) if col%2 else (139, 139, 122))
             self.SetColAttr(col,attr)
+        #keep diagonal blank
         for row in range(table.GetNumberRows()):
             self.SetReadOnly(row,row+1,True)
-        attr.SetReadOnly(True)
-        self.SetColAttr(table.GetNumberCols()-1,attr)
+        #attr.SetReadOnly(True)
+        #self.SetColAttr(table.GetNumberCols()-1,attr)
 
         gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
         gridlib.EVT_GRID_LABEL_LEFT_DCLICK(self,self.onLeftDClickRowCell)
@@ -166,17 +167,20 @@ class ConstraintMatrixGrid(gridlib.Grid):
 
 
 class FormDialog(sc.SizedDialog):
-    def __init__(self, parent, id):
+    def __init__(self, parent, id,individualdata=None,groupdata=None):
         sc.SizedDialog.__init__(self, None, -1, "Reduction Forms",
                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         pane = self.GetContentsPane()
         pane.SetSizerType("vertical")
 
-
+        self.cellfile=groupdata['cellfile']
         FilePane = sc.SizedPanel(pane, -1)
         FilePane.SetSizerType("horizontal")
         FilePane.SetSizerProps(expand=True)
+        wx.StaticText(FilePane, -1, "CellFile:%s"%(self.cellfile,))
+        b = wx.Button(self, -1, "Browse", (50,50))
+        self.Bind(wx.EVT_BUTTON, self.OnOpen, b)
 
 
 
@@ -251,7 +255,7 @@ class FormDialog(sc.SizedDialog):
             defaultDir=defaultDir,
             defaultFile="",
             wildcard=wildcard,
-            style=wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR
+            style=wx.OPEN | wx.CHANGE_DIR
             )
 
         # Show the dialog and retrieve the user response. If it is the OK response,
@@ -260,7 +264,7 @@ class FormDialog(sc.SizedDialog):
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
             #self.log.WriteText('You selected %d files:' % len(paths))
-            self.files=paths
+            self.cellfile=paths
 
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
