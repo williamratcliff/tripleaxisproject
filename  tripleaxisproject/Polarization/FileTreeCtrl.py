@@ -423,6 +423,29 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         result=dlg.ShowModal()
         if result==wx.ID_OK:
             print "OK"
+            print 'cellfile',dlg.groupdata['cellfile']
+            table=dlg.grid.GetTable()
+#        self.colLabels = ['selected?','off off', 'off on', 'on off','on on']
+#        self.rowLabels=['off off', 'off on', 'on off','on on']
+#pp mm pm mp
+            dlg.groupdata['pbflags'].Spp=table.GetRowValues(0)[1:] #row,col
+            dlg.groupdata['pbflags'].Smm=table.GetRowValues(1)[1:] #row,col
+            dlg.groupdata['pbflags'].Spm=table.GetRowValues(2)[1:] #row,col
+            dlg.groupdata['pbflags'].Smp=table.GetRowValues(3)[1:] #row,col
+            dlg.groupdata['pbflags'].Sconstrain=table.GetColValues(0) #row,col
+            print 'MonitorCorrect',dlg.groupdata['pbflags'].MonoSelect
+            print 'MonitorCorrect',dlg.groupdata['pbflags'].MonitorCorrect
+            print 'PolMonitorCorrect',dlg.groupdata['pbflags'].PolMonitorCorrect
+            print 'CountsEnable',dlg.groupdata['pbflags'].CountsEnable
+            print 'CountsEnable',dlg.groupdata['pbflags'].CountsEnable
+            print 'CountsAdd1',dlg.groupdata['pbflags'].CountsAdd1
+            print 'CountsAdd2',dlg.groupdata['pbflags'].CountsAdd2
+            print 'Sconstrain', dlg.groupdata['pbflags'].Sconstrain
+            print 'Spp', dlg.groupdata['pbflags'].Spp
+            print 'Smm', dlg.groupdata['pbflags'].Smm
+            print 'Spm', dlg.groupdata['pbflags'].Spm
+            print 'Smp', dlg.groupdata['pbflags'].Smp
+
         else:
             print "Cancel"
         dlg.Destroy()
