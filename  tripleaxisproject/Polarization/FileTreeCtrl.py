@@ -433,11 +433,17 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             dlg.groupdata['pbflags'].Spm=table.GetRowValues(2)[1:] #row,col
             dlg.groupdata['pbflags'].Smp=table.GetRowValues(3)[1:] #row,col
             dlg.groupdata['pbflags'].Sconstrain=table.GetColValues(0) #row,col
+            #If combining counts, disable the 2nd cross section
+            if dlg.groupdata['pbflags'].CountsAdd1[0]==1:
+                dlg.groupdata['pbflags'].CountsEnable[1]=0
+            if dlg.groupdata['pbflags'].CountsAdd2[0]==3:
+                dlg.groupdata['pbflags'].CountsEnable[3]=0
+
             print 'MonitorCorrect',dlg.groupdata['pbflags'].MonoSelect
             print 'MonitorCorrect',dlg.groupdata['pbflags'].MonitorCorrect
             print 'PolMonitorCorrect',dlg.groupdata['pbflags'].PolMonitorCorrect
             print 'CountsEnable',dlg.groupdata['pbflags'].CountsEnable
-            print 'CountsEnable',dlg.groupdata['pbflags'].CountsEnable
+            #print 'CountsEnable',dlg.groupdata['pbflags'].CountsEnable
             print 'CountsAdd1',dlg.groupdata['pbflags'].CountsAdd1
             print 'CountsAdd2',dlg.groupdata['pbflags'].CountsAdd2
             print 'Sconstrain', dlg.groupdata['pbflags'].Sconstrain
@@ -445,6 +451,14 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             print 'Smm', dlg.groupdata['pbflags'].Smm
             print 'Spm', dlg.groupdata['pbflags'].Spm
             print 'Smp', dlg.groupdata['pbflags'].Smp
+            print 'text',self.itemdict['text']
+            files={}
+            for currdata in children_data:
+                key=currdata['polstate']
+                files[key]=currdata['filename']
+            print files
+            self.files=files
+            self.groupdata=groupdata
 
         else:
             print "Cancel"
@@ -452,6 +466,63 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
     def OnItemReduceGroup(self,event):
         print 'Reduce Group'
+        files=self.files
+        text=self.itemdict['text']
+        cellfile=self.groupdata['cellfile']
+        flags=self.groupdata['pbflags']
+        if cellfile !='':
+             f=open(cellfile,'wt')
+             s='#absolute'
+             f.write(s+'\n')
+             s='#cellfile %s'%(cellfile,)
+             f.write(s+'\n')
+
+             s='#MonoSelect %d'%(flags.MonoSelect)
+             f.write(s+'\n')
+             s='#MonitorCorrect %d'%(flags.MonitorCorrect)
+             f.write(s+'\n')
+             s='#PolMonitorCorrect %d'%(flags.PolMonitorCorrect)
+             f.write(s+'\n')
+
+             s='#CountsEnable %d %d %d %d'%(flags.CountsEnable[0],flags.CountsEnable[1],
+                                        flags.CountsEnable[2],flags.CountsEnable[3])
+             f.write(s+'\n')
+             s='#CountsAdd1 %d %d %d %d'%(flags.CountsAdd1[0],flags.CountsAdd1[1],
+                                        flags.CountsAdd1[2],flags.CountsAdd1[3])
+             f.write(s+'\n')
+             s='#CountsAdd2 %d %d %d %d'%(flags.CountsAdd2[0],flags.CountsAdd2[1],
+                                        flags.CountsAdd2[2],flags.CountsAdd2[3])
+             f.write(s+'\n')
+             s='#Sconstrain %d %d %d %d'%(flags.Sconstrain[0],flags.Sconstrain[1],
+                                        flags.Sconstrain[2],flags.Sconstrain[3])
+             f.write(s+'\n')
+             s='#Smm %2.3f %2.3f %2.3f %2.3f'%(flags.Smm[0],flags.Smm[1],
+                                        flags.Smm[2],flags.Smm[3])
+             f.write(s+'\n')
+             s='#Spp %2.3f %2.3f %2.3f %2.3f'%(flags.Spp[0],flags.Spp[1],
+                                        flags.Spp[2],flags.Spp[3])
+             f.write(s+'\n')
+             s='#Smp %2.3f %2.3f %2.3f %2.3f'%(flags.Smp[0],flags.Smp[1],
+                                        flags.Smp[2],flags.Smp[3])
+             f.write(s+'\n')
+             s='#Spm %2.3f %2.3f %2.3f %2.3f'%(flags.Spm[0],flags.Spm[1],
+                                        flags.Spm[2],flags.Spm[3])
+             f.write(s+'\n')
+             s='#directory %s'(os.getcwd(),)
+             f.write(s,'\n')
+             s='#begin'
+             f.write(s+'\n')
+             keylist=['pp','mm','pm','mp']
+             s=''
+             for key in keys:
+                 if files.haskey(key):
+                     s=s+'%s=%s\n'%(key,files[key])
+             f.write(s)
+             s='#end'
+             f.write(s+'\n')
+             f.close()
+
+
 
     def GetChildData(self,currgroup):
         if self.HasChildren(currgroup):

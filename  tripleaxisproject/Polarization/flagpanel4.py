@@ -85,11 +85,17 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
     def GetColValues(self,col):
         colvalues=[]
         for row in range(self.GetNumberRows()):
-            try:
-                colvalues.append(float(self.GetValue(row,col)))
-            except ValueError:
-                colvalues.append(0)
-
+            if col >0:
+                try:
+                    colvalues.append(float(self.GetValue(row,col)))
+                except ValueError:
+                    colvalues.append(0)
+            else:
+                selected=self.GetValue(row,col)
+                if selected=='x':
+                    colvalues.append(1)
+                else:
+                    colvalues.append(0)
         return colvalues
 
 
@@ -329,11 +335,24 @@ class FormDialog(sc.SizedDialog):
 
 #pp mm pm mp
     def EvtNSF(self,evt):
-        self.groupdata['pbflags'].CountsAdd1[0]=evt.IsChecked()
-        self.groupdata['pbflags'].CountsAdd1[1]=evt.IsChecked()
+        if evt.IsChecked():
+            self.groupdata['pbflags'].CountsAdd1[0]=1
+            self.groupdata['pbflags'].CountsAdd1[1]=2
+            #self.groupdata['pbflags'].CountsEnable[1]=0
+        else:
+            self.groupdata['pbflags'].CountsAdd1[0]=0
+            self.groupdata['pbflags'].CountsAdd1[1]=0
+
     def EvtSF(self,evt):
-        self.groupdata['pbflags'].CountsAdd2[2]=evt.IsChecked()
-        self.groupdata['pbflags'].CountsAdd2[3]=evt.IsChecked()
+        if evt.IsChecked():
+            self.groupdata['pbflags'].CountsAdd2[2]=3
+            self.groupdata['pbflags'].CountsAdd2[3]=4
+            #self.groupdata['pbflags'].CountsEnable[3]=0
+        else:
+            self.groupdata['pbflags'].CountsAdd1[2]=0
+            self.groupdata['pbflags'].CountsAdd1[3]=0
+
+
 
 
 

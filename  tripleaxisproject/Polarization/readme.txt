@@ -25,7 +25,7 @@ For example:
 CountsAdd1 1 2 0 0
 will take the data from the -- cross section and add it to the ++ cross section
 and use that sum for corrections involving the ++ channel (that is data in the
-first channel is replaced)
+first channel is replaced)  Note--the value are the indices for the equation, not zeros or ones
    pbflags.CountsAdd2=[0,0,0,0]
 ?
    pbflags.Sconstrain=[0,0,0,0]
