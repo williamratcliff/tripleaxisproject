@@ -5,6 +5,7 @@ import wx.lib.colourselect as csel
 import wx.lib.customtreectrl as CT
 import flagpanel4 as flagpanel
 import dataplot
+import polcorrect3 as polcorrect
 #import images
 #try:
 #    import treemixin
@@ -522,6 +523,10 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
              s='#end'
              f.write(s)
              f.close()
+             mypolcor=polcorrect.polarization_correct(files,cellfile)
+             corrected_counts=mypolcor.correct(pbflags)
+             mypolcor.savefiles()
+
 
 
 
