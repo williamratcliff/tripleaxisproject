@@ -159,14 +159,14 @@ class CustomDataTable(gridlib.PyGridTableBase):
                         '', #polarization state
                         '', #hsample
                         '', #vsample
-                        gridbar.Bar(5,6,(0,10)), #h
-                        gridbar.Bar(5,7,(0,10)), #k
-                        gridbar.Bar(5,8,(0,10)), #l
-                        gridbar.Bar(5,9,(0,10)), #e
-                        gridbar.Bar(5,10,(0,10)), #a3
-                        gridbar.Bar(5,11,(0,10)), #a4
-                        gridbar.Bar(5,12,(0,10)), #temp
-                        gridbar.Bar(5,13,(0,10)), #magfield
+                        gridbar.Bar(0,0,(0,10)), #h  (lo,high, range)
+                        gridbar.Bar(0,0,(0,10)), #k
+                        gridbar.Bar(0,0,(0,10)), #l
+                        gridbar.Bar(0,0,(0,10)), #e
+                        gridbar.Bar(0,0,(0,10)), #a3
+                        gridbar.Bar(0,0,(0,10)), #a4
+                        gridbar.Bar(0,0,(0,10)), #temp
+                        gridbar.Bar(0,0,(0,10)), #magfield
                         ])
         return
             #[1010, "The foo doesn't bar", "major", 1, 'MSW', 1, 1, 1, 1.12],
@@ -467,43 +467,51 @@ class CatalogFrame(wx.Frame):
                     range_column=(self.catalog.h_range.min,self.catalog.h_range.max)
                     range_cell=(self.catalog.data[row]['h']['min'],self.catalog.data[row]['h']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['h']['min'],self.catalog.data[row]['h']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar); #
+                i=i+1
                 if self.catalog.data[row].has_key('k'):
                     range_column=(self.catalog.k_range.min,self.catalog.k_range.max)
                     range_cell=(self.catalog.data[row]['k']['min'],self.catalog.data[row]['k']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['k']['min'],self.catalog.data[row]['k']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar); #
+                i=i+1
                 if self.catalog.data[row].has_key('l'):
                     range_column=(self.catalog.l_range.min,self.catalog.l_range.max)
                     range_cell=(self.catalog.data[row]['l']['min'],self.catalog.data[row]['l']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['l']['min'],self.catalog.data[row]['l']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar); #
+                i=i+1
                 if self.catalog.data[row].has_key('e'):
                     range_column=(self.catalog.e_range.min,self.catalog.e_range.max)
                     range_cell=(self.catalog.data[row]['e']['min'],self.catalog.data[row]['e']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['e']['min'],self.catalog.data[row]['e']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar);
+                i=i+1
                 if self.catalog.data[row].has_key('a3'):
                     range_column=(self.catalog.a3_range.min,self.catalog.a3_range.max)
                     range_cell=(self.catalog.data[row]['a3']['min'],self.catalog.data[row]['a3']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['a3']['min'],self.catalog.data[row]['a3']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar);
+                i=i+1
                 if self.catalog.data[row].has_key('a4'):
                     range_column=(self.catalog.a4_range.min,self.catalog.a4_range.max)
                     range_cell=(self.catalog.data[row]['a4']['min'],self.catalog.data[row]['a4']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['a4']['min'],self.catalog.data[row]['a4']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar);
+                i=i+1
                 if self.catalog.data[row].has_key('temp'):
                     #print 'temp'
                     range_column=(self.catalog.temp_range.min,self.catalog.temp_range.max)
                     range_cell=(self.catalog.data[row]['temp']['min'],self.catalog.data[row]['temp']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['temp']['min'],self.catalog.data[row]['temp']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar);
+                i=i+1
                 if self.catalog.data[row].has_key('magfield'):
                     range_column=(self.catalog.magfield_range.min,self.catalog.magfield_range.max)
                     range_cell=(self.catalog.data[row]['magfield']['min'],self.catalog.data[row]['magfield']['max'])
                     currbar=gridbar.Bar(self.catalog.data[row]['magfield']['min'],self.catalog.data[row]['magfield']['max'],range_column)
-                    table.SetValue(row,i,currbar); i=i+1
+                    table.SetValue(row,i,currbar);
+                i=i+1
                 #print 'row',row
 
             #table.Update()
