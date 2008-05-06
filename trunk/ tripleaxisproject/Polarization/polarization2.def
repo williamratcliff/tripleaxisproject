@@ -6,5 +6,10 @@ EXPORTS
     PBsim @5
     TWOPI @6 DATA
     deter @7
-    invert @8
-    invertP @9
+    deterC @8
+    dmatrix @9
+    free_dmatrix @10
+    invert @11
+    invertLU @12
+    invertP @13
+    invertPC @14
