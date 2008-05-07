@@ -937,11 +937,9 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         self.log.write("CHOICE FROM COMBOBOX: You Chose '" + selection + "'\n")
         event.Skip()
 
-class FileTreeFrame(wx.Frame):
+class FileTreePanel(wx.Panel):
     def __init__(self,parent,id):
-        wx.Frame.__init__(self,parent,id,'File Groups',size=(300,600),style=wx.DEFAULT_FRAME_STYLE^wx.CLOSE_BOX)
-        self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
-        #p = wx.Panel(self, -1, style=0)
+        wx.Panel.__init__(self,parent,id,style=0)
         mytree=CustomTreeCtrl(self,-1,style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT\
         | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS|CT.TR_EDIT_LABELS,log=sys.stdout)
         bs = wx.BoxSizer(wx.VERTICAL)
@@ -950,6 +948,14 @@ class FileTreeFrame(wx.Frame):
         #bs.Fit()
         self.tooltip = ''
         self.tree=mytree
+
+
+
+class FileTreeFrame(wx.Frame):
+    def __init__(self,parent,id):
+        wx.Frame.__init__(self,parent,id,'File Groups',size=(300,600),style=wx.DEFAULT_FRAME_STYLE^wx.CLOSE_BOX)
+        self.Bind(wx.EVT_CLOSE,self.OnCloseWindow)
+        self.filetree_panel = FileTreePanel(self, -1)
         #self.dataplot_frame=dataplot.TestFrame(self,-1)
         #self.dataplot_frame.Show()
 
