@@ -950,8 +950,8 @@ class FileTreeFrame(wx.Frame):
         #bs.Fit()
         self.tooltip = ''
         self.tree=mytree
-        self.dataplot_frame=dataplot.TestFrame(self,-1)
-        self.dataplot_frame.Show()
+        #self.dataplot_frame=dataplot.TestFrame(self,-1)
+        #self.dataplot_frame.Show()
 
 
     def OnCloseWindow(self,event):
