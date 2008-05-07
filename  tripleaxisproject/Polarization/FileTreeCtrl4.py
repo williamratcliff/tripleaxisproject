@@ -4,8 +4,8 @@ import os,sys
 import wx.lib.colourselect as csel
 import wx.lib.customtreectrl as CT
 import flagpanel4 as flagpanel
-import dataplot
 import polcorrect3 as polcorrect
+import numpy as N
 #import images
 #try:
 #    import treemixin
@@ -183,7 +183,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                  log=None):
 
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style)
-
+        self.parent=parent
         alldata = dir(CT)
 
         treestyles = []
@@ -261,6 +261,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         self.Bind(CT.EVT_TREE_SEL_CHANGING, self.OnSelChanging)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
         self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
+        #self.Bind(wx.EVT_LEFT_DCLICK, self.OnRightUp)
         #else:
         #    for combos in mainframe.treeevents:
         #        self.BindEvents(combos)
@@ -394,6 +395,9 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             item1 = menu.Append(wx.ID_ANY, "Set Reduction Preferences")
             menu.AppendSeparator()
             item2 = menu.Append(wx.ID_ANY, "Reduce Group")
+            menu.AppendSeparator()
+            item3 = menu.Append(wx.ID_ANY, "Plot Group")
+
             #item10 = menu.Append(wx.ID_ANY, "Delete Item")
             #if item == self.GetRootItem():
             #    item10.Enable(False)
@@ -401,6 +405,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             #    item10.Enable(False)
             self.Bind(wx.EVT_MENU, self.OnItemSetReductionPreferences, item1)
             self.Bind(wx.EVT_MENU, self.OnItemReduceGroup, item2)
+            self.Bind(wx.EVT_MENU, self.OnItemPlot, item3)
             #self.Bind(wx.EVT_MENU, self.OnItemForeground, item2)
             #self.Bind(wx.EVT_MENU, self.OnItemBold, item3)
             #self.Bind(wx.EVT_MENU, self.OnItemFont, item4)
@@ -415,6 +420,26 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
             self.PopupMenu(menu)
             menu.Destroy()
+
+    def OnItemPlot(self,event):
+        current_selected=self.current
+        pydata=self.itemdict['pydata']
+        children_data=self.GetChildData(self.current)
+        for data in children_data:
+            print data
+            x=data['data'].data['qx']
+            y=data['data'].data['detector']
+            dy=N.sqrt(y)
+            print x
+
+            from sans.guicomm.events import NewPlotEvent
+            from sans.guitools.plottables import Data1D
+            new_plot = Data1D(x, y, dy=dy)
+            new_plot.name =data['filename']+' '+data['polstate']
+            new_plot.xaxis("\\rm{Q}", 'A^{-1}')
+            new_plot.yaxis("\\rm{Intensity} ","cm^{-1}")
+            wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
+
 
     def OnItemSetReductionPreferences(self,event):
         current_selected=self.current
@@ -540,6 +565,19 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             return treedata
         else:
             return None
+
+    def OnLeftDClick(self, event):
+
+        pt = event.GetPosition()
+        item, flags = self.HitTest(pt)
+        if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
+            if self.GetTreeStyle() & CT.TR_EDIT_LABELS:
+                self.log.write("OnLeftDClick: %s (manually starting label edit)"% self.GetItemText(item) + "\n")
+                self.EditLabel(item)
+            else:
+                self.log.write("OnLeftDClick: Cannot Start Manual Editing, Missing Style TR_EDIT_LABELS\n")
+
+        event.Skip()
 
 
 
@@ -733,19 +771,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         self.log.write("\n")
 
 
-    def OnLeftDClick(self, event):
-
-        pt = event.GetPosition()
-        item, flags = self.HitTest(pt)
-        if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
-            if self.GetTreeStyle() & CT.TR_EDIT_LABELS:
-                self.log.write("OnLeftDClick: %s (manually starting label edit)"% self.GetItemText(item) + "\n")
-                self.EditLabel(item)
-            else:
-                self.log.write("OnLeftDClick: Cannot Start Manual Editing, Missing Style TR_EDIT_LABELS\n")
-
-        event.Skip()
-
 
     def OnItemExpanded(self, event):
 
@@ -938,7 +963,14 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         event.Skip()
 
 class FileTreePanel(wx.Panel):
+
+    ## Internal name for the AUI manager
+    window_name = "filetreepanel"
+    ## Title to appear on top of the window
+    window_caption = "File Tree Panel"
+
     def __init__(self,parent,id):
+        self.parent=parent
         wx.Panel.__init__(self,parent,id,style=0)
         mytree=CustomTreeCtrl(self,-1,style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT\
         | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS|CT.TR_EDIT_LABELS,log=sys.stdout)
