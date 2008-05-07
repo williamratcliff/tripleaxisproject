@@ -355,6 +355,12 @@ class CustTableGrid(gridlib.Grid):
 
 
 class CatalogPanel(wx.Panel):
+    ## Internal name for the AUI manager
+    window_name = "catalogpanel"
+    ## Title to appear on top of the window
+    window_caption = "File Catalog Panel"
+    CENTER_PANE = True
+
     def __init__(self,parent,id):
         wx.Panel.__init__(self,parent,id,style=0)
         grid = CustTableGrid(self)
@@ -366,10 +372,12 @@ class CatalogPanel(wx.Panel):
         self.bs=bs
         self.tooltip = ''
         self.catalog=None
+        self.log=sys.stdout
         self.grid.GetGridWindow().Bind(wx.EVT_MOTION, self.onMouseOver)
         self.grid.GetGridWindow().Bind(wx.EVT_CHAR,self.OnChar)
-        self.filetree_frame=parent.filetree_frame
-        self.filetree_panel=parent.filetree_frame.filetree_panel
+        #self.filetree_frame=parent.filetree_frame
+        #self.filetree_panel=parent.filetree_frame.filetree_panel
+        self.filetree_panel = None
 
     def onMouseOver(self, event):
         '''
@@ -600,6 +608,38 @@ class CatalogPanel(wx.Panel):
             gridlib.Grid.AutoSize(self.grid)
             gridlib.Grid.ForceRefresh(self.grid)
 
+    def OnOpen(self,event):
+        # Create the dialog. In this case the current directory is forced as the starting
+        # directory for the dialog, and no default file name is forced. This can easilly
+        # be changed in your program. This is an 'open' dialog, and allows multitple
+        # file selections as well.
+        #
+        # Finally, if the directory is changed in the process of getting files, this
+        # dialog is set up to change the current working directory to the path chosen.
+
+        defaultDir=os.getcwd()
+        defaultDir=r'c:\bifeo3xtal\jan8_2008\9175'
+        wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
+        dlg = wx.FileDialog(
+            self, message="Choose a file",
+            defaultDir=defaultDir,
+            defaultFile="",
+            wildcard=wildcard,
+            style=wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR
+            )
+
+        # Show the dialog and retrieve the user response. If it is the OK response,
+        # process the data.
+        if dlg.ShowModal() == wx.ID_OK:
+            # This returns a Python list of files that were selected.
+            paths = dlg.GetPaths()
+            self.files=paths
+            self.catalog=classify_files.readfiles(self.files)
+            self.UpdateCatalog()
+        # Destroy the dialog. Don't do this until you are done with it!
+        # BAD things can happen otherwise!
+        dlg.Destroy()
+
 
 class CatalogFrame(wx.Frame):
     def __init__(self,parent,id,log=None):
@@ -639,37 +679,6 @@ class CatalogFrame(wx.Frame):
     def OnCloseWindow(self,event):
         self.Destroy()
 
-    def OnOpen(self,event):
-        # Create the dialog. In this case the current directory is forced as the starting
-        # directory for the dialog, and no default file name is forced. This can easilly
-        # be changed in your program. This is an 'open' dialog, and allows multitple
-        # file selections as well.
-        #
-        # Finally, if the directory is changed in the process of getting files, this
-        # dialog is set up to change the current working directory to the path chosen.
-
-        defaultDir=os.getcwd()
-        defaultDir=r'c:\bifeo3xtal\jan8_2008\9175'
-        wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
-        dlg = wx.FileDialog(
-            self, message="Choose a file",
-            defaultDir=defaultDir,
-            defaultFile="",
-            wildcard=wildcard,
-            style=wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR
-            )
-
-        # Show the dialog and retrieve the user response. If it is the OK response,
-        # process the data.
-        if dlg.ShowModal() == wx.ID_OK:
-            # This returns a Python list of files that were selected.
-            paths = dlg.GetPaths()
-            self.files=paths
-            self.catalog_panel.catalog=classify_files.readfiles(self.files)
-            self.catalog_panel.UpdateCatalog()
-        # Destroy the dialog. Don't do this until you are done with it!
-        # BAD things can happen otherwise!
-        dlg.Destroy()
 
 
 
