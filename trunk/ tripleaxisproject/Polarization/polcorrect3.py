@@ -1,7 +1,7 @@
 import numpy as N
 #import pylab
 import math
-import readncnr2 as readncnr
+import readncnr3 as readncnr
 import writebt7
 import copy
 import ctypes
@@ -493,40 +493,40 @@ def readscript(myfilestr):
                 print '%s 1 0 1 3'%(directive,)
                 break
             else:
-                pbflags.Spp[0]=int(tokenized[1])
-                pbflags.Spp[1]=int(tokenized[2])
-                pbflags.Spp[2]=int(tokenized[3])
-                pbflags.Spp[3]=int(tokenized[4])
+                pbflags.Spp[0]=float(tokenized[1])
+                pbflags.Spp[1]=float(tokenized[2])
+                pbflags.Spp[2]=float(tokenized[3])
+                pbflags.Spp[3]=float(tokenized[4])
         elif tokenized[0]=='#Smm'.lower:
             if len(tokenized)!=5:
                 print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
                 print '%s 1 0 1 3'%(directive,)
                 break
             else:
-                pbflags.Smm[0]=int(tokenized[1])
-                pbflags.Smm[1]=int(tokenized[2])
-                pbflags.Smm[2]=int(tokenized[3])
-                pbflags.Smm[3]=int(tokenized[4])
+                pbflags.Smm[0]=float(tokenized[1])
+                pbflags.Smm[1]=float(tokenized[2])
+                pbflags.Smm[2]=float(tokenized[3])
+                pbflags.Smm[3]=float(tokenized[4])
         elif tokenized[0]=='#Spm'.lower():
             if len(tokenized)!=5:
                 print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
                 print '%s 1 0 1 3'%(directive,)
                 break
             else:
-                pbflags.Spm[0]=int(tokenized[1])
-                pbflags.Spm[1]=int(tokenized[2])
-                pbflags.Spm[2]=int(tokenized[3])
-                pbflags.Spm[3]=int(tokenized[4])
+                pbflags.Spm[0]=float(tokenized[1])
+                pbflags.Spm[1]=float(tokenized[2])
+                pbflags.Spm[2]=float(tokenized[3])
+                pbflags.Spm[3]=float(tokenized[4])
         elif tokenized[0]=='#Smp'.lower():
             if len(tokenized)!=5:
                 print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
                 print '%s 1 0 1 3'%(directive,)
                 break
             else:
-                pbflags.Smp[0]=int(tokenized[1])
-                pbflags.Smp[1]=int(tokenized[2])
-                pbflags.Smp[2]=int(tokenized[3])
-                pbflags.Smp[3]=int(tokenized[4])
+                pbflags.Smp[0]=float(tokenized[1])
+                pbflags.Smp[1]=float(tokenized[2])
+                pbflags.Smp[2]=float(tokenized[3])
+                pbflags.Smp[3]=float(tokenized[4])
 
         elif tokenized[0]=='#begin'.lower():
             inblock=True
