@@ -1,0 +1,210 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod4" > FFT_HARM </a> </h2>                                                                                                             
+    <dd>  FFT Calculations Routines </dd>                                                                                                                 
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > POINTS_INTERVAL_TYPE </a> </li>                                                                                             
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > CONVOL </a> </li>                                                                                                           
+      <li> <a href="#fun2"  > CONVOL_PEAKS </a> </li>                                                                                                     
+      <li> <a href="#fun3"  > F_FFT </a> </li>                                                                                                            
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > HFFT </a> </li>                                                                                                             
+      <li> <a href="#sub2"  > SFFT </a> </li>                                                                                                             
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE, public :: Points_Interval_Type </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+     Type, public :: Points_Interval_Type                                                                                                                 
+       integer    :: np                                                                                                                                   
+       real       :: low                                                                                                                                  
+       real       :: high                                                                                                                                 
+     End Type Points_Interval_Type                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod4"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Pure Function convol(f,pf,g,pg,interval)  result(conv) </a> </h4>                                                              
+    <p> <pre>                                                                                                                                             
+       real,dimension(:),          intent(in) :: pf                                                                                                       
+       real,dimension(:),          intent(in) :: pg                                                                                                       
+       type(Points_Interval_Type), intent(in) :: interval                                                                                                 
+       real, dimension(interval%np)           :: conv                                                                                                     
+       Interface f_function                                                                                                                               
+         Pure function f(x,parf)  result (vf)                                                                                                             
+           real,              intent(in) :: x                                                                                                             
+           real, dimension(:),intent(in) :: parf                                                                                                          
+           real                          :: vf                                                                                                            
+         end function f                                                                                                                                   
+       end interface f_function                                                                                                                           
+       Interface g_function                                                                                                                               
+         Pure function g(x,parg)  result (vg)                                                                                                             
+           real, intent(in)              :: x                                                                                                             
+           real, dimension(:),intent(in) :: parg                                                                                                          
+         end function g                                                                                                                                   
+       end interface g_function                                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convolution of the user-provided centred (x=0) peak functions                                                                                         
+    f and g. The characteristic parameters of the functions f and                                                                                         
+    g are provided in vectors pf and pg.                                                                                                                  
+    The intent-in Points_Interval_Type variable "Interval" gives                                                                                          
+    the number of points and the limits of the interval                                                                                                   
+    Number of points:  Interval%np                                                                                                                        
+    Range of calculation: [ Interval%low, Interval%high ]                                                                                                 
+    step =  (Interval%high-Interval%low)/Interval%np                                                                                                      
+    The convolution function is normalized to unit area .                                                                                                 
+    Example of use:                                                                                                                                       
+    h = convol(Pseudo_Voigt,P_PV, hat, P_hat, my_interval)                                                                                                
+    generates my_interval%np values  h(i), i=1,my_interval%np corresponding                                                                               
+    to the convolution of a pseudo-Voigt function with a hat function                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod4"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Pure Function convol_peaks(f,pf,g,pg,wd,np)  result(conv) </a> </h4>                                                           
+    <p> <pre>                                                                                                                                             
+       real,dimension(:),          intent(in) :: pf !Parameters of the function f (starting with FWHM)                                                    
+       real,dimension(:),          intent(in) :: pg !Parameters of the function g (starting with FWHM)                                                    
+       real,                       intent(in) :: wd !Number of times a FWHM of the f-function to calculate range                                          
+       integer,                    intent(in) :: np !Number of points (it is increased internally up to the closest power of 2)                           
+       Interface f_function                                                                                                                               
+         Pure function f(x,parf)  result (vf)                                                                                                             
+           real,              intent(in) :: x                                                                                                             
+           real, dimension(:),intent(in) :: parf                                                                                                          
+           real                          :: vf                                                                                                            
+         end function f                                                                                                                                   
+       end interface f_function                                                                                                                           
+       Interface g_function                                                                                                                               
+         Pure function g(x,parg)  result (vg)                                                                                                             
+           real, intent(in)              :: x                                                                                                             
+           real, dimension(:),intent(in) :: parg                                                                                                          
+         end function g                                                                                                                                   
+       end interface g_function                                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convolution of the user-provided centred (x=0) peak functions                                                                                         
+    f and g. The characteristic parameters of the functions f and                                                                                         
+    g are provided in vectors pf and pg. The first component should                                                                                       
+    be the value of the parameter related to the FWHM.                                                                                                    
+    The parameter wd controls the range of the calculation in terms                                                                                       
+    of the FWHM of peaks. The definition interval [a,b] of the peaks                                                                                      
+    is calculated as: a=-b, with b=wd*FWHM=wd*pf(1).                                                                                                      
+    The number of points to calculate the convolution is "np".                                                                                            
+    Internally, the actual number of points "n". Conrresponding to                                                                                        
+    and increased value of np ut to the nearest higher power of 2.                                                                                        
+    The convolution function is normalized to unit area .                                                                                                 
+    The internal step is:  step=(b-a)/n                                                                                                                   
+    Example of use:                                                                                                                                       
+    h = convol_peaks (Pseudo_Voigt,P_PV, hat, P_hat, 15.0, 150)                                                                                           
+    generates 150 values  h(i), i=1,150 corresponding to the convolution                                                                                  
+    of a pseudo-Voigt function with a hat function                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod4"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Pure Function F_fft(Xx,typ) result(fft) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        complex, dimension(:),     intent (in) :: XX  !  In -> real array containing real parts of transform                                              
+        character(len=*),optional, intent (in) :: typ !  In -> type="INV"    : backward transform                                                         
+                                                          Absent or whatever : forward transform                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    This Function is a slight modification of a complex split                                                                                             
+    radix FFT routine presented by C.S. Burrus. There is no control                                                                                       
+    of the error consisting in giving a dimension that is not a power                                                                                     
+    of two. It is the responsibility of the user to provide a complex                                                                                     
+    array of dimension equal to a power of 2.                                                                                                             
+    The function is similar to subroutine SFFT and it is useful only when                                                                                 
+    one is interested in conserving the original array.                                                                                                   
+    Example of use:                                                                                                                                       
+                                                                                                                                                          
+    FX = F_fft(X)                                                                                                                                         
+    Y = F_fft(FY,"INV")                                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod4"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Pure Subroutine Hfft(Aa,Ifset,Iferr) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        complex, dimension(:),    intent (in out) :: AA      In -> Contains the complex 3D array to be transformed                                        
+        integer,                  intent (in    ) :: IFSET   In ->  1, 2 Inverse Fourier Transform                                                        
+                                                                   -1,-2 Fourier Transform                                                                
+        integer,                  intent (   out) :: IFERR  Out -> Flags to error. 0 No error                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Performs discrete complex fourier transforms on a complex                                                                                             
+    three dimensional array.                                                                                                                              
+    This subroutine is to be used for complex, 3-dimensional                                                                                              
+    arrays in which each dimension is a power of 2.  the                                                                                                  
+    maximum m(i) must not be less than 3 or greater than 20,                                                                                              
+    i = 1,2,3                                                                                                                                             
+                                                                                                                                                          
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+      Method                                                                                                                                              
+                                                                                                                                                          
+         For IFSET = -1, or -2, the fourier transform of complex                                                                                          
+         array a is obtained.                                                                                                                             
+                                                                                                                                                          
+                      N1-1   N2-1   N3-1                L1   L2   L3                                                                                      
+         X(J1,J2,J3)=SUM    SUM    SUM    A(K1,K2,K3)*W1  *W2  *W3                                                                                        
+                      K1=0   K2=0   K3=0                                                                                                                  
+                                                                                                                                                          
+         where wi is the n(i) root of unity and L1=K1*J1,L2=K2*J2, L3=K3*J3                                                                               
+                                                                                                                                                          
+                                                                                                                                                          
+         For IFSET = +1, or +2, the inverse fourier transform a of                                                                                        
+         complex array x is obtained.                                                                                                                     
+                                                                                                                                                          
+         A(K1,K2,K3)=                                                                                                                                     
+                                                                                                                                                          
+                   1      N1-1   N2-1   N3-1                -L1  -L2  -L3                                                                                 
+               -------- *SUM    SUM    SUM    X(J1,J2,J3)*W1  *W2  *W3                                                                                    
+               N1*N2*N3   J1=0   J2=0   J3=0                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    </p>                                                                                                                                                  
+     <a href="#Mod4"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Pure Subroutine Sfft(Xx,typ, Iferr) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        complex, dimension(:),     intent (in out) :: XX  !  In -> real array containing real parts of transform                                          
+        character(len=*),optional, intent (in)     :: typ !  In -> type="INV"    : backward transform                                                     
+                                                              Absent or whatever : forward transform                                                      
+        integer, optional,         intent (   out) :: IFERR  ! Out -> Flags to error. 0 No error                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    This routine is a slight modification of a complex split                                                                                              
+    radix FFT routine presented by C.S. Burrus.                                                                                                           
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+        The forward transform computes                                                                                                                    
+            X(k) = sum_{j=0}^{N-1} x(j)*exp(-2ijk*pi/N)                                                                                                   
+                                                                                                                                                          
+        The backward transform computes                                                                                                                   
+            x(j) = (1/N) * sum_{k=0}^{N-1} X(k)*exp(2ijk*pi/N)                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod4"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

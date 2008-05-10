@@ -1,0 +1,377 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod18" > REFLECTIONS_UTILITIES </a> </h2>                                                                                               
+    <dd>  Series of procedures handling operation with                                                                                                    
+    Bragg reflections </dd>                                                                                                                               
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_REFL </a> </li>                                                                                                         
+      <li> <a href="#var2"  > ERR_MESS_REFL </a> </li>                                                                                                    
+      <li> <a href="#var3"  > HKL_REF_COND </a> </li>                                                                                                     
+      <li> <a href="#var4"  > REFLECT_TYPE </a> </li>                                                                                                     
+      <li> <a href="#var5"  > REFLECTION_TYPE </a> </li>                                                                                                  
+      <li> <a href="#var6"  > REFLECTION_LIST_TYPE </a> </li>                                                                                             
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > ASU_HKL </a> </li>                                                                                                          
+      <li> <a href="#fun2"  > GET_MAXNUMREF </a> </li>                                                                                                    
+      <li> <a href="#fun3"  > HKL_ABSENT </a> </li>                                                                                                       
+      <li> <a href="#fun4"  > HKL_EQUAL </a> </li>                                                                                                        
+      <li> <a href="#fun5"  > HKL_EQUIV </a> </li>                                                                                                        
+      <li> <a href="#fun6"  > HKL_MULT </a> </li>                                                                                                         
+      <li> <a href="#fun7"  > HKL_R </a> </li>                                                                                                            
+      <li> <a href="#fun8"  > HKL_S </a> </li>                                                                                                            
+      <li> <a href="#fun9"  > UNIT_CART_HKL </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > HKL_EQUIV_LIST </a> </li>                                                                                                   
+      <li> <a href="#sub2"  > HKL_GEN </a> </li>                                                                                                          
+      <li> <a href="#sub3"  > HKL_RP </a> </li>                                                                                                           
+      <li> <a href="#sub4"  > HKL_UNI </a> </li>                                                                                                          
+      <li> <a href="#sub5"  > INIT_ERR_REFL </a> </li>                                                                                                    
+      <li> <a href="#sub6"  > INIT_REFLIST </a> </li>                                                                                                     
+      <li> <a href="#sub7"  > SEARCH_EXTINCTIONS </a> </li>                                                                                               
+      <li> <a href="#sub8"  > WRITE_ASU </a> </li>                                                                                                        
+      <li> <a href="#sub9"  > WRITE_REFLIST_INFO </a> </li>                                                                                               
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_REFL </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public :: err_refl                                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in REFLECTIONS_UTILITIES module                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_MESS_REFL </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: err_mess_refl                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > HKL_REF_CONDITIONS </a> </h4>                                                                                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(58), parameter, public :: Hkl_Ref_Conditions                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Reflection conditions for Lattices, glide planes, screw axes                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > TYPE :: REFLECT_TYPE </a> </h4>                                                                                                
+    <p> <pre>                                                                                                                                             
+     Type, public :: Reflect_Type                                                                                                                         
+        integer,dimension(3) :: H    ! H                                                                                                                  
+        integer              :: Mult ! mutiplicity                                                                                                        
+        real(kind=sp)        :: S    ! Sin(Theta)/lambda                                                                                                  
+     End Type Reflect_Type                                                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > TYPE :: REFLECTION_TYPE </a> </h4>                                                                                             
+    <p> <pre>                                                                                                                                             
+     Type, public :: Reflection_Type                                                                                                                      
+        integer,dimension(3) :: H    ! H                                                                                                                  
+        integer              :: Mult ! mutiplicity                                                                                                        
+        real(kind=sp)        :: Fo   ! Observed Structure Factor                                                                                          
+        real(kind=sp)        :: Fc   ! Calculated Structure Factor                                                                                        
+        real(kind=sp)        :: SFo  ! Sigma of  Fo                                                                                                       
+        real(kind=sp)        :: S    ! Sin(Theta)/lambda                                                                                                  
+        real(kind=sp)        :: W    ! Weight                                                                                                             
+        real(kind=sp)        :: Phase! Phase in degrees                                                                                                   
+        real(kind=sp)        :: A    ! real part of the Structure Factor                                                                                  
+        real(kind=sp)        :: B    ! Imaginary part of the Structure Factor                                                                             
+        real(kind=sp)        :: AA   ! Free                                                                                                               
+        real(kind=sp)        :: BB   ! Free                                                                                                               
+     End Type Reflection_Type                                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var6"  > TYPE :: REFLECTION_LIST_TYPE </a> </h4>                                                                                        
+    <p> <pre>                                                                                                                                             
+     Type, public :: Reflection_List_Type                                                                                                                 
+        integer                                        :: NRef ! Number of Reflections                                                                    
+        type(reflection_type),allocatable,dimension(:) :: Ref  ! Reflection List                                                                          
+     End Type Reflection_List_Type                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Function Asu_Hkl(H, Spacegroup) Result(K) </a> </h4>                                                                           
+    <p> <pre>                                                                                                                                             
+        integer, dimension (3),  intent(in) :: h                                                                                                          
+        type (Space_Group_Type), intent(in) :: Spacegroup                                                                                                 
+        integer, dimension(3)               :: k                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtain an equivalent reflection in asymmetric unit.                                                                                                   
+    If not, the output is the input reflection.                                                                                                           
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+        We assumed that F(hkl)=F(-h -k -l).                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    If and error occurs, the function return a 0-vector.                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Function  Get_MaxNumRef(SinTLMax, VolCell, SinTLMin, Mult) result(numref) </a> </h4>                                           
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),           intent(in) :: SinTLMax !Maximum sinTheta/Lambda                                                                          
+        real(kind=sp),           intent(in) :: VolCell  !Direct Cell Volume                                                                               
+        real(kind=sp), optional, intent(in) :: SinTLMin !Minimum sinTheta/Lambda                                                                          
+        Integer,       optional, intent(in) :: Mult     !General Multiplicity                                                                             
+        Integer                             :: numref                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides un upper limit of the expected maximum number of                                                                                             
+    reflections up to SinTLMax for a volume VolCell of the                                                                                                
+    primitive cell. If the optional argument SinTLMin is given,                                                                                           
+    the result is the number of reflections in the interval (SinTLMin,SinTLMax).                                                                          
+    If Mult is provided the result is divided by this multiplicity                                                                                        
+    so we obtain the expected mumber of unique reflections.                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Function  Hkl_Absen(H, Spacegroup) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in) :: h                                                                                              
+        type (Space_Group_Type),             intent(in) :: SpaceGroup                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Returns the value ".true." if the reflection is absent.                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun4"  > Logical Function  Hkl_Equal(H,K) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in) :: h                                                                                              
+        integer/real(kind=sp), dimension(3), intent(in) :: k                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate if two reflections are equal                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun5"  > Logical Function  Hkl_Equiv(H,K,Spacegroup,Friedel) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in) :: h                                                                                              
+        integer/real(kind=sp), dimension(3), intent(in) :: k                                                                                              
+        type (Space_Group_Type),             intent(in) :: SpaceGroup                                                                                     
+        Logical, optional ,                  intent(in) :: Friedel                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate if two reflections are equivalent                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun6"  > Function  Hkl_Mult(H, Spacegroup, Friedel) </a> </h4>                                                                          
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in) :: h                                                                                              
+        type (Space_Group_Type),             intent(in) :: SpaceGroup                                                                                     
+        Logical,                             intent(in) :: Friedel                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the multiplicity of the reflection                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun7"  > Function  Hkl_R(H,Op) </a> </h4>                                                                                               
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in) :: h                                                                                              
+        type (Sym_Oper_Type),                intent(in) :: Op                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the equivalent reflection                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun8"  > Function  Hkl_S(H, Crystalcell) </a> </h4>                                                                                     
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in) :: h                                                                                              
+        type (Crystal_Cell_Type),            intent(in) :: CrystalCell                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates: sin_theta/lamda = 1/(2d)                                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun9"  > Function  Unit_Cart_Hkl(H, Crystalcell) Result (U) </a> </h4>                                                                  
+    <p> <pre>                                                                                                                                             
+         integer/real(kind=sp), dimension(3), intent(in) :: h                                                                                             
+         type (Crystal_Cell_Type),            intent(in) :: CrystalCell                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate a unitary vector in the cartesian crystal frame                                                                                             
+    along a reciprocal vector hkl (reciprocal lattice)                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Glide_Planes_Conditions(Spacegroup, iunit) </a> </h4>                                                               
+    <p> <pre>                                                                                                                                             
+        type (Space_Group_Type), intent(in) :: Spacegroup                                                                                                 
+        integer,optional,        intent(in) :: iunit                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Reflections Conditions according with I.T. Table 2.2.13.2                                                                                             
+    space.                                                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Hkl_Equiv_List(H,Spacegroup,Friedel,Mul,Hlist) </a> </h4>                                                           
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3),                    intent(in) :: h                                                                           
+        type (Space_Group_Type),                                intent(in) :: SpaceGroup                                                                  
+        logical,                                                intent(in) :: Friedel                                                                     
+        integer,                                                intent(out):: mul                                                                         
+        integer/real(kind=sp),dimension(3,SpaceGroup%numops*2), intent(out):: hlist                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the multiplicity of the reflection and the list of all                                                                                      
+    equivalent reflections. Friedel law assumed if Friedel=.true.                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine  Hkl_Gen(Crystalcell,Spacegroup,Friedel,Value1,Value2,Num_Ref,Reflex) </a> </h4>                                    
+    <p> <pre>                                                                                                                                             
+        Type (Crystal_Cell_Type),          intent(in) :: CrystalCell     !Unit cell object                                                                
+        Type (Space_Group_Type) ,          intent(in) :: SpaceGroup      !Space Group object                                                              
+        Logical,                           intent(in) :: Friedel         !If true, Friedel law applied                                                    
+        real(kind=sp),                     intent(in) :: value1,value2   !Range in SinTheta/Lambda                                                        
+        Integer            ,               intent(out):: Num_Ref         !Number of generated reflections                                                 
+        Type (Reflect_Type), dimension(:), intent(out):: Reflex          !List of generated hkl,mult, s                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate unique reflections between two values of                                                                                                    
+    sin_theta/lambda.  The output is not ordered.                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine  Hkl_Rp(H,Phase, Op,K, Phasen, Op) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in)  :: h                                                                                             
+        real(kind=sp),                       intent(in)  :: phase                                                                                         
+        type (Sym_Oper_Type),                intent(in)  :: Op                                                                                            
+        integer/real(kind=sp), dimension(3), intent(out) :: k                                                                                             
+        real(kind=sp),                       intent(out) :: phasen                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the equivalent reflection and Phase                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine  Hkl_Uni(Crystalcell, Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex) </a> </h4>                              
+    <p> <pre>                                                                                                                                             
+        Type (Crystal_Cell_Type),          intent(in) :: CrystalCell  !Cell Objet                                                                         
+        Type (Space_Group_Type) ,          intent(in) :: SpaceGroup   !Space group Object                                                                 
+        Logical,                           intent(in) :: Friedel                                                                                          
+        real(kind=sp),                     intent(in) :: value1,value2 !Range in sintheta/Lambda                                                          
+        character(len=1),                  intent(in) :: code     !If code="r", d-spacing are input                                                       
+        Integer            ,               intent(out):: num_Ref  !Number of generated reflections                                                        
+        Type (Reflect_Type), dimension(:), intent(out):: reflex   !Ordered set of reflections                                                             
+             or                                                                                                                                           
+        Type (Reflection_Type), dimension(:), intent(out):: reflex !Ordered set of reflections                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate unique reflections between two values (value1,value2)                                                                                       
+    of sin_theta/lambda                                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > SUBROUTINE INIT_ERR_REFL() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in this Module                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > SUBROUTINE INIT_REFLIST() </a> </h4>                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the Reflection List Variable                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Integral_Conditions(Spacegroup, iunit) </a> </h4>                                                                   
+    <p> <pre>                                                                                                                                             
+        type (Space_Group_Type), intent(in) :: Spacegroup                                                                                                 
+        integer,optional,        intent(in) :: iunit                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Integral Conditions according with I.T. Table 2.2.13.1                                                                                                
+    space.                                                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Screw_Axis_Conditions(Spacegroup, iunit) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        type (Space_Group_Type), intent(in) :: Spacegroup                                                                                                 
+        integer,optional,        intent(in) :: iunit                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Reflections conditions for Screw axes Table 2.2.13.2                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod18"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

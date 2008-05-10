@@ -1,0 +1,183 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod10" > SPHERICAL_HARMONICS </a> </h2>                                                                                                 
+    <dd>  Spherical Harmonics routines </dd>                                                                                                              
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_MESS_SPHER </a> </li>                                                                                                   
+      <li> <a href="#var2"  > ERR_SPHER </a> </li>                                                                                                        
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > CUBIC_HARM_ANG </a> </li>                                                                                                   
+      <li> <a href="#fun2"  > CUBIC_HARM_UCVEC </a> </li>                                                                                                 
+      <li> <a href="#fun3"  > INT_SLATER_BESSEL </a> </li>                                                                                                
+      <li> <a href="#fun4"  > REAL_SPHER_HARM_ANG </a> </li>                                                                                              
+      <li> <a href="#fun5"  > REAL_SPHER_HARM_UCVEC </a> </li>                                                                                            
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > INIT_ERR_SPHER </a> </li>                                                                                                   
+      <li> <a href="#sub2"  > PIKOUT_LJ_CUBIC </a> </li>                                                                                                  
+      <li> <a href="#sub3"  > SPHJN </a> </li>                                                                                                            
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MESS_SPHER </a> </h4>                                                                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: err_mess_spher                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_SPHER </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+        logical, public    :: err_spher                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in SPHERICAL_HARMONICS module                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Function Cubic_Harm_Ang(L,M,Theta,Phi) Result(Klm) </a> </h4>                                                                  
+    <p> <pre>                                                                                                                                             
+        integer,         intent(in) :: l                                                                                                                  
+        integer,         intent(in) :: m                                                                                                                  
+        real(kind=sp),   intent(in) :: theta                                                                                                              
+        real(kind=sp),   intent(in) :: phi                                                                                                                
+        real(kind=sp)               :: Klm                                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculation of the cubic harmonics given in Table 3 of reference                                                                                      
+    M.Kara & K. Kurki-Suonio, Acta Cryt. A37, 201 (1981).                                                                                                 
+    Only up to tenth order.                                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Function Cubic_Harm_Ucvec(L,M,U) Result(Klm) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        integer,                    intent(in) :: l                                                                                                       
+        integer,                    intent(in) :: m                                                                                                       
+        real(kind=sp),dimension(3), intent(in) :: u                                                                                                       
+        real(kind=sp)                          :: Klm                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculation of the cubic harmonics given in Table 3 of reference                                                                                      
+    M.Kara & K. Kurki-Suonio, Acta Cryt. A37, 201 (1981).                                                                                                 
+    Only up to tenth order. A control of errors is included.                                                                                              
+    For "m3m" symmetry, calculations include up to L=20 M=2 using the                                                                                     
+    coefficients from F.M. Mueller and M.G. Priestley, Phys Rev 148, 638 (1966)                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Function Int_Slater_Bessel(N,L,Z,S) Result(Int_Slater_Besselv) </a> </h4>                                                      
+    <p> <pre>                                                                                                                                             
+        integer,           intent(in) :: n                                                                                                                
+        integer,           intent(in) :: l                                                                                                                
+        real(kind=sp),     intent(in) :: z                                                                                                                
+        real(kind=sp),     intent(in) :: s                                                                                                                
+        real(kind=sp)                 :: Int_Slater_Besselv                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Returns the integral:                                                                                                                                 
+    Int[0,inf]{r**(n+2)*exp(-chi*r)*j_l(s*r)} dr                                                                                                          
+    where j_l is the spherical Bessel function of order l                                                                                                 
+    only -1 <= n  and 0 <= l <= n+1                                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun4"  > FUNCTION Real_Spher_Harm_Ang(L,M,P,Theta,Phi) Result(Ylmp) </a> </h4>                                                          
+    <p> <pre>                                                                                                                                             
+        integer,       intent(in) :: l         !  In -> Index l >= 0                                                                                      
+        integer,       intent(in) :: m         !  In -> Index m <= l                                                                                      
+        integer,       intent(in) :: p         !  In -> +1: cosinus, -1: sinus                                                                            
+        real(kind=sp), intent(in) :: theta     !  In -> Spherical coordinate in degree                                                                    
+        real(kind=sp), intent(in) :: phi       !  In -> Spherical coordinate in degree                                                                    
+        real(kind=sp)             :: ylmp      ! Out -> Value of ylmn(theta,phi)                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    real(kind=sp) Spherical Harmonics: M.Kara & K. Kurki-Suonio, Acta Cryt. A37, 201 (1981)                                                               
+    Input spherical coordinates Theta & Phi in degrees                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun5"  > Function Real_Spher_Harm_Ucvec(L,M,P,U) Result(Ylmp) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        integer,                    intent(in) :: l       !  In -> Index l >= 0                                                                           
+        integer,                    intent(in) :: m       !  In -> Index m <= l                                                                           
+        integer,                    intent(in) :: p       !  In -> +1: cosinus, -1: sinus                                                                 
+        real(kind=sp),dimension(3), intent(in) :: u       !  In -> unit vector in cartesian coordinates                                                   
+        real(kind=sp)                          :: ylmp    ! Out -> Value of ylmn(u)                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Real Spherical Harmonics: M.Kara & K. Kurki-Suonio, Acta Cryt. A37, 201 (1981)                                                                        
+    Input U: unit vector in cartesian coordinates                                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Init_Err_Spher() </a> </h4>                                                                                         
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in Spherical_Harmonics                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Pikout_Lj_Cubic(Group,Lj,Ncoef,Lun) </a> </h4>                                                                      
+    <p> <pre>                                                                                                                                             
+        character (len=*), intent (in)        :: group   !  In ->                                                                                         
+        integer, dimension(2,11), intent(out) :: lj      ! Out ->                                                                                         
+        integer, intent (out)                 :: ncoef   ! Out ->                                                                                         
+        integer, optional, intent (in)        :: lun     !  In ->                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Picking out rules for indices of cubic harmonics for the 5 cubic groups                                                                               
+    Only up to tenth order Given in Table 4 of reference M.Kara &                                                                                         
+    K. Kurki-Suonio, Acta Cryt. A37, 201 (1981)                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Sphjn(N,X,Nm,Jn,Djn) </a> </h4>                                                                                     
+    <p> <pre>                                                                                                                                             
+        integer,       intent(in)                   :: n    !  In -> Order of jn(x) (n=0,1,2,3,...)                                                       
+        real(kind=dp), intent(in)                   :: x    !  In -> Argument of jn(x)                                                                    
+        integer, intent(out)                        :: nm   ! Out -> Highest order computed                                                               
+        real(kind=dp), dimension(0:n), intent(out)  :: jn   ! Out -> Array with spherical Bessel functions jn(x)                                          
+        real(kind=dp), dimension(0:n), intent(out)  :: djn  ! Out -> Array with derivatives jn'(x)                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Compute spherical Bessel functions jn(x) and their derivatives                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod10"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

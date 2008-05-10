@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod28" > IO_MESSAGES </a> </h2>                                                                                                         
+    <dd>  Input / Output General Messages. It is convenient to use these intermediate procedures instead of                                               
+    Fortran Write(*,*) or Print*, because it is much more simple to modify a program for making a GUI.                                                    
+    Usually GUI tools and libraries need special calls to dialog boxes for screen messages. These                                                         
+    calls may be implemented within this module using the same name procedures. The subroutines                                                           
+    ERROR_MESSAGE and INFO_MESSAGE are just wrappers for the actual calls.                                                                                
+    HISTORY </dd>                                                                                                                                         
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > ERROR_MESSAGE </a> </li>                                                                                                    
+      <li> <a href="#sub2"  > INFO_MESSAGE </a> </li>                                                                                                     
+      <li> <a href="#sub3"  > PRINT_MESS </a> </li>                                                                                                       
+      <li> <a href="#sub4"  > WAIT </a> </li>                                                                                                             
+      <li> <a href="#sub5"  > WRITE_SCROLL_TEXT </a> </li>                                                                                                
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Error_Message(Line, Iunit) </a> </h4>                                                                               
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in)           :: Line    !  In -> Error information                                                                      
+        integer,          intent(in), optional :: Iunit   !  In -> Write information on Iunit unit                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Print an error message on the screen or in "Iunit" if present                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod28"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Info_Message(Line, Iunit) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in)           :: Line    !  In -> Info information                                                                       
+        integer,          intent(in), optional :: Iunit   !  In -> Write information on Iunit unit                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Print an message on the screen or in "Iunit" if present                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod28"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Print_Mess(Warning) </a> </h4>                                                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in)  :: Warning    !  In -> Print information                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Print an message on the screen                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod28"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Wait(Message) </a> </h4>                                                                                            
+    <p> <pre>                                                                                                                                             
+        character(len=*), optional, intent(in) :: Message                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Similar to Pause for Console version                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod28"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > SUBROUTINE WRITE_SCROLL_TEXT(Line) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in)           :: Line                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Print the string in a the scroll window                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod28"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

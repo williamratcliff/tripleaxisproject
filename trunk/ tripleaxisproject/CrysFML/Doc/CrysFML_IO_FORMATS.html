@@ -1,0 +1,620 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod25" > IO_FORMATS </a> </h2>                                                                                                          
+    <dd>  Creation/Conversion for several formats </dd>                                                                                                   
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_FORM </a> </li>                                                                                                         
+      <li> <a href="#var2"  > ERR_MESS_FORM </a> </li>                                                                                                    
+      <li> <a href="#var3"  > INTERVAL_TYPE </a> </li>                                                                                                    
+      <li> <a href="#var4"  > JOB_INFO_TYPE </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > GET_JOB_INFO </a> </li>                                                                                                     
+      <li> <a href="#sub2"  > INIT_ERR_FORM </a> </li>                                                                                                    
+      <li> <a href="#sub3"  > READ_ATOM </a> </li>                                                                                                        
+      <li> <a href="#sub4"  > READ_CELL </a> </li>                                                                                                        
+      <li> <a href="#sub5"  > READ_CIF_ATOM </a> </li>                                                                                                    
+      <li> <a href="#sub6"  > READ_CIF_CELL </a> </li>                                                                                                    
+      <li> <a href="#sub7"  > READ_CIF_CONT </a> </li>                                                                                                    
+      <li> <a href="#sub8"  > READ_CIF_HALL </a> </li>                                                                                                    
+      <li> <a href="#sub9"  > READ_CIF_HM </a> </li>                                                                                                      
+      <li> <a href="#sub10" > READ_CIF_LAMBDA </a> </li>                                                                                                  
+      <li> <a href="#sub11" > READ_CIF_SYMM </a> </li>                                                                                                    
+      <li> <a href="#sub12" > READ_CIF_TITLE </a> </li>                                                                                                   
+      <li> <a href="#sub13" > READ_CIF_Z </a> </li>                                                                                                       
+      <li> <a href="#sub14" > READ_FILE_ATOM </a> </li>                                                                                                   
+      <li> <a href="#sub15" > READ_FILE_CELL </a> </li>                                                                                                   
+      <li> <a href="#sub16" > READ_FILE_LAMBDA </a> </li>                                                                                                 
+      <li> <a href="#sub17" > READ_FILE_RNGSINTL </a> </li>                                                                                               
+      <li> <a href="#sub18" > READ_FILE_SPG </a> </li>                                                                                                    
+      <li> <a href="#sub19" > READ_FILE_TRANSF </a> </li>                                                                                                 
+      <li> <a href="#sub20" > READ_SHX_ATOM </a> </li>                                                                                                    
+      <li> <a href="#sub21" > READ_SHX_CELL </a> </li>                                                                                                    
+      <li> <a href="#sub22" > READ_SHX_CONT </a> </li>                                                                                                    
+      <li> <a href="#sub23" > READ_SHX_FVAR </a> </li>                                                                                                    
+      <li> <a href="#sub24" > READ_SHX_LATT </a> </li>                                                                                                    
+      <li> <a href="#sub25" > READ_SHX_SYMM </a> </li>                                                                                                    
+      <li> <a href="#sub26" > READ_SHX_TITL </a> </li>                                                                                                    
+      <li> <a href="#sub27" > READ_UVALS </a> </li>                                                                                                       
+      <li> <a href="#sub28" > READN_SET_XTAL_STRUCTURE </a> </li>                                                                                         
+      <li> <a href="#sub29" > WRITE_CIF_POWDER_PROFILE </a> </li>                                                                                         
+      <li> <a href="#sub30" > WRITE_CIF_TEMPLATE </a> </li>                                                                                               
+      <li> <a href="#sub31" > WRITE_SHX_TEMPLATE </a> </li>                                                                                               
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_FORM </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public :: err_form                                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in IO_FORMATS                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_MESS_FORM </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: err_mess_form                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > TYPE :: INTERVAL_TYPE </a> </h4>                                                                                               
+    <p> <pre>                                                                                                                                             
+     Type, public :: interval_type                                                                                                                        
+        real(kind=sp) :: mina  !low limit                                                                                                                 
+        real(kind=sp) :: maxb  !high limit                                                                                                                
+     End Type interval_type                                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > TYPE :: JOB_INFO_TYPE </a> </h4>                                                                                               
+    <p> <pre>                                                                                                                                             
+     Type, public :: Job_Info_type                                                                                                                        
+        character(len=120)                            :: Title          ! Title                                                                           
+        integer                                       :: Num_Phases     ! Number of phases                                                                
+        integer                                       :: Num_Patterns   ! Number of patterns                                                              
+        integer                                       :: Num_cmd        ! Number of command lines                                                         
+        character(len=16),  dimension(:), allocatable :: Patt_typ       ! Type of Pattern                                                                 
+        character(len=128), dimension(:), allocatable :: Phas_nam       ! Name of phases                                                                  
+        character(len=128), dimension(:), allocatable :: cmd            ! Command lines: text for actions                                                 
+        type(interval_type),dimension(:), allocatable :: range_stl      ! Range in sinTheta/Lambda                                                        
+        type(interval_type),dimension(:), allocatable :: range_q        ! Range in 4pi*sinTheta/Lambda                                                    
+        type(interval_type),dimension(:), allocatable :: range_d        ! Range in d-spacing                                                              
+        type(interval_type),dimension(:), allocatable :: range_2theta   ! Range in 2theta-spacing                                                         
+        type(interval_type),dimension(:), allocatable :: range_Energy   ! Range in Energy                                                                 
+        type(interval_type),dimension(:), allocatable :: range_tof      ! Range in Time of Flight                                                         
+        type(interval_type),dimension(:), allocatable :: Lambda         ! Lambda                                                                          
+        real(kind=sp)      ,dimension(:), allocatable :: ratio          ! ratio lambda2/lambda1                                                           
+        real(kind=sp)      ,dimension(:), allocatable :: dtt1,dtt2      ! d-to-TOF coefficients                                                           
+     End Type Job_Info_type                                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > TYPE :: FILE_LIST_TYPE </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+     Type,public :: File_List_Type                                                                                                                        
+        integer                                       :: nlines ! Number of lines in the file                                                             
+        character(len=132), allocatable, dimension(:) :: line   ! Content of the lines                                                                    
+     End Type file_list_type                                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Get_Job_Info(file_dat,i_ini,i_end,Job_info) </a> </h4>                                                              
+    <p> <pre>                                                                                                                                             
+       character(len=*), dimension(:), intent( in) :: file_dat     !Lines of text (content of a file)                                                     
+       integer,                        intent( in) :: i_ini,i_end  !Lines to explore                                                                      
+       type(job_info_type),            intent(out) :: Job_info     !Object to be constructed here                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Constructor of the object Job_info. The arrary of strings file_dat                                                                                    
+    have to be provided as input. It contains lines corresponding to the                                                                                  
+    input control file. The analysis of the command lines is not given here.                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Init_Err_Form() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize Errors Variable for this module                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Read_Atom(Line,Atomo) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in out ) :: line    !  In -> Input String with ATOM directive                                                            
+        Type (Atom_Type), intent(out)     :: Atomo   ! Out -> Parameters on variable Atomo                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to read the atom parameters from a given "line"                                                                                            
+    it construct the object Atomo of type Atom.                                                                                                           
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Read_Cell(Line,Celda) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        character(len=*),       intent(in out ) :: line   !  In -> Input String with CELL Directive                                                       
+        real,dimension(6),      intent(out)     :: Celda  !  In -> Parameters on Celda Variable                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to read the cell parameters from a given "line"                                                                                            
+    it construct the object Celda of type Crystal_Cell.                                                                                                   
+    Assumes the string "line" has been read from a file and                                                                                               
+    starts with the word "cell", that is removed before reading                                                                                           
+    the values of the parameters.                                                                                                                         
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Read_Cif_Atom(Filevar,Nline_Ini,Nline_End,N_Atom,Atm_List) </a> </h4>                                               
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:), intent(in)     :: filevar    !  In -> Input strings information                                                    
+        integer,                       intent(in out) :: nline_ini  !  In -> Line to beginning search                                                     
+                                                                       Out -> Current line on Filevar                                                     
+        integer,                       intent(in)     :: nline_end  !  In -> Line to the End search                                                       
+        integer,                       intent(out)    :: n_atom     ! Out -> Actual number of atom                                                        
+        type (atom_list_type),        intent(out)    :: Atm_List   ! Out -> Atom list                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Atoms parameters from Cif file. A control error is present.                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Read_Cif_Cell(Filevar,Nline_Ini,Nline_End,Celda,Stdcelda) </a> </h4>                                                
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar      !  In -> String vector input                                                           
+        integer,           intent(in out)          :: nline_ini    !  In -> Line to start the search                                                      
+                                                                     Out -> Actual line on Filevar                                                        
+        integer,           intent(in)              :: nline_end    !  In -> Line to finish the search                                                     
+        real,dimension(6), intent (out)            :: Celda        ! Out -> Cell variable                                                                 
+        real,dimension(6), intent (out)            :: StdCelda     ! Out -> Cell variable                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read Cell Parameters from Cif file                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Read_Cif_Cont(Filevar,Nline_Ini,Nline_End,N_Elem_Type,Elem_Type,N_Elem) </a> </h4>                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*),  dimension(:), intent(in)     :: filevar      !  In -> String vector input                                                      
+        integer,                         intent(in out) :: nline_ini    !  In -> Line to start the search                                                 
+                                                                           Out -> Actual line on Filevar                                                  
+        integer,                         intent(in)     :: nline_end    !  In -> Line to finish the search                                                
+        integer,                         intent(out)    :: n_elem_type  ! Out -> N. of different elements                                                 
+        character(len=*), dimension(:),  intent(out)    :: elem_type    ! Out -> String for Element type                                                  
+        real, dimension(:), optional     intent(out)    :: n_elem       ! Out -> Number of elements                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining the chemical contents from Cif file                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Read_Cif_Hall(Filevar,Nline_Ini,Nline_End,Spgr_Ha) </a> </h4>                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar      !  In -> String vector input                                                           
+        integer,          intent(in out)           :: nline_ini    !  In -> Line to start the search                                                      
+                                                                     Out -> Actual line on Filevar                                                        
+        integer,          intent(in)               :: nline_end    !  In -> Line to finish the search                                                     
+        character(len=*), intent(out)              :: spgr_ha      ! Out -> Hall symbol                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining the Hall symbol of the Space Group                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Read_Cif_Hm(Filevar,Nline_Ini,Nline_End,Spgr_Hm) </a> </h4>                                                         
+    <p> <pre>                                                                                                                                             
+        character(len=*),  dimension(:), intent(in) :: filevar     !  In -> String vector                                                                 
+        integer,           intent(in out)           :: nline_ini   !  In -> Line to start the search                                                      
+                                                                     Out -> Actual Line on Filevar                                                        
+        integer,           intent(in)               :: nline_end   !  In -> Line to finish the search                                                     
+        character(len=*),  intent(out)              :: spgr_hm     ! Out -> Hermann-Mauguin symbol                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining the Herman-Mauguin symbol of Space Group                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Read_Cif_Lambda(Filevar,Nline_Ini,Nline_End,Lambda) </a> </h4>                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar      !  In -> String vector                                                                 
+        integer,           intent(in out)          :: nline_ini    !  In -> Line to start of search                                                       
+                                                                     Out -> Actual line on Filevar                                                        
+        integer,           intent(in)              :: nline_end    !  In -> Line to finish the search                                                     
+        real,              intent(out)             :: lambda       ! Out -> lamda value                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Radiation length                                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine Read_Cif_Symm(Filevar,Nline_Ini,Nline_End,N_Oper,Oper_Symm) </a> </h4>                                              
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar       !  In -> String vector                                                                
+        integer,          intent(in out)           :: nline_ini     !  In -> Line to start the search                                                     
+                                                                      Out -> Actual line on Filevar                                                       
+        integer,          intent(in)               :: nline_end     !  In -> Line to finish the search                                                    
+        integer,          intent(out)              :: n_oper        ! Out -> Number of Operators                                                          
+        character(len=*), dimension(:),intent(out) :: oper_symm     ! Out -> Vector with Symmetry Operators                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Symmetry Operators from Cif file                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Read_Cif_Title(Filevar,Nline_Ini,Nline_End,Title) </a> </h4>                                                        
+    <p> <pre>                                                                                                                                             
+        character(len=*),  dimension(:), intent(in) :: filevar      !  In -> String vector                                                                
+        integer,           intent(in out)           :: nline_ini    !  In -> Line to start the search                                                     
+                                                                      Out -> Actual line on Filevar                                                       
+        integer,           intent(in)               :: nline_end    !  In -> Line to finish the search                                                    
+        character(len=*),  intent(out)              :: title        ! Out -> Title string                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Title from Cif file                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Read_Cif_Z(Filevar,Nline_Ini,Nline_End,Z) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar     !  In -> String vector                                                                  
+        integer,           intent(in out)          :: nline_ini   !  In -> Line to start the search                                                       
+                                                                    Out -> Actual line on Filevar                                                         
+        integer,           intent(in)              :: nline_end   !  In -> Line to finish the search                                                      
+        integer,           intent(out)             :: Z           ! Out -> Z value                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Unit formula from Cif file                                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub15" > Subroutine Read_File_Atom(Filevar,Nline_Ini,Nline_End,Atomos) </a> </h4>                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:), intent(in)       :: filevar     !  In -> String vector                                                             
+        integer,                       intent(in)       :: nline_ini   !  In -> Line to start the search                                                  
+                                                                         Out -> Actual line on Filevar                                                    
+        integer,                       intent(in)       :: nline_end   !  In -> Line to finish the search                                                 
+        type (atom_list_type),        intent(out)      :: Atomos      ! Out -> Atom list                                                                  
+               or                                                                                                                                         
+        type (Point_list_Type),        intent(out)      :: Atomos      ! Out -> point list                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to read an atom (or point) list from a file. Atomos should be previously allocated.                                                        
+    Control of error is present.                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub16" > Subroutine Read_File_PointList(Filevar,Nline_Ini,Nline_End,Atomos) </a> </h4>                                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:), intent(in)       :: filevar     !  In -> String vector                                                             
+        integer,                       intent(in)       :: nline_ini   !  In -> Line to start the search                                                  
+                                                                         Out -> Actual line on Filevar                                                    
+        integer,                       intent(in)       :: nline_end   !  In -> Line to finish the search                                                 
+        type (Point_List_Type),        intent(out)      :: Atomos      ! Out -> point list                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to read an point list from a file. Atomos should be previously allocated.                                                                  
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub17" > Subroutine Read_File_Cell(Filevar,Nline_Ini,Nline_End,Celda) </a> </h4>                                                        
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar      !  In -> String Vector                                                                 
+        integer,           intent(in out)          :: nline_ini    !  In -> Line to start the search                                                      
+                                                                     Out -> Atual line on Filevar                                                         
+        integer,           intent(in)              :: nline_end    !  In -> line to finish the search                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    real,dimension(6), intent (out)            :: Celda        ! Out -> Cell variable                                                                     
+    or                                                                                                                                                    
+    type (Crystal_Cell_Type), intent (out)     :: Celda        ! Out -> Cell variable                                                                     
+                                                                                                                                                          
+    Read Cell Parameters from file. Control error is present                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub18" > Subroutine Read_File_lambda(Filevar,Nline_Ini,Nline_End,v1,v2,v3) </a> </h4>                                                   
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in)     :: filevar   !  In -> String Vector                                                                
+        integer,                        intent(in out) :: nline_ini !  In -> Line to start the search                                                     
+                                                                      Out -> Atual line on Filevar                                                        
+        integer,                        intent(in)     :: nline_end !  In -> line to finish the search                                                    
+        real(kind=sp),                  intent(   out) :: v1,v2,v3  ! Out -> Lambda1,lambda2,ratio                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read wavelengths and ratio.                                                                                                                           
+    If no value is read, Lambda1=Lambda2=1.54056 Angstroms, ratio=0.0                                                                                     
+    If only one value is read Lambda1=Lambda2=v1, ratio=0                                                                                                 
+    If only two values iare read Lambda1=v1, Lambda2=v2, ratio=0.5                                                                                        
+    In other cases Lambda1=v1, Lambda2=v2, ratio=v3                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub19" > Subroutine Read_File_RngSintL(Filevar,Nline_Ini,Nline_End,v1,v2) </a> </h4>                                                    
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in)     :: filevar   !  In -> String Vector                                                                
+        integer,                        intent(in out) :: nline_ini !  In -> Line to start the search                                                     
+                                                                      Out -> Atual line on Filevar                                                        
+        integer,                        intent(in)     :: nline_end !  In -> line to finish the search                                                    
+        real(kind=sp),                  intent(   out) :: v1,v2     ! Out -> Interval [v1,v2] in sinT/Lambda                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read range for sintheta/lambda.                                                                                                                       
+    If only one value is read v1=0 and v2= read value                                                                                                     
+    If the keyword RNGSL is not given in the file, the default                                                                                            
+    values are v1=0.0, v2=1.0                                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub20" > Subroutine Read_File_Spg (Filevar,Nline_Ini,Nline_End,Spg,Sub) </a> </h4>                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=*),  dimension(:), intent(in) :: filevar       !  In -> String vector                                                               
+        integer,           intent(in)               :: nline_ini     !  In -> Line to start the search                                                    
+                                                                       Out -> Actual line on Filevar                                                      
+        integer,           intent(in)               :: nline_end     !  In -> Line to Finish the search                                                   
+        character(len=*),  intent(out)              :: spg           ! Out -> Space Group symbol                                                          
+        character(len=*),  intent(in ),optional     :: sub           ! in  -> The space sroup symbol is a subgroup                                        
+                                                                     !        of an already given space group                                             
+        Reads the card "SPGR" in filvar. Control of error is present                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub21" > Read_File_Transf(Filevar,Nline_Ini,Nline_End,Transf,Orig) </a> </h4>                                                           
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar      !  In -> String Vector                                                                 
+        integer,           intent(in out)          :: nline_ini    !  In -> Line to start the search                                                      
+                                                                     Out -> Atual line on Filevar                                                         
+        integer,           intent(in)              :: nline_end    !  In -> line to finish the search                                                     
+        real,dimension(3,3),             intent(out)    :: transf  ! Out -> Cell variable                                                                 
+        real,dimension(3  ),             intent(out)    :: orig                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read transformation matrix for changing the space group or cell setting.                                                                              
+    First the matrix M is read row by row and then the origin in the old setting                                                                          
+    is finally read. A single line with 12 real numbers should be given.                                                                                  
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+        e.g.: TRANS  m11 m12 m13  m21 m22 m33  m31 m32 m33   o1 o2 o3                                                                                     
+                                                                                                                                                          
+        That means       a'=m11 a + m12 b + m13 c                                                                                                         
+                         b'=m21 a + m22 b + m23 c                                                                                                         
+                         c'=m31 a + m32 b + m33 c                                                                                                         
+                                                                                                                                                          
+                         X' = inv(Mt) (X-O)                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub22" > Subroutine Read_Shx_Atom(Filevar,Nline_Ini,Nline_End,N_Fvar,Fvar,Elem_Type,N_Atom,Atm_List) </a> </h4>                         
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:), intent(in)        :: filevar        !  In -> String vector                                                         
+        integer,           intent(in out)                :: nline_ini      !  In -> Line to start the search                                              
+                                                                             Out -> Actual line on Filevar                                                
+        integer,           intent(in)                    :: nline_end      !  In -> Line to finish the search                                             
+        integer,                             intent(in)  :: n_fvar         !  In -> Number of parameters on FVAR                                          
+        real, dimension(:),                  intent(in)  :: fvar           !  In -> Values for FVAR                                                       
+        character(len=*), dimension(:),      intent(in)  :: elem_type      !  In -> type of elements                                                      
+        type (Crystal_Cell_Type),            intent(in)  :: Celda          !  In -> Cell type variable                                                    
+        integer,                             intent(out) :: n_atom         ! Out -> number of atoms                                                       
+        type (atom_list_type),              intent(out) :: Atm_List       ! Out -> Atom List                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Atoms parameters from Shelx file (.ins or .res)                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub23" > Subroutine Read_Shx_Cell(Filevar,Nline_Ini,Nline_End,Celda,Stdcelda,Lambda,Z) </a> </h4>                                       
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in)     :: filevar       !  In -> String vector                                                            
+        integer,                        intent(in out) :: nline_ini     !  In -> Line to start the search                                                 
+                                                                          Out -> Actual line on Filevar                                                   
+        integer,                        intent(in)     :: nline_end     !  In -> Line to finish the search                                                
+        real,dimension(6),              intent(out)    :: celda         ! Out -> Cell Parameters                                                          
+        real,dimension(6),              intent(out)    :: Stdcelda      ! Out -> Std Cell Parameters                                                      
+        real,                           intent(out)    :: lambda        ! Out -> Lambda                                                                   
+        integer,                        intent(out)    :: Z             ! Out -> Z                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Cell Parameter from Shelx file                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub24" > Subroutine Read_Shx_Cont(Filevar,Nline_Ini,Nline_End,N_Elem_Type,Elem_Type,N_Elem) </a> </h4>                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*),  dimension(:), intent(in)       :: filevar       !  In -> String Vector                                                         
+        integer,                         intent(in out)   :: nline_ini     !  In -> Line to start the search                                              
+                                                                             Out -> Actual Line on Filevar                                                
+        integer,                         intent(in)       :: nline_end     !  In -> Line to finish the search                                             
+        integer,                         intent(out)      :: n_elem_type   ! Out -> N. of different species                                               
+        character(len=*), dimension(:),  intent(out)      :: elem_type     ! Out -> Character to identify the specie                                      
+        real, dimension(:), optional,    intent(out)      :: n_elem        ! Out -> Number of elementos into the same species                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Chemical contents from Shelx file (.ins or .res)                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub25" > Subroutine Read_Shx_Fvar(Filevar,Nline_Ini,Nline_End,N_Fvar,Fvar) </a> </h4>                                                   
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar       !  In -> String vector                                                                
+        integer,           intent(in out)          :: nline_ini     !  In -> Line to start the search                                                     
+                                                                    ! Out -> Actual line on Filevar                                                       
+        integer,           intent(in)              :: nline_end     !  In -> Line to finish the search                                                    
+        integer,intent(out)                        :: n_fvar        ! Out -> N. of parameters on FVAR                                                     
+        real, dimension(:), intent(out)            :: fvar          ! Out -> values of FVAR                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Fvar parameters from Shelx file (.ins or .res)                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub26" > Subroutine Read_Shx_Latt(Filevar,Nline_Ini,Nline_End,Latt) </a> </h4>                                                          
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar     !  In -> String Vector                                                                  
+        integer,           intent(in out)          :: nline_ini   !  In -> Line to start the search                                                       
+                                                                    Out -> Actual line on Filevar                                                         
+        integer,           intent(in)              :: nline_end   !  In -> Line to finish the search                                                      
+        integer,           intent(out)             :: latt        ! Out -> Lattice number                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining lattice from Shelx file (.ins or .res)                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub27" > Subroutine Read_Shx_Symm(Filevar,Nline_Ini,Nline_End,N_Oper,Oper_Symm) </a> </h4>                                              
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: filevar       !  In -> String Vector                                                                
+        integer,           intent(in out)          :: nline_ini     !  In -> Line to start the search                                                     
+                                                                      Out -> Actual Line on Filevar                                                       
+        integer,           intent(in)              :: nline_end     !  In -> Line to finish the search                                                    
+        integer,           intent(out)             :: n_oper        ! Out -> Number of Operators                                                          
+        character(len=*), dimension(:),intent(out) :: oper_symm     ! Out -> String for Symmetry Operators                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Symmetry Operators from Shelx file (.ins or .res)                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub28" > Subroutine Read_Shx_Titl(Filevar,Nline_Ini,Nline_End,Title) </a> </h4>                                                         
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:), intent(in)     :: filevar      !  In -> String Vector                                                              
+        integer,                       intent(in out) :: nline_ini    !  In -> Line to start the search                                                   
+                                                                        Out -> Actual Line on Filevar                                                     
+        integer,                       intent(in)     :: nline_end    !  In -> Line to finish the search                                                  
+        character(len=*),              intent(out)    :: title        ! Out -> Title                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtaining Title from Shelx file                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub29" > Subroutine Read_Uvals(Line,Atomo,Ulabel) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        character(len=*),  intent(in out)  :: line      !  In -> String                                                                                   
+        Type (Atom_Type),  intent(in out)  :: Atomo     !  In -> Atomo variable                                                                           
+                                                          Out ->                                                                                          
+        character(len=4),  intent(in)      :: ulabel    !  In -> u_ij, b_ij, beta                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to read the anisotropic thermal parameters from a given Line                                                                               
+    it complets the object Atomo of type Atom.                                                                                                            
+    Assumes the string Line has been read from a file and                                                                                                 
+    starts with one of the words (u_ij, b_ij or beta), that is removed before reading                                                                     
+    the values of the parameters.                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub30" > Subroutine Write_Cif_Powder_Profile(Filename,Code) </a> </h4>                                                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in) :: filename     !  In -> Name of File                                                                                
+        integer,     intent(in)      :: code         !  In -> 0 Shelxs-Patterson                                                                          
+                                                              1 Shelxs-Direct Methods                                                                     
+                                                              2 Shelxl-Refinement                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Write a Cif Powder Profile file                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub31" > Subroutine Write_Cif_Template(Filename,Type_Data,Code) </a> </h4>                                                              
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in) :: filename      !  In -> Filename                                                                                   
+        integer,          intent(in) :: type_data     !  In -> 0: Single Crystal, 1: Powder Data                                                          
+        integer,          intent(in) :: code          !  In -> 0 Shelxs-Patterson                                                                         
+                                                               1 Shelxs-Direct Methods                                                                    
+                                                               2 Shelxl-Refinement                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Write a Cif File                                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod25"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

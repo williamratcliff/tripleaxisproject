@@ -1,0 +1,333 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod26" > CONFIGURATION_CALCULATIONS </a> </h2>                                                                                          
+    <dd>  Subroutines related to calculations of energy or                                                                                                
+    configuration properties depending on the crystal structure: BVS, Energy,.... </dd>                                                                   
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ATOM_CONF_LIST </a> </li>                                                                                                   
+      <li> <a href="#var2"  > BVS_ANIONS_N </a> </li>                                                                                                     
+      <li> <a href="#var3"  > BVS_ANIONS </a> </li>                                                                                                       
+      <li> <a href="#var4"  > BVS_ANIONS_RION </a> </li>                                                                                                  
+      <li> <a href="#var5"  > BVS_PAR_TYPE </a> </li>                                                                                                     
+      <li> <a href="#var6"  > BVS_SPECIES_N </a> </li>                                                                                                    
+      <li> <a href="#var7"  > BVS_TABLE </a> </li>                                                                                                        
+      <li> <a href="#var8"  > ERR_CONF </a> </li>                                                                                                         
+      <li> <a href="#var9"  > ERR_MESS_CONF </a> </li>                                                                                                    
+      <li> <a href="#var10" > TABLE_B </a> </li>                                                                                                          
+      <li> <a href="#var11" > TABLE_D0 </a> </li>                                                                                                         
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > ALLOCATE_ATOMS_CONF_LIST </a> </li>                                                                                         
+      <li> <a href="#sub2"  > BOND_VALENCE </a> </li>                                                                                                     
+      <li> <a href="#sub3"  > CALC_BVS </a> </li>                                                                                                         
+      <li> <a href="#sub4"  > COST_BVS </a> </li>                                                                                                         
+      <li> <a href="#sub5"  > COST_BVS_COULOMBREP </a> </li>                                                                                              
+      <li> <a href="#sub6"  > DEALLOCATE_ATOMS_CONF_LIST </a> </li>                                                                                       
+      <li> <a href="#sub7"  > DEALLOCATE_BVS_TABLE </a> </li>                                                                                             
+      <li> <a href="#sub8"  > INIT_ERR_CONF </a> </li>                                                                                                    
+      <li> <a href="#sub9"  > SET_BVS_TABLE </a> </li>                                                                                                    
+      <li> <a href="#sub10" > SET_TABLE_D0_B </a> </li>                                                                                                   
+      <li> <a href="#sub11" > SPECIES_ON_LIST </a> </li>                                                                                                  
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE :: ATOMS_CONF_LIST_TYPE </a> </h4>                                                                                        
+    <p> <pre>                                                                                                                                             
+     Type, public :: Atoms_Conf_List_Type                                                                                                                 
+        integer                                     :: natoms    ! Total number of atoms in the list                                                      
+        integer                                     :: N_Spec    ! Number of different species in the list                                                
+        integer                                     :: N_Anions  ! Number of anions in the list                                                           
+        integer                                     :: N_Cations ! Number of cations in the list                                                          
+        real                                        :: Tol       ! Tolerance(%) for sum of radii conditions                                               
+        real                                        :: totatoms  ! Total number of atoms in the unit cell                                                 
+        character(len=4), dimension(:), allocatable :: Species   ! Symbol + valence                                                                       
+        real,             dimension(:), allocatable :: Radius    !ionic/atomic radius of species                                                          
+        type(Atom_Type),  dimension(:), allocatable :: atom                                                                                               
+     End Type Atoms_Conf_List_Type                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > BVS_ANIONS_N </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: bvs_anions_n                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of anions known in BVS Table in O"Keefe, Breese, Brown                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > BVS_Anions </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        character(len=4), parameter, dimension(bvs_anions_n) :: bvs_anions                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Anions known from O'Keefe, Bresse, Brown                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > BVS_Anions_Rion </a> </h4>                                                                                                     
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), parameter, dimension(bvs_anions_n) :: bvs_anions_rion                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Radii Ionic for Anions                                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > TYPE :: BVS_PAR_TYPE </a> </h4>                                                                                                
+    <p> <pre>                                                                                                                                             
+     Type, public :: Bvs_Par_Type                                                                                                                         
+        character (len=4)               :: Symb      ! Chemical symbol                                                                                    
+        real,   dimension(bvs_anions_n) :: d0        ! D0 Parameter                                                                                       
+        real,   dimension(bvs_anions_n) :: b_par     ! B Parameter                                                                                        
+        integer,dimension(bvs_anions_n) :: reference ! Integer pointing to the reference paper                                                            
+     End Type Bvs_Par_Type                                                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Definition for BVS Parameters                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var6"  > BVS_SPECIES_N </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: bvs_species_n                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of Maximum species on BVS_Table                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var7"  > BVS_TABLE </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+        Type(Bvs_Par_Type), allocatable, dimension(:), public :: BVS_Table                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    BVS Parameters for calculations                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var8"  > ERR_CONF </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public  :: err_conf                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable taking the value .true. if an error in the module                                                                                    
+    CONFIGURATIONS_CALCULATIONS occurs.                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var9"  > ERR_MESS_CONF </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public:: err_mess_conf                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var10" > TABLE_B </a> </h4>                                                                                                             
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(:,:), allocatable, private :: Table_b                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Matrix N_Species x N_Species of B parameters for BVS                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var11" > TABLE_D0 </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(:,:), allocatable, private :: Table_d0                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Matrix N_Species x N_Species of D0 for BVS                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > TABLE_Ref </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+        integer,dimension(:,:), allocatable, private :: Table_ref                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Matrix N_Species x N_Species with references for BVS parameters                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Reference list for BVS parameters </a> </h4>                                                                                   
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+                                                                                                                                                          
+    Subroutine Allocate_Atoms_Conf_List(N,A)                                                                                                              
+    integer, intent(in)                         :: n    !  In -> Atoms in asymmetric unit                                                                 
+    type (Atoms_Conf_List_Type), intent(in out) :: A    !  In -> Objet to be allocated                                                                    
+                                                                                                                                                          
+    Allocation of objet A of type atom_list_Conf. This subroutine                                                                                         
+    should be called before using an object of type atom_list_Conf.                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Bond_Valence(d0,b0,d,sd,bv,sbv) </a> </h4>                                                                          
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)  :: d0    ! BVS parameter                                                                                               
+        real(kind=sp), intent(in)  :: b0    ! BVS parameter                                                                                               
+        real(kind=sp), intent(in)  :: d     ! Distance                                                                                                    
+        real(kind=sp), intent(in)  :: sd    ! Sigma(d)                                                                                                    
+        real(kind=sp), intent(out) :: bv    ! BVS                                                                                                         
+        real(kind=sp), intent(out) :: sbv   ! Sigma(bv)                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Zachariasen exponential expression of Bond Valence                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Calc_BVS(A, Ipr, N_BVSm, BVS_M, Filecod) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        type (Atoms_Conf_List_type),              intent(in)   :: A            !  In -> Object of Atoms_Conf_List_type                                    
+        integer,                        optional, intent(in)   :: Ipr                                                                                     
+        integer,                        optional, intent(in)   :: n_bvsm       !  In -> Number of modifications                                           
+        character(len=*), dimension(:), optional, intent(in)   :: BVS_M        ! In -> Text with BVS parameters                                           
+        character(len=*),               optional, intent(in)   :: Filecod                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to calculate Bond-Valence sums.                                                                                                            
+    Before calling this subroutine it is the responsibility of the calling                                                                                
+    program to make a previous call to "Calc_Distance_Angles_Sigma" in order                                                                              
+    to update the internal private variables related to distance/angle calculations.                                                                      
+    Needs as input the object A (of type atom_Conf_list_type, that                                                                                        
+    should be allocated in the calling program).                                                                                                          
+    Control for error is present.                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Cost_BVS(A, GII, gic) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        type (Atoms_Conf_List_type),  intent(in)   :: A    !  In  -> Object of Atoms_Conf_List_type                                                       
+        real(kind=sp),                intent(out)  :: GII  !  OUT -> Global instability index                                                             
+        character(len=*),   optional, intent(in)   :: gic  ! If present GII_c is put in GII                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to calculate the Global Instability Index.                                                                                                 
+    Before calling this subroutine it is the responsibility of the calling                                                                                
+    program to make a previous call to "Calc_TDist_Coordination" in order                                                                                 
+    to update the internal private variables related to distance/angle calculations.                                                                      
+    Needs as input the object A (of type atom_Conf_list_type, that                                                                                        
+    should be allocated in the calling program).                                                                                                          
+    All items corresponding to the bond-valence parameters contained in A have to                                                                         
+    be properly set before calling this procedure.                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Cost_BVS_CoulombRep(A, GII, ERep) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        type (Atoms_Conf_List_type),  intent(in)   :: A     !  In  -> Object of Atoms_Conf_List_type                                                      
+        real(kind=sp),                intent(out)  :: GII   !  OUT -> Global instability index                                                            
+        real(kind=sp),                intent(out) :: ERep   !  Pseudo Repulsion Coulomb "energy"                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine to calculate the Global Instability Index Gii_a and                                                                                        
+    a pseudo Coulomb repulsion energy useful to avoid cation-cation and                                                                                   
+    anion-anion overlap when using this cost function for predicting or                                                                                   
+    solving a ionic crystal structure. It was used in the old program PiXSA,                                                                              
+    by J. Pannetier, J. Bassas-Alsina, J.Rodriguez-Carvajal and V. Caignaert,                                                                             
+    in "Prediction of Crystal Structures from Crystal Chemistry Rules by                                                                                  
+    Simulated Annealing", Nature 346, 343-345 (1990).                                                                                                     
+    Before calling this subroutine it is the responsibility of the calling                                                                                
+    program to make a previous call to "Calc_TDist_Coordination" in order                                                                                 
+    to update the internal Coord_Info variables related to distance and                                                                                   
+    angle calculations.                                                                                                                                   
+    Needs as input the object A (of type atom_Conf_list_type, that                                                                                        
+    should be allocated in the calling program).                                                                                                          
+    All items corresponding to the bond-valence parameters contained in                                                                                   
+    "A" have to be properly set before calling this procedure.                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Deallocate_Atoms_Conf_List(A) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        type (Atoms_Conf_List_Type), intent(in out)   :: A  ! In/ Out -> Objet to be deallocated                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    De-allocation of objet A of type Atoms_Conf_List. This subroutine                                                                                     
+    should be after using an object of type Atoms_Conf_List that is no                                                                                    
+    more needed.                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Deallocate_BVS_Table() </a> </h4>                                                                                   
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Deallocating BVS_Table                                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Init_Err_Conf() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in this Module                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Set_BVS_Table() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Fills the parameters for BVS from O'Keefe, Bresse, Brown                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Set_Table_d0_b() </a> </h4>                                                                                         
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+                                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod26"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

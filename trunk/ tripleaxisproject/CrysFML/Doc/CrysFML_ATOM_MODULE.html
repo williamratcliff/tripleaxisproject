@@ -1,0 +1,460 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod19" > ATOM_MODULE </a> </h2>                                                                                                         
+    <dd>  Subroutines related to Atoms definitions </dd>                                                                                                  
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ATOM_TYPE </a> </li>                                                                                                        
+      <li> <a href="#var2"  > ATOMS_CELL_TYPE </a> </li>                                                                                                  
+      <li> <a href="#var3"  > ATOM_LIST_TYPE </a> </li>                                                                                                   
+      <li> <a href="#var4"  > MATOM_TYPE </a> </li>                                                                                                       
+      <li> <a href="#var5"  > MATOM_LIST_TYPE </a> </li>                                                                                                  
+      <li> <a href="#var6"  > ERR_ATMD </a> </li>                                                                                                         
+      <li> <a href="#var7"  > ERR_MESS_ATMD </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > EQUIV_ATM </a> </li>                                                                                                        
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > ALLOCATE_ATOMS_CELL </a> </li>                                                                                              
+      <li> <a href="#sub2"  > ALLOCATE_ATOM_LIST </a> </li>                                                                                               
+      <li> <a href="#sub3"  > ALLOCATE_MATOM_LIST </a> </li>                                                                                              
+      <li> <a href="#sub4"  > ATLIST1_EXTENCELL_ATLIST2 </a> </li>                                                                                        
+      <li> <a href="#sub5"  > ATOMS_CELL_TO_LIST </a> </li>                                                                                               
+      <li> <a href="#sub6"  > ATOM_LIST_TO_CELL </a> </li>                                                                                                
+      <li> <a href="#sub7"  > ATOM_UEQUI_LIST </a> </li>                                                                                                  
+      <li> <a href="#sub8"  > DEALLOCATE_ATOMS_CELL </a> </li>                                                                                            
+      <li> <a href="#sub9"  > DEALLOCATE_ATOM_LIST </a> </li>                                                                                             
+      <li> <a href="#sub10" > DEALLOCATE_MATOM_LIST </a> </li>                                                                                            
+      <li> <a href="#sub11" > INIT_ATOM_TYPE </a> </li>                                                                                                   
+      <li> <a href="#sub12" > INIT_ERR_ATMD </a> </li>                                                                                                    
+      <li> <a href="#sub13" > MERGE_ATOMS_PEAKS </a> </li>                                                                                                
+      <li> <a href="#sub14" > MULTI </a> </li>                                                                                                            
+      <li> <a href="#sub15" > WRITE_atom_list </a> </li>                                                                                                  
+      <li> <a href="#sub16" > WRITE_ATOMS_CFL </a> </li>                                                                                                  
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE :: ATOM_TYPE </a> </h4>                                                                                                   
+    <p> <pre>                                                                                                                                             
+     Type, public :: Atom_Type                                                                                                                            
+        character(len=10)                       :: Lab           ! Label                                                                                  
+        character(len=2)                        :: ChemSymb      ! Chemical Symbol                                                                        
+        character(len=4)                        :: SfacSymb      ! Chemical Symbol for SF                                                                 
+        logical                                 :: active        ! Control for different purposes                                                         
+        integer                                 :: Z             ! Atomic number                                                                          
+        integer                                 :: mult          ! multiplicity of the site                                                               
+        real(kind=sp),dimension(3)              :: x             ! Fractional coordinates                                                                 
+        real(kind=sp),dimension(3)              :: x_std         ! Standar deviations                                                                     
+        real(kind=sp),dimension(3)              :: mx            ! Multiplier parameters of coordinates                                                   
+        integer,      dimension(3)              :: lx            ! Numbers of LSQ parameters for coordinates                                              
+        real(kind=sp)                           :: occ           ! occupation factor                                                                      
+        real(kind=sp)                           :: occ_std       ! Standard deviation of occupation factor                                                
+        real(kind=sp)                           :: mOcc          !                                                                                        
+        integer                                 :: lOcc          !                                                                                        
+        real(kind=sp)                           :: Biso          ! Isotropic B-factor                                                                     
+        real(kind=sp)                           :: Biso_std      ! Standard deviation of Isotropic B-factor                                               
+        real(kind=sp)                           :: mBiso         !                                                                                        
+        integer                                 :: lBiso         !                                                                                        
+        character(len=4)                        :: utype         ! type of anisotropic thermal parameters: u_ij, b_ij, beta, none                         
+        character(len=5)                        :: thtype        ! "isotr","aniso","other"                                                                
+        real(kind=sp),dimension(6)              :: U             ! U11, U22, U33, U12, U13, U23                                                           
+        real(kind=sp),dimension(6)              :: U_std         ! Standar_Deviations of U"s                                                              
+        real(kind=sp)                           :: Ueq           ! Uequiv                                                                                 
+        real(kind=sp),dimension(6)              :: mU            !                                                                                        
+        real(kind=sp),dimension(6)              :: lU            !                                                                                        
+        real(kind=sp)                           :: Charge        ! Charge                                                                                 
+        real(kind=sp)                           :: Moment        ! Moment                                                                                 
+        integer, dimension(5)                   :: Ind           ! Index for different purposes                                                           
+        integer                                 :: Nvar          !                                                                                        
+        real(kind=sp),dimension(10)             :: VarF          ! Free parameters to for different purposes                                              
+     End Type Atom_Type                                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > TYPE :: atoms_cell_type </a> </h4>                                                                                             
+    <p> <pre>                                                                                                                                             
+     Type, public :: atoms_cell_type                                                                                                                      
+        integer                                      :: nat         ! -> Total number of atoms                                                            
+        character(len=10), dimension(:), allocatable :: noms        ! -> Name of atoms   (nat)                                                            
+        real(kind=sp),   dimension(:,:), allocatable :: xyz         ! -> Fractional coordinates (3,nat)                                                   
+        real(kind=sp),     dimension(:), allocatable :: charge                                                                                            
+        real(kind=sp),     dimension(:), allocatable :: moment                                                                                            
+        real(kind=sp),   dimension(:,:), allocatable :: Var_free    ! -> Free variables (10,nat)                                                          
+        integer,           dimension(:), allocatable :: neighb      ! -> Number of neighbours (nat)                                                       
+        integer,        dimension( :,:), allocatable :: neighb_atom ! -> Ptr.->neighbour (# in list)(nat,idp)                                             
+        real(kind=sp),  dimension( :,:), allocatable :: distance    ! -> Corresponding distances (nat,idp)                                                
+        real(kind=sp),dimension(:, :,:), allocatable :: trans       ! -> Lattice translations   (3,nat,idp)                                               
+        integer                                      :: ndist       ! -> Number of distinct distances                                                     
+        real(kind=sp),     dimension(:), allocatable :: ddist       ! -> List of distinct distances(nat*idp)                                              
+        character (len=8), dimension(:), allocatable :: ddlab       ! -> Labels of atoms at ddist (nat*idp)                                               
+     End Type atoms_cell_type                                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > TYPE :: ATOM_LIST_TYPE </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+     Type, public :: atom_list_type                                                                                                                       
+        integer                                    :: natoms  ! total number of atoms in the list                                                         
+        type(Atom_Type),dimension(:),allocatable   :: atom    ! individual atoms                                                                          
+     End Type atom_list_type                                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > TYPE :: MATOM_TYPE </a> </h4>                                                                                                  
+    <p> <pre>                                                                                                                                             
+     Type, public :: mAtom_Type                                                                                                                           
+        character(len=10)                       :: Lab           ! Label                                                                                  
+        character(len=2)                        :: ChemSymb      ! Chemical Symbol                                                                        
+        character(len=4)                        :: SfacSymb      ! Chemical Symbol for SF                                                                 
+        logical                                 :: active        ! Control for different purposes                                                         
+        integer                                 :: Z             ! Atomic number                                                                          
+        integer                                 :: mult          ! multiplicity of the site                                                               
+        real(kind=sp),dimension(3)              :: x             ! Fractional coordinates                                                                 
+        real(kind=sp),dimension(3)              :: x_std         ! Standar deviations                                                                     
+        real(kind=sp),dimension(3)              :: mx            ! Multiplier parameters of coordinates                                                   
+        integer,      dimension(3)              :: lx            ! Numbers of LSQ parameters for coordinates                                              
+        real(kind=sp)                           :: occ           ! occupation factor                                                                      
+        real(kind=sp)                           :: occ_std       ! Standard deviation of occupation factor                                                
+        real(kind=sp)                           :: mOcc          !                                                                                        
+        integer                                 :: lOcc          !                                                                                        
+        real(kind=sp)                           :: Biso          ! Isotropic B-factor                                                                     
+        real(kind=sp)                           :: Biso_std      ! Standard deviation of Isotropic B-factor                                               
+        real(kind=sp)                           :: mBiso         !                                                                                        
+        integer                                 :: lBiso         !                                                                                        
+        character(len=4)                        :: utype         ! type of anisotropic thermal parameters: u_ij, b_ij, beta, none                         
+        character(len=5)                        :: thtype        ! "isotr","aniso","other"                                                                
+        real(kind=sp),dimension(6)              :: U             ! U11, U22, U33, U12, U13, U23                                                           
+        real(kind=sp),dimension(6)              :: U_std         ! Standar_Deviations of U"s                                                              
+        real(kind=sp)                           :: Ueq           ! Uequiv                                                                                 
+        real(kind=sp),dimension(6)              :: mU            !                                                                                        
+        real(kind=sp),dimension(6)              :: lU            !                                                                                        
+        real(kind=sp)                           :: Charge        ! Charge                                                                                 
+        real(kind=sp)                           :: Moment        ! Moment                                                                                 
+        integer, dimension(5)                   :: Ind           ! Index for different purposes                                                           
+        integer                                 :: Nvar          !                                                                                        
+        real(kind=sp),dimension(10)             :: VarF          ! Free parameters to load                                                                
+                               ===================                                                                                                        
+                               Magnetic parameters                                                                                                        
+                               ===================                                                                                                        
+        integer                                 :: nvk           ! Number of propagation vectors (excluding -k)                                           
+        integer,      dimension(12)             :: imat          ! Number of the magnetic matrices set to be applied                                      
+        real(kind=sp),dimension(3,12)           :: SkR           ! Real part of Fourier Coefficient                                                       
+        real(kind=sp),dimension(3,12)           :: mSkR          ! Multipliers for the real part of Fourier coefficients                                  
+        integer,      dimension(3,12)           :: lskr          ! Numbers in the list of LSQ parameters                                                  
+        real(kind=sp),dimension(3,12)           :: SkI           ! Imaginary part of Fourier Coefficient                                                  
+        real(kind=sp),dimension(3,12)           :: mSki          ! Multipliers for the imaginary part of Fourier coefficients                             
+        integer,      dimension(3,12)           :: lski          ! Numbers in the list of LSQ parameters                                                  
+        real(kind=sp),dimension(12)             :: mphas         ! Magnetic Phase in fractions of 2pi                                                     
+        real(kind=sp),dimension(12)             :: mmphas        ! Multiplier for the magnetic phase                                                      
+        integer,dimension(12)                   :: lmphas        ! Number in the list of LSQ parameters                                                   
+     End Type mAtom_Type                                                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > TYPE :: MATOM_LIST_TYPE </a> </h4>                                                                                             
+    <p> <pre>                                                                                                                                             
+     Type, public :: mAtom_list_type                                                                                                                      
+        integer                                     :: natoms  ! total number of atoms in the list                                                        
+        type(mAtom_Type),dimension(:),allocatable   :: Atom    ! individual atoms                                                                         
+     End Type mAtom_list_type                                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var6"  > ERR_ATMD </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public  :: err_atmd                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable taking the value .true. if an error in the module ATOM_DISTANCES occurs.                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var7"  > ERR_MESS_ATMD </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public:: err_mess_atmd                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Logical Function Equiv_Atm(Nam1,Nam2,Namea) Result(Equiv_Atom) </a> </h4>                                                      
+    <p> <pre>                                                                                                                                             
+        character (len=*), intent (in) :: nam1       !  In -> Atom Nam1                                                                                   
+        character (len=*), intent (in) :: nam2       !  In -> Atom Nam2                                                                                   
+        character (len=*), intent (in) :: name       !  In -> String containing atom names                                                                
+        logical                        :: equiv_atom !  Result .true. or .false.                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Determine whether the atoms of names "nam1" and "nam2" are included in                                                                                
+    the longer string "name" (constructed by function "wrt_lab").                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Function Wrt_Lab(Nam1,Nam2) Result(Bilabel) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        character (len=*), intent (in) :: nam1     !  In -> Atom name 1                                                                                   
+        character (len=*), intent (in) :: nam2     !  In -> Atom name 2                                                                                   
+        character (len=8)              :: bilabel  ! Result -> Composed string with underscores                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Character function merging the main part of the labels                                                                                                
+    (before underscore "_") of the atoms "nam1" and "nam2" into                                                                                           
+    the string "bilabel"                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Allocate_Atoms_Cell(Nasu,Mul,Dmax,Ac) </a> </h4>                                                                    
+    <p> <pre>                                                                                                                                             
+        integer, intent(in)                      :: nasu    !  In -> Number of atoms in asymmetric unit                                                   
+        integer, intent(in)                      :: mul     !  In -> General multiplicity of the Space Group                                              
+        real(kind=sp),    intent(in)             :: dmax    !  In -> Maximun distance to be calculated                                                    
+        type (atoms_cell_type), intent(in out)   :: Ac      !  In -> Object of type atoms_cell_type                                                       
+                                                              Out -> Allocated and initialized object Ac                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Allocation of objet "Ac" of type Atoms_Cell. "Ac" contains                                                                                            
+    components with ALLOCATABLE attribute with dimension depending                                                                                        
+    on the input arguments "Nasu", "Mul" and "Dmax". The variables used for calculating the                                                               
+    de dimensions are:                                                                                                                                    
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+              natcel=nasu*mul       and      id=idp=nint(0.74048*(dmax/r_atom)**3)                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    This subroutine should be called before using the subroutines of this module with                                                                     
+    dummy arguments of type Atoms_Cell.                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Allocate_atom_list(N,A) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        integer, intent(in)                    :: n    !  In -> Number of elements of A                                                                   
+        type (atom_list_type), intent(in out) :: A    !  In -> Objet to be allocated                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Allocation of objet A of type atom_list. This subroutine                                                                                              
+    should be called before using an object of type atom_list.                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Allocate_mAtom_list(N,A) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        integer, intent(in)                    :: n    !  In -> Number of elements of A                                                                   
+        type (mAtom_list_type), intent(in out) :: A    !  In -> Objet to be allocated                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Allocation of objet A of type mAtom_list. This subroutine                                                                                             
+    should be called before using an object of type mAtom_list.                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Atlist1_Extencell_Atlist2(Spg,A,B,Conven) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        type(Space_Group_Type), intent(in)     :: SpG       !  In -> Space Group Information                                                              
+        type(atom_list_type),  intent(in)     :: A         !  In -> Atom List (asymmetric unit)                                                           
+        type(atom_list_type),  intent(out)    :: B         ! Out -> Atoms in unit cell                                                                    
+        logical,                intent(in)     :: conven    !  In -> .true. for using the whole conventional unit cell                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to generate atoms in the primitive (conven=.false.) or the conventional                                                                    
+    unit cell (conven=.true.)                                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Atoms_Cell_To_List(Ac,A) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        Type(atoms_cell_type),  Intent(In)        :: Ac   !  In -> instance of atoms_cell_type                                                            
+        type(atom_list_type),  intent(in out)    :: A    !  In -> instance of atom_list_type                                                              
+                                                             Out-> Initialize atom_list_type components                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to construct an Atom List object "A" from an Atoms_Cell                                                                                    
+    object "Ac". It is supposed that both objects have been previouly                                                                                     
+    allocated using the appropriate procedures: direct allocation                                                                                         
+    for A and call to Allocate_Atoms_Cell for Ac.                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine atom_list_To_Cell(A,Ac) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        type(atom_list_type),  intent(in)        :: A    !  In -> instance of atom_list_type                                                              
+        type(atoms_cell_type),  intent(in out)    :: Ac   !  In -> instance of atoms_cell_type                                                            
+                                                             Out-> Initialize atoms_cell_type components                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to construct an Atom Cell object "Ac" from an atom_list                                                                                    
+    object "A". It is supposed that both objects have been previouly                                                                                      
+    allocated using the appropriate procedures.                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Atom_Uequi_List(Cell, A) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        type(Crystal_Cell_Type), intent(in)     :: Cell   !  In -> Cell variable                                                                          
+        type(atom_list_type),   intent(in out) :: A      !  In -> Atom list                                                                               
+                                                             Out ->                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to obtain the U equiv from U11 U22 U33 U12 U13 U23                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Deallocate_Atoms_Cell(Ac) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        type (atoms_cell_type), intent(in out)   :: Ac   !  In -> Object of atoms_cell_type                                                               
+                                                         ! Out -> The object is removed from memory.                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Deallocation of objet Ac of type Atoms_Cell.  Ac contains                                                                                             
+    components with ALLOCATABLE attribute. This subroutine should                                                                                         
+    be called after using this module.                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Deallocate_atom_list(A) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        type (atom_list_type), intent(in out)   :: A  ! In/ Out -> Objet to be deallocated                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    De-allocation of objet A of type atom_list. This subroutine                                                                                           
+    should be after using an object of type atom_list that is no                                                                                          
+    more needed.                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Deallocate_mAtom_list(A) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        type (mAtom_list_type), intent(in out)   :: A  ! In/ Out -> Objet to be deallocated                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    De-allocation of objet A of type atom_list. This subroutine                                                                                           
+    should be invoked after using an object of type mAtom_list                                                                                            
+    that is no more needed.                                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine Init_Atom_Type(A) </a> </h4>                                                                                        
+    <p> <pre>                                                                                                                                             
+        type (Atom_Type),  intent(in out) :: A   ! In / Out -> Atom type                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Initialize Atom_Type                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Init_mAtom_Type(A) </a> </h4>                                                                                       
+    <p> <pre>                                                                                                                                             
+        type (mAtom_Type),  intent(in out) :: A   ! In / Out -> mAtom type                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Initialize mAtom_Type                                                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Init_Err_Atmd() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in this Module                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub15" > Subroutine Merge_Atoms_Peaks(Cell,Atm,Npks,Pks,Grp,NAtm) </a> </h4>                                                            
+    <p> <pre>                                                                                                                                             
+        type(Crystal_Cell_Type),        intent(in) :: Cell  ! Cell object                                                                                 
+        type(atom_list_type),          intent(in) :: Atm   ! Atoms List                                                                                   
+        integer,                        intent(in) :: Npks  ! Number of Peaks on Pks                                                                      
+        real(kind=sp), dimension(:,:),  intent(in) :: Pks   ! Lis of Peaks                                                                                
+        type(Space_Group_Type),         intent(in) :: Grp   ! Space Group Information                                                                     
+        type(atom_list_type),          intent(out):: NAtm  ! New Atoms+Peaks List                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    This routine merge atoms and peaks on a new List.                                                                                                     
+    <p> <pre>                                                                                                                                             
+            Atom        Peak    -->        Label      Symb                                                                                                
+        ------------------------------------------------------                                                                                            
+             *            *                Atom       "Pk"                                                                                                
+             *            -                 Atom information                                                                                              
+             -            *                "Pks"        "**"                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub16" > Subroutine Multi(Lun,Iprin,Conven,Spg,A,Ac) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        integer,                intent(in)     :: lun     !  In -> Logical Unit for writing                                                               
+        logical,                intent(in)     :: iprin   !  In -> .true. for writing in Lun                                                              
+        logical,                intent(in)     :: conven  !  In -> .true. for using the whole conventional unit cell                                      
+        type(Space_Group_Type), intent(in)     :: SpG     !  In -> Space Group Information                                                                
+        type(atom_list_type),  intent(in out) :: A       !  In -> Atom List (asymmetric unit)                                                             
+                                                            Out -> Updated Atom List (multiplicity of sites)                                              
+        type(atoms_cell_type),  intent(out)    :: Ac      ! Out -> Atoms in unit cell                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to obtain multiplicities and coordinates of all atoms in                                                                                   
+    the conventional unit cell. Calculates  "A%At(k)%mult" and constructs,                                                                                
+    partially, the object "Ac" of type "Atoms_Cell". The generated atoms constitute the                                                                   
+    content of the primitive (conven=.false.) or the conventional unit cell (conven=.true.).                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod19"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

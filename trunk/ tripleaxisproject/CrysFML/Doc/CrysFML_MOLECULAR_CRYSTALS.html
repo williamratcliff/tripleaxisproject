@@ -1,0 +1,651 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod24" > MOLECULAR_CRYSTALS </a> </h2>                                                                                                  
+    <dd>  Module to define molecules on Crystals </dd>                                                                                                    
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_MESS_MOLEC </a> </li>                                                                                                   
+      <li> <a href="#var2"  > ERR_MOLEC </a> </li>                                                                                                        
+      <li> <a href="#var3"  > MOLECULE_TYPE </a> </li>                                                                                                    
+      <li> <a href="#var4"  > MOLECULAR_CRYSTAL_TYPE </a> </li>                                                                                           
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > CARTESIAN_TO_FRACTIONAL </a> </li>                                                                                          
+      <li> <a href="#sub2"  > CARTESIAN_TO_SPHERICAL </a> </li>                                                                                           
+      <li> <a href="#sub3"  > CARTESIAN_TO_ZMATRIX </a> </li>                                                                                             
+      <li> <a href="#sub4"  > EMPIRIC_FORMULA </a> </li>                                                                                                  
+      <li> <a href="#sub5"  > FIX_ORDER </a> </li>                                                                                                        
+      <li> <a href="#sub6"  > FIX_ORIENT_CARTESIAN </a> </li>                                                                                             
+      <li> <a href="#sub7"  > FRACTIONAL_TO_CARTESIAN </a> </li>                                                                                          
+      <li> <a href="#sub8"  > FRACTIONAL_TO_SPHERICAL </a> </li>                                                                                          
+      <li> <a href="#sub9"  > FRACTIONAL_TO_ZMATRIX </a> </li>                                                                                            
+      <li> <a href="#sub10" > INIT_ERR_MOLEC </a> </li>                                                                                                   
+      <li> <a href="#sub11" > INIT_MOLECULE_VAR </a> </li>                                                                                                
+      <li> <a href="#sub12" > MOLCRYS_TO_ATOMLIST </a> </li>                                                                                              
+      <li> <a href="#sub13" > MOLEC_TO_ATOMLIST </a> </li>                                                                                                
+      <li> <a href="#sub14" > READ_FREE_ATOMS </a> </li>                                                                                                  
+      <li> <a href="#sub15" > READ_MOLECULE </a> </li>                                                                                                    
+      <li> <a href="#sub16" > SET_EULER_MATRIX </a> </li>                                                                                                 
+      <li> <a href="#sub17" > SPHERICAL_TO_CARTESIAN </a> </li>                                                                                           
+      <li> <a href="#sub18" > SPHERICAL_TO_FRACTIONAL </a> </li>                                                                                          
+      <li> <a href="#sub19" > SPHERICAL_TO_ZMATRIX </a> </li>                                                                                             
+      <li> <a href="#sub20" > WRITE_FREE_ATOMS </a> </li>                                                                                                 
+      <li> <a href="#sub21" > WRITE_MOLECULAR_CRYSTAL </a> </li>                                                                                          
+      <li> <a href="#sub22" > WRITE_MOLECULE </a> </li>                                                                                                   
+      <li> <a href="#sub23" > ZMATRIX_TO_CARTESIAN </a> </li>                                                                                             
+      <li> <a href="#sub24" > ZMATRIX_TO_FRACTIONAL </a> </li>                                                                                            
+      <li> <a href="#sub25" > ZMATRIX_TO_SPHERICAL </a> </li>                                                                                             
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MESS_MOLEC </a> </h4>                                                                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=256), public :: Err_Mess_Molec                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_MOLEC </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+        logical, public :: err_molec                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in MOLECULAR_CRYSTAL module                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > TYPE :: MOLECULE_TYPE </a> </h4>                                                                                               
+    <p> <pre>                                                                                                                                             
+      Type, public :: Molecule_Type                                                                                                                       
+         character(len=80)                               :: Name_mol     !Global name for the molecule                                                    
+         integer                                         :: natoms       !Number of atoms                                                                 
+         logical                                         :: in_xtal      !True if global coordinates xcentre, orient are defined                          
+         logical                                         :: is_EulerMat  !True if the Euler Matrix has been set                                           
+         logical                                         :: is_connect   !True if the connectivity is correct                                             
+         character(len=1)                                :: rot_type     !Type of rotational angles                                                       
+                                                                         !"E": Conventional Euler angles (alpha,beta,gamma)                               
+                                                                         !"P": Second variant of Euler angles (default)                                   
+                                                                         !     Polar:(theta,phi,chi)                                                      
+         character(len=1)                                :: coor_type    !Type of internal coordinates                                                    
+                                                                         !"Z": Z-matrix                                                                   
+                                                                         !"C": Cartesian                                                                  
+                                                                         !"S": Spherical                                                                  
+                                                                         !"F": Fractional coordinates (only if in_xtal = .true.)                          
+         character(len=3)                                :: therm_type   !Type of thermal factor                                                          
+                                                                         !"ISO": No collective motion                                                     
+                                                                         !"T  ": Translational                                                            
+                                                                         !"TL ": Translational + Librational                                              
+                                                                         !"TLS": Translational + Librational + Correlation                                
+         real(kind=cp), dimension(3)                     :: xcentre      !Fractional coordinates of the centre                                            
+         real,          dimension(3)                     :: mxcentre     !Refinement codes of Fractional coordinates of the centre                        
+         integer,       dimension(3)                     :: lxcentre     !Numbers of LSQ parameters for Fractional coordinates of the centre              
+         real(kind=cp), dimension(3)                     :: Orient       !Orientation angles (Euler angles or variant ...)                                
+         real,          dimension(3)                     :: mOrient      !Refinement codes of Orientation angles (Euler angles or variant ...)            
+         integer,       dimension(3)                     :: lOrient      !Numbers of LSQ parameters for Orientation angles (Euler angles or vari          
+         real(kind=cp), dimension(6)                     :: T_TLS        !Translational Thermal factor tensor                                             
+         real,          dimension(6)                     :: mT_TLS       !Refinement codes of Translational Thermal factor tensor                         
+         integer,       dimension(6)                     :: lT_TLS       !Numbers of LSQ parameters for Translational Thermal factor tensor               
+         real(kind=cp), dimension(6)                     :: L_TLS        !Librational Thermal factor tensor                                               
+         real,          dimension(6)                     :: mL_TLS       !Refinement codes of Librational Thermal factor tensor                           
+         integer,       dimension(6)                     :: lL_TLS       !Numbers of LSQ parameters for Librational Thermal factor tensor                 
+         real(kind=cp), dimension(3,3)                   :: S_TLS        !TL-correlation Thermal factor                                                   
+         real,          dimension(3,3)                   :: mS_TLS       !Refinement codes of TL-correlation Thermal factor                               
+         integer,       dimension(3,3)                   :: lS_TLS       !Numbers of LSQ parameters for TL-correlation Thermal factor                     
+         real(kind=cp), dimension(3,3)                   :: Euler        !Euler matrix                                                                    
+         character(len=6),  allocatable, dimension(  :)  :: AtName       !Atom Name                                                                       
+         character(len=4),  allocatable, dimension(  :)  :: AtSymb       !Atom species                                                                    
+         integer,           allocatable, dimension(  :)  :: AtZ          !Atomic Number                                                                   
+         integer,           allocatable, dimension(:,:)  :: Ptr          !Pointer to scat.factors (first index -> pattern)                                
+         real(kind=cp),     allocatable, dimension(:,:)  :: I_coor       !Internal coordinates (d,ang,dang)                                               
+         real,              allocatable, dimension(:,:)  :: mI_coor      !Refinement codes of internal coordinates                                        
+         integer,           allocatable, dimension(:,:)  :: lI_coor      !Numbers of LSQ parameters for internal coordinates                              
+         real(kind=cp),     allocatable, dimension(  :)  :: biso         !Isotropic temperature factor                                                    
+         real,              allocatable, dimension(  :)  :: mbiso        !Refinement codes of Isotropic temperature factor                                
+         integer,           allocatable, dimension(  :)  :: lbiso        !Numbers of LSQ parameters for Isotropic temperature factor                      
+         real(kind=cp),     allocatable, dimension(  :)  :: occ          !Occupation factor                                                               
+         real,              allocatable, dimension(  :)  :: mocc         !Refinement codes of Occupation factor                                           
+         integer,           allocatable, dimension(  :)  :: locc         !Numbers of LSQ parameters for Occupation factor                                 
+         integer,           allocatable, dimension(  :)  :: Nb           !Number of neighbours                                                            
+         integer,           allocatable, dimension(:,:)  :: inb          !Index of neighbous                                                              
+         integer,           allocatable, dimension(:,:)  :: Tb           !Type of bonds                                                                   
+         integer,           allocatable, dimension(:,:)  :: conn         !Conectivity (N1,N2,N3)                                                          
+      End Type Molecule_Type                                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > TYPE :: MOLECULAR_CRYSTAL_TYPE </a> </h4>                                                                                      
+    <p> <pre>                                                                                                                                             
+      Type, public :: Molecular_Crystal_Type                                                                                                              
+         integer                                              :: N_free      !Number of free atoms                                                        
+         integer                                              :: N_mol       !Number of Molecules                                                         
+         integer                                              :: N_species   !Number of species                                                           
+         integer                                              :: Npat        !                                                                            
+         type(Crystal_Cell_type)                              :: Cell        !Cell Information                                                            
+         type(Space_Group_type)                               :: SpG         !Space Group Information                                                     
+         type(Atom_type),         allocatable, dimension(  :) :: Atm         !Free Atoms                                                                  
+         type(Molecule_type ),    allocatable, dimension(  :) :: Mol         !Molecules                                                                   
+      End type Molecular_Crystal_Type                                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Cartesian_to_Fractional(Molecule,Cell,NewMolecule) </a> </h4>                                                       
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Crystal_Cell_Type), intent(in)           :: Cell                                                                                            
+        type (Molecule_type), intent(   out), optional :: Newmolecule                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a                                                                                                 
+    molecule from cartesian coordinates to  fractional coordinates.                                                                                       
+    If a third argument is present the subroutine creates a new                                                                                           
+    molecule (copy of the old one) with fractional coordinates,                                                                                           
+    preserving the input molecule in Cartesian Coordinates. Otherwise                                                                                     
+    the input molecule is changed on output.                                                                                                              
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Cartesian_to_Spherical(Molecule,NewMolecule) </a> </h4>                                                             
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Molecule_type), intent(   out), optional :: Newmolecule                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a                                                                                                 
+    molecule from cartesian coordinates to  spherical coordinaters.                                                                                       
+    If a second argument is present the subroutine creates a new                                                                                          
+    molecule (copy of the old one) with spherical coordinates,                                                                                            
+    preserving the input molecule in Cartesian Coordinates. Otherwise                                                                                     
+    the input molecule is changed on output.                                                                                                              
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Cartesian_to_Zmatrix(Molecule,NewMolecule,Cell, D_min,D_max) </a> </h4>                                             
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Molecule_type), intent(   out), optional :: NewMolecule                                                                                     
+        Type(Crystal_Cell_Type), intent(in),  optional :: Cell                                                                                            
+        real,                 intent(in    ), optional :: D_min                                                                                           
+        real,                 intent(in    ), optional :: D_max                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a molecule                                                                                        
+    from cartesian coordinates to  Z-matrix.                                                                                                              
+    If a second argument is present the subroutine creates a new                                                                                          
+    molecule (copy of the old one) with Z-matrix, preserving                                                                                              
+    the input molecule in Cartesian Coordinates. Otherwise the input                                                                                      
+    molecule is changed on output.                                                                                                                        
+    The input cartesian coordinates may be defined with respect to another                                                                                
+    internal frame. The final internal frame is that defined for Z-matrices:                                                                              
+    the x-axis is from the first to the second atom and the x-y plane is formed                                                                           
+    by the three first atoms. The Euler matrix and the molecular centre in the                                                                            
+    crystallographic system is changed in consequence.                                                                                                    
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Fix_Order(Molecule, NewMolecule, NAtom_O, NAtom_X, NAtom_XY) </a> </h4>                                             
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type),     intent(in out)           :: Molecule                                                                                    
+        type (Molecule_type),     intent(   out), optional :: Newmolecule                                                                                 
+        integer,                  intent(in),     optional :: NAtom_O                                                                                     
+        integer,                  intent(in),     optional :: NAtom_X                                                                                     
+        integer,                  intent(in),     optional :: NAtom_XY                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to order the molecule choosing which atom is the origin,                                                                                   
+    which define the X axis and which defines the XY Plane                                                                                                
+    If the second argument is present the subroutine creates a new molecule                                                                               
+    preserving the input molecule in Cartesian. Otherwise the input molecule is                                                                           
+    changed on output.                                                                                                                                    
+    If Natom_0 is absent, then the first atom on the molecule will be the origin.                                                                         
+    If Natom_X is absent, then the second atom on the molecule will define the X axis.                                                                    
+    If Natom_XY is absent, then the third atom on the molecule will define the XY Plane.                                                                  
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Fix_Orient_Cartesian(Molecule, NewMolecule, NAtom_O, NAtom_X, NAtom_XY,Mat) </a> </h4>                              
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type),     intent(in out)           :: Molecule                                                                                    
+        type (Molecule_type),     intent(   out), optional :: Newmolecule                                                                                 
+        integer,                  intent(in),     optional :: NAtom_O                                                                                     
+        integer,                  intent(in),     optional :: NAtom_X                                                                                     
+        integer,                  intent(in),     optional :: NAtom_XY                                                                                    
+        real(kind=cp),dimension(3,3),intent(out), optional :: Mat                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the Cartesian coordinates of the molecule choosing                                                                            
+    which atom is the origin, which define the X axis and which defines the XY Plane                                                                      
+    If the second argument is present the subroutine creates a new molecule                                                                               
+    preserving the input molecule in Cartesian. Otherwise the input molecule is                                                                           
+    changed on output.                                                                                                                                    
+    If Natom_0 is absent, then the first atom on the molecule will be the origin.                                                                         
+    If Natom_X is absent, then the second atom on the molecule will define the X axis.                                                                    
+    If Natom_XY is absent, then the third atom on the molecule will define the XY Plane.                                                                  
+    The optional output matrix Mat is the active rotation matrix passing from the old                                                                     
+    Cartesian frame to the new one. The transpose matrix has served to transform the                                                                      
+    original Cartesian coordinates.                                                                                                                       
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Empiric_Formula_FAtom(Atm,Formula,Form_Weight) </a> </h4>                                                           
+    <p> <pre>                                                                                                                                             
+        type(Atom_List_Type), intent(in)  :: Atm                                                                                                          
+        character(len=*),     intent(out) :: Formula                                                                                                      
+        real, optional,       intent(out) :: Form_Weight                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtain the Empiric Formula from Atm variable                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Empiric_Formula_Molcrys(Molcrys,Formula,Form_Weight) </a> </h4>                                                     
+    <p> <pre>                                                                                                                                             
+        type(molecular_crystal_type), intent(in)  :: Molcrys                                                                                              
+        character(len=*),             intent(out) :: Formula                                                                                              
+        real, optional,               intent(out) :: Form_Weight                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtain the Empiric Formula from Molecule variable and                                                                                                 
+    the Weight is the variable is present.                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Empiric_Formula_Molec(Molecule,Formula,Form_Weight) </a> </h4>                                                      
+    <p> <pre>                                                                                                                                             
+        type(molecule_type), intent(in)  :: Molecule                                                                                                      
+        character(len=*),    intent(out) :: Formula                                                                                                       
+        real, optional,      intent(out) :: Form_Weight                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtain the Empiric Formula from Molecule variable and                                                                                                 
+    the Weight is the variable is present.                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Fractional_to_Cartesian(Molecule,Cell,NewMolecule) </a> </h4>                                                       
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type),     intent(in out)           :: Molecule                                                                                    
+        type (Crystal_Cell_Type), intent(in    )           :: Cell                                                                                        
+        type (Molecule_type),     intent(   out), optional :: Newmolecule                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the fractional coordinates to cartesian internal                                                                              
+    coordinates of a molecule.                                                                                                                            
+    If Newmolecule is present the subroutine creates a new molecule                                                                                       
+    (copy of the old one) with cartesian coordinates, preserving                                                                                          
+    the input molecule in fractional. Otherwise the input molecule is                                                                                     
+    changed on output.                                                                                                                                    
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Fractional_to_Spherical(Molecule,Cell,NewMolecule) </a> </h4>                                                       
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Crystal_Cell_Type), intent(in)           :: Cell                                                                                            
+        type (Molecule_type), intent(   out), optional :: Newmolecule                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a                                                                                                 
+    molecule from Fractional coordinates to  Spherical coordinaters.                                                                                      
+    If a third argument is present the subroutine creates a new                                                                                           
+    molecule (copy of the old one) with Spherical coordinates,                                                                                            
+    preserving the input molecule in Fractional Coordinates. Otherwise                                                                                    
+    the input molecule is changed on output.                                                                                                              
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Fractional_to_Zmatrix(Molecule,Cell,NewMolecule) </a> </h4>                                                         
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Crystal_Cell_Type), intent(in)           :: Cell                                                                                            
+        real(kind=cp),            intent(in)           :: Phi                                                                                             
+        real(kind=cp),            intent(in)           :: Theta                                                                                           
+        real(kind=cp),            intent(in)           :: Chi                                                                                             
+        type (Molecule_type), intent(   out), optional :: Newmolecule                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a                                                                                                 
+    molecule from Fractional coordinates to  Zmatrix coordinaters.                                                                                        
+    If a second argument is present the subroutine creates a new                                                                                          
+    molecule (copy of the old one) with Zmatrix coordinates,                                                                                              
+    preserving the input molecule in Fractional Coordinates. Otherwise                                                                                    
+    the input molecule is changed on output.                                                                                                              
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > The algorithm used to determine the Cartesian coordinates of atom (i) is the </a> </h4>                                        
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    SUBROUTINE INIT_ERR_MOLEC()                                                                                                                           
+                                                                                                                                                          
+    Initialize Flags of Errors in this module                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > SUBROUTINE INIT_MOLECULE(Molecule,Natm) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        type(Molecule_Type), intent(out) :: Molecule                                                                                                      
+        integer, optional,   intent(in)  :: Natm                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Initialize the Variable Molecule                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Molcrys_to_AtomList(Molcrys,Atm) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        type (Molecular_Crystal_Type), intent(in)  :: Molec                                                                                               
+        type (Atom_List_Type),         intent(out) :: Atm                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to pass all information from Molecular_Crystal_Type                                                                                        
+    to Atom_List_Type                                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub15" > Subroutine Molec_to_AtomList(Molec,Atm, Coor_Type, Cell) </a> </h4>                                                            
+    <p> <pre>                                                                                                                                             
+        type (Molecule_Type),               intent(in)  :: Molec                                                                                          
+        type (Atom_List_Type),              intent(out) :: Atm                                                                                            
+        character(len=*),         optional, intent(in)  :: Coor_type                                                                                      
+        type (Crystal_Cell_type), optional, intent(in)  :: Cell                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to pass all information from Molecule_Type                                                                                                 
+    to Atom_List_Type. Coor_type determine the type of                                                                                                    
+    cordinates parameter in output. In general Cell if                                                                                                    
+    necessary to obtain on Output fractional coordinates or                                                                                               
+    special case for ZMatrix.                                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub16" > Subroutine Read_Free_Atoms(Lun,AtmF,N) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        integer,                            intent(in)   :: Lun        ! Logical unit to be rad                                                           
+        type(Free_Atom_Type), dimension(:), intent(out)  :: AtmF       ! Free atoms                                                                       
+        integer,                            intent(out)  :: N          ! Free atoms read                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    <p> <pre>                                                                                                                                             
+        Subroutine to read a set of Free Atoms from a file.                                                                                               
+        The format is:                                                                                                                                    
+            ATOMS N_Atoms                                                                                                                                 
+                                                                                                                                                          
+        Internal Coordinates for Atoms (N_Atoms Lines)                                                                                                    
+            Atom_Name(6)  Atom_Specie(4)  Coordinates(3)  Biso  Occ [VARY]                                                                                
+                                                                                                                                                          
+        if VARY is present as last option on the Internal Coordinates line,                                                                               
+        then an extra line is read                                                                                                                        
+            Codes_Coordinates(3)   Code_BIso  Code_Occ                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub17" > Subroutine Read_Molecule_in_File(Lun,Molecule) </a> </h4>                                                                      
+    <p> <pre>                                                                                                                                             
+        integer,              intent( in)                  :: Lun         !  In -> Logical unit to be read                                                
+        type (Molecule_type), intent(out)                  :: Molecule    ! Out -> Molecule                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    <p> <pre>                                                                                                                                             
+        Subroutine to read a molecule from a file.                                                                                                        
+        The format is:                                                                                                                                    
+            MOLE[X] N_Atoms Molecule_Name Coordinates_Type                                                                                                
+                                                                                                                                                          
+        where:                                                                                                                                            
+            N_atoms             Number of atoms in the molecule definition                                                                                
+            Molecule_Name       Name for the molecule                                                                                                     
+            Coordinates_Type    C: Cartesian coordinates                                                                                                  
+                                F: Fractional coordinates                                                                                                 
+                                S: Spherical coordinates                                                                                                  
+                                Z: Z-Matrix coordinates                                                                                                   
+                                                                                                                                                          
+        If keyword MOLEX is present, then the next line will be read (6 reals, 2 characters)                                                              
+            Molecule_Centre(3), Molecule_Orient(3), Rotational_Angle Type(1), Thermal_Factor Type(1)                                                      
+                                                                                                                                                          
+        where:                                                                                                                                            
+            Molecule_Centre     Coordinate of Center of Molecule                                                                                          
+            Molecule_Orient     Angles orientation                                                                                                        
+            Rotational Angle    E: Conventional Euler angles (alpha, beta, gamma)                                                                         
+                                P: Polar Euler angles (Phi, theta, Chi) (default)                                                                         
+            Thermal Factor    ISO: No collective motion                                                                                                   
+                              TLS: Traslational + Librational + Correlation                                                                               
+                               TL: Traslational + Librational                                                                                             
+                                T: Traslational                                                                                                           
+                                                                                                                                                          
+            According to Thermal Factors, next lines will be read                                                                                         
+                              [T]: 6 Thermal Factors (Line1) + 6 Codes Thermal Factors (Line2)                                                            
+                                                                                                                                                          
+                             [TL]: 6 Thermal Factors (Line1) + 6 Codes Thermal Factors (Line2)                                                            
+                                   6 Thermal Factors (Line3) + 6 Codes Thermal Factors (Line4)                                                            
+                                                                                                                                                          
+                            [TLS]: 6 Thermal Factors (Line1) + 6 Codes Thermal Factors (Line2)                                                            
+                                   6 Thermal Factors (Line3) + 6 Codes Thermal Factors (Line4)                                                            
+                                   9 Thermal Factors (Line5) + 9 Codes Thermal Factors (Line6)                                                            
+                                                                                                                                                          
+        Internal Coordinates for Atoms (N_Atoms Lines)                                                                                                    
+            Atom_Name(6)  Atom_Specie(4)  Coordinates(3)  N1  N2  N3  Biso  Occ [VARY]                                                                    
+                                                                                                                                                          
+        if VARY is present as last option on the Internal Coordinates line,                                                                               
+        then an extra line is read                                                                                                                        
+            Codes_Coordinates(3)   Code_BIso  Code_Occ                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub18" > Subroutine Set_Euler_Matrix(Rt,Phi,Theta,Chi,Eu) </a> </h4>                                                                    
+    <p> <pre>                                                                                                                                             
+        character(len=*),              intent ( in) :: Rt                                                                                                 
+        real(kind=cp),                 intent ( in) :: Phi,Theta,Chi                                                                                      
+        real(kind=cp), dimension(3,3), intent (out) :: Eu                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to obtain the Euler active matrix to transform a point                                                                                     
+    to another point. For instance the internal coordinates of a molecule                                                                                 
+    can be transformed to absolute positions using columns vectors.                                                                                       
+    If the Cartesian coordinates of an atom in the molecular frame is the                                                                                 
+    column vector  Xm, the cartesian coordinates in the crystal frame X                                                                                   
+    are obtained from:  X = Eu Xm                                                                                                                         
+    The internal coordinates of a point are obtained from Xm = EuT X.                                                                                     
+    The character variable "rt" indicates the type of Euler angles provided.                                                                              
+    If rt="E", the angles PHI,THETA,CHI correspond to the conventional                                                                                    
+    Euler angles ALPHA, BETA, GAMMA. Otherwise, they correspond to the                                                                                    
+    2nd setting, allowing to interpret PHI and THETA as the polar angles of                                                                               
+    the molecular frame Zm-axis, and CHI a rotation around Zm.                                                                                            
+                                                                                                                                                          
+    Updated: February - 2005                                                                                                                              
+                                                                                                                                                          
+    Subroutine Spherical_to_Cartesian(Molecule,NewMolecule)                                                                                               
+    type (Molecule_type), intent(in out)           :: Molecule                                                                                            
+    type (Molecule_type), intent(   out), optional :: Newmolecule                                                                                         
+                                                                                                                                                          
+    Subroutine to transform the internal coordinates of a molecule from Spherical                                                                         
+    coordinates to  cartesian coordinaters.                                                                                                               
+    If a second argument is present the subroutine creates a new molecule                                                                                 
+    (copy of the old one) with spherical coordinates, preserving                                                                                          
+    the input molecule in Cartesian Coordinates. Otherwise the input                                                                                      
+    molecule is changed on output.                                                                                                                        
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub19" > Subroutine Spherical_to_Fractional(Molecule,Cell,NewMolecule) </a> </h4>                                                       
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Crystal_Cell_Type), intent(in)           :: Cell                                                                                            
+        type (Molecule_type), intent(   out), optional :: Newmolecule                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a                                                                                                 
+    molecule from Spherical coordinates to  Fractional coordinaters.                                                                                      
+    If a second argument is present the subroutine creates a new                                                                                          
+    molecule (copy of the old one) with Fractional coordinates,                                                                                           
+    preserving the input molecule in Spherical Coordinates. Otherwise                                                                                     
+    the input molecule is changed on output.                                                                                                              
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub20" > Subroutine Spherical_to_Zmatrix(Molecule,NewMolecule,Cell) </a> </h4>                                                          
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Molecule_type), intent(   out), optional :: Newmolecule                                                                                     
+        Type(Crystal_Cell_Type), intent(in),  optional :: Cell                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a                                                                                                 
+    molecule from Spherical coordinates to  Zmatrix coordinaters.                                                                                         
+    If a second argument is present the subroutine creates a new                                                                                          
+    molecule (copy of the old one) with Zmatrix coordinates,                                                                                              
+    preserving the input molecule in Spherical Coordinates. Otherwise                                                                                     
+    the input molecule is changed on output.                                                                                                              
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub21" > Subroutine Write_Free_Atoms(AtmF,N,Lun) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        type (Atom_type), dimension(:), intent(in) :: AtmF                                                                                                
+        integer,                        intent(in) :: N                                                                                                   
+        integer, optional,              intent(in) :: Lun                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Write information about Free Atoms for Molecular Crystal                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub22" > Subroutine Write_Molecular_Crystal(MolCrys,Lun) </a> </h4>                                                                     
+    <p> <pre>                                                                                                                                             
+        type (Molecular_Crystal_type), intent(in) :: MolCrys                                                                                              
+        integer, optional,             intent(in) :: Lun                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Write information about Molecular Crystal                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub23" > Subroutine Write_Molecule(Molecule,Lun) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in)           :: Molecule                                                                                            
+        integer,              intent(in), optional :: Lun                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Write information about molecule                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub24" > Subroutine Zmatrix_to_Cartesian(Molecule,NewMolecule) </a> </h4>                                                               
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type), intent(in out)           :: Molecule                                                                                        
+        type (Molecule_type), intent(   out), optional :: NewMolecule                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a molecule from                                                                                   
+    Z-matrix to cartesian coordinates.                                                                                                                    
+    If a second argument is present the subroutine creates a new molecule                                                                                 
+    (copy of the old one) with cartesian coordinates, preserving                                                                                          
+    the input molecule. Otherwise the input molecule is changed on output.                                                                                
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub25" > Subroutine Zmatrix_to_Fractional(Molecule,Cell,NewMolecule) </a> </h4>                                                         
+    <p> <pre>                                                                                                                                             
+        type (Molecule_type),     intent(in out)           :: Molecule                                                                                    
+        type (Crystal_Cell_Type), intent(in    )           :: Cell                                                                                        
+        type (Molecule_type),     intent(   out), optional :: NewMolecule                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to transform the internal coordinates of a molecule from                                                                                   
+    Z-matrix to fractional coordinates.                                                                                                                   
+    If a third argument is present the subroutine creates a new molecule                                                                                  
+    (copy of the old one) with fractional coordinates, preserving                                                                                         
+    the input molecule in Z-matrix. Otherwise the input molecule is changed on output.                                                                    
+    Control of error is present                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod24"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

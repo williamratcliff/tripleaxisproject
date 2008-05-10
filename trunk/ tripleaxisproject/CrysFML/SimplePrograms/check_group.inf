@@ -1,0 +1,61 @@
+  Program Check_Group
+  ===================
+
+  This program reads a file "codfiln.hkl" coming from FullProf when
+  run on profile matching (Le Bail) mode and generates a list of possible
+  space groups compatible with the observed diffraction pattern.
+
+  The group used for generating the reflections within FullProf should
+  be the holohedral group of the crystal system in order to be sure that
+  all possible reflections have been generated.
+
+  The heading of a hkl-file has the form:
+
+ Pattern#  1 Phase No:   1  phase 1: Myphase
+    1366       0  293.00    <-- The number of effective reflections may be lower
+   2   0   0    4         18.884          0.801       5.1224       0.0138
+   1   1   2    8         27.160          0.473       5.4115       0.0138
+   2   0   1    8        403.671          1.470       5.5030       0.0138
+   2   1   0    8          4.917          0.551       5.7275       0.0139
+   . . . . . . . . . . . . . .
+
+  The two first lines are considerd by the program as comments. The rest of
+  lines contain the following items: h,k,l,mult, Intensity, Sigma, 2theta and FWHM
+
+
+  The program is invoked from the command line. If no argument is provided
+  the program asks the following questions:
+
+
+  " => Please enter the code of the hkl-file: "
+            { Give the name without extension of a hkl-file, eg. "xx" for xx.hkl}
+
+  " => Please enter the crystallographic system (M,O,T,R,H,C): "
+         { Enter one of the given letters for Monoclinic, Orthorhombic, Tetragonal,
+           Rhombohedral, Hexagonal or Cubic}
+
+  " => Check centred lattices? (y=<cr>/n): "
+         { Answer with "y" or "n"}
+
+  " => Please enter the maximum value of the Scattering angle (2theta): "
+         { Enter a positive real number, eg.  35.0 }
+
+  " => Minimum FWHM distance between adjacent reflections (e.g.:1,2...): "
+         { Enter a real number "dfw", reflections are considered as distinguishable
+           if their positions are separated at least dfw*FWHM degrees in 2Theta }
+
+  " => % of the maximum intensity to consider observed reflections (e.g.: 1): "
+         { This is the threshold for considering as observed a particular reflection.
+           Putting "1" means that all reflections having an intensity greater or equal
+           to 0.01*Imax are considered as observed }
+
+
+  The response to the above questions can be provided directly in the command line
+  invoking the program. For example:
+
+  C:\My directory> check_group  myhklfile T y 30 1 1
+
+  The program is invoked to be run with the file "myhklfile.hkl", looking for Tegragonal
+  groups, checking centred lattices, reflections up to 2Theta=30.0 degrees are considered
+  when they are separated from each other at least 1*FWHM and are observed is their intensity
+  is greater or equal to 0.01*Imax.
