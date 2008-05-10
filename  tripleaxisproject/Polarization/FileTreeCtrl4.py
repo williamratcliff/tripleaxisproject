@@ -6,6 +6,10 @@ import wx.lib.customtreectrl as CT
 import flagpanel4 as flagpanel
 import polcorrect3 as polcorrect
 import numpy as N
+from sans.guicomm.events import NewPlotEvent
+from sans.guitools.plottables import Data1D
+import copy
+
 #import images
 #try:
 #    import treemixin
@@ -425,19 +429,24 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         current_selected=self.current
         pydata=self.itemdict['pydata']
         children_data=self.GetChildData(self.current)
+        i=0
         for data in children_data:
-            print data
-            x=data['data'].data['qx']
+            #print data
+            self.varying=data['data'].metadata['count_info']['varying']
+            self.independent_variable=self.varying[0]
+            x=data['data'].data[self.independent_variable]
+            self.x=x
             y=data['data'].data['detector']
             dy=N.sqrt(y)
-            print x
+            print 'varying',self.independent_variable
 
-            from sans.guicomm.events import NewPlotEvent
-            from sans.guitools.plottables import Data1D
+            #from sans.guicomm.events import NewPlotEvent
+            #from sans.guitools.plottables import Data1D
             new_plot = Data1D(x, y, dy=dy)
             new_plot.name =data['filename']+' '+data['polstate']
-            new_plot.xaxis("\\rm{Q}", 'A^{-1}')
-            new_plot.yaxis("\\rm{Intensity} ","cm^{-1}")
+            new_plot.group_id='data'
+            new_plot.xaxis('independent_variable', 'A^{-1}')
+            new_plot.yaxis("\\rm{Intensity} ","Arb. units")
             wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
 
 
@@ -465,7 +474,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             if dlg.groupdata['pbflags'].CountsAdd2[0]==3:
                 dlg.groupdata['pbflags'].CountsEnable[3]=0
 
-            print 'MonitorCorrect',dlg.groupdata['pbflags'].MonoSelect
+            print 'MonitorSelect',dlg.groupdata['pbflags'].MonoSelect
             print 'MonitorCorrect',dlg.groupdata['pbflags'].MonitorCorrect
             print 'PolMonitorCorrect',dlg.groupdata['pbflags'].PolMonitorCorrect
             print 'CountsEnable',dlg.groupdata['pbflags'].CountsEnable
@@ -492,7 +501,21 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
     def OnItemReduceGroup(self,event):
         print 'Reduce Group'
-        files=self.files
+        children_data=self.GetChildData(self.current)
+        polstates=[]
+        for data in children_data:
+            #print data
+            self.varying=data['data'].metadata['count_info']['varying']
+            self.independent_variable=self.varying[0]
+            x=data['data'].data[self.independent_variable]
+            polstates.append(data['polstate'])
+        files=copy.deepcopy(self.files)
+        for ckey,myfile in files.iteritems():
+            myfile=os.path.join(os.getcwd(),myfile)+'.bt7'
+            files[ckey]=myfile
+        files={}
+        files['pm']=r'C:\BiFeO3xtal\Jan8_2008\9175\data\fieldscansplusminusreset53630.bt7'
+        files['mp']=r'C:\BiFeO3xtal\Jan8_2008\9175\data\fieldscanminusplusreset53631.bt7'
         text=self.itemdict['text']+'.polcor'
         print 'driver file', text
         cellfile=self.groupdata['cellfile']
@@ -501,7 +524,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
              f=open(text,'wt')
              s='#absolute'
              f.write(s+'\n')
-             s='#cellfile %s'%(cellfile,)
+             s='#cell %s'%(cellfile,)
              f.write(s+'\n')
 
              s='#MonoSelect %d'%(flags.MonoSelect)
@@ -536,6 +559,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                                         flags.Spm[2],flags.Spm[3])
              f.write(s+'\n')
              s='#directory %s'%(os.getcwd(),)
+             s='#absolute'
              f.write(s+'\n')
              s='#begin'
              f.write(s+'\n')
@@ -548,9 +572,30 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
              s='#end'
              f.write(s)
              f.close()
+             print 'files',files
+             print 'cellfile',cellfile
              mypolcor=polcorrect.polarization_correct(files,cellfile)
-             corrected_counts=mypolcor.correct(pbflags)
+             corrected_counts=mypolcor.correct(flags)
              mypolcor.savefiles()
+
+             keys=['pp','mm','mp','pm']
+             print 'corrected',corrected_counts.keys()
+             #print corrected_counts['Spm']
+             #print corrected_counts['Smp']
+             for key in polstates:
+                 if corrected_counts.has_key('S'+key):
+                     #x=self.x
+                     y=corrected_counts['S'+key]
+                     dy=corrected_counts['E'+key]
+                     print 'varying',self.independent_variable
+                     new_plot = Data1D(x, y, dy=dy)
+                     new_plot.name =key+'.corrected'
+                     new_plot.group_id='reduced'
+                     new_plot.xaxis('independent_variable', 'A^{-1}')
+                     new_plot.yaxis("\\rm{Intensity} ","Arb. units")
+                     wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
+
+             self.OnItemPlot(event)
 
 
 

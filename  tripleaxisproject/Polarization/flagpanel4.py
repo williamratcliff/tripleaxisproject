@@ -366,8 +366,8 @@ class FormDialog(sc.SizedDialog):
         # dialog is set up to change the current working directory to the path chosen.
 
         defaultDir=os.getcwd()
-        defaultDir=r'c:\bifeo3xtal\jan8_2008\9175'
-        wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
+        defaultDir=r'c:\bifeo3xtal\jan8_2008\9175\data'
+        wildcard="cell files (*.txt)|*.txt|All files (*.*)|*.*"
         dlg = wx.FileDialog(
             self, message="Choose a file",
             defaultDir=defaultDir,

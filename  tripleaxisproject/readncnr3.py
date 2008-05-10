@@ -5,6 +5,7 @@ from time import mktime
 #import mx.DateTime
 import writebt7
 import re
+import scanparser
 
 
 months={'jan':1,'feb':2,'mar':3,'apr':4,'may':5,'jun':6,'jul':7,'aug':8,'sep':9,'oct':10,'nov':11,'dec':12}
@@ -34,6 +35,8 @@ class datareader:
         self.metadata['count_info']['monitor']=None#self.metadata['count_info']['monitor_base']*self.metadata['count_info']['monitor_prefactor']
         self.metadata['count_info']['count_type']=None  #can be 'monitor', 'time' #tokenized[8].strip("'").lower()
         self.metadata['count_info']['signal']=None  #for example, 'detector'
+        self.metadata['count_info']['varying']=None
+        self.metadata['count_info']['ranges']=None
         self.metadata['count_info']['analyzerdetectormode']=None
         self.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]=None
         self.metadata['count_info']['AnalyzerDDGroup'.lower()]=None
@@ -580,8 +583,13 @@ class datareader:
                 for i in range(1,len(tokenized)):
                     scanstr=scanstr+tokenized[i]+' '
                 self.metadata['file_info']['scan_description']=scanstr
-                if self.metadata['file_info']['filebase']!='fpx':
-                    self.additional_metadata['parsed_scandescription']=self.parse_scan(scanstr)
+                #print 'scanstr',scanstr
+                myparser=scanparser.scanparser(scanstr)
+                self.metadata['count_info']['varying']=myparser.get_varying()
+                self.metadata['count_info']['ranges']=myparser.ranges
+                #if self.metadata['file_info']['filebase']!='fpx':
+                #    self.additional_metadata['parsed_scandescription']=self.parse_scan(scanstr)
+
                     #CAN'T SEEM TO PARSE fpx files, but if the filename is broken as in the last cycle, then how do I know?
                     #Better soln is to fix parser
                 #print self.metadata['scan_description']['range']
@@ -800,7 +808,7 @@ if __name__=='__main__':
         #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7'
         #myfilestr=r'c:\12436\data\LaOFeAs56413.bt7'
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
-        myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\fpx53418.bt7'
+        #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\fpx53418.bt7'
         #myfilestr=r'c:\13165\13165\data\MagHigh56784.bt7'
         mydatareader=datareader()
         #mydata=mydatareader.readbuffer(myfilestr,lines=91)
@@ -812,6 +820,7 @@ if __name__=='__main__':
         #print mydata.data['magfield']
         print mydata.data.keys()
         print 'done'
+        print mydata.metadata['count_info']['varying']
         #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
         #print N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])
         #print len(mydata.data['timestamp'])

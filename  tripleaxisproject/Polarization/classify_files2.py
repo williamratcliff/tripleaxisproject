@@ -1,7 +1,7 @@
 import numpy as N
 import scriptutil as SU
 import re
-import readncnr2 as readncnr
+import readncnr3 as readncnr
 import sys,os
 import math
 threshold=1.0e-1
