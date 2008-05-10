@@ -1,0 +1,794 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod2" > MATH_GEN </a> </h2>                                                                                                             
+    <dd>  Mathematic general utilities for use in Crystallography and                                                                                     
+    Solid State Physics and Chemistry. </dd>                                                                                                              
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > DP </a> </li>                                                                                                               
+      <li> <a href="#var2"  > SP </a> </li>                                                                                                               
+      <li> <a href="#var3"  > CP </a> </li>                                                                                                               
+      <li> <a href="#var4"  > DEPS </a> </li>                                                                                                             
+      <li> <a href="#var5"  > EPS </a> </li>                                                                                                              
+      <li> <a href="#var6"  > ERR_MATH_GEN </a> </li>                                                                                                     
+      <li> <a href="#var7"  > ERR_MESS_MATH_GEN </a> </li>                                                                                                
+      <li> <a href="#var8"  > PI </a> </li>                                                                                                               
+      <li> <a href="#var9"  > TO_DEG </a> </li>                                                                                                           
+      <li> <a href="#var10" > TO_RAD </a> </li>                                                                                                           
+      <li> <a href="#var11" > TPI </a> </li>                                                                                                              
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > ACOSD </a> </li>                                                                                                            
+      <li> <a href="#fun2"  > ASIND </a> </li>                                                                                                            
+      <li> <a href="#fun3"  > ATAN2D </a> </li>                                                                                                           
+      <li> <a href="#fun4"  > ATAND </a> </li>                                                                                                            
+      <li> <a href="#fun5"  > COSD </a> </li>                                                                                                             
+      <li> <a href="#fun6"  > SIND </a> </li>                                                                                                             
+      <li> <a href="#fun7"  > TAND </a> </li>                                                                                                             
+      <li> <a href="#fun8"  > BESSJ0 </a> </li>                                                                                                           
+      <li> <a href="#fun9"  > BESSJ1 </a> </li>                                                                                                           
+      <li> <a href="#fun10" > FACTORIAL </a> </li>                                                                                                        
+      <li> <a href="#fun11" > NEGLIGIBLE </a> </li>                                                                                                       
+      <li> <a href="#fun12" > PGCD </a> </li>                                                                                                             
+      <li> <a href="#fun13" > PPCM </a> </li>                                                                                                             
+      <li> <a href="#fun14" > PYTHAG </a> </li>                                                                                                           
+      <li> <a href="#fun15" > CO_LINEAR </a> </li>                                                                                                        
+      <li> <a href="#fun16" > EQUAL_MATRIX </a> </li>                                                                                                     
+      <li> <a href="#fun17" > EQUAL_VECTOR </a> </li>                                                                                                     
+      <li> <a href="#fun18" > IMAXLOC </a> </li>                                                                                                          
+      <li> <a href="#fun19" > IMINLOC </a> </li>                                                                                                          
+      <li> <a href="#fun20" > LOCATE </a> </li>                                                                                                           
+      <li> <a href="#fun21" > MODULO_LAT </a> </li>                                                                                                       
+      <li> <a href="#fun22" > OUTERPROD </a> </li>                                                                                                        
+      <li> <a href="#fun23" > TRAZA </a> </li>                                                                                                            
+      <li> <a href="#fun24" > ZBELONG </a> </li>                                                                                                          
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > INIT_ERR_MATHGEN </a> </li>                                                                                                 
+      <li> <a href="#sub2"  > SET_EPSG </a> </li>                                                                                                         
+      <li> <a href="#sub3"  > SET_EPSG_DEFAULT </a> </li>                                                                                                 
+      <li> <a href="#sub4"  > RTAN </a> </li>                                                                                                             
+      <li> <a href="#sub5"  > DETERMINANT </a> </li>                                                                                                      
+      <li> <a href="#sub6"  > DIAGONALIZE_SH </a> </li>                                                                                                   
+      <li> <a href="#sub7"  > INVERT_MATRIX </a> </li>                                                                                                    
+      <li> <a href="#sub8"  > LINEAR_DEPENDENT </a> </li>                                                                                                 
+      <li> <a href="#sub9"  > LU_BACKSUB </a> </li>                                                                                                       
+      <li> <a href="#sub10" > LU_DECOMP </a> </li>                                                                                                        
+      <li> <a href="#sub11" > MATINV </a> </li>                                                                                                           
+      <li> <a href="#sub12" > RANK </a> </li>                                                                                                             
+      <li> <a href="#sub13" > SORT </a> </li>                                                                                                             
+      <li> <a href="#sub14" > SORT_STRINGS </a> </li>                                                                                                     
+      <li> <a href="#sub15" > SPLINE </a> </li>                                                                                                           
+      <li> <a href="#sub16" > SPLINT </a> </li>                                                                                                           
+      <li> <a href="#sub17" > SVDCMP </a> </li>                                                                                                           
+      <li> <a href="#sub18" > SWAP </a> </li>                                                                                                             
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > DP </a> </h4>                                                                                                                  
+    <p> <pre>                                                                                                                                             
+        DP: Double precision ( dp = selected_real_kind(14,80) )                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > SP </a> </h4>                                                                                                                  
+    <p> <pre>                                                                                                                                             
+        SP: Single precision ( sp = selected_real_kind(6,30) )                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > CP </a> </h4>                                                                                                                  
+    <p> <pre>                                                                                                                                             
+        CP: Current precision                                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > DEPS </a> </h4>                                                                                                                
+    <p> <pre>                                                                                                                                             
+        real(kind=dp), parameter :: deps=0.00000001_dp                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Epsilon value                                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > EPS </a> </h4>                                                                                                                 
+    <p> <pre>                                                                                                                                             
+         real(kind=sp), public ::  eps=0.00001_sp                                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Epsilon value                                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var6"  > ERR_MATH_GEN </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        logical :: err_math_gen                                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in MATH_GEN module                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var7"  > ERR_MESS_MATH_GEN </a> </h4>                                                                                                   
+    <p> <pre>                                                                                                                                             
+        character(len=150) :: err_mess_math_gen                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var8"  > PI </a> </h4>                                                                                                                  
+    <p> <pre>                                                                                                                                             
+        real(kind=dp), parameter ::  pi = 3.141592653589793238463_dp                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Pi value                                                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var9"  > TO_DEG </a> </h4>                                                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=dp), parameter ::  to_DEG = 180.0_dp/pi                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Conversion from Rad to Degree                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var10" > TO_RAD </a> </h4>                                                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=dp), parameter ::  to_RAD  = pi/180.0_dp                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Conversion from Degree to Rad                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var11" > TPI </a> </h4>                                                                                                                 
+    <p> <pre>                                                                                                                                             
+      real(kind=dp), parameter ::  tpi = 6.283185307179586476925_dp                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    2.0*Pi value                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Elemental Function Acosd(x) Result(arc_cos) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), intent(in) :: x                                                                                                                 
+        real(kind=sp/dp)             :: arc_cos                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Inverse cosine function -> output in Degrees                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Function Asind(x) Result(arc_sin) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), intent(in) :: x                                                                                                                 
+        real(kind=sp/dp)             :: arc_sin                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Inverse sine function -> output in Degrees                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Elemental Function Atan2d(y,x) Result(atande) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), intent(in) :: y,x                                                                                                               
+        real(kind=sp/dp)             :: atande                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Inverse tangent function of y/x                                                                                                                       
+    y,x have the same units -> output in Degrees                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun4"  > Elemental Function Atand(x) Result(atande) </a> </h4>                                                                          
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), intent(in) :: x                                                                                                                 
+        real(kind=sp/dp)             :: atande                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Inverse tangent function, X no units -> output in Degrees                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun5"  > Elemental Function Cosd(x) Result(cosine) </a> </h4>                                                                           
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), intent(in) :: x                                                                                                                 
+        real(kind=sp/dp)             :: cosine                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Cosine function, X in degrees                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun6"  > Elemental Function Sind(x) Result(sine) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), intent(in) :: x                                                                                                                 
+        real(kind=sp/dp)             :: sine                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Sine function, X in degrees                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun7"  > Elemental Function Tand(x) Result(tande) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), intent(in) :: x                                                                                                                 
+        real(kind=sp/dp)             :: tande                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tangent function, X in degrees                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun8"  > Elemental Function Bessj0(x) Result(bessj_0) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in) :: x                                                                                                                    
+        real(kind=sp)             :: bessj_0                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Bessel Fuction J0(x)                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun9"  > Elemental Function Bessj1(x) Result(bessj_1) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in) : x                                                                                                                     
+        real(kind=sp)             : bessj_1                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Bessel Fuction J1(x)                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun10" > Elemental Function Factorial(n) Result(fact) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        integer, intent(in) : n                                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Factorial of N                                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun11" > Elemental Function Negligible(v) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        complex/real(kind=sp),    intent( in) :: v                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the value .TRUE. if the real(kind=sp) (or complex)                                                                                           
+    number V is less than EPS                                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun12" > Function Pgcd(a,b) Result(mcd) </a> </h4>                                                                                      
+    <p> <pre>                                                                                                                                             
+        integer, intent(in) :: a                                                                                                                          
+        integer, intent(in) :: b                                                                                                                          
+        integer             :: mcd                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Function calculating the maximum common divisor of two integers                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun13" > Function Ppcm(a,b) result(mcm) </a> </h4>                                                                                      
+    <p> <pre>                                                                                                                                             
+        integer, intent(in) :: a                                                                                                                          
+        integer, intent(in) :: b                                                                                                                          
+        integer             :: mcm                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Function calculating the minimum common multiple of two integers                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun14" > Function Pythag(a,b) Result (c) </a> </h4>                                                                                     
+    <p> <pre>                                                                                                                                             
+        real(sp/dp),intent(in):: a,b                                                                                                                      
+        real(sp/dp)           :: c                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Computes c=sqrt(a^2 +b^2 ) without destructive underflow or overflow.                                                                                 
+    Adapted from Numerical Recipes.                                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun15" > Logical Function Co_Linear(A,B,N) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+        complex/integer/real(kind=sp), dimension(:), intent(in)  :: a                                                                                     
+        complex/integer/real(kind=sp), dimension(:), intent(in)  :: b                                                                                     
+        integer,                                     intent(in)  :: n                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the value .TRUE. if the vectors A and B are co-linear                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun16" > Logical Function Equal_Matrix(A,B,N) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(:,:), intent(in)  :: a,b                                                                                         
+        integer,                               intent(in)  :: n                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the value .TRUE. if the array A is equal to array B                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun17" > Logical Function Equal_Vector(A,B,N) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(:),   intent(in)  :: a,b                                                                                         
+        integer,                               intent(in)  :: n                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the value .TRUE. if the vector A is equal to vector B                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun18" > Function Imaxloc(arr) Result(mav) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+      real(kind=sp)/integer, dimension(:), intent(in) :: arr                                                                                              
+      integer                                         :: mav                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Index of maxloc on an array                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun19" > Function Iminloc(arr)  Result(miv) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+      real(kind=sp)/integer, dimension(:), intent(in) :: arr                                                                                              
+      integer                                         :: miv                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Index of minloc on an array  (from Numerical Recipes)                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun20" > Function Locate(xx, n, x) Result(j) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(n),intent(in)  :: xx                                                                                             
+        integer ,                           intent(in)  :: n                                                                                              
+        integer/real(kind=sp),              intent(in)  :: x                                                                                              
+        integer ,                           intent(out) :: j                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine for locating the index J of an array XX(N)                                                                                                 
+    satisfying:                                                                                                                                           
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+                   XX(J) <= X < XX(J+1)                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun21" > Function Modulo_Lat(U) </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(:), intent(in) :: u                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Reduces a real vector to another with components in                                                                                                   
+    the interval [0,1)                                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun22" > Function Outerprod(a,b) Result(c) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+        real(sp/dp),dimension(:),intent(in)    :: a,b                                                                                                     
+        real(sp/dp),dimension(size(a),size(b)) :: c                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Computes the outer product (tensorial product) of two                                                                                                 
+    vectors to give a tensor (matrix) as the result:                                                                                                      
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+                       c(i,j) = a(i)*b(j).                                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    It uses the intrinsic Fortran 90 function SPREAD.                                                                                                     
+    Function adapted from Numerical Recipes.                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun23" > Function Traza(A) </a> </h4>                                                                                                   
+    <p> <pre>                                                                                                                                             
+        complex/integer/real(kind=sp), dimension(:,:), intent(in)  :: a                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the trace of a complex/real or integer matrix                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun24" > Logical Function Zbelong(V) </a> </h4>                                                                                         
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),   dimension(:,:), intent( in) :: v                                                                                                 
+                          or                                                                                                                              
+        real(kind=sp),   dimension(:),   intent( in) :: v                                                                                                 
+                          or                                                                                                                              
+        real(kind=sp),                   intent( in) :: v                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the value .TRUE. if the real(kind=sp) number (or array) V is close enough                                                                    
+    (whithin EPSS) to an integer.                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Init_Err_Mathgen() </a> </h4>                                                                                       
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in Math_Gen                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Set_Epsg(Neweps) </a> </h4>                                                                                         
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent( in) :: neweps                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Sets global EPSS to the value "neweps"                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Set_Epsg_Default() </a> </h4>                                                                                       
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Sets global EPSS to the default value: epss=1.0E-5_sp                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Rtan(x,y,ang,deg) </a> </h4>                                                                                        
+    <p> <pre>                                                                                                                                             
+        real(sp/dp),               intent( in) :: x,y                                                                                                     
+        real(sp/dp),               intent(out) :: ang                                                                                                     
+        character(len=*),optional, intent( in) :: deg                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Returns ang=arctan(y/x) in the quadrant where the signs sin(ang) and                                                                                  
+    cos(ang) are those of y and x. If deg is present, return ang in degrees.                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Determinant(A,n,determ) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        complex/real(sp), dimension(:,:), intent( in) :: A      !input square matrix (n,n)                                                                
+        integer,                          intent( in) :: n      !actual dimension of A                                                                    
+        real(kind=sp),                    intent(out) :: determ !det(A) if real                                                                           
+                                                                 det(AR)^2 + det(AI)^2 if complex                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the determinant of a real(kind=sp) square matrix.                                                                                          
+    Calculates the pseudo-determinant of a complex square matrix.                                                                                         
+    The calculated value is only useful for linear dependency purposes.                                                                                   
+    It tell us if the complex matrix is singular or not.                                                                                                  
+                                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Diagonalize_SH(A,n,e_val,e_vect) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        complex/real,      dimension(:,:), intent( in)  :: A                                                                                              
+        integer,                           intent( in)  :: n                                                                                              
+        real(kind=sp),     dimension(:),   intent(out)  :: E_val                                                                                          
+        complex, optional, dimension(:,:), intent(out)  :: E_vect                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Diagonalize Symmetric/Hermitian matrices.                                                                                                             
+    The eigen_values E_val are sorted in descending order. The columns                                                                                    
+    of E_vect are the corresponding eigenvectors.                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Invert_Matrix(a,b,singular,perm) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(:,:),  intent( in) :: a                                                                                                  
+        real(kind=sp), dimension(:,:),  intent(out) :: b                                                                                                  
+        LOGICAL,                        intent(out) :: singular                                                                                           
+        integer, dimension(:),optional, intent(out) :: perm                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to invert a real matrix using LU decomposition.                                                                                            
+    In case of singular matrix (singular=.true.) instead of the inverse                                                                                   
+    matrix, the subroutine provides the LU decomposed matrix as used                                                                                      
+    in Numerical Recipes.                                                                                                                                 
+    The input matrix is preserved and its inverse (or its LU decomposition)                                                                               
+    is provided in "b". The optional argument "perm" holds the row permutation                                                                            
+    performed to obtain the LU decomposition.                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Linear_Dependent(a,na,b,nb,mb,linear_dependent) </a> </h4>                                                          
+    <p> <pre>                                                                                                                                             
+        complex/integer/real(kind=sp), dimension(:),   intent(in)  :: a                                                                                   
+        complex/integer/real(kind=sp), dimension(:,:), intent(in)  :: b                                                                                   
+        integer,                                       intent(in)  :: na,nb,mb                                                                            
+        logical,                                       intent(out) :: Linear_Dependent                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the value .TRUE. if the vector A is linear dependent of the                                                                                  
+    vectors constituting the rows (columns) of the matrix B. In input nb & mb                                                                             
+    are the number of rows and columns of B to be considered. The actual                                                                                  
+    dimension of vector a should be na=max(nb,mb).                                                                                                        
+    The problem is equivalent to determine the rank (in algebraic sense)                                                                                  
+    of the composite matrix C(nb+1,mb)=(B/A) or C(nb,mb+1)=(B|A). In the first                                                                            
+    case it is supposed that na = mb and in the second na = nb.                                                                                           
+    and the rank of B is min(nb, mb). If na /= nb and na /= mb an error condition                                                                         
+    is generated. The function uses floating arithmetic for all types.                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine LU_Backsub(a,indx,b) </a> </h4>                                                                                     
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),    dimension(:,:),intent(in)     :: a                                                                                              
+        integer,          dimension(:),  intent(in)     :: indx                                                                                           
+        real(kind=sp),    dimension(:),  intent(in out) :: b                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Adapted from Numerical Recipes.                                                                                                                       
+    Solves the set of N linear equations A · X = B. Here the N × N matrix A is input,                                                                     
+    not as the original matrix A, but rather as its LU decomposition, determined                                                                          
+    by the routine LU_DECOMP. INDX is input as the permutation vector of length N                                                                         
+    returned by LU_DECOMP. B is input as the right-hand-side vector B,                                                                                    
+    also of length N, and returns with the solution vector X.                                                                                             
+    A and INDX are not modified by this routine and can be left in place for successive calls                                                             
+    with different right-hand sides B. This routine takes into account the possibility that B will                                                        
+    begin with many zero elements, so it is efficient for use in matrix inversion.                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine LU_Decomp(a,d,singular,indx) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),    dimension(:,:),intent(in out) :: a                                                                                              
+        real(kind=sp),                   intent(out)    :: d                                                                                              
+        logical,                         intent(out)    :: singular                                                                                       
+        integer, dimension(:), optional, intent(out)    :: indx                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to make the LU decomposition of an input matrix A.                                                                                         
+    The input matrix is destroyed and replaced by a matrix containing                                                                                     
+    in its upper triangular part (plus diagonal) the matrix U. The                                                                                        
+    lower triangular part contains the nontrivial part (Lii=1) of matrix L.                                                                               
+    The output is rowwise permutation of the initial matrix. The vector INDX                                                                              
+    recording the row permutation. D is output as +/-1 depending on whether                                                                               
+    the number of row interchanges was even or odd, respectively.                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Matinv(a,n) </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(:,:),intent(in out) :: a                                                                                                 
+        integer     ,                 intent(in)     :: n                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine for inverting a real square matrix.                                                                                                        
+    The input matrix is replaced in output with its inverse.                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine Rank(a,tol,r) </a> </h4>                                                                                            
+    <p> <pre>                                                                                                                                             
+        real(sp/dp), dimension(:,:), intent( in) :: a                                                                                                     
+        real(sp/dp),                 intent( in) :: tol                                                                                                   
+        integer,                     intent(out) :: r                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Computes the rank (in algebraic sense) of the rectangular matrix A.                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Sort(arr,n,indx) </a> </h4>                                                                                         
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp)  dimension(:), intent( in) :: arr                                                                                           
+        integer,                             intent( in) :: n                                                                                             
+        integer,               dimension(:), intent(out) :: indx                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Sort an array such the arr(indx(j)) is in ascending                                                                                                   
+    order for j=1,2,...,N.                                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Sort_Strings(arr) </a> </h4>                                                                                        
+    <p> <pre>                                                                                                                                             
+        character(len=*) dimension(:), intent( in out) :: arr                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Sort an array of string                                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub15" > Subroutine Spline(x, y, n, yp1, ypn, y2) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),    intent(in),     dimension(n) :: x     !  In -> Array X                                                                          
+        real(kind=sp),    intent(in),     dimension(n) :: y     !  In -> Array Yi=F(Xi)                                                                   
+        integer ,         intent(in)                   :: n     !  In -> Dimension of X, Y                                                                
+        real(kind=sp),    intent(in)                   :: yp1   !  In -> Derivate of Point 1                                                              
+        real(kind=sp),    intent(in)                   :: ypn   !  In -> Derivate of Point N                                                              
+        real(kind=sp),    intent(out),    dimension(n) :: y2    ! Out -> array containing second derivatives                                              
+                                                                         at the given points                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub16" > Subroutine Splint(xa, ya, y2a, n, x, y) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),    intent(in), dimension(n) :: xa  !  In -> Array X                                                                                
+        real(kind=sp),    intent(in), dimension(n) :: ya  !  In -> Array Y=F(X)                                                                           
+        real(kind=sp),    intent(in), dimension(n) :: y2a !  In -> Array Second Derivatives in X                                                          
+        integer ,         intent(in)               :: n   !  In -> Dimension of XA,YA,Y2A                                                                 
+        real(kind=sp),    intent(in)               :: x   !  In -> Point to evaluate                                                                      
+        real(kind=sp),    intent(out),             :: y   ! Out -> Interpoled value                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Spline Interpolation                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub17" > Subroutine Svdcmp(a,w,v) </a> </h4>                                                                                            
+    <p> <pre>                                                                                                                                             
+        real(sp/dp),dimension(:,:),intent(in out) :: a  !A(m,n)                                                                                           
+        real(sp/dp),dimension(:),  intent(   out) :: w  !W(n)                                                                                             
+        real(sp/dp),dimension(:,:),intent(   out) :: v  !V(n,n)                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Given an M×N matrix A ,this routine computes its singular value decomposition,                                                                        
+    A = U ·W ·VT . The matrix U replaces A on output. The diagonal matrix of                                                                              
+    singular values W is output as the N-dimensional vector w. The N×N matrix V                                                                           
+    (not the transpose VT )is output as v .                                                                                                               
+    Adapted from Numerical Recipes. Valid for arbitrary real matrices                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub18" > Subroutine Swap(a,b) or Swap(a,b,mask) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        integer,real(sp),complex, intent( in out) :: a, b                                                                                                 
+          or                                                                                                                                              
+        integer,real(sp),complex, dimension(:), intent( in out) :: a, b                                                                                   
+          or                                                                                                                                              
+        integer,real(sp),complex, dimension(:,:), intent( in out) :: a, b                                                                                 
+          or                                                                                                                                              
+        real(kind=sp),  intent(in out) :: a,b                                                                                                             
+        logical,        intent(in)     :: mask                                                                                                            
+          or                                                                                                                                              
+        real(kind=sp), dimension(:), intent(in out) :: a,b                                                                                                
+        logical,       dimension(:), intent(in)     :: mask                                                                                               
+          or                                                                                                                                              
+        real(kind=sp), dimension(:,:), intent(in out) :: a,b                                                                                              
+        logical,       dimension(:,:), intent(in)     :: mask                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Swap the contents of a and b, when mask (if given) is true.                                                                                           
+                                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod2"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

@@ -1,0 +1,162 @@
+;; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, first visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.
+
+
+   Hi William,
+  I'm sorry for the delay in my answer to your e-mail. I'm quite busy!
+I'm sending you, attached to this e-mail, a version of CrysFML together with the Siena
+Tutorial I gave the last summer. I used for that G95 but it is better to use the
+Lahey/Fujitsu compiler that is more reliable. I have also included Enermag and Simbo (no
+manuals of these programs are available! you must first run simbo with one of the *.cfl
+files and then enermag), I hope it will useful to you.
+  At present the most important drawback of CrysFML is the absence of a proper
+documentation. I hope to have time to prepare this in the forthcoming 2-3 months.
+If you are using Windows you must create a directory c:\CrysFML in which you must
+extract  all the ZIP files respecting the directory structure. You must create by hand a
+subdirectory call "LibC" (c:\CrysFML\LibC) in which the library with the module
+information will be held.
+  On the other hand, BasIreps treats only the content of a primitive cell, even if the
+description is with respect to the basis of the conventional (eventually centred)
+cell. This is what is really needed for describing magnetic structures. Centring
+translations have exactly the same meaning as whatever other translation. The fact
+that the coefficients of the linear combination of the basis vectors are non-integers
+is just a mattern of using the conventional cell as is common in crystallography.
+  Below you have a copy of a PCR file using the basis vectors for treating the file
+"hobk.dat" in the distribution of FullProf.
+  Regards,
+  Juan
+
+PCR file:
+COMM Ho2BaNiO5 D1B 1.5K  (Magnetic part: Basis Functions in numerical form)
+! Current global Chi2 (Bragg contrib.) =      52.97
+! Files => DAT-file: hobk,  PCR-file: hobk_bas
+!Job Npr Nph Nba Nex Nsc Nor Dum Iwg Ilo Ias Res Ste Nre Cry Uni Cor Opt Aut
+   1   5   2   0   2   0   0   0   0   0   0   0   0   0   0   0   0   0   1
+!
+!Ipr Ppl Ioc Mat Pcr Ls1 Ls2 Ls3 NLI Prf Ins Rpa Sym Hkl Fou Sho Ana
+   0   0   1   0   1   0   0   0   0   1   3   1   1   0   0   0   0
+!
+! lambda1 Lambda2    Ratio    Bkpos    Wdt    Cthm     muR   AsyLim   Rpolarz ->Patt# 1
+ 2.524000 2.524000  1.0000   30.000  5.0000  0.0000  0.0000    5.00    0.0000
+!
+!NCY  Eps  R_at  R_an  R_pr  R_gl     Thmin       Step       Thmax    PSD    Sent0
+  5  0.10  1.00  1.00  1.00  1.00     10.0100   0.200000    89.8100   0.000   0.000
+!
+! Excluded regions (LowT  HighT) for Pattern#  1
+        0.00        8.00
+       90.00      180.00
+!
+!
+      20    !Number of refined parameters
+!
+!  Zero    Code    SyCos    Code   SySin    Code  Lambda     Code MORE ->Patt# 1
+  0.08428 111.00  0.00000   0.00  0.00000   0.00 0.000000    0.00   0
+!   Background coefficients/codes  for Pattern#  1
+  7078.2     -154.04      458.30     -947.45      933.90     -293.35
+      21.000      31.000      41.000       0.000       0.000       0.000
+!-------------------------------------------------------------------------------
+!  Data for PHASE number:   1  ==> Current R_Bragg for Pattern#  1:     3.44
+!-------------------------------------------------------------------------------
+Ho2BaNiO5      magph2
+!
+!Nat Dis Ang Pr1 Pr2 Pr3 Jbt Irf Isy Str Furth       ATZ    Nvk Npr More
+   5   0   0 0.0 0.0 1.0   0   0   0   0   0       1211.800   0   5   1
+!
+!Jvi Jdi Hel Sol Mom Ter  Brind   RMua    RMub    RMuc   Jtyp  Nsp_Ref Ph_Shift
+   3   0   0   0   0   0  1.0000  0.0000  0.0000  0.0000    1      0      0
+!
+I m m m                  <--Space group symbol
+!Atom Typ       X        Y        Z     Biso       Occ     In Fin N_t Spc /Codes
+BA   BA      0.50000  0.50000  0.00000  0.00000   0.12500   0   0   0    0  #nodisplay
+                0.00     0.00     0.00     0.00      0.00
+HO   HO      0.50000  0.00000  0.20264  0.00000   0.25000   0   0   0    0  #color 0 1 0
+1  bond NI O1 0 2.2
+                0.00     0.00    81.00     0.00      0.00
+NI   NI      0.00000  0.00000  0.00000  0.00000   0.12500   0   0   0    0  #bond NI O2
+0 2.2
+                0.00     0.00     0.00     0.00      0.00
+O1   O       0.00000  0.24355  0.14959  0.00000   0.50000   0   0   0    0
+                0.00   101.00    91.00     0.00      0.00
+O2   O       0.50000  0.00000  0.00000  0.00000   0.12500   0   0   0    0
+                0.00     0.00     0.00     0.00      0.00
+!-------> Profile Parameters for Pattern #  1
+!  Scale        Shape1      Bov      Str1      Str2      Str3   Strain-Model
+  59.083       0.03820   0.51205   0.00000   0.00000   0.00000       0
+    11.00000    61.000    51.000     0.000     0.000     0.000
+!       U         V          W           X          Y        GauSiz   LorSiz Size-Model
+   1.548590  -0.988974   0.338850   0.000000   0.000000   0.000000   0.000000    0
+    121.000    131.000    141.000      0.000      0.000      0.000      0.000
+!     a          b         c        alpha      beta       gamma      #Cell Info
+   3.754168   5.729971  11.269407  90.000000  90.000000  90.000000   #box -0.50 1.50
+-0.50 1.50 -0.15 1.15
+  171.00000  161.00000  151.00000    0.00000    0.00000    0.00000
+!  Pref1    Pref2      Asy1     Asy2     Asy3     Asy4
+  0.00000  0.00000  0.06085  0.00000  0.00000  0.00000
+     0.00     0.00     0.00     0.00     0.00     0.00
+!-------------------------------------------------------------------------------
+!  Data for PHASE number:   2  ==> Current R_Bragg for Pattern#  1:     1.87
+!-------------------------------------------------------------------------------
+Ho2BaNiO5    (Irep 3 from BasIreps)
+!
+!Nat Dis Mom Pr1 Pr2 Pr3 Jbt Irf Isy Str Furth       ATZ    Nvk Npr More
+   2   0   0 0.0 0.0 1.0   1  -1  -2   0   0          0.000   1   5   0
+!
+I -1                     <--Space group symbol
+! Nsym   Cen  Laue Ireps N_Bas
+     2     1     1    -1     2
+! Real(0)-Imaginary(1) indicator for Ci
+  0  0
+!
+SYMM x,y,z
+BASR   1  0  0    0  0  1
+BASI   0  0  0    0  0  0
+SYMM  -x,y,-z
+BASR   1  0  0    0  0  1
+BASI   0  0  0    0  0  0
+!
+!Atom Typ  Mag Vek    X      Y      Z       Biso   Occ      C1      C2      C3
+!     C4     C5     C6      C7      C8      C9     MagPh
+Ho   JHO3  1  0  0.50000 0.00000 0.20250 0.00000 1.00000   0.128   8.992   0.000  #color
+0 1 0 1 scale 0.3
+                    0.00    0.00   81.00    0.00    0.00   71.00  181.00    0.00
+   0.000   0.000   0.000   0.000   0.000   0.000 0.00000
+    0.00    0.00    0.00    0.00    0.00    0.00    0.00
+Ni   MNI2  1  0  0.00000 0.00000 0.00000 0.00000 0.50000   0.586  -1.286   0.000
+                    0.00    0.00    0.00    0.00    0.00  191.00  201.00    0.00
+   0.000   0.000   0.000   0.000   0.000   0.000 0.00000
+    0.00    0.00    0.00    0.00    0.00    0.00    0.00
+!-------> Profile Parameters for Pattern #  1
+!  Scale        Shape1      Bov      Str1      Str2      Str3   Strain-Model
+  59.083       0.03820   0.51205   0.00000   0.00000   0.00000       0
+    11.00000    61.000    51.000     0.000     0.000     0.000
+!       U         V          W           X          Y        GauSiz   LorSiz Size-Model
+   1.548590  -0.988974   0.338850   0.000000   0.000000   0.000000   0.000000    0
+    121.000    131.000    141.000      0.000      0.000      0.000      0.000
+!     a          b         c        alpha      beta       gamma      #Cell Info
+   3.754168   5.729971  11.269407  90.000000  90.000000  90.000000   #box -0.50 1.50
+-0.50 1.50 -0.15 1.15
+  171.00000  161.00000  151.00000    0.00000    0.00000    0.00000
+!  Pref1    Pref2      Asy1     Asy2     Asy3     Asy4
+  0.00000  0.00000  0.06085  0.00000  0.00000  0.00000
+     0.00     0.00     0.00     0.00     0.00     0.00
+! Propagation vectors:
+   0.5000000   0.0000000   0.5000000          Propagation Vector  1
+    0.000000    0.000000    0.000000
+
+
+
+> Hi!  How goes it?  I am the instrument scientist for the BT9 thermal triple axis
+> at the NCNR at NIST.  I am interested in your CrysFML library.  Would it be
+> possible for me to obtain a copy of it and the programs Enermag and Simbo?  For
+> the programs such as Enermag and Simbo, do they run under windows, or under lynux?
+>
+>
+> Thanks,
+> William Ratcliff
+> (p.s. on a different note, do you have an example file for fullprof which uses
+> the basis vector method for magnetic structure determination?  Your basireps
+> program seems to go from the primitive rather than the unit cell and I just want
+> to try a trial case before moving on to the structure of actual interest to
+> me--thanks!)
+>

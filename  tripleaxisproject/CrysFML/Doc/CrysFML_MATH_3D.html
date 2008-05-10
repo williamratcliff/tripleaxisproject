@@ -1,0 +1,402 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod9" > MATH_3D </a> </h2>                                                                                                              
+    <dd>  Simple mathematics general utilities for 3D Systems </dd>                                                                                       
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_MATH_3D </a> </li>                                                                                                      
+      <li> <a href="#var2"  > ERR_MESS_MATH_3D </a> </li>                                                                                                 
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > CROSS_PRODUCT </a> </li>                                                                                                    
+      <li> <a href="#fun2"  > DETERM_A </a> </li>                                                                                                         
+      <li> <a href="#fun3"  > DETERM_V </a> </li>                                                                                                         
+      <li> <a href="#fun4"  > INVERT_A </a> </li>                                                                                                         
+      <li> <a href="#fun5"  > ROTATE_OX </a> </li>                                                                                                        
+      <li> <a href="#fun6"  > ROTATE_OY </a> </li>                                                                                                        
+      <li> <a href="#fun7"  > ROTATE_OZ </a> </li>                                                                                                        
+      <li> <a href="#fun8"  > VECLENGTH </a> </li>                                                                                                        
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > INIT_ERR_MATH3D </a> </li>                                                                                                  
+      <li> <a href="#sub2"  > SET_EPS </a> </li>                                                                                                          
+      <li> <a href="#sub3"  > SET_EPS_DEFAULT </a> </li>                                                                                                  
+      <li> <a href="#sub4"  > GET_CART_FROM_CYLIN </a> </li>                                                                                              
+      <li> <a href="#sub5"  > GET_CYLINDR_COORD </a> </li>                                                                                                
+      <li> <a href="#sub6"  > GET_CART_FROM_SPHER </a> </li>                                                                                              
+      <li> <a href="#sub7"  > GET_PLANE_FROM_POINTS </a> </li>                                                                                            
+      <li> <a href="#sub8"  > GET_SPHERIC_COORD </a> </li>                                                                                                
+      <li> <a href="#sub9"  > MATRIX_DIAGEIGEN </a> </li>                                                                                                 
+      <li> <a href="#sub10" > MATRIX_INVERSE </a> </li>                                                                                                   
+      <li> <a href="#sub11" > RESOLV_SIST_1X2 </a> </li>                                                                                                  
+      <li> <a href="#sub12" > RESOLV_SIST_1X3 </a> </li>                                                                                                  
+      <li> <a href="#sub13" > RESOLV_SIST_2X2 </a> </li>                                                                                                  
+      <li> <a href="#sub14" > RESOLV_SIST_2X3 </a> </li>                                                                                                  
+      <li> <a href="#sub15" > RESOLV_SIST_3X3 </a> </li>                                                                                                  
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MATH_3D </a> </h4>                                                                                                         
+    <p> <pre>                                                                                                                                             
+        logical :: err_math_3d                                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in MATH_3D module                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_MESS_MATH_3D </a> </h4>                                                                                                    
+    <p> <pre>                                                                                                                                             
+        character(len=150) :: err_mess_math_3d                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Function  Cross_Product(U,V) Result(W) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), dimension(3), intent( in) :: u   !  In -> Vector 1                                                                              
+        real(kind=sp/dp), dimension(3), intent( in) :: v   !  In -> Vector 2                                                                              
+        real(kind=sp/dp), dimension(3)              :: w   ! Out -> Vector 1 x vector 2                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the cross product of vectors u and v                                                                                                       
+    Vectors, w= u x v, are given in cartesian components.                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Function Determ_A(A) </a> </h4>                                                                                                
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3,3), intent(in)  :: a                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the determinant of an integer/real 3x3 matrix                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Function  Determ_V(a,b,c) </a> </h4>                                                                                           
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=sp), dimension(3), intent(in) :: a,b,c                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the determinant of the components of three vectors                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun4"  > Funcion Invert_A(A) Result(b) </a> </h4>                                                                                       
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), dimension(3,3), intent(in) :: a                                                                                                 
+        real(Kind=sp/dp), dimension(3,3)             :: b                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate de inverse of a real 3x3 matrix. If the routine fails,                                                                                      
+    then a 0.0 matrix is returned.                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun5"  > Function Rotate_OX(X,Angle) Result (Vec) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        real, dimension(3), intent(in) :: x       !  In -> Vector                                                                                         
+        real,               intent(in) :: angle   !  In -> Angle (Degrees)                                                                                
+        real, dimension(3)             :: vec     ! Out -> Vector                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    X Rotation. Positive rotation is unclockwise                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun6"  > Function Rotate_OY(Y,Angle) Result (Vec) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        real, dimension(3), intent(in) :: y       !  In -> Vector                                                                                         
+        real,               intent(in) :: angle   !  In -> Angle (Degrees)                                                                                
+        real, dimension(3)             :: vec     ! Out -> Vector                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Y Rotation.                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun7"  > Function Rotate_OZ(Z,Angle) Result (Vec) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        real, dimension(3), intent(in) :: z       !  In -> Vector                                                                                         
+        real,               intent(in) :: angle   !  In -> Angle (Degrees)                                                                                
+        real, dimension(3)             :: vec     ! Out -> Vector                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Z Rotation                                                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun8"  > Function Veclength(A,B) Result(c) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3,3), intent(in)  :: a                                                                                                   
+        real(kind=sp), dimension(3),   intent(in)  :: b                                                                                                   
+        real(kind=sp),                             :: c                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Length of vector B when A is the Crystallographic                                                                                                     
+    to orthogonal matrix length=c                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Init_Err_Math3D() </a> </h4>                                                                                        
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in Math_3d                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Set_Eps(Neweps) </a> </h4>                                                                                          
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent( in) :: neweps                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Sets global EPS to the value "neweps"                                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Set_Eps_Default() </a> </h4>                                                                                        
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Sets global EPS to the default value: eps=0.00001                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Get_Cart_from_Cylin(rho,Phi,zeta,Xo,Mode) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp),              intent( in)           :: rho                                                                                       
+        real(kind=sp/dp),              intent( in)           :: phi                                                                                       
+        real(kind=sp/dp),              intent( in)           :: zeta                                                                                      
+        real(kind=sp/dp), dimension(3),intent(out)           :: xo                                                                                        
+        character(len=*),              intent( in), optional :: mode                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Determine the Cartesian coordinates from cylindrical coordinates.                                                                                     
+    If Mode='D' the angle phi is provided in Degrees.                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Get_Cylindr_Coord(Xo,rho,Phi,zeta,Mode) </a> </h4>                                                                  
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), dimension(3),intent( in)           :: xo                                                                                        
+        real(kind=sp/dp),              intent(out)           :: rho                                                                                       
+        real(kind=sp/dp),              intent(out)           :: phi                                                                                       
+        real(kind=sp/dp),              intent(out)           :: zeta                                                                                      
+        character(len=*),              intent( in), optional :: mode                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Determine the cylindrical coordinates from Cartesian coordinates.                                                                                     
+    If Mode='D' the angle phi is provided in Degrees.                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Get_Cart_from_Spher(r,Theta,Phi,Xo,Mode) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp),              intent( in)           :: r                                                                                         
+        real(kind=sp/dp),              intent( in)           :: Theta                                                                                     
+        real(kind=sp/dp),              intent( in)           :: Phi                                                                                       
+        real(kind=sp/dp), dimension(3),intent(out)           :: xo                                                                                        
+        character(len=*),              intent( in), optional :: mode                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Determine the Cartesian coordinates from spherical coordinates.                                                                                       
+    If Mode='D' the angle phi is provided in Degrees.                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Get_Plane_from_Points(P1,P2,P3,A,B,C,D) </a> </h4>                                                                  
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3), intent(in) :: P1                                                                                                     
+        real(kind=sp), dimension(3), intent(in) :: P2                                                                                                     
+        real(kind=sp), dimension(3), intent(in) :: P3                                                                                                     
+        real(kind=sp),               intent(out):: A                                                                                                      
+        real(kind=sp),               intent(out):: B                                                                                                      
+        real(kind=sp),               intent(out):: C                                                                                                      
+        real(kind=sp),               intent(out):: D                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Caculate the implicit form of a Plane in 3D as                                                                                                        
+    A * X + B * Y + C * Z + D = 0                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Get_Spheric_Coord(Xo,Ss,Theta,Phi,Mode) </a> </h4>                                                                  
+    <p> <pre>                                                                                                                                             
+        real(kind=sp/dp), dimension(3),intent( in)           :: xo                                                                                        
+        real(kind=sp/dp),              intent(out)           :: ss                                                                                        
+        real(kind=sp/dp),              intent(out)           :: theta                                                                                     
+        real(kind=sp/dp),              intent(out)           :: phi                                                                                       
+        character(len=*),              intent( in), optional :: mode                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Determine the spheric coordinates from rectangular coordinates.                                                                                       
+    If Mode='D' the angles will be done in Degrees.                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Matrix_DiagEigen(A, V, C) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3,3), intent(in)  :: a                                                                                                   
+        real(kind=sp), dimension(3),   intent(out) :: v                                                                                                   
+        real(kind=sp), dimension(3,3), intent(out) :: c                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Diagonalize the matrix A, put eigenvalues in V and                                                                                                    
+    eigenvectors in C                                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Matrix_Inverse(A, B, Ifail) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3,3), intent(in)  :: a                                                                                                   
+        real(kind=sp), dimension(3,3), intent(out) :: b                                                                                                   
+        integer                      , intent(out) :: ifail                                                                                               
+                                                      0 = OK; 1 = Fail                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Inverts a 3x3 Matrix                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Resolv_Sist_1X2(W,T,Ts,X,Ix) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        integer,       dimension(2),      intent(in) :: w     !  In -> Input vector                                                                       
+        real(kind=sp),                    intent(in) :: t     !  In -> Input value                                                                        
+        real(kind=sp), dimension(2),      intent(out):: ts    ! Out -> Fixed value of solution                                                            
+        real(kind=sp), dimension(2),      intent(out):: x     ! Out -> Fixed value for x,y                                                                
+        integer, dimension(2),            intent(out):: ix    ! Out -> determine if solution                                                              
+                                                                       1: x, 2: y, 3: z                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    w11 x1 + w12 x2  = t1                                                                                                                                 
+    x_sol(i)= ts(i) + x(i) ix(i)                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine Resolv_Sist_1X3(W,T,Ts,X,Ix) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        integer, dimension(3),            intent(in) :: w     !  In -> Input vector                                                                       
+        real(kind=sp),                    intent(in) :: t     !  In -> Input value                                                                        
+        real(kind=sp), dimension(3),      intent(out):: ts    ! Out -> Fixed value of solution                                                            
+        real(kind=sp), dimension(3),      intent(out):: x     ! Out -> Fixed value for x,y,z                                                              
+        integer, dimension(3),            intent(out):: ix    ! Out -> determine if solution                                                              
+                                                                       1: x, 2: y, 3: z                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    w11 x1 + w12 x2 + w13 x3 = t1                                                                                                                         
+    x_sol(i)= ts(i) + x(i) ix(i)                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Resolv_Sist_2X2(W,T,Ts,X,Ix) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        integer, dimension(2,2),          intent(in) :: w     !  In -> Input vector                                                                       
+        real(kind=sp), dimension(2),      intent(in) :: t     !  In -> Input value                                                                        
+        real(kind=sp), dimension(2),      intent(out):: ts    ! Out -> Fixed value of solution                                                            
+        real(kind=sp), dimension(2),      intent(out):: x     ! Out -> Fixed value for x,y                                                                
+        integer, dimension(2),            intent(out):: ix    ! Out -> determine if solution                                                              
+                                                                       1: x, 2: y, 3: z                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    w11 x1 + w12 x2  = t1                                                                                                                                 
+    w21 x1 + w22 x2  = t2                                                                                                                                 
+    x_sol(i)= ts(i) + x(i) ix(i)                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Resolv_Sist_2X3(W,T,Ts,X,Ix) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        integer, dimension(2,3),          intent(in) :: w      !  In -> Input vector                                                                      
+        real(kind=sp), dimension(2),      intent(in) :: t      !  In -> Input value                                                                       
+        real(kind=sp), dimension(3),      intent(out):: ts     ! Out -> Fixed value of solution                                                           
+        real(kind=sp), dimension(3),      intent(out):: x      ! Out -> Fixed value for x,y                                                               
+        integer, dimension(3),            intent(out):: ix     ! Out -> determine if solution                                                             
+                                                                        1: x, 2: y, 3: z                                                                  
+                   w11 x1 + w12 x2 + w13 x3 = t1                                                                                                          
+                   w21 x1 + w22 x2 + w23 x3 = t2                                                                                                          
+                   x_sol(i)= ts(i) + x(i) ix(i)                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub15" > Subroutine Resolv_Sist_3X3(W,T,Ts,X,Ix) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        integer, dimension(3,3),          intent(in) :: w      !  In -> Input vector                                                                      
+        real(kind=sp), dimension(3),      intent(in) :: t      !  In -> Input value                                                                       
+        real(kind=sp), dimension(3),      intent(out):: ts     ! Out -> Fixed value of solution                                                           
+        real(kind=sp), dimension(3),      intent(out):: x      ! Out -> Fixed value for x,y                                                               
+        integer, dimension(3),            intent(out):: ix     ! Out -> determine if solution                                                             
+                                                                         1: x, 2: y, 3: z                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    w11 x1 + w12 x2 + w13 x3 = t1                                                                                                                         
+    w21 x1 + w22 x2 + w23 x3 = t2                                                                                                                         
+    w31 x1 + w32 x2 + w33 x3 = t3                                                                                                                         
+    x_sol(i)= ts(i) + x(i) ix(i)                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod9"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

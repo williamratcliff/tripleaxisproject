@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod15" > DIFFRACTION_PATTERNS_MOD </a> </h2>                                                                                            
+    <dd>  Diffraction Patterns Information </dd>                                                                                                          
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > DIFFRACTION_PATTERN_TYPE </a> </li>                                                                                         
+      <li> <a href="#var2"  > ERR_DIFFPATT </a> </li>                                                                                                     
+      <li> <a href="#var3"  > ERR_MESS_DIFFPATT </a> </li>                                                                                                
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > INIT_ERR_DIFFPATT </a> </li>                                                                                                
+      <li> <a href="#sub2"  > READ_BACKGROUND_FILE </a> </li>                                                                                             
+      <li> <a href="#sub3"  > READ_PATTERN </a> </li>                                                                                                     
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE :: DIFFRACTION_PATTERN_TYPE </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+     Type, public :: Diffraction_Pattern_Type                                                                                                             
+        character(len=20)                           :: diff_kind     !type of radiation                                                                   
+        character(len=20)                           :: scat_var      !x-space: 2theta, TOF, Q, S, d, etc                                                  
+        character(len=20)                           :: instr         !file type                                                                           
+        real(kind=sp)                               :: thmin                                                                                              
+        real(kind=sp)                               :: thmax                                                                                              
+        real(kind=sp)                               :: scal                                                                                               
+        real(kind=sp)                               :: step                                                                                               
+        integer                                     :: npts          !number of points                                                                    
+        logical                                     :: ct_step       ! Constant step                                                                      
+        real(kind=sp), dimension (:), allocatable   :: y             !Experimental intensity                                                              
+        real(kind=sp), dimension (:), allocatable   :: ycalc         !Calculated intensity                                                                
+        real(kind=sp), dimension (:), allocatable   :: bgr           !Background                                                                          
+        real(kind=sp), dimension (:), allocatable   :: x             !Scattering variable (2theta...)                                                     
+        real(kind=sp), dimension (:), allocatable   :: sigma         !observations VARIANCE (it is the square of sigma!)                                  
+     End Type Spgr_Info_Type                                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Definition for Diffraction Pattern                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod15"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_DIFFPATT </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        logical, public :: Err_Diffpatt                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable to indicate an error on this module.                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod15"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > ERR_MESS_DIFFPATT </a> </h4>                                                                                                   
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: Err_Mess_Diffpatt                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod15"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Init_Err_DiffPatt() </a> </h4>                                                                                      
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in DiffPatt                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod15"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Read_Backgound_File(bck_file, bck_mode, dif_pat) </a> </h4>                                                         
+    <p> <pre>                                                                                                                                             
+        character (len=*),               intent(in   )    :: bck_file                                                                                     
+        character (len=*),               intent(in   )    :: bck_mode                                                                                     
+        type (diffraction_pattern_type), intent(out)      :: dif_Pat                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read background from a file                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod15"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Read_Pattern(Filename, Dif_Pat, Mode) </a> </h4>                                                                    
+    <p> <pre>                                                                                                                                             
+                       or   (Filename, Dif_Pat, NumPat, Mode)                                                                                             
+        character(len=*),                              intent (in) :: Filename                                                                            
+        type (diffraction_pattern_type),               intent (out):: Dif_Pat                                                                             
+        character(len=*), optional,                    intent (in) :: mode                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    character(len=*),                              intent (in) :: Filename                                                                                
+    type (diffraction_pattern_type), dimension(:), intent (out):: Dif_Pat                                                                                 
+    integer,                                       intent (out):: numpat                                                                                  
+    character(len=*), optional,                    intent (in) :: mode                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    Read one pattern from a Filename                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod15"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

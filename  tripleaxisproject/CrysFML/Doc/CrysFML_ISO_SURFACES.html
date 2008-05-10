@@ -1,0 +1,190 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod6" > ISO_SURFACES </a> </h2>                                                                                                         
+    <dd>  Iso_Surfaces Representation (Marching_Cubes & 2D Contour) </dd>                                                                                 
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > CUBE_INFO_TYPE </a> </li>                                                                                                   
+      <li> <a href="#var2"  > CUBE_INFO </a> </li>                                                                                                        
+      <li> <a href="#var3"  > MAX_POINTS </a> </li>                                                                                                       
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > INDEX_CUBE </a> </li>                                                                                                       
+      <li> <a href="#fun2"  > VERTICE_POINT </a> </li>                                                                                                    
+      <li> <a href="#fun3"  > VERTICES_CUBE </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > CALCULATE_CONTOUR2D </a> </li>                                                                                              
+      <li> <a href="#sub2"  > CALCULATE_MESH </a> </li>                                                                                                   
+      <li> <a href="#sub3"  > SET_CUBE_INFO </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE :: CUBE_INFO_TYPE </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+      Type :: Cube_Info_Type                                                                                                                              
+         integer                :: NElem     ! Number of Elemens                                                                                          
+         integer                :: Code      ! Code of Elements                                                                                           
+                                               1:               4:                                                                                        
+                                               2:               5:                                                                                        
+                                               3:               6:                                                                                        
+         integer, dimension(12) :: Edges     ! Code for Edge connections                                                                                  
+      End Type Cube_Info_Type                                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > CUBE_INFO </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+         Type (Cube_Info_Type), dimension(0:255) :: Cube_Info                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Information of Mesh in a cube                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > MAX_POINTS </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public ::  Max_Points                                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of maximum points permitted                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Function Index_Cube(Iv,Mc) Result (Value) </a> </h4>                                                                           
+    <p> <pre>                                                                                                                                             
+        integer, dimension(8),intent(in) :: iv   ! In -> Vertices state On/Off                                                                            
+        logical,              intent(in) :: mc   ! Mc = .true. Only triangles (128-255 Code)                                                              
+                                                        .false.               (  0-127 Code)                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Return the index for Marching cubes algorithm                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Function Vertice_Point(Code_Edge,D0,D1,D2,D3,D4,D5,D6,D7,D8,D9) Result(V) </a> </h4>                                           
+    <p> <pre>                                                                                                                                             
+         integer, intent(in) :: code_edge                                                                                                                 
+         or                                                                                                                                               
+         integer, intent(in) :: code_edge                                                                                                                 
+         real,    intent(in) :: d0, d1,d2,d3,d4,d5,d6,d7,d8,d9                                                                                            
+         real, dimension(3)  :: v                                                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Return the relative position point from (i,j,k) of V1                                                                                                 
+    Given a binary dataset, linear interpolation is not needed to                                                                                         
+    extract isosurfaces, When a cell edge in a binary dataset has                                                                                         
+    both on and off coners, the midpoint of the edge is the                                                                                               
+    intersection being looked for.                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Function Vertices_Cube(Index_Cube) Result(Iv) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        integer, intent(in)   :: index_cube     !  In -> Index cibe                                                                                       
+        integer, dimension(8) :: iv             ! Out -> Vertices state                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Return the state of the 8 vertices of the cube in Marching                                                                                            
+    cubes algorithm                                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Pure Function xy_sect(p1,p2,h,xh) result(sect) </a> </h4>                                                                      
+    <p> <pre>                                                                                                                                             
+        integer,              intent(in) :: p1,p2                                                                                                         
+        real, dimension(0:4), intent(in) :: h,xh                                                                                                          
+        real                             :: sect                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the intersection of lines                                                                                                                  
+    Used internally by Calculate_Contour2D                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Calculate_Contour2D(d,ilb,iub,jlb,jub,x,y,z,nlv,ntp,xyz) </a> </h4>                                                 
+    <p> <pre>                                                                                                                                             
+        integer,                           intent(in)     :: ilb,iub    ! Lower and upper limits on the first dimension                                   
+        integer,                           intent(in)     :: jlb,jub    ! Lower and upper limits for the second dimension                                 
+        real, dimension (ilb:iub,jlb:jub), intent(in)     :: d          ! Section 2D                                                                      
+        real, dimension (ilb:iub),         intent(in)     :: x          ! Limits values on X                                                              
+        real, dimension (jlb:jub),         intent(in)     :: y          ! Limits values on Y                                                              
+        real, dimension (:),               intent(in)     :: z          ! Level values                                                                    
+        integer,                           intent(in)     :: nlv        ! Number of levels                                                                
+        integer,                           intent(in out) :: ntp        ! Number of points                                                                
+        real, dimension (:,:),             intent(out)    :: xyz        ! XY Points                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine for Contour 2D                                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Calculate_Mesh(Rho,Ngrid,Nlevel,Levels,MC_Method,Npoints,Xyz,Limits,Step) </a> </h4>                                
+    <p> <pre>                                                                                                                                             
+        real,    dimension(:,:,:),         intent(in)     :: Rho                                                                                          
+        integer, dimension(3),             intent(in)     :: Ngrid                                                                                        
+        integer,                           intent(in)     :: Nlevel                                                                                       
+        real,    dimension(nlevel),        intent(in)     :: Levels                                                                                       
+        character(len=*),                  intent(in)     :: MC_Method                                                                                    
+        integer, dimension(nlevel),        intent(out)    :: Npoints                                                                                      
+        real,    dimension(:,:),           intent(out)    :: Xyz                                                                                          
+        real,    dimension(2,3), optional, intent(in)     :: Limits                                                                                       
+        integer, dimension(3), optional,   intent(in)     :: Step                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Updated: February - 2005                                                                                                                              
+                                                                                                                                                          
+    Subroutine Set_Cube_Info()                                                                                                                            
+                                                                                                                                                          
+    Set values for Cube_Info.                                                                                                                             
+    From 0 to 127 the code is defined according the next table.                                                                                           
+    From 128 to 255 all is defined using triangles.                                                                                                       
+                                                                                                                                                          
+    <p> <pre>                                                                                                                                             
+       Code  Figure               Process                                                                                                                 
+        =====================================================================                                                                             
+          1   Triangle             Pto1 -> Pto2 -> Pto3 -> Pto1                                                                                           
+                                                                                                                                                          
+          2   Trapezoide           Pto1 -> Pto2 -> Pto3 -> Pto4 -> Pto1                                                                                   
+                                                                                                                                                          
+          3   Triangle             Pto1 -> Pto2 -> Pto3 -> Pto1                                                                                           
+              Trapezoide           Pto4 -> Pto5 -> Pto6 -> Pto7 -> Pto4                                                                                   
+                                                                                                                                                          
+          4   Triangle             Pto1 -> Pto2 -> Pto3 -> Pto1                                                                                           
+              Triangle             Pto4 -> Pto5 -> Pto6 -> Pto4                                                                                           
+              Trapezoide           Pto7 -> Pto8 -> Pto9 -> Pto10 -> Pto7                                                                                  
+                                                                                                                                                          
+          5   Triangle + Line      Pto1 -> Pto2 -> Pto3 -> Pto1 :  Pto1 -> Pto4                                                                           
+                                                                                                                                                          
+          6   Triangle             Pto1 -> Pto2 -> Pto3 -> Pto1                                                                                           
+              Triangle + Line      Pto4 -> Pto5 -> Pto6 -> Pto4 :  Pto4 -> Pto7                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    </p>                                                                                                                                                  
+     <a href="#Mod6"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

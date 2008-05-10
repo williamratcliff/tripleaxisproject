@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod8" > OPTIMIZATION_LSQ </a> </h2>                                                                                                     
+    <dd>  Module implementing several algorithms for non-linear least-squares.                                                                            
+    At present only the Levenberg-Marquardt method is implemented. </dd>                                                                                  
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_LSQ </a> </li>                                                                                                          
+      <li> <a href="#var2"  > ERR_MESS_LSQ </a> </li>                                                                                                     
+      <li> <a href="#var3"  > NPAR </a> </li>                                                                                                             
+      <li> <a href="#var4"  > LSQ_CONDITIONS_TYPE </a> </li>                                                                                              
+      <li> <a href="#var5"  > LSQ_STATE_VECTOR_TYPE </a> </li>                                                                                            
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > MARQUARDT_FIT </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_LSQ </a> </h4>                                                                                                             
+    <p> <pre>                                                                                                                                             
+        logical, public  :: ERR_LSQ                                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical variable. The vaule .true. indicates that an error condition occurs                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod8"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_MESS_LSQ </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        Character(len=132), public  :: ERR_MESS_LSQ                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Character variable containing the error message associated to the                                                                                     
+    ocurrence of an error condition                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod8"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > NPAR </a> </h4>                                                                                                                
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public  :: npar                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Maximum number of free parameters (500)                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod8"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > Type, public :: LSQ_Conditions_type </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+         logical          :: constr=.false.  ! if true box constraint of percent% are applied to parameters                                               
+         logical          :: reached =.false.! if true convergence was reached in the algorithm                                                           
+         integer          :: corrmax=50      ! value of correlation in % to output                                                                        
+         integer          :: icyc            ! number of cycles of refinement                                                                             
+         integer          :: npvar           !number of effective free parameters of the model                                                            
+         integer          :: iw              ! indicator for weighting scheme (if iw=1 => w=1/yc)                                                         
+         real(kind=sp)    :: percent         ! %value of maximum variation of a parameter w.r.t.                                                          
+                                             ! the intial value before fixing it                                                                          
+      End Type LSQ_Conditions_type                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Derived type encapsulating all necessary conditions for running the LSQ algorithm                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod8"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > Type, public :: LSQ_State_Vector_type </a> </h4>                                                                               
+    <p> <pre>                                                                                                                                             
+         integer                            :: np         !total number of model parameters <= npar                                                       
+         real(kind=sp),     dimension(npar) :: pv         !Vector of parameters                                                                           
+         real(kind=sp),     dimension(npar) :: spv        !Vector of standard deviations                                                                  
+         integer,           dimension(npar) :: code       !pointer for selecting variable parameters                                                      
+         character(len=15), dimension(npar) :: nampar=" " !Names of parameters                                                                            
+      End Type LSQ_State_Vector_type                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Derived type encapsulating the vector state defining a set of parameter                                                                               
+    for calculating the model function and running the LSQ algorithm.                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod8"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Marquardt_Fit(Model_Functn, X, Y, W, Yc, Nobs, c, vs, Ipr, Chi2, scroll_lines) </a> </h4>                           
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(:),intent(in)     :: x      !Vector of x-values                                                                          
+        real(kind=sp), dimension(:),intent(in)     :: y      !Vector of observed y-values                                                                 
+        real(kind=sp), dimension(:),intent(in out) :: w      !Vector of weights-values (1/variance)                                                       
+        real(kind=sp), dimension(:),intent(   out) :: yc     !Vector of calculated y-values                                                               
+        integer                    ,intent(in)     :: nobs   !Number of effective components of x,y,w,yc                                                  
+        type(LSQ_conditions_type),  intent(in out) :: c      !Conditions for the algorithm                                                                
+        type(LSQ_State_Vector_type),intent(in out) :: vs     !State vector for the model calculation                                                      
+        integer                    ,intent(in)     :: Ipr    !Logical unit for writing                                                                    
+        real(kind=sp),              intent(out)    :: chi2   !Reduced Chi-2                                                                               
+        character(len=*),dimension(:), intent(out), optional  :: scroll_lines  !If present, part of the output is stored                                  
+                                                                               !in this text for treatment in the calling program                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Model_functn                                            !Name of the subroutine calculating yc(i) for point x(i)                                      
+    Interface                                               !Interface for the Model_Functn subroutine                                                    
+    Subroutine Model_Functn(iv,Xv,ycalc,aa,der)                                                                                                           
+    integer,                    intent(in) :: iv     !Number of the component: "i" in x(i)                                                                
+    real,                       intent(in) :: xv     !Value of x(i)                                                                                       
+    real,                       intent(out):: ycalc  !Value of yc at point x(i) => ycalc=yc(i)                                                            
+    real,dimension(:),          intent(in) :: aa     !Vector of parameters                                                                                
+    real,dimension(:),optional, intent(out):: der    !Derivatives of the function w.r.t. free parameters                                                  
+    End Subroutine Model_Functn                                                                                                                           
+    End Interface                                                                                                                                         
+                                                                                                                                                          
+                                                                                                                                                          
+    Subroutine for applying the Levenberg-Marquardt method for Least-Squares.                                                                             
+    The user must provide a model function according to the interface above.                                                                              
+    The model function should use at least some of the public variables of the                                                                            
+    present module in order to set the derivatives with respect to the model                                                                              
+    parameters. Examples of using this module are given in the program                                                                                    
+    templates CW_fit and TOF_fit.                                                                                                                         
+                                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod8"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

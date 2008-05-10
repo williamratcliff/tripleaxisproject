@@ -1,0 +1,268 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod27" > REFINEMENT_CODES </a> </h2>                                                                                                    
+    <dd>  Refinable Codes for Parameters </dd>                                                                                                            
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_REFCODES </a> </li>                                                                                                     
+      <li> <a href="#var2"  > ERR_MESS_REFCODES </a> </li>                                                                                                
+      <li> <a href="#var3"  > NP_CONS </a> </li>                                                                                                          
+      <li> <a href="#var4"  > NP_MAX </a> </li>                                                                                                           
+      <li> <a href="#var5"  > NP_REFI </a> </li>                                                                                                          
+      <li> <a href="#var6"  > NP_REST </a> </li>                                                                                                          
+      <li> <a href="#var7"  > V_BCON </a> </li>                                                                                                           
+      <li> <a href="#var8"  > V_BOUNDS </a> </li>                                                                                                         
+      <li> <a href="#var9"  > V_LIST </a> </li>                                                                                                           
+      <li> <a href="#var10" > V_NAME </a> </li>                                                                                                           
+      <li> <a href="#var11" > V_VEC </a> </li>                                                                                                            
+      <li> <a href="#var12" > V_SHIFT </a> </li>                                                                                                          
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > ALLOCATING RESTPARAM </a> </li>                                                                                             
+      <li> <a href="#sub2"  > ALLOCATING V_PARAM </a> </li>                                                                                               
+      <li> <a href="#sub3"  > INIT_ERR_REFCODES </a> </li>                                                                                                
+      <li> <a href="#sub4"  > INIT_REFCODES </a> </li>                                                                                                    
+      <li> <a href="#sub5"  > READ_REFCODES_FILE </a> </li>                                                                                               
+      <li> <a href="#sub6"  > VSTATE_TO_ATOMSPAR </a> </li>                                                                                               
+      <li> <a href="#sub7"  > WRITE_INFO_REFCODES </a> </li>                                                                                              
+      <li> <a href="#sub8"  > WRITE_RESTRAINTS_OBSCALC </a> </li>                                                                                         
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE :: ANGLE_RESTRAINT_TYPE </a> </h4>                                                                                        
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Type, public :: Angle_Restraint_Type                                                                                                                  
+    real(kind=sp)                 :: AObs                                                                                                                 
+    real(kind=sp)                 :: ACalc                                                                                                                
+    real(kind=sp)                 :: Sigma                                                                                                                
+    integer,dimension(3)          :: P                                                                                                                    
+    character(len=8),dimension(2) :: STCode                                                                                                               
+    End Type Angle_Restraint_Type                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ANG_REST </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        type(Angle_Restraint_Type), public, dimension(:), allocatable :: Ang_rest                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Relations for Angle Restraints                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > TYPE :: DISTANCE_RESTRAINT_TYPE </a> </h4>                                                                                     
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Type, public :: Distance_Restraint_Type                                                                                                               
+    real(kind=sp)        :: DObs                                                                                                                          
+    real(kind=sp)        :: DCalc                                                                                                                         
+    real(kind=sp)        :: Sigma                                                                                                                         
+    integer,dimension(2) :: P                                                                                                                             
+    character(len=8)     :: STCode    ! _N.ABC                                                                                                            
+    End Type Distance_Restraint_Type                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > DIS_REST </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        type(Distance_Restraint_Type), public, dimension(:), allocatable :: Dis_Rest                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Relations for Angle Restraints                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > TYPE :: TORSION_RESTRAINT_TYPE </a> </h4>                                                                                      
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Type, public :: Torsion_Restraint_Type                                                                                                                
+    real(kind=sp)                 :: TObs                                                                                                                 
+    real(kind=sp)                 :: TCalc                                                                                                                
+    real(kind=sp)                 :: Sigma                                                                                                                
+    integer,dimension(4)          :: P                                                                                                                    
+    character(len=8),dimension(3) :: STCode                                                                                                               
+    End Type Torsion_Restraint_Type                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var6"  > TOR_REST </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        type(Torsion_Restraint_Type), public, dimension(:), allocatable :: Tor_Rest                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Relations for Torsion Angle Restraints                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var7"  > ERR_REFCODES </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        logical, public :: Err_RefCodes                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Error variable                                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var8"  > ERR_MESS_REFCODES </a> </h4>                                                                                                   
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: Err_Mess_RefCodes                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Error variable messages                                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var9"  > CODE_NAM </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        character(len=6), dimension(NCode), public, parameter :: Code_Nam                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Variable for treatement Codes                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var10" > KEY_CODE </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        character(len=3), dimension(NKey), public, parameter :: key_Code                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var11" > NP_CONS </a> </h4>                                                                                                             
+    <p> <pre>                                                                                                                                             
+        integer, public :: NP_Cons                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of Constraints relations                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var12" > NP_MAX </a> </h4>                                                                                                              
+    <p> <pre>                                                                                                                                             
+        integer, public :: NP_Max                                                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of Maximum Parameters to Refine                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > NP_REFI </a> </h4>                                                                                                             
+    <p> <pre>                                                                                                                                             
+        integer, public :: NP_Refi                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of Refinable Parameters                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > NP_Rest_Ang </a> </h4>                                                                                                         
+    <p> <pre>                                                                                                                                             
+        integer, public :: NP_Rest_Ang                                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of Angle Restraints relations                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > NP_Rest_Dis </a> </h4>                                                                                                         
+    <p> <pre>                                                                                                                                             
+        integer, public :: NP_Rest_Dis                                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of Distance Restraints relations                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > NP_Rest_Tor </a> </h4>                                                                                                         
+    <p> <pre>                                                                                                                                             
+        integer, public :: NP_Rest_Tor                                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of Torsion Restraints relations                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > V_BCon </a> </h4>                                                                                                              
+    <p> <pre>                                                                                                                                             
+        integer, public, dimension(:), allocatable :: V_BCon                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Vector of Boundary Conditions                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > V_Bounds </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        real, public, dimension(:,:), allocatable :: V_Bounds                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Vector of Lower, Upper limits and Step for Parameters                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > V_List </a> </h4>                                                                                                              
+    <p> <pre>                                                                                                                                             
+        integer, public, dimension(:), allocatable :: V_List                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Vector of Index point the atom order                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > V_Name </a> </h4>                                                                                                              
+    <p> <pre>                                                                                                                                             
+        character(len=20), public, dimension(:), allocatable :: V_Name                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Vector of  Name of Refinable Parameters                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod27"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

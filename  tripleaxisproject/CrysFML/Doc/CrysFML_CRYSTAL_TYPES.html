@@ -1,0 +1,293 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod14" > CRYSTAL_TYPES </a> </h2>                                                                                                       
+    <dd>  Module to define crystallographic types and to provide                                                                                          
+    automatic crystallographic operations. </dd>                                                                                                          
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > CRYSTAL_CELL_TYPE </a> </li>                                                                                                
+      <li> <a href="#var2"  > ERR_CRYS </a> </li>                                                                                                         
+      <li> <a href="#var3"  > ERR_MESS_CRYS </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > CART_U_VECTOR </a> </li>                                                                                                    
+      <li> <a href="#fun2"  > CART_VECTOR </a> </li>                                                                                                      
+      <li> <a href="#fun3"  > CONVERT_B_BETAS </a> </li>                                                                                                  
+      <li> <a href="#fun4"  > CONVERT_B_U </a> </li>                                                                                                      
+      <li> <a href="#fun5"  > CONVERT_BETAS_B </a> </li>                                                                                                  
+      <li> <a href="#fun6"  > CONVERT_BETAS_U </a> </li>                                                                                                  
+      <li> <a href="#fun7"  > CONVERT_U_B </a> </li>                                                                                                      
+      <li> <a href="#fun8"  > CONVERT_U_BETAS </a> </li>                                                                                                  
+      <li> <a href="#fun9"  > ROT_MATRIX </a> </li>                                                                                                       
+      <li> <a href="#fun10" > U_EQUIV </a> </li>                                                                                                          
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > CHANGE_SETTING_CELL </a> </li>                                                                                              
+      <li> <a href="#sub2"  > GET_CRYST_FAMILY </a> </li>                                                                                                 
+      <li> <a href="#sub3"  > INIT_ERR_CRYS </a> </li>                                                                                                    
+      <li> <a href="#sub4"  > SET_CRYSTAL_CELL </a> </li>                                                                                                 
+      <li> <a href="#sub5"  > WRITE_CRYSTAL_CELL </a> </li>                                                                                               
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE :: CRYSTAL_CELL_TYPE </a> </h4>                                                                                           
+    <p> <pre>                                                                                                                                             
+      Type, public :: Crystal_Cell_Type                                                                                                                   
+         real(kind=sp),dimension(3)   :: cell, ang          ! Direct cell parameters                                                                      
+         real(kind=sp),dimension(3)   :: cell_std, ang_std  ! Standar deviations cell parameters                                                          
+         real(kind=sp),dimension(3)   :: rcell,rang         ! Reciprocal cell parameters                                                                  
+         real(kind=sp),dimension(3,3) :: GD,GR              ! Direct and reciprocal Metric Tensors                                                        
+         real(kind=sp),dimension(3,3) :: Cr_Orth_cel        ! P-Matrix transforming Orthonormal                                                           
+                                                            ! basis to direct Crytal cell (as I.T.)                                                       
+                                                            ! (or crystallographic components to                                                          
+                                                            !  cartesian components)                                                                      
+         real(kind=sp),dimension(3,3) :: Orth_Cr_cel        ! Inv(Cr_Orth_cel) -> Cartesian to cryst. components                                          
+         real(kind=sp)                :: CellVol            ! Direct and Reciprocal                                                                       
+         real(kind=sp)                :: RCellVol           ! Cell volumes                                                                                
+         Character (len=1)            :: CartType           ! Cartesian Frame type: if CartType='A'                                                       
+                                                            ! the Cartesian Frame has x // a.                                                             
+      End Type Crystal_Cell_Type                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_CRYS </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public :: err_crys                                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in CRYSTAL_TYPES module                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > ERR_MESS_CRYS </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: Err_Mess_Crys                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Function Cart_U_Vector(Code,V,Celda) Result(Vc) </a> </h4>                                                                     
+    <p> <pre>                                                                                                                                             
+        character (len=*),             intent(in) :: code    !  In -> D: Direct, R: Reciprocal                                                            
+        real(kind=sp), dimension(3),   intent(in) :: v       !  In -> Vector                                                                              
+        Type (Crystal_Cell_Type),      intent(in) :: Celda   !  In -> Cell Variable                                                                       
+        real(kind=sp),dimension(3)                :: vc      ! Out ->                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert a vector in crystal space to unitary cartesian components                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Function Cart_Vector(Code,V,Celda) Result(Vc) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        character (len=*),             intent(in) :: code     !  In -> D: Direct, R: Reciprocal                                                           
+        real(kind=sp), dimension(3),   intent(in) :: v        !  In -> Vector                                                                             
+        Type (Crystal_Cell_Type),      intent(in) :: Celda    !  In -> Cell variable                                                                      
+        real(kind=sp) dimension(3)                :: vc       ! Out ->                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert a vector in crystal space to cartesian components                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Function Convert_B_Betas(B,Cell) Result(Beta) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(6), intent(in)  :: B                                                                                                      
+        type (Crystal_cell_Type),   intent(in)  :: Cell                                                                                                   
+        real(kind=sp),dimension(6)              :: Beta                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert Thermal factors from B to Betas                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun4"  > Function Convert_B_U(B) Result(U) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(6), intent(in)  :: B                                                                                                      
+        real(kind=sp),dimension(6)              :: U                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert Thermal factors from B to U                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun5"  > Function Convert_Betas_B(Beta,Cell) Result(B) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(6), intent(in)  :: Beta                                                                                                   
+        type (Crystal_cell_Type),   intent(in)  :: Cell                                                                                                   
+        real(kind=sp),dimension(6)              :: B                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert Thermal factors from Betas to B                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun6"  > Function Convert_Betas_U(Beta,Cell) Result(U) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(6), intent(in)  :: Beta                                                                                                   
+        type (Crystal_cell_Type),   intent(in)  :: Cell                                                                                                   
+        real(kind=sp),dimension(6)              :: U                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert Thermal factors from Betas to U                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun7"  > Function Convert_U_B(U) Result(B) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(6), intent(in)  :: U                                                                                                      
+        real(kind=sp),dimension(6)              :: B                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert Thermal factors from U to B                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun8"  > Function Convert_U_Betas(U,Cell) Result(Beta) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),dimension(6), intent(in)  :: U                                                                                                      
+        type (Crystal_cell_Type),   intent(in)  :: Cell                                                                                                   
+        real(kind=sp),dimension(6)              :: Beta                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Convert Thermal factors from U to Betas                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun9"  > Function Rot_Matrix(U, Phi, Celda) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3),        intent(in) :: U                                                                                               
+        real(kind=sp),                      intent(in) :: Phi                                                                                             
+        type (Crystal_Cell_Type), optional, intent(in) :: Celda                                                                                           
+        real(kind=sp), dimension(3,3)                  :: Rm                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Returns the matrix (Gibbs matrix) of the active rotation of "phi" degrees                                                                             
+    along the "U" direction: R v = v', the vector v is tranformed to vector v'                                                                            
+    keeping the reference frame unchanged.                                                                                                                
+                                                                                                                                                          
+    If one wants to calculate the components of the vector "v" in a rotated                                                                               
+    reference frame it suffices to invoke the function using "-phi".                                                                                      
+    If "Celda" is present, "U" is in "Celda" coordinates,                                                                                                 
+    if not "U" is in cartesian coordinates.                                                                                                               
+                                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun10" > Function U_Equiv(Cell, Th_U) Result(Uequi) </a> </h4>                                                                          
+    <p> <pre>                                                                                                                                             
+        type(Crystal_Cell_Type),    intent(in)     :: Cell    !  In -> Cell variable                                                                      
+        real(kind=sp), dimension(6),intent(in)     :: Th_U    !  In -> U parameters                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to obtain the U equiv from U11 U22 U33 U23 U13 U12                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Change_Setting_Cell(Cell,Mat,Celln,Matkind) </a> </h4>                                                              
+    <p> <pre>                                                                                                                                             
+        type (Crystal_Cell_Type),      intent( in)    :: Cell                                                                                             
+        real(kind=sp), dimension (3,3),intent( in)    :: Mat                                                                                              
+        type (Crystal_Cell_Type),      intent(out)    :: Celln                                                                                            
+        character (len=*), optional,   intent (in)    :: matkind                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates a new cell                                                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Get_Cryst_Family(Cell,Car_Family,Car_Symbol,Car_System) </a> </h4>                                                  
+    <p> <pre>                                                                                                                                             
+        type(Crystal_Cell_type),         intent(in ) :: Cell                                                                                              
+        character(len=*),                intent(out) :: Car_Family                                                                                        
+        character(len=*),                intent(out) :: Car_Symbol                                                                                        
+        character(len=*),                intent(out) :: Car_System                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Obtain the Crystal Family, Symbol and System from cell parameters                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Get_Deriv_Orth_Cell(Cellp,De_Orthcell,Cartype) </a> </h4>                                                           
+    <p> <pre>                                                                                                                                             
+        type(Crystal_Cell_type),         intent(in ) :: cellp                                                                                             
+        real(kind=sp), dimension(3,3,6), intent(out) :: de_Orthcell                                                                                       
+        character (len=1), optional,    intent (in ) :: CarType                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to get derivative matrix of the transformation matrix                                                                                      
+    to orthogonal frame. Useful for calculations of standard deviations                                                                                   
+    of distances and angles. The specialised subroutine calculating                                                                                       
+    sigmas of distances "distance_and_sigma" is in Atom_mod.                                                                                              
+    The output matrices "de_Orthcell" are the derivatives of, with                                                                                        
+    respect to a(1),b(2),c(3),alpha(4),beta(5) and gamma(6) of the                                                                                        
+    matrix   "Cellp%Cr_Orth_cel".                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > SUBROUTINE INIT_ERR_CRYS() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize Flags of Errors in this module                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Set_Crystal_Cell(Cellv,Angl,Celda,Cartype,Scell,Sangl) </a> </h4>                                                   
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension (3),        intent(in ) :: cellv   !  In -> a,b,c                                                                        
+        real(kind=sp), dimension (3),        intent(in ) :: angl    !  In -> angles of cell parameters                                                    
+        Type (Crystal_Cell_Type),            intent(out) :: Celda   !  Out-> Celda components                                                             
+        character (len=1),          optional,intent(in ) :: CarType !  In -> Type of Cartesian Frame                                                      
+        real(kind=sp), dimension(3),optional,intent(in ) :: scell,sangl                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Constructs the object "Celda" of type Crystal_Cell. Control for error                                                                                 
+    is present                                                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod14"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

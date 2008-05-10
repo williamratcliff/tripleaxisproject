@@ -1,0 +1,284 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod7" > OPTIMIZATION_PROCEDURES </a> </h2>                                                                                              
+    <dd>  Module implementing several algorithms for global and local                                                                                     
+    optimization. </dd>                                                                                                                                   
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_OPTIM </a> </li>                                                                                                        
+      <li> <a href="#var2"  > ERR_MESS_OPTIM </a> </li>                                                                                                   
+      <li> <a href="#var3"  > OPT_CONDITIONS_TYPE </a> </li>                                                                                              
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > CG_QUASI_NEWTON </a> </li>                                                                                                  
+      <li> <a href="#sub2"  > CSENDES_GLOBAL </a> </li>                                                                                                   
+      <li> <a href="#sub3"  > INIT_ERR_OPTIM </a> </li>                                                                                                   
+      <li> <a href="#sub4"  > INIT_OPT_CONDITIONS </a> </li>                                                                                              
+      <li> <a href="#sub5"  > NELDER_MEAD_SIMPLEX </a> </li>                                                                                              
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MESS_OPTIM </a> </h4>                                                                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: Err_Mess_Optim                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_OPTIM </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+        logical, public :: Err_Optim                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable to indicate an error on this module.                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > TYPE :: OPT_CONDITIONS_TYPE </a> </h4>                                                                                         
+    <p>                                                                                                                                                   
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+     Type, public :: Opt_Conditions_Type                                                                                                                  
+        integer      :: nmeth ! (in)  nmeth=0 => conjugate gradient                                                                                       
+                              !       nmeth=1 => the BFGS method is used                                                                                  
+        integer      :: mxfun ! (in)  Maximum number function calls                                                                                       
+        integer      :: iout  ! (in)  Printing parameter,                                                                                                 
+                              !       if iout= 0 no printing for Quasi_Newton & Conjugate Gradient                                                        
+                              !       if iout= 0 partial printing for Simplex (<0 no printing)                                                            
+                              !       if iout>0 printing each iout iterations/evaluations.                                                                
+        integer      :: loops ! (in)  Useful for SIMPLEX method: = 0                                                                                      
+                              !                                                                                                                           
+        integer      :: iquad ! (in)  For SIMPLEX, if iquad/= 0 fitting to a quadratic                                                                    
+                              !                                                                                                                           
+        integer      :: nflag ! (out) Flag value states which condition caused the exit of                                                                
+                              !       the optimization subroutine                                                                                         
+                              !       If NFLAG=0, the algorithm has converged.                                                                            
+                              !       If NFLAG=1, the maximum number of function                                                                          
+                              !          evaluations have been used.                                                                                      
+                              !       If NFLAG=2, the linear search has failed to                                                                         
+                              !          improve the function value. This is the                                                                          
+                              !          usual exit if either the function or the                                                                         
+                              !          gradient is incorrectly coded.                                                                                   
+                              !       If NFLAG=3, The search vector was not                                                                               
+                              !          a descent direction. This can only be caused                                                                     
+                              !          by roundoff,and may suggest that the                                                                             
+                              !          convergence criterion is too strict.                                                                             
+        integer      :: ifun  ! (out) Total number of function and gradient evaluations                                                                   
+        integer      :: iter  ! (out) Total number of search directions used in the algorithm                                                             
+        real(kind=cp):: eps   ! (in)  Convergence occurs when the norm of the gradient                                                                    
+                              !       is less than or equal to EPS times the maximum                                                                      
+                              !       of one and the norm of the vector X                                                                                 
+                              !       Initialized to 1.0E-6                                                                                               
+        real(kind=cp):: acc   ! (in)  ACC is a user supplied estimate of machine                                                                          
+                              !       accuracy. A linear search is unsuccessfully                                                                         
+                              !       terminated when the norm of the step size                                                                           
+                              !       becomes smaller than ACC. In practice,                                                                              
+                              !       ACC=10.0E-20 has proved satisfactory.                                                                               
+                              !       This is the default value.                                                                                          
+                              !       For Simplex method the meaning is different                                                                         
+                              !       (see below) and this should be changed to 1.0e-6                                                                    
+     End Type Opt_Conditions_Type                                                                                                                         
+                                                                                                                                                          
+        This TYPE has been introduced to simplify the call to optimization                                                                                
+        procedures. It contains the optimization parameters useful for different                                                                          
+        algorithms.                                                                                                                                       
+        All integer components are initialized to zero and the real components                                                                            
+        are initilized as indicated below.                                                                                                                
+        A variable of this type should be defined by the user and all their                                                                               
+        input parameters (in) must be provided before calling the procedures.                                                                             
+        On output from the procedure the (out) items are provided for checking.                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Cg_Quasi_Newton(Model_Functn,Nparm,X,F,G,C,Ipr) </a> </h4>                                                          
+    <p> <pre>                                                                                                                                             
+        integer,                          intent(in)     :: n      ! The number of variables in the function to be                                        
+                                                                   ! minimized.                                                                           
+        real(kind=cp),dimension(n),       intent(in out) :: x      ! The vector containing the current estimate to                                        
+                                                                   ! the minimizer.                                                                       
+                                                                   ! In -> Must contain an initial estimate supplied by the user.                         
+                                                                   ! Out-> X will hold the best estimate to the minimizer obtained                        
+        real(kind=cp),                    intent(   out) :: f      ! Out-> F will contain the lowest value of the object function obtained.               
+        real(kind=cp),dimension(n),       intent(   out) :: g      ! Out-> G =(g(1),...g(n)) will contain the elements of the gradient of                 
+                                                                   !       F evaluated at the point contained in X=(x(1),...x(N))                         
+        type(Opt_conditions),             intent(in out) :: C      ! Conditions for the algorithm. C is of type(Opt_conditions)                           
+        integer, optional,                intent(in)     :: ipr   ! Logical unit for printing if the parameter C%IOUT /= 0.                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    <p> <pre>                                                                                                                                             
+        Interface                                                                                                                                         
+           Subroutine Model_Functn(n,x,f,g)                                                                                                               
+              use Math_Gen,  only: cp                                                                                                                     
+              integer,                    intent(in)     :: n                                                                                             
+              real(kind=cp),dimension(:), intent(in)     :: x                                                                                             
+              real(kind=cp),              intent(out)    :: f                                                                                             
+              real(kind=cp),dimension(:), intent(out)    :: g                                                                                             
+           End Subroutine Model_Functn                                                                                                                    
+        End Interface                                                                                                                                     
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    Minimization Of Unconstrained Multivariate Functions                                                                                                  
+    Subroutine CG_QUASI_NEWTON minimizes an unconstrained nonlinear                                                                                       
+    scalar valued function of a vector variable X either by the                                                                                           
+    BFGS variable metric algorithm or by a beale restarted conjugate                                                                                      
+    gradient algorithm.                                                                                                                                   
+    (Authors: D.F. Shanno and K.H. Phua, The original name of the                                                                                         
+    subroutine was CONMIN)                                                                                                                                
+    ACM TRANSACTIONS ON MATHEMATICAL SOFTWARE 6 (DECEMBER 1980), 618-622                                                                                  
+                                                                                                                                                          
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+     REMARKS:    In addition to the specified values in the above                                                                                         
+                 argument list, the user must supply a subroutine                                                                                         
+                 "Model_Functn" which calculates the function and gradient at                                                                             
+                 X and places them in F and G(1),...,G(N) respectively.                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Csendes_Global(Model_Functn,Mini, Maxi, Nparm, N100, Ng0, Nsig, X0, Nc, F0, Ipr) </a> </h4>                         
+    <p> <pre>                                                                                                                                             
+        Model_Functn : is the dummy name of the objective function to be optimized.                                                                       
+        real(kind=cp), dimension(:),   intent(in)    :: mini   ! Vector of Length Nparm Containing The Lower Bounds                                       
+        real(kind=cp), dimension(:),   intent(in)    :: maxi   ! Vector of Length Nparm Containing The Upper Bounds                                       
+        integer,                       intent(in)    :: nparm  ! Number of Parameters                                                                     
+        integer,                       intent(in out):: n100   ! Number of Sample Points To Be Drawn Uniformly In One Cycle < 10000                       
+                                                               ! Suggested value is 100*Nparm                                                             
+        integer,                       intent(in out):: ng0    ! Number of Best Points Selected From The Actual Sample                                    
+                                                               ! The Suggested Value Is Twice The Expected Number Of Local Minima                         
+        integer,                       intent(in)    :: nsig   ! Convergence Criterion                                                                    
+        real(kind=cp), dimension(:,:), intent(in out):: x0     ! Output (up to Npar x Nc) Matrix Containing Nc Local Minimizers Found.                    
+        integer,                       intent(out)   :: nc     ! Number of Different Local Minimizers Found                                               
+        real(kind=cp), dimension(:),   intent(in out):: f0     ! Output Vector Of Nc  Objective Function Values,                                          
+                                                               ! F0(I) Belongs To The Parameters X0(1,I), X0(2,I), ..., X0(Nparm,I)                       
+        integer,                       intent(in)    :: ipr    ! Printing Information                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    <p> <pre>                                                                                                                                             
+        Interface                                                                                                                                         
+           Subroutine Model_Functn(Nparm,X, F)                                                                                                            
+              real(kind=cp),dimension(:), intent(in)  :: x                                                                                                
+              real(kind=cp),              intent(out) :: f                                                                                                
+              integer,                    intent(in)  :: nparm                                                                                            
+           End Subroutine Model_Functn                                                                                                                    
+        End Interface                                                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    Global optimization using the Boender-Timmer-Rinnoy Kan algorithm                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Init_Err_Optim() </a> </h4>                                                                                         
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in this Module                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Init_Opt_Contitions(Opt) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        type(Opt_Conditions_Type), intent(out) :: Opt                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Initialize the variable Opt                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Nelder_Mead_Simplex(Model_Functn, Nop, P, Step, Var, Func, C, Ipr) </a> </h4>                                       
+    <p> <pre>                                                                                                                                             
+        integer,                      intent(in)      :: nop   ! In -> no. of parameters, incl. any to be held fixed                                      
+        real (kind=cp), dimension(:), intent(in out)  :: p     ! In -> starting values of parameters                                                      
+                                                               ! Out-> final values of parameters                                                         
+        real (kind=cp), dimension(:), intent(in out)  :: step  ! In -> initial step sizes                                                                 
+        real (kind=cp), dimension(:), intent(out)     :: var   ! Out-> contains the diagonal elements of the inverse of                                   
+                                                               !       the information matrix.                                                            
+        real (kind=cp),               intent(out)     :: func  ! Out-> the function value corresponding to the final                                      
+                                                               !       parameter values.                                                                  
+        type(opt_conditions),         intent(in out)  :: c     ! Optimization Conditions                                                                  
+        integer, optional,            intent(in)      :: Ipr   ! Logical unit for printing if the parameter C%IOUT /= 0.                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    <p> <pre>                                                                                                                                             
+        Interface                                                                                                                                         
+           Subroutine Model_Functn(n,p, func)                  ! name of the user's subroutine - arguments (P,FUNC)                                       
+              use math_gen, only: cp                           ! which returns the function value for a given set of                                      
+              integer,                      intent(in)  :: n   ! Number of parameters                                                                     
+              real (kind=cp), dimension(:), intent(in)  :: p   ! parameter values in array P.                                                             
+              real (kind=cp),               intent(out) :: func                                                                                           
+           End Subroutine Model_Functn                                                                                                                    
+        End Interface                                                                                                                                     
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    A subroutine for function minimization using the SIMPLEX method.                                                                                      
+                                                                                                                                                          
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+        Optimization Conditions type with the following components:                                                                                       
+           C%MXFUN = Input, the maximum no. of function evaluations allowed.                                                                              
+                       Say, 20 times the number of parameters, NOP.                                                                                       
+           C%IOUT  = Input, print control parameter                                                                                                       
+                       < 0 No printing                                                                                                                    
+                       = 0 Printing of parameter values and the function                                                                                  
+                           value after initial evidence of convergence.                                                                                   
+                       > 0 As for C%IOUT = 0 plus progress reports after every                                                                            
+                           C%IOUT evaluations, plus printing for the initial simplex.                                                                     
+           C%EPS   = Input, stopping criterion.                                                                                                           
+                     The criterion is applied to the standard deviation of                                                                                
+                     the values of FUNC at the points of the simplex.                                                                                     
+           C%Loops = Input, the stopping rule is applied after every NLOOP                                                                                
+                     function evaluations.   Normally NLOOP should be slightly                                                                            
+                     greater than NOP, say NLOOP = 2*NOP.                                                                                                 
+           C%Iquad = Input, = 1 If fitting of a quadratic surface is required                                                                             
+                            = 0 If not                                                                                                                    
+                     N.B. The fitting of a quadratic surface is strongly                                                                                  
+                     recommended, provided that the fitted function is                                                                                    
+                     continuous in the vicinity of the minimum.   It is often                                                                             
+                     a good indicator of whether a premature termination of                                                                               
+                     the search has occurred.                                                                                                             
+           C%ACC   = Input, criterion for expanding the simplex to overcome                                                                               
+                     rounding errors before fitting the quadratic surface.                                                                                
+                     The simplex is expanded so that the function values at                                                                               
+                     the points of the simplex exceed those at the supposed                                                                               
+                     minimum by at least an amount SIMP.                                                                                                  
+                                                                                                                                                          
+           C%NFLAG = Output, = 0 for successful termination                                                                                               
+                       = 1 If maximum no. of function evaluations exceeded                                                                                
+                       = 2 If information matrix is not +ve semi-definite                                                                                 
+                       = 3 If NOP < 1                                                                                                                     
+                       = 4 If C%Loops < 1                                                                                                                 
+                                                                                                                                                          
+           N.B. P, STEP and VAR (If C%Iquad = 1) must have dimension at least NOP                                                                         
+                in the calling program.                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod7"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

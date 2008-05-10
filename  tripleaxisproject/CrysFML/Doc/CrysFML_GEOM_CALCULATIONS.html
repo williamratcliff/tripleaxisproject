@@ -1,0 +1,506 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod22" > GEOM_CALCULATIONS </a> </h2>                                                                                                   
+    <dd>  Routines for Geometry Calculations </dd>                                                                                                        
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > COORDINATION_TYPE </a> </li>                                                                                                
+      <li> <a href="#var2"  > COORD_INFO </a> </li>                                                                                                       
+      <li> <a href="#var3"  > ERR_GEOM </a> </li>                                                                                                         
+      <li> <a href="#var4"  > ERR_MESS_GEOM </a> </li>                                                                                                    
+      <li> <a href="#var5"  > POINT_LIST_TYPE </a> </li>                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > ANGLE_DIHEDRAL </a> </li>                                                                                                   
+      <li> <a href="#fun2"  > ANGLE_MOD </a> </li>                                                                                                        
+      <li> <a href="#fun3"  > ANGLE_UV </a> </li>                                                                                                         
+      <li> <a href="#fun4"  > COORD_MOD </a> </li>                                                                                                        
+      <li> <a href="#fun5"  > DISTANCE </a> </li>                                                                                                         
+      <li> <a href="#fun6"  > MATRIX_PHITHECHI </a> </li>                                                                                                 
+      <li> <a href="#fun7"  > MATRIX_RX </a> </li>                                                                                                        
+      <li> <a href="#fun8"  > MATRIX_RY </a> </li>                                                                                                        
+      <li> <a href="#fun9"  > MATRIX_RZ </a> </li>                                                                                                        
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > ALLOCATE_COORDINATION_TYPE </a> </li>                                                                                       
+      <li> <a href="#sub2"  > ALLOCATE_POINT_LIST </a> </li>                                                                                              
+      <li> <a href="#sub3"  > CALC_DIST_ANGLE </a> </li>                                                                                                  
+      <li> <a href="#sub4"  > CALC_DIST_ANGLE_SIGMA </a> </li>                                                                                            
+      <li> <a href="#sub5"  > DEALLOCATE_COORDINATION_TYPE </a> </li>                                                                                     
+      <li> <a href="#sub6"  > DEALLOCATE_POINT_LIST </a> </li>                                                                                            
+      <li> <a href="#sub7"  > DISTANCE_AND_SIGMA </a> </li>                                                                                               
+      <li> <a href="#sub8"  > GET_EULER_FROM_FRACT </a> </li>                                                                                             
+      <li> <a href="#sub9"  > GET_PHITHECHI </a> </li>                                                                                                    
+      <li> <a href="#sub10" > INIT_ERR_GEOM </a> </li>                                                                                                    
+      <li> <a href="#sub11" > P1_DIST </a> </li>                                                                                                          
+      <li> <a href="#sub12" > PRINT_DISTANCES </a> </li>                                                                                                  
+      <li> <a href="#sub13" > SET_ORBITS_INLIST </a> </li>                                                                                                
+      <li> <a href="#sub14" > SET_TDIST_COORDINATION </a> </li>                                                                                           
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE :: COORDINATION_TYPE </a> </h4>                                                                                           
+    <p> <pre>                                                                                                                                             
+     Type, public :: Coordination_Type                                                                                                                    
+        integer                                      :: Natoms    ! number of atoms                                                                       
+        integer                                      :: Max_Coor  ! Maximum number of connected atoms to a given one                                      
+        integer,       dimension(:),     allocatable :: Coord_Num ! Counter of distances connected to the current atom                                    
+        integer,       dimension(:,:),   allocatable :: N_Cooatm  ! Pointer to the ordinal number in the list of the attached                             
+                                                                  ! atom to the atom given by the first index                                             
+        integer,       dimension(:,:),   allocatable :: N_Sym     !                                                                                       
+        real(kind=sp), dimension(:,:),   allocatable :: Dist      ! List of distances related to an atom                                                  
+        real(kind=sp), dimension(:,:),   allocatable :: S_Dist    ! List of Sigma(distances)                                                              
+        real(kind=sp), dimension(:,:,:), allocatable :: Tr_coo    !                                                                                       
+     End type Coordination_Type                                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > COORD_INFO </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        type(Coordination_Type), public :: coord_info                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Coordination Information                                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > ERR_GEOM </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public  :: err_geom                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in GEOM_CALCULATIONS module                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > ERR_MESS_GEOM </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: err_mess_geom                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > TYPE :: POINT_LIST_TYPE </a> </h4>                                                                                             
+    <p> <pre>                                                                                                                                             
+     Type, public :: Point_List_Type                                                                                                                      
+        integer                                       :: np   !number of points in list                                                                   
+        character(len=12), dimension(:),  allocatable :: nam  !name/label associated to each point                                                        
+        integer,           dimension(:),  allocatable :: p    !integer pointer for various purposes                                                       
+        real,              dimension(:,:),allocatable :: x    !fractional coordinates of points                                                           
+     End type Point_List_Type                                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Function Angle_Dihedral(U,V,W) Or (Ri,Rj,Rk,Rn)   Result(Angle) </a> </h4>                                                     
+    <p> <pre>                                                                                                                                             
+        real(kind=cp), dimension(3), intent( in) :: u       !  In -> Vector 1                                                                             
+        real(kind=cp), dimension(3), intent( in) :: v       !  In -> Vector 2                                                                             
+        real(kind=cp), dimension(3), intent( in) :: w       !  In -> Vector 3                                                                             
+        or                                                                                                                                                
+        real(kind=cp), dimension(3), intent( in) :: ri      !  In -> Vector position ri                                                                   
+        real(kind=cp), dimension(3), intent( in) :: rj      !  In -> Vector position rj                                                                   
+        real(kind=cp), dimension(3), intent( in) :: rk      !  In -> Vector position rk                                                                   
+        real(kind=cp), dimension(3), intent( in) :: rl      !  In -> Vector position rn                                                                   
+        real(kind=cp)                            :: angle   ! Out -> Dihedral angle                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the dihedral angle between planes "u-v" and "v-w", where vectors U,V,W                                                                     
+    are given in cartesian components.                                                                                                                    
+    Calculates the dihedral angle corresponding to the four points (ri,rj,rk,rn)                                                                          
+    given in cartesian components. The definition used for the dihedral angle                                                                             
+    is the following:                                                                                                                                     
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+        Phi(i,j,k,n) = acos { (rij x rjk) (rjk x rkn) / |rij x rjk| / |rjk x rkn| }                                                                       
+                                                                                                                                                          
+        with this definition the sign of Phi is positive if the vector product                                                                            
+        (rij x rjk) x (rjk x rkn) is in the same direction as rjk, and negative if                                                                        
+        the direction is opposite.                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Function Angle_Mod(X) Result (Y) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+         real(kind=cp),               intent(in) :: x                                                                                                     
+                      or                                                                                                                                  
+         real(kind=cp), dimension(:), intent(in) :: x                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the angle [-pi,pi)                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Function Angle_Uv(U,V,G) Result(Angle) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        integer/real(kind=cp), dimension(:), intent( in)     :: u      !  In -> Vector 1                                                                  
+        integer/real(kind=cp), dimension(:), intent( in)     :: v      !  In -> Vector 2                                                                  
+        real(kind=cp), dimension(:,:), intent( in), optional :: g      !  In -> Metric tensor                                                             
+        real(kind=cp)                                        :: angle  ! Out -> Angle                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the angle between vectors u and v given in cartesian                                                                                       
+    components. If g is not given cartesian components are assumed.                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun4"  > Function Coord_Mod(X) Result (Y) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        Real(Kind=Cp),               intent(in) :: x                                                                                                      
+                      or                                                                                                                                  
+        real(kind=cp), dimension(:), intent(in) :: x                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculates the coordinates between [0,1)                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun5"  > Function Distance(X0,X1,Cell or Code) Result(D) </a> </h4>                                                                     
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3),        intent(in) :: x0     !  In -> Point 1                                                                         
+        real(kind=sp), dimension(3),        intent(in) :: x1     !  In -> Point 2                                                                         
+        Type (Crystal_Cell_Type),           intent(in) :: Cell   !  In -> Cell parameters                                                                 
+        Or                                                                                                                                                
+        character(len=*), optional,         intent(in) :: Code                                                                                            
+        real(kind=sp)                                  :: d      ! Out -> Distance                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate distance between two points.                                                                                                                
+    Fractional Coordinates: Use Cell                                                                                                                      
+    Cartesian Coordiantes: Code="C" or Code=" "                                                                                                           
+    Spherical Coordinates: Code="S"                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun6"  > Function Matrix_Phithechi(Phi,Theta,Chi,Code) Result(M) </a> </h4>                                                             
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),                intent(in) :: Phi                                                                                                   
+        real(kind=sp),                intent(in) :: Theta                                                                                                 
+        real(kind=sp),                intent(in) :: Chi                                                                                                   
+        character(len=*), optional,   intent(in) :: Code                                                                                                  
+        real(kind=sp), dimension(3,3)            :: M    ! Put -> Active Rotation Matrix                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the active rotation matrix corresponding to the composition                                                                                 
+    of a rotation around z of angle Chi, followed by a rotation of angle Theta                                                                            
+    around the y-axis and a subsequent rotation of angle Phi around z.                                                                                    
+    The matrix is M = Rz(Chi) . Ry(Theta) . Rz(Chi)                                                                                                       
+    The colums represent the components of the unitary vectors {u,v,w} that                                                                               
+    may be considered a an alternative orthonormal frame to the canonical {i,j,k}.                                                                        
+    Apply the matrix M to a point in {i,j,k} gives another point in {i,j,k} obtained                                                                      
+    by the successive application of the three rotations given above. The transpose                                                                       
+    (inverse) of the M-matrix, when applied to a point in {i,j,k}, gives the coordinates                                                                  
+    of the same point referred to the frame {u,v,w}.                                                                                                      
+    If Code =="R" or Blank or not present then the input angles are given in radians.                                                                     
+    If Code =="D" then the input angles are given in degrees (Phi, Theta, Chi).                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun7"  > Function Matrix_Rx(Phi,Code) Result(M) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),                      intent(in) :: Phi                                                                                             
+        character(len=*), optional,         intent(in) :: Code                                                                                            
+        real(kind=sp), dimension(3,3)                  :: M    ! Put -> Active Rotation Matrix                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the active rotation matrix corresponding to the positive rotation                                                                           
+    of an angle Phi around the x-axis.                                                                                                                    
+    If Code =="R" or Blank or not present then the input angle is given in radians.                                                                       
+    If Code =="D" then the input angle is given in degrees.                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun8"  > Function Matrix_Ry(Phi,Code) Result(M) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),                      intent(in) :: Phi                                                                                             
+        character(len=*), optional,         intent(in) :: Code                                                                                            
+        real(kind=sp), dimension(3,3)                  :: M    ! Put -> Active Rotation Matrix                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the active rotation matrix corresponding to the positive rotation                                                                           
+    of an angle Phi around the y-axis.                                                                                                                    
+    If Code =="R" or Blank or not present then the input angle is given in radians.                                                                       
+    If Code =="D" then the input angle is given in degrees.                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun9"  > Function Matrix_Rz(Phi,Code) Result(M) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),                      intent(in) :: Phi                                                                                             
+        character(len=*), optional,         intent(in) :: Code                                                                                            
+        real(kind=sp), dimension(3,3)                  :: M    ! Put -> Active Rotation Matrix                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the active rotation matrix corresponding to the positive rotation                                                                           
+    of an angle Phi around the z-axis.                                                                                                                    
+    If Code =="R" or Blank or not present then the input angle is given in radians.                                                                       
+    If Code =="D" then the input angle is given in degrees.                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Allocate_Coordination_Type(nasu,numops,dmax,Max_Coor) </a> </h4>                                                    
+    <p> <pre>                                                                                                                                             
+        integer,       intent(in) :: nasu      !  In -> Number of atoms in asymmetric unit                                                                
+        integer,       intent(in) :: numops    !  In -> Number of S.O. excluding lattice centerings                                                       
+        real(kind=sp), intent(in) :: dmax      !  In -> Maximun distance to be calculated                                                                 
+        integer,      intent(out) :: Max_Coor  !  Maximum coordination allowed                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Allocation of Coordination_Type.                                                                                                                      
+    Should be called before using this module.                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Allocate_Point_List(N,Pl,Ier) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        integer,               intent(in)     :: n      !  In -> Dimension for allocating components of the type                                          
+        type(point_list_type), intent(in out) :: pl     !  In Out-> Type with allocatable components                                                      
+        integer,               intent(out)    :: ier    !  Out -> if ier /= 0 an error occurred.                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Allocation of an objet of type Point_List_Type                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Calc_Dist_Angle(Dmax, Dangl, Cell, Spg, A, Lun) </a> </h4>                                                          
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),            intent(in)             :: dmax   !  In -> Max. Distance to calculate                                                    
+        real(kind=sp),            intent(in)             :: dangl  !  In -> Max. distance for angle calculations                                          
+        type (Crystal_cell_type), intent(in)             :: Cell   !  In -> Object of Crytal_Cell_Type                                                    
+        type (Space_Group_type),  intent(in)             :: SpG    !  In -> Object of Space_Group_Type                                                    
+        type (atom_list_type),   intent(in)             :: A      !  In -> Object of atom_list_type                                                       
+        integer,                  optional, intent(in)   :: lun    !  In -> Logical Unit for writing                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to calculate distances and angles, below the prescribed distances                                                                          
+    "dmax" and "dangl" (angles of triplets at distance below "dangl" to an atom),                                                                         
+    without standard deviations. If dangl=0.0, no angle calculations are done.                                                                            
+    Needs as input the objects Cell (of type Crystal_cell), SpG (of type Space_Group)                                                                     
+    and A (or type atom_list, that should be allocated in the calling program).                                                                           
+    Writes results in file (unit=lun) if lun is present                                                                                                   
+    Control for error is present.                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Calc_Dist_Angle_Sigma(Dmax, Dangl, Cell, Spg, A, Lun, Lun_cons) </a> </h4>                                          
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),            intent(in)   :: dmax     !  In -> Max. Distance to calculate                                                            
+        real(kind=sp),            intent(in)   :: dangl    !  In -> Max. distance for angle calculations                                                  
+        type (Crystal_cell_type), intent(in)   :: Cell     !  In -> Object of Crytal_Cell_Type                                                            
+        type (Space_Group_type),  intent(in)   :: SpG      !  In -> Object of Space_Group_Type                                                            
+        type (atom_list_type),    intent(in)   :: A        !  In -> Object of atom_list_type                                                              
+        integer, optional,        intent(in)   :: lun      !  In -> Logical Unit for writing                                                              
+        integer, optional,        intent(in)   :: lun_cons !  In -> Logical unit for writing restraints                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to calculate distances and angles, below the prescribed distances                                                                          
+    "dmax" and "dangl" (angles of triplets at distance below "dangl" to an atom),                                                                         
+    with standard deviations. If dangl=0.0, no angle calculations are done.                                                                               
+    Needs as input the objects Cell (of type Crystal_cell), SpG (of type Space_Group)                                                                     
+    and A (or type atom_list, that should be allocated in the calling program).                                                                           
+    Writes results in file (unit=lun) if iprin=.true.                                                                                                     
+    Control for error is present.                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Deallocate_Coordination_Type() </a> </h4>                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Deallocation of Coordination_Type.                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Deallocate_Point_List(Pl) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        type(point_list_type), intent(in out) :: pl  !  In Out-> Type with allocatable components                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    De-allocation of an objet of type point_list_type                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Distance_and_Sigma(Cellp,DerM,x0,x1,s0,s1,dis,s) </a> </h4>                                                         
+    <p> <pre>                                                                                                                                             
+        Type(Crystal_Cell_Type),         intent(in)  :: Cellp         ! Cell object                                                                       
+        real(kind=sp), dimension(3,3,6), intent(in)  :: DerM          ! Matrix of derivatives of Cellp%Cr_Orth_cel                                        
+        real(kind=sp), dimension(3),     intent(in)  :: x0,x1,s0,s1   ! Two points in fractional coordinates and sigmas                                   
+        real(kind=sp),                   intent(out) :: dis,s         ! Distance and sigma                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Get_Euler_From_Fract(X1,X2,X3,Mt,Phi,Theta,Chi,Eum,Code) </a> </h4>                                                 
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),           dimension(3),   intent (in) :: x1,x2,x3                                                                                  
+        real(kind=sp),           dimension(3,3), intent (in) :: M !Matrix transforming to Cartesian coordinates                                           
+        real(kind=sp),                           intent(out) :: theta,phi,chi                                                                             
+        real(kind=sp), optional, dimension(3,3), intent(out) :: EuM                                                                                       
+        character(len=*), optional,              intent (in) :: Code                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to obtain the Euler angles (2nd setting) of a Cartesian frame having                                                                       
+    as origin the point x3, the z-axis along x1-x3 and the "xz" plane coincident with                                                                     
+    the plane generated by the two vectors (x2-x3,x1-x3). The                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > SUBROUTINE Get_PhiTheChi(Mt,Phi,Theta,Chi,Code) </a> </h4>                                                                     
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3,3),intent(in)  :: Mt                                                                                                   
+        real(kind=sp),                intent(out) :: Phi                                                                                                  
+        real(kind=sp),                intent(out) :: Theta                                                                                                
+        real(kind=sp),                intent(out) :: Chi                                                                                                  
+        character(len=*), optional,   intent(in)  :: Code                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the Euler Angles corresponding to an orthogonal matrix                                                                                      
+    The definition of the Euler angles in this case correspond to the                                                                                     
+    active rotation matrix obtained from the composition of a rotation                                                                                    
+    around z of angle Chi, followed by a rotation of angle Theta                                                                                          
+    around the y-axis and a subsequent rotation of angle Phi around z.                                                                                    
+    The matrix is supposed to be of the form: M = Rz(Chi).Ry(Theta).Rz(Chi)                                                                               
+    If Code =="R" or not present then the output angles are provided in radians.                                                                          
+    If Code =="D" then the output angles are provided in degrees.                                                                                         
+    A checking of the input matrix is given before calculating the angles.                                                                                
+    The user must check the logical variable "err_geom" after calling this                                                                                
+    subroutine. If err_geom=.true. it means that the input matrix is not orthogonal.                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Get_Transf_List(Trans,Ox,Pl,Npl,Ifail) </a> </h4>                                                                   
+    <p> <pre>                                                                                                                                             
+       real,            dimension(3,3), intent(in) :: trans   !Matrix transforming the basis                                                              
+       real,            dimension(3  ), intent(in) :: ox      !Coordinates of origin of the new basis                                                     
+       type(point_list_type),           intent(in) :: pl      !Input List of points                                                                       
+       type(point_list_type),       intent(in out) :: npl     !Output list of transformed points                                                          
+       integer,                         intent(out):: ifail   !If ifail/=0 matrix inversion failed                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to get the fractional coordinates of the points of the input list "pl" in the                                                              
+    new transformed cell ( a'= trans a) displaced to the new origing "ox". The coordinates                                                                
+    are generated using only lattice translations. All coordinates are reduced to be                                                                      
+    between 0.0 and 1.0, so that  0.0 <= x,y,z < 1.0                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > SUBROUTINE INIT_ERR_GEOM() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in Geom_Calculations                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine P1_Dist(Dmax, Cell, Spg, Ac, Lun) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),            intent(in)    :: dmax      !  In -> Max. Distance to be calculated                                                      
+        type (Crystal_cell_Type), intent(in)    :: Cell      !  In -> Object of Crystal_cell_Type                                                         
+        type (Space_Group_Type),  intent(in)    :: SpG       !  In -> Object of Space_Group_Type                                                          
+        type (Atoms_Cell_Type),   intent(in out):: Ac        !  In -> Object of Atoms_Cell_Type                                                           
+                                                               Out -> Updated Object of Atoms_Cell_Type                                                   
+        integer,optional,         intent(in)    :: lun       !  In -> Logical Unit for writing                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine calculate distances, below the prescribed distances "dmax",                                                                                
+    without standard deviations. No symmetry is applied: only lattice translations.                                                                       
+    Need as input the objects "Cell" (of type Crystal_cell_type), "SpG" (of type Space_Group_Type)                                                        
+    and "Ac" (or type Atoms_Cell). Complete the construction of Ac.                                                                                       
+    Control for error is present.                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Print_Distances(Lun, Dmax, Cell, Spg, A) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        integer,                  intent(in)   :: lun    !  In -> Logical Unit for writing                                                                
+        real(kind=sp),            intent(in)   :: dmax   !  In -> Max. Distance to be calculated                                                          
+        type (Crystal_cell_Type), intent(in)   :: Cell   !  In -> Object of Crystal_cell_Type                                                             
+        type (Space_Group_Type),  intent(in)   :: SpG    !  In -> Object of Space_Group_Type                                                              
+        type (atom_list_type),   intent(in)   :: A      !  In -> Object of atom_list_type                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to print distances, below the prescribed distances                                                                                         
+    "dmax", without standard deviations.                                                                                                                  
+    Need as input the objects "Cell" (of type Crystal_cell_type), "SpG"                                                                                   
+    (of type Space_Group_type) and "A" (or type atom_list_type, that should be                                                                            
+    allocated in the calling program).                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Set_Orbits_Inlist(Spg,Pl) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        type(space_group_type), intent(in)     :: SpG     !  In -> Space group                                                                            
+        type(point_list_type),  intent(in out) :: pl      !  In -> list of points                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Set up of the integer pointer "pl%p" in the object "pl" of type point_list_type.                                                                      
+    Each point is associated with the number of an orbit. This pointer is useful                                                                          
+    to get the asymmetric unit with respect to the input space group of an arbitrary                                                                      
+    list of points (atom coordinates).                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod22"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

@@ -1,0 +1,417 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod3" > RANDOM_GENER </a> </h2>                                                                                                         
+    <dd>  A module for random number generation for differents                                                                                            
+    distributions. </dd>                                                                                                                                  
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_MESS_RANDOM </a> </li>                                                                                                  
+      <li> <a href="#var2"  > ERR_RANDOM </a> </li>                                                                                                       
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > BIN_PROB </a> </li>                                                                                                         
+      <li> <a href="#sub2"  > INIT_ERR_RANDOM </a> </li>                                                                                                  
+      <li> <a href="#sub3"  > INTEGRAL </a> </li>                                                                                                         
+      <li> <a href="#sub4"  > LNGAMMA </a> </li>                                                                                                          
+      <li> <a href="#sub5"  > RANDOM_BETA </a> </li>                                                                                                      
+      <li> <a href="#sub6"  > RANDOM_BINOMIAL1 </a> </li>                                                                                                 
+      <li> <a href="#sub7"  > RANDOM_BINOMIAL2 </a> </li>                                                                                                 
+      <li> <a href="#sub8"  > RANDOM_CAUCHY </a> </li>                                                                                                    
+      <li> <a href="#sub9"  > RANDOM_CHISQ </a> </li>                                                                                                     
+      <li> <a href="#sub10" > RANDOM_EXPONENTIAL </a> </li>                                                                                               
+      <li> <a href="#sub11" > RANDOM_GAMMA </a> </li>                                                                                                     
+      <li> <a href="#sub12" > RANDOM_GAMMA1 </a> </li>                                                                                                    
+      <li> <a href="#sub13" > RANDOM_GAMMA2 </a> </li>                                                                                                    
+      <li> <a href="#sub14" > RANDOM_INV_GAUSS </a> </li>                                                                                                 
+      <li> <a href="#sub15" > RANDOM_MVNORM </a> </li>                                                                                                    
+      <li> <a href="#sub16" > RANDOM_NEG_BINOMIAL </a> </li>                                                                                              
+      <li> <a href="#sub17" > RANDOM_NORMAL </a> </li>                                                                                                    
+      <li> <a href="#sub18" > RANDOM_ORDER </a> </li>                                                                                                     
+      <li> <a href="#sub19" > RANDOM_POISSON </a> </li>                                                                                                   
+      <li> <a href="#sub20" > RANDOM_T </a> </li>                                                                                                         
+      <li> <a href="#sub21" > RANDOM_VON_MISES </a> </li>                                                                                                 
+      <li> <a href="#sub22" > RANDOM_WEIBULL </a> </li>                                                                                                   
+      <li> <a href="#sub23" > SEED_RANDOM_NUMBER </a> </li>                                                                                               
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MESS_RANDOM </a> </h4>                                                                                                     
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: Err_Mess_Random                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_RANDOM </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        logical, public :: err_random                                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in RANDOM_GENER module                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Bin_Prob(N, P, R,Fn_Val) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        integer,          intent(in) :: n         !  In ->                                                                                                
+        real(kind=sp),    intent(in) :: p         !  In ->                                                                                                
+        integer,          intent(in) :: r         !  In ->                                                                                                
+        real(kind=sp)    ,intent(out):: fn_val    ! Out ->                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate a binomial probability                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Init_Err_Random() </a> </h4>                                                                                        
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in Random_Gener                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Integral(A, B, Resultt, Dk) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)  :: a                                                                                                                   
+        real(kind=sp), intent(in)  :: b                                                                                                                   
+        real(kind=sp), intent(out) :: resultt                                                                                                             
+        real(kind=sp), intent(in)  :: dk                                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Gaussian integration of exp(k.cosx) from a to b.                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Lngamma(X,Fn_Val) </a> </h4>                                                                                        
+    <p> <pre>                                                                                                                                             
+        real(kind=sp) (kind=dp), intent(in) :: x         !  In ->                                                                                         
+        real(kind=sp) (kind=dp)             :: fn_val    ! Out ->                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logarithm to base e of the gamma subroutine.                                                                                                          
+    Accurate to about 1.e-14. (Alan Miller)                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Random_Beta(Aa, Bb, First,Fn_Val) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)    :: aa          !  In -> shape parameter from distribution (0 < real)                                                 
+        real(kind=sp), intent(in)    :: bb          !  In -> shape parameter from distribution (0 < real)                                                 
+        logical, intent(in)          :: first       !  In ->                                                                                              
+        real(kind=sp)                :: fn_val      ! Out ->                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine generates a random variate in [0,1] from a beta distribution with                                                                          
+    density proportional to beta**(aa-1) * (1-beta)**(bb-1) using cheng"s log                                                                             
+    logistic method.                                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Random_Binomial1(N, P, First,Ival) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        integer,       intent(in) :: n          !  In -> Number Of Bernoulli Trials       (1 <= Integer)                                                  
+        real(kind=sp), intent(in) :: p          !  In -> Bernoulli Success Probability    (0 <= Real <= 1)                                                
+        logical,       intent(in) :: first      !  In -> .TRUE. for the first call using the current parameter values                                     
+                                                         .FALSE. if the values of (n,p) are unchanged from last call                                      
+        integer,       intent(out):: ival       ! Out ->                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generates A Random Binomial Variate Using C.D.Kemp"s method.                                                                                          
+    This algorithm is suitable when many random variates are                                                                                              
+    required with the SAME parameter values for n & p.                                                                                                    
+                                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Random_Binomial2(N, Pp, First, Ival) </a> </h4>                                                                     
+    <p> <pre>                                                                                                                                             
+        integer,       intent(in) :: n      !  In -> The number of trials in the binomial distribution                                                    
+                                               from which a random deviate is to be generated.                                                            
+        real(kind=sp), intent(in) :: pp     !  In -> The probability of an event in each trial of the                                                     
+                                               binomial distribution from which a random deviate                                                          
+                                               is to be generated.                                                                                        
+        logical,       intent(in) :: first  !  In -> .TRUE. for the first call to perform initialization                                                  
+                                               the set FIRST = .FALSE. for further calls using the                                                        
+                                               same pair of parameter values (N, P)                                                                       
+        integer,       intent(out):: ival                                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generates a single random deviate from a binomial                                                                                                     
+    distribution whose number of trials is N and whose                                                                                                    
+    probability of an event in each trial is P.                                                                                                           
+    Random_binomial2 <-- A random deviate yielding the number                                                                                             
+    of events from N independent trials, each of which has a                                                                                              
+    probability of event P.                                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Random_Cauchy(Fn_Val) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        real(kind=sp) ,intent(out):: fn_val                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generate a random deviate from the standard Cauchy distribution                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Random_Chisq(Ndf, First,Fn_Val) </a> </h4>                                                                          
+    <p> <pre>                                                                                                                                             
+        integer,       intent(in) :: ndf      !  In ->                                                                                                    
+        logical,       intent(in) :: first    !  In ->                                                                                                    
+        real(kind=sp) ,intent(out):: fn_val   ! Out ->                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generates a random variate from the chi-squared                                                                                                       
+    distribution with ndf degrees of freedom                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Random_Exponential(Fn_Val) </a> </h4>                                                                               
+    <p> <pre>                                                                                                                                             
+        real(kind=sp) ,intent(out)   :: fn_val                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine generates a random variate in [0,infinity) from a negative exponential                                                                     
+    distribution wlth density proportional to exp(-random_exponential), using inversion.                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Random_Gamma(S, First,Fn_Val) </a> </h4>                                                                            
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)  :: s       !  In -> shape parameter of distribution (0.0 < real)                                                       
+        logical,       intent(in)  :: first   !  In ->                                                                                                    
+        real(kind=sp) ,intent(out) :: fn_val  ! Out ->                                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine generates a random gamma variate.                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine Random_Gamma1(S, First,Fn_Val) </a> </h4>                                                                           
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in) :: s       !  In -> shape parameter of distribution (1.0 < real)                                                        
+        logical,       intent(in) :: first                                                                                                                
+        real(kind=sp) ,intent(out):: fn_val                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine generates a random variate in [0,infinity) from a gamma distribution                                                                       
+    with density proportional to gamma**(s-1)*exp(-gamma), based upon best"s t                                                                            
+    distribution method                                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Random_Gamma2(S, First,Fn_Val) </a> </h4>                                                                           
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)  :: s        !  In -> shape parameter of distribution (1.0 < real)                                                      
+        logical,       intent(in)  :: first                                                                                                               
+        real(kind=sp) ,intent(out) :: fn_val                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine generates a random variate in [0,infinity) from                                                                                            
+    a gamma distribution with density proportional to                                                                                                     
+    gamma2**(s-1) * exp(-gamma2), using a switching method.                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Random_Inv_Gauss(H, B, First, Fn_Val) </a> </h4>                                                                    
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)    :: h       !  In -> parameter of distribution (0 <= real)                                                            
+        real(kind=sp), intent(in)    :: b       !  In -> parameter of distribution (0 < real)                                                             
+        logical,       intent(in)    :: first                                                                                                             
+        real(kind=sp), intent(out)   :: fn_val                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine generates a random variate in [0,infinity] from                                                                                            
+    a reparameterised generalised inverse gaussian (gig) distribution                                                                                     
+    with density proportional to  gig**(h-1) * exp(-0.5*b*(gig+1/gig))                                                                                    
+    using a ratio method.                                                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub15" > Subroutine Random_Mvnorm(N, H, D, F, First, X, Ier) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        integer,       intent(in)  :: n            !  In -> number of variates in vector (input,integer >= 1)                                             
+        real(kind=sp), intent(in)  :: h(n)         !  In -> vector of means                                                                               
+        real(kind=sp), intent(in)  :: d(n*(n+1)/2) !  In -> variance matrix (j> = i)                                                                      
+        real(kind=sp), intent(out) :: f(n*(n+1)/2) ! Out -> lower triangular decomposition of variance matrix (j <= i)                                    
+        real(kind=sp), intent(out) :: x(n)         ! Out -> delivered vector                                                                              
+        logical,       intent(in)  :: first        !  In -> .true. if this is the first call of the routine                                               
+                                                             or if the distribution has changed since the last                                            
+                                                             call of the routine. otherwise set to .false.                                                
+        integer,       intent(out) :: ier          ! Out ->  = 1 if the input covariance matrix is not +ve definite                                       
+                                                             = 0 otherwise                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generates an n variate random normal vector using                                                                                                     
+    a cholesky decomposition.                                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub16" > Subroutine Random_Neg_Binomial(Sk, P, Ival) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)    :: sk     !  In -> Number of failures required (dagpunar's words!)                                                   
+                                                        the "power" parameter of the negative binomial  (0 < real)                                        
+        real(kind=sp), intent(in)    :: p      !  In -> bernoulli success probability  (0 < real(kind=sp) < 1)                                            
+        integer,       intent(out)   :: ival                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generates a random negative binomial variate using unstored                                                                                           
+    inversion and/or the reproductive property.                                                                                                           
+                                                                                                                                                          
+                                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub17" > Subroutine Random_Normal(Fn_Val) </a> </h4>                                                                                    
+    <p> <pre>                                                                                                                                             
+        real(kind=sp)  :: fn_val                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    The subroutine random_normal() returns a normally distributed                                                                                         
+    pseudo-random number with zero mean and unit variance.                                                                                                
+    The algorithm uses the ratio of uniforms method of A.J. Kinderman                                                                                     
+    and J.F. Monahan augmented with quadratic bounding curves.                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub18" > Subroutine Random_Order(Order, N) </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+        integer, intent(in)  :: n                                                                                                                         
+        integer, intent(out) :: order(n)                                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generate a random ordering of the integers 1 ... n.                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub19" > Subroutine Random_Poisson(Mu,Genpoi) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)    :: mu                                                                                                                
+        integer , intent(out)        :: genpoi                                                                                                            
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generates a single random deviate from a Poisson distribution                                                                                         
+    with mean mu.                                                                                                                                         
+                                                                                                                                                          
+    Method for generation of a random number according to Poisson distribution                                                                            
+    METHODE  = 1/2/3 if (centred limit )/(box-muller)/(reject)                                                                                            
+    METHODEG = 1/2/3 if (FR-1)/(product)/(gauss)                                                                                                          
+    GPSTAB   = 0/1/2 stabilisation of the variance                                                                                                        
+    (non)/(0.33)/(0.375) cf. EFRON)                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub20" > Subroutine Random_T(M, Fn_Val) </a> </h4>                                                                                      
+    <p> <pre>                                                                                                                                             
+        integer,      intent(in) :: m       !  In -> degrees of freedom of distribution (1 <= 1nteger)                                                    
+        real(kind=sp),intent(out):: fn_val                                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine generates a random variate from a                                                                                                          
+    t distribution using kinderman and monahan"s ratio method.                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub21" > Subroutine Random_Von_Mises(K, First, Fn_Val) </a> </h4>                                                                       
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)  :: k        !  In -> Parameter of the von Mises distribution                                                           
+        logical,       intent(in)  :: first    !  In -> set to .TRUE. the first time that the subroutine                                                  
+                                                        is called                                                                                         
+        real(kind=sp) ,intent(out) :: fn_val                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Von Mises Distribution                                                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub22" > Subroutine Random_Weibull(A, Fn_Val) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), intent(in)  :: a                                                                                                                   
+        real(kind=sp), intent(out) :: fn_val                                                                                                              
+                                    a                                                                                                                     
+                             a-1  -x                                                                                                                      
+                   f(x) = a.x    e                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Generates a random variate from the Weibull distribution with                                                                                         
+    probability density as shown before.                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub23" > Subroutine Seed_Random_Number(I_input,I_output) </a> </h4>                                                                     
+    <p> <pre>                                                                                                                                             
+        integer, optional, intent(in)  :: I_input                                                                                                         
+        integer, optional, intent(in)  :: I_output                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod3"> [Top Document] </a>                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

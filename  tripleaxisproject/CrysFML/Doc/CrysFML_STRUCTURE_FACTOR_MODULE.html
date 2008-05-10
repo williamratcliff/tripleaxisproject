@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod20" > STRUCTURE_FACTOR_MODULE </a> </h2>                                                                                             
+    <dd>  Main module for Structure Factors Calculations </dd>                                                                                            
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_MESS_SFAC </a> </li>                                                                                                    
+      <li> <a href="#var2"  > ERR_SFAC </a> </li>                                                                                                         
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > CALC_STRFACTOR </a> </li>                                                                                                   
+      <li> <a href="#sub2"  > INIT_STRUCTURE_FACTORS </a> </li>                                                                                           
+      <li> <a href="#sub3"  > MODIFY_SF </a> </li>                                                                                                        
+      <li> <a href="#sub4"  > STRUCTURE_FACTORS </a> </li>                                                                                                
+      <li> <a href="#sub5"  > WRITE_STRUCTURE_FACTORS </a> </li>                                                                                          
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MESS_SFAC </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: err_mess_sfac                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod20"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_SFAC </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public :: err_sfac                                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in SF_Calculation module                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod20"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > SF_Initialized </a> </h4>                                                                                                      
+    <p> <pre>                                                                                                                                             
+        logical, private :: SF_Initialized                                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating if the module has been initialized.                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod20"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Calc_StrFactor(mode,rad,nn,sn,Atm,Grp,sf2,deriv,fc) </a> </h4>                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=*),                   intent(in) :: mode !S-XTAL (S) or Powder (P)                                                                  
+        character(len=*),                   intent(in) :: rad  !Radiation: X-rays, Neutrons                                                               
+        integer,                            intent(in) :: nn                                                                                              
+        real,                               intent(in) :: sn !(sinTheta/Lambda)**2                                                                        
+        type(atom_list_type),               intent(in) :: Atm                                                                                             
+        type(space_group_type),             intent(in) :: Grp                                                                                             
+        real,                               intent(out):: sf2                                                                                             
+        real,dimension(:),optional,         intent(out):: deriv                                                                                           
+        complex, optional,                  intent(out):: fc                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    (Private)                                                                                                                                             
+    Calculate Structure Factor for reflection "nn" in the list                                                                                            
+    and derivatives with respect to refined parameters                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod20"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Init_Structure_Factors(Reflex,Atm,Grp,Mode,lambda,lun) </a> </h4>                                                   
+    <p> <pre>                                                                                                                                             
+        type(reflection_list_type),          intent(in) :: Reflex                                                                                         
+        type(atom_list_type),               intent(in) :: Atm                                                                                             
+        type(space_group_type),              intent(in) :: Grp                                                                                            
+        character(len=*),          optional, intent(in) :: Mode                                                                                           
+        real(kind=sp),             optional, intent(in) :: lambda                                                                                         
+        integer,                   optional, intent(in) :: lun  !Logical unit for writing scatt-factors                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Allocates and initializes arrays for Structure Factors calculations.                                                                                  
+    A calculation of fixed tables is also performed.                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod20"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Modify_SF(Reflex,Atm,Grp,List,Nlist,Mode) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        type(reflection_list_type),         intent(in out) :: Reflex                                                                                      
+        type(atom_list_type),              intent(in)     :: Atm                                                                                          
+        type(space_group_type),             intent(in)     :: Grp                                                                                         
+        integer,dimension(:),               intent(in)     :: List                                                                                        
+        integer,                            intent(in)     :: Nlist                                                                                       
+        character(len=*),optional,          intent(in)     :: Mode                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Recalculation of Structure Factors because a list of Atoms                                                                                            
+    parameters were modified. List variable                                                                                                               
+    contains the number of atoms to be changed.                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod20"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Structure_Factors(Atm,Grp,Reflex,Mode,lambda) </a> </h4>                                                            
+    <p> <pre>                                                                                                                                             
+        type(atom_list_type),               intent(in)     :: Atm                                                                                         
+        type(space_group_type),             intent(in)     :: Grp                                                                                         
+        type(reflection_list_type),         intent(in out) :: Reflex                                                                                      
+        character(len=*), optional,         intent(in)     :: Mode                                                                                        
+        real(kind=sp), optional,            intent(in)     :: lambda                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Calculate the Structure Factors from a list of Atoms                                                                                                  
+    and a set of reflections. A call to Init_Structure_Factors                                                                                            
+    is a pre-requisite for using this subroutine. In any case                                                                                             
+    the subroutine calls Init_Structure_Factors if SF_initialized=.false.                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod20"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

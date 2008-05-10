@@ -1,0 +1,472 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod13" > SCATTERING_CHEMICAL_TABLES </a> </h2>                                                                                          
+    <dd>  Tabulated information about atomic chemical and scattering data. A set of fortran                                                               
+    TYPEs and variables are defined. Tables are declared as allocatable arrays of                                                                         
+    types and they are charged only if the setting (initialising) procedures are called.                                                                  
+    It is convenient in a particular program using this moduled to call the "removing"                                                                    
+    procedures (making a deallocation) to liberate memory after the required information                                                                  
+    is found and stored in user-defined variables. </dd>                                                                                                  
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ANOMALOUS_SC_TYPE </a> </li>                                                                                                
+      <li> <a href="#var2"  > ANOMALOUS_SCFAC </a> </li>                                                                                                  
+      <li> <a href="#var3"  > CHEM_INFO_TYPE </a> </li>                                                                                                   
+      <li> <a href="#var4"  > CHEM_INFO </a> </li>                                                                                                        
+      <li> <a href="#var5"  > MAGNETIC_FORM_TYPE </a> </li>                                                                                               
+      <li> <a href="#var6"  > MAGNETIC_FORM </a> </li>                                                                                                    
+      <li> <a href="#var7"  > MAGNETIC_J2 </a> </li>                                                                                                      
+      <li> <a href="#var8"  > MAGNETIC_J4 </a> </li>                                                                                                      
+      <li> <a href="#var9"  > MAGNETIC_J6 </a> </li>                                                                                                      
+      <li> <a href="#var10" > NUM_CHEM_INFO </a> </li>                                                                                                    
+      <li> <a href="#var11" > NUM_DELTA_FP </a> </li>                                                                                                     
+      <li> <a href="#var12" > NUM_MAG_FORM </a> </li>                                                                                                     
+      <li> <a href="#var13" > NUM_MAG_J2 </a> </li>                                                                                                       
+      <li> <a href="#var14" > NUM_MAG_J4 </a> </li>                                                                                                       
+      <li> <a href="#var15" > NUM_MAG_J6 </a> </li>                                                                                                       
+      <li> <a href="#var16" > NUM_XRAY_FORM </a> </li>                                                                                                    
+      <li> <a href="#var17" > XRAY_FORM_TYPE </a> </li>                                                                                                   
+      <li> <a href="#var18" > XRAY_FORM </a> </li>                                                                                                        
+      <li> <a href="#var19" > XRAY_WAVELENGTH_TYPE </a> </li>                                                                                             
+      <li> <a href="#var20" > XRAY_WAVELENGTHS </a> </li>                                                                                                 
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > GET_ATOMIC_MASS </a> </li>                                                                                                  
+      <li> <a href="#sub2"  > GET_CHEMSYMB </a> </li>                                                                                                     
+      <li> <a href="#sub3"  > GET_COVALENT_RADIUS </a> </li>                                                                                              
+      <li> <a href="#sub4"  > GET_FERMI_LENGTH </a> </li>                                                                                                 
+      <li> <a href="#sub5"  > GET_IONIC_RADIUS </a> </li>                                                                                                 
+      <li> <a href="#sub6"  > REMOVE_CHEM_INFO </a> </li>                                                                                                 
+      <li> <a href="#sub7"  > REMOVE_DELTA_FP_FPP </a> </li>                                                                                              
+      <li> <a href="#sub8"  > REMOVE_MAGNETIC_FORM </a> </li>                                                                                             
+      <li> <a href="#sub9"  > REMOVE_XRAY_FORM </a> </li>                                                                                                 
+      <li> <a href="#sub10" > SET_CHEM_INFO </a> </li>                                                                                                    
+      <li> <a href="#sub11" > SET_DELTA_FP_FPP </a> </li>                                                                                                 
+      <li> <a href="#sub12" > SET_MAGNETIC_FORM </a> </li>                                                                                                
+      <li> <a href="#sub13" > SET_XRAY_FORM </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > TYPE, PUBLIC :: ANOMALOUS_SC_TYPE </a> </h4>                                                                                   
+    <p> <pre>                                                                                                                                             
+     Type, public :: Anomalous_Sc_Type                                                                                                                    
+        character (len= 2)           :: Symb  ! Symbol of the Chemical species                                                                            
+        real(kind=sp), dimension(5)  :: Fp    ! Delta Fp                                                                                                  
+        real(kind=sp), dimension(5)  :: Fpp   ! Delta Fpp                                                                                                 
+     End Type Anomalous_Sc_Type                                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ANOMALOUS_SCFAC </a> </h4>                                                                                                     
+    <p> <pre>                                                                                                                                             
+        Type(Anomalous_Sc_Type), allocatable, dimension(:), public :: Anomalous_ScFac                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Table of Delta-Fp and Delta-Fpp for 5 common radiations.                                                                                              
+    The order is the following:                                                                                                                           
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+                              1         2         3          4          5                                                                                 
+            Wavelenghts:     Cr        Fe        Cu         Mo         Ag                                                                                 
+                 Lambda   2.28962   1.93597   1.54051    0.70926    0.556363                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > TYPE, PUBLIC :: CHEM_INFO_TYPE </a> </h4>                                                                                      
+    <p> <pre>                                                                                                                                             
+     Type, public :: Chem_Info_Type                                                                                                                       
+        character (len= 2)         :: Symb     ! Symbol of the Element                                                                                    
+        character (len=12)         :: Name     ! Name of the Element                                                                                      
+        integer                    :: Z        ! Atomic Number                                                                                            
+        real(kind=sp)              :: AtWe     ! Atomic weight                                                                                            
+        real(kind=sp)              :: RCov     ! Covalent Radio                                                                                           
+        real(kind=sp)              :: RWaals   ! van der Waals Radio                                                                                      
+        real(kind=sp)              :: VAtm     ! Atomic volumen                                                                                           
+        integer, dimension(5)      :: Oxid     ! Oxidation State                                                                                          
+        real(kind=sp), dimension(5):: Rion     ! Ionic Radio (depending of the oxidation)                                                                 
+        real(kind=sp)              :: SctF     ! Scattering length Fermi                                                                                  
+        real(kind=sp)              :: SedInc   ! Incoherent Scattering Neutron cross-section (barns -> [10**(-24) cm**2] )                                
+        real(kind=sp)              :: Sea      ! Neutron Absorption cross-section ( barns, for v= 2200m/s, l(A)=3.95/v (km/s) )                           
+     End Type Chem_Info_Type                                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > CHEM_INFO </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+        Type (Chem_Info_Type), allocatable, dimension(:), public :: Chem_Info                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tabulated chemical data according to the items specified in the definition of Chem_Info_Type.                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > TYPE :: MAGNETIC_FORM_TYPE </a> </h4>                                                                                          
+    <p> <pre>                                                                                                                                             
+     Type, public :: Magnetic_Form_Type                                                                                                                   
+        character (len= 4)          :: Symb   ! Symbol of the Chemical species                                                                            
+        real(kind=sp), dimension(7) :: SctM   ! Scattering Factors                                                                                        
+     End Type Magnetic_Form_Type                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var6"  > MAGNETIC_FORM </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        Type (Magnetic_Form_Type), allocatable, dimension(:), public :: Magnetic_Form                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tabulated magnetic form factor data                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var7"  > MAGNETIC_J2 </a> </h4>                                                                                                         
+    <p> <pre>                                                                                                                                             
+        Type (Magnetic_Form_Type), allocatable, dimension(:), public :: Magnetic_j2                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tabulated magnetic form factor J2                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var8"  > MAGNETIC_J4 </a> </h4>                                                                                                         
+    <p> <pre>                                                                                                                                             
+        Type (Magnetic_Form_Type), allocatable, dimension(:), public :: Magnetic_J4                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tabulated magnetic form factor J4                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var9"  > MAGNETIC_J6 </a> </h4>                                                                                                         
+    <p> <pre>                                                                                                                                             
+        Type (Magnetic_Form_Type), allocatable, dimension(:), public :: Magnetic_J6                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tabulated magnetic form factor J6                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var10" > NUM_CHEM_INFO </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: Num_Chem_Info = 108                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of total Chem_info Data                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var11" > NUM_DELTA_FP </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: Num_Delta_Fp  = 98                                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of total Delta (Fp,Fpp) Data                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var12" > NUM_MAG_FORM </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: Num_Mag_Form  = 116                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of total Magnetic_Form Data                                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var13" > NUM_MAG_J2 </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: Num_Mag_J2 = 95                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of <j2> Magnetic_Form Data                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var14" > NUM_MAG_J4 </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: Num_Mag_J4 = 95                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of <j4> Magnetic_Form Data                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var15" > NUM_MAG_J6 </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: Num_Mag_J6 = 38                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of <j5> Magnetic_Form Data                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var16" > NUM_XRAY_FORM </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: Num_Xray_Form = 214                                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Number of total Xray_Form Data                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var17" > TYPE :: XRAY_FORM_TYPE </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+     Type, public :: Xray_Form_Type                                                                                                                       
+        character (len= 4)         :: Symb  ! Symbol of the Chemical species                                                                              
+        integer                    :: Z     ! Atomic Number                                                                                               
+        real(kind=sp), dimension(4):: a     ! Coefficients for calculating the X-ray scattering factors                                                   
+        real(kind=sp), dimension(4):: b     ! f(s) = Sum_{i=1,4} { a(i) exp(-b(i)*s^2) } + c                                                              
+        real(kind=sp)              :: c     ! s=sinTheta/Lambda                                                                                           
+     End Type Xray_Form_Type                                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var18" > XRAY_FORM </a> </h4>                                                                                                           
+    <p> <pre>                                                                                                                                             
+        Type (Xray_Form_Type), allocatable, dimension(:), public :: Xray_Form                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tabulated Xray scattering factor coefficients                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var19" > TYPE :: XRAY_WAVELENGTH_TYPE </a> </h4>                                                                                        
+    <p> <pre>                                                                                                                                             
+     Type, public :: Xray_Wavelength_Type                                                                                                                 
+        character (len= 2)                :: Symb  ! Symbol of the Chemical species                                                                       
+        real(kind=sp), dimension(2)       :: Kalfa ! K-Serie for X-ray                                                                                    
+     End Type Xray_Wavelength_Type                                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var20" > XRAY_WAVELENGTHS </a> </h4>                                                                                                    
+    <p> <pre>                                                                                                                                             
+        Type (Xray_Wavelength_Type), dimension(7), public :: Xray_Wavelengths                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Tabulated K-Series for Xray                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Get_Atomic_Mass(Atm,Mass) </a> </h4>                                                                                
+    <p> <pre>                                                                                                                                             
+        character(len=2), intent(in)  :: Atm                                                                                                              
+        real(kind=sp),    intent(out) :: Mass                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the atomic mass given the chemical symbol of the element                                                                                     
+    In case of problems the returned mass is ZERO.                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Get_ChemSymb(Label, ChemSymb, Z) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+       character(len=*),  intent(in) :: Label    ! Label                                                                                                  
+       character(len=*),  intent(out):: ChemSymb ! Chemical Symbol                                                                                        
+       integer, optional, intent(out):: Z        ! Atomic number                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine to get the chemical symbol from label and optionally                                                                                       
+    the atomic number                                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Get_Covalent_Radius(nam,rad) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent (in) :: nam                                                                                                              
+        real(kind=sp),    intent(out) :: rad                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the covalent radius given the chemical symbol of the element                                                                                 
+    In case of problems the returned radius is 1.4 angstroms.                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Get_Fermi_Length(nam,b) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent (in) :: nam                                                                                                              
+        real(kind=sp),    intent(out) :: b                                                                                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the Fermi length (in 10-12 cm) given the chemical                                                                                            
+    symbol of the element. In case of problems the returned Fermi                                                                                         
+    length is 0.0 10-12 cm.                                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Get_Ionic_Radius(nam,valence,rad) </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent (in) :: nam                                                                                                              
+        integer,          intent (in) :: valence                                                                                                          
+        real(kind=sp),    intent(out) :: rad                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the ionic radius given the chemical symbol of the element                                                                                    
+    and the valence as an integer. In case of problems the returned radius is 0.0 angstroms.                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Remove_Chem_Info() </a> </h4>                                                                                       
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Deallocate Chem_Info Table                                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Remove_Delta_Fp_Fpp() </a> </h4>                                                                                    
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Deallocate Anomalous_ScFac Table                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Remove_Magnetic_Form() </a> </h4>                                                                                   
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Deallocate Magnetic_Form Table                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Remove_Xray_Form() </a> </h4>                                                                                       
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Deallocate Xray_Form Table                                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Set_Chem_Info() </a> </h4>                                                                                          
+    <p> <pre>                                                                                                                                             
+        Allocates and loads the table  chem_info(num_chem_info):                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    1: Symbol of the Element                                                                                                                              
+    2: Name of the Element                                                                                                                                
+    3: Atomic Number                                                                                                                                      
+    4: Atomic weight                                                                                                                                      
+    5: Covalent Radius                                                                                                                                    
+    6: Van der Waals Radius                                                                                                                               
+    7: Atomic volumen                                                                                                                                     
+    8: Oxidation State (5 states)                                                                                                                         
+    9: Ionic Radius (depending of the oxidation)                                                                                                          
+    10: Fermi lenght [10**(-12) cm]                                                                                                                       
+    11: Incoherent Scattering Neutron cross-section (barns -> [10**(-24) cm**2] )                                                                         
+    12: Neutron Absorption cross-section ( barns, for v= 2200m/s, l(A)=3.95/v (km/s) )                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Set_Delta_Fp_Fpp() </a> </h4>                                                                                       
+    <p>                                                                                                                                                   
+    <p> <pre>                                                                                                                                             
+                                                                                                                                                          
+        Wavelenghts:     Cr        Fe        Cu         Mo         Ag                                                                                     
+             Lambda   2.28962   1.93597   1.54051    0.70926    0.556363                                                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    Set values for Delta-fp & Delta-fpp for the above wavelengths                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine Set_Magnetic_Form() </a> </h4>                                                                                      
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Magnetic form factors <j0> P.J. Brown, ILL prep. SP.88BR5016                                                                                          
+    (March 1988)                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Set_Xray_Form() </a> </h4>                                                                                          
+    <p> <pre>                                                                                                                                             
+        Set Xray_Form Array:                                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    1: Symbol of the Element                                                                                                                              
+    2: Name of the Element                                                                                                                                
+    3: a(4)                                                                                                                                               
+    4: b(4)                                                                                                                                               
+    5: c                                                                                                                                                  
+    Coefficients for calculating the X-ray scattering factors                                                                                             
+    f(s) = Sum_{i=1,4} { a(i) exp(-b(i)*s^2) } + c                                                                                                        
+                                                                                                                                                          
+    where s=sinTheta/Lambda                                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod13"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

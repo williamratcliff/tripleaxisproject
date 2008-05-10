@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod16" > BONDS_TABLE </a> </h2>                                                                                                         
+    <dd>  This module constains a simple subroutine providing the list                                                                                    
+    of the usual bonds between atoms. There are three possible                                                                                            
+    mode for each bonds.                                                                                                                                  
+    Type                                                                                                                                                  
+    1      Simple Bond                                                                                                                                    
+    2      Double Bond or Shorter                                                                                                                         
+    3      Triple Bond or Shortest </dd>                                                                                                                  
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > BONDS_LENGTH_TABLE </a> </li>                                                                                               
+      <li> <a href="#var2"  > ERR_BOND </a> </li>                                                                                                         
+      <li> <a href="#var3"  > ERR_MESS_BOND </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > GET_BONDS_TABLE </a> </li>                                                                                                  
+      <li> <a href="#sub2"  > REMOVE_BONDS_TABLE </a> </li>                                                                                               
+      <li> <a href="#sub3"  > SET_BONDS_TABLE </a> </li>                                                                                                  
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > Bond_Length_Table </a> </h4>                                                                                                   
+    <p> <pre>                                                                                                                                             
+        real, private, allocatable, dimension(:,:,:) :: Bond_Length_Table                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Variable to hold the Bonds length between type of atoms. Order by Z                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod16"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_BOND </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical :: err_bond                                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in BONDS_TABLE module                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod16"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > ERR_MESS_BOND </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150) :: err_mess_bond                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod16"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Set_BT_Variable </a> </h4>                                                                                                     
+    <p> <pre>                                                                                                                                             
+        logical, private :: Set_BT_Variable                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Define if the Variable Bond_Length_Table was loaded or not                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod16"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Get_Bonds_Table(Symbol1/Z1,Symbol2/Z2,Bonds) </a> </h4>                                                             
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Fills the components of the Bond_Length_Table variable                                                                                                
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod16"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Init_Err_Bond() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initializes general error variables for this module as:                                                                                               
+    ERR_BOND=.false. ;  ERR_MESS_BOND=" "                                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod16"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

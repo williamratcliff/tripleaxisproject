@@ -1,0 +1,236 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod23" > MAPS_CALCULATIONS </a> </h2>                                                                                                   
+    <dd>  Subroutines related to operations on the array's </dd>                                                                                          
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var3"  > ERR_MAPS </a> </li>                                                                                                         
+      <li> <a href="#var4"  > ERR_MESS_MAPS </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub6"  > INIT_ERR_MAPS </a> </li>                                                                                                    
+      <li> <a href="#sub7"  > LOAD_EXTENDEDMAP </a> </li>                                                                                                 
+      <li> <a href="#sub8"  > LOAD_SECTION </a> </li>                                                                                                     
+      <li> <a href="#sub9"  > SEARCH_PEAKS </a> </li>                                                                                                     
+      <li> <a href="#sub10" > STATISTIC_MAP </a> </li>                                                                                                    
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MAPS </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        logical, public  :: err_maps                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in MAPS_CALCULATIONS module                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_MESS_MAPS </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: err_mess_maps                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > Subroutine Init_Err_Maps() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in Maps_Calculations                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > Subroutine Load_ExtentedMap(Rho,Ngrid,Limits,Rhonew) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        real, dimension(:,:,:), intent(in) :: rho                                                                                                         
+        integer, dimension(3),  intent(in) :: ngrid                                                                                                       
+        real,dimension(2,3),    intent(in) :: limits                                                                                                      
+        real, dimension(:,:,:), intent(out):: rhonew                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Rhonew has one dimension more in each dimension that Rho                                                                                              
+    This routine is useful for 2D representation.                                                                                                         
+    Rho(nx,ny,nz) -> Rhonew(nx+1,ny+1,nz+1)                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > SUBROUTINE Load_Section(Rho,ngrid,imap,section,limits,ngrid2,dmap) </a> </h4>                                                  
+    <p> <pre>                                                                                                                                             
+        real, dimension(:,:,:), intent(in) :: rho                                                                                                         
+        integer, dimension(3),  intent(in) :: ngrid                                                                                                       
+        integer,                intent(in) :: imap                                                                                                        
+        integer,                intent(in) :: section                                                                                                     
+        real, dimension(2,2),   intent(in) :: limits                                                                                                      
+        integer, dimension(2),  intent(in) :: ngrid2                                                                                                      
+        real, dimension(:,:),   intent(out):: dmap                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    This routine only works with fractional coordinates                                                                                                   
+                                                                                                                                                          
+    Updated: February - 2005                                                                                                                              
+                                                                                                                                                          
+    Subroutine Search_Peaks(Rho,Grp,Cell,Npeaks_to_Found,Peaks,Abs_Code)                                                                                  
+    real(kind=sp), dimension(:,:,:),    intent(in)      :: Rho         ! The Map                                                                          
+    type(space_group_type),             intent(in)      :: Grp         ! Space Group                                                                      
+    type(crystal_cell_type),            intent(in)      :: Celda       ! Cell                                                                             
+    integer,                            intent(in out)  :: NPFound     ! Number of peaks to found                                                         
+    real(kind=sp), dimension(4,NPfound),intent(out)     :: Peaks       ! Peak List                                                                        
+    logical, optional,                  intent(in)      :: Abs_Code    ! logical to use absolute value on Rho                                             
+                                                                                                                                                          
+    General procedure to search peaks on Rho                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine Statistic_Map(Rho,MaxV,MinV,AveV,SigmaV) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(:,:,:), intent(in) :: Rho                                                                                                
+        real(kind=sp),                   intent(out):: MaxV      ! Maximum value of Rho                                                                   
+        real(kind=sp),                   intent(out):: MinV      ! Minimum value of Rho                                                                   
+        real(kind=sp),                   intent(out):: AveV      ! Average value of Rho                                                                   
+        real(kind=sp),                   intent(out):: SigmaV    ! Sigma value of Rho                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Some statistic parameters of the map                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Copyleft(C) 1999-2005,              Version: 3.0 </a> </h4>                                                                    
+    <p> <pre>                                                                                                                                             
+     Juan Rodriguez-Carvajal & Javier Gonzalez-Platas                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    MODULE: MAPS_CALCULATIONS                                                                                                                             
+    INFO: Subroutines related to operations on the array's                                                                                                
+                                                                                                                                                          
+    HISTORY                                                                                                                                               
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > DEPENDENCIES </a> </h4>                                                                                                        
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+                                                                                                                                                          
+    VARIABLES                                                                                                                                             
+    ERR_MAPS                                                                                                                                              
+    ERR_MESS_MAPS                                                                                                                                         
+                                                                                                                                                          
+    PROCEDURES                                                                                                                                            
+    Functions:                                                                                                                                            
+                                                                                                                                                          
+    Subroutines:                                                                                                                                          
+    INIT_ERR_MAPS                                                                                                                                         
+    LOAD_EXTENDEDMAP                                                                                                                                      
+    LOAD_SECTION                                                                                                                                          
+    SEARCH_PEAKS                                                                                                                                          
+    STATISTIC_MAP                                                                                                                                         
+                                                                                                                                                          
+                                                                                                                                                          
+    ERR_MAPS                                                                                                                                              
+    logical, public  :: err_maps                                                                                                                          
+                                                                                                                                                          
+    Logical Variable indicating an error in MAPS_CALCULATIONS module                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > ERR_MESS_MAPS </a> </h4>                                                                                                       
+    <p> <pre>                                                                                                                                             
+        character(len=150), public :: err_mess_maps                                                                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Init_Err_Maps() </a> </h4>                                                                                          
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initialize the errors flags in Maps_Calculations                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Load_ExtentedMap(Rho,Ngrid,Limits,Rhonew) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        real, dimension(:,:,:), intent(in) :: rho                                                                                                         
+        integer, dimension(3),  intent(in) :: ngrid                                                                                                       
+        real,dimension(2,3),    intent(in) :: limits                                                                                                      
+        real, dimension(:,:,:), intent(out):: rhonew                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Rhonew has one dimension more in each dimension that Rho                                                                                              
+    This routine is useful for 2D representation.                                                                                                         
+    Rho(nx,ny,nz) -> Rhonew(nx+1,ny+1,nz+1)                                                                                                               
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > SUBROUTINE Load_Section(Rho,ngrid,imap,section,limits,ngrid2,dmap) </a> </h4>                                                  
+    <p> <pre>                                                                                                                                             
+        real, dimension(:,:,:), intent(in) :: rho                                                                                                         
+        integer, dimension(3),  intent(in) :: ngrid                                                                                                       
+        integer,                intent(in) :: imap                                                                                                        
+        integer,                intent(in) :: section                                                                                                     
+        real, dimension(2,2),   intent(in) :: limits                                                                                                      
+        integer, dimension(2),  intent(in) :: ngrid2                                                                                                      
+        real, dimension(:,:),   intent(out):: dmap                                                                                                        
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    This routine only works with fractional coordinates                                                                                                   
+                                                                                                                                                          
+    Updated: February - 2005                                                                                                                              
+                                                                                                                                                          
+    Subroutine Search_Peaks(Rho,Grp,Cell,Npeaks_to_Found,Peaks,Abs_Code)                                                                                  
+    real(kind=sp), dimension(:,:,:),    intent(in)      :: Rho         ! The Map                                                                          
+    type(space_group_type),             intent(in)      :: Grp         ! Space Group                                                                      
+    type(crystal_cell_type),            intent(in)      :: Celda       ! Cell                                                                             
+    integer,                            intent(in out)  :: NPFound     ! Number of peaks to found                                                         
+    real(kind=sp), dimension(4,NPfound),intent(out)     :: Peaks       ! Peak List                                                                        
+    logical, optional,                  intent(in)      :: Abs_Code    ! logical to use absolute value on Rho                                             
+                                                                                                                                                          
+    General procedure to search peaks on Rho                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Statistic_Map(Rho,MaxV,MinV,AveV,SigmaV) </a> </h4>                                                                 
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(:,:,:), intent(in) :: Rho                                                                                                
+        real(kind=sp),                   intent(out):: MaxV      ! Maximum value of Rho                                                                   
+        real(kind=sp),                   intent(out):: MinV      ! Minimum value of Rho                                                                   
+        real(kind=sp),                   intent(out):: AveV      ! Average value of Rho                                                                   
+        real(kind=sp),                   intent(out):: SigmaV    ! Sigma value of Rho                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Some statistic parameters of the map                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod23"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

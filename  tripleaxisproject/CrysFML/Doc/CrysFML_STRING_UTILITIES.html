@@ -1,0 +1,497 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod11" > STRING_UTILITIES </a> </h2>                                                                                                    
+    <dd>  Manipulation of strings with alfanumeric characters </dd>                                                                                       
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > ERR_MESS_STRING </a> </li>                                                                                                  
+      <li> <a href="#var2"  > ERR_STRING </a> </li>                                                                                                       
+      <li> <a href="#var3"  > ERR_TEXT_TYPE </a> </li>                                                                                                    
+      <li> <a href="#var4"  > IERR_FMT </a> </li>                                                                                                         
+      <li> <a href="#var5"  > MESS_FINDFMT </a> </li>                                                                                                     
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#fun1"  > EQUAL_SETS_TEXT </a> </li>                                                                                                  
+      <li> <a href="#fun2"  > L_CASE </a> </li>                                                                                                           
+      <li> <a href="#fun3"  > PACK_STRING </a> </li>                                                                                                      
+      <li> <a href="#fun4"  > U_CASE </a> </li>                                                                                                           
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > CUTST </a> </li>                                                                                                            
+      <li> <a href="#sub2"  > FINDFMT </a> </li>                                                                                                          
+      <li> <a href="#sub3"  > FRAC_TRANS_1DIG </a> </li>                                                                                                  
+      <li> <a href="#sub4"  > FRAC_TRANS_2DIG </a> </li>                                                                                                  
+      <li> <a href="#sub5"  > GET_FRACTION_1DIG </a> </li>                                                                                                
+      <li> <a href="#sub6"  > GET_FRACTION_2DIG </a> </li>                                                                                                
+      <li> <a href="#sub7"  > GET_LOGUNIT </a> </li>                                                                                                      
+      <li> <a href="#sub8"  > GETNUM </a> </li>                                                                                                           
+      <li> <a href="#sub9"  > GETNUM_STD </a> </li>                                                                                                       
+      <li> <a href="#sub10" > GETWORD </a> </li>                                                                                                          
+      <li> <a href="#sub11" > INIT_ERR_STRING </a> </li>                                                                                                  
+      <li> <a href="#sub12" > INIT_FINDFMT </a> </li>                                                                                                     
+      <li> <a href="#sub13" > LCASE </a> </li>                                                                                                            
+      <li> <a href="#sub14" > NUMBER_LINES </a> </li>                                                                                                     
+      <li> <a href="#sub15" > READ_KEY_STR </a> </li>                                                                                                     
+      <li> <a href="#sub16" > READ_KEY_STRVAL </a> </li>                                                                                                  
+      <li> <a href="#sub17" > READ_KEY_VALUE </a> </li>                                                                                                   
+      <li> <a href="#sub18" > READ_KEY_VALUEST </a> </li>                                                                                                 
+      <li> <a href="#sub19" > READING_LINES </a> </li>                                                                                                    
+      <li> <a href="#sub20" > SETNUM_STD </a> </li>                                                                                                       
+      <li> <a href="#sub21" > UCASE </a> </li>                                                                                                            
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > ERR_MESS_STRING </a> </h4>                                                                                                     
+    <p> <pre>                                                                                                                                             
+        character(len=150) :: err_mess_string                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String containing information about the last error                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > ERR_STRING </a> </h4>                                                                                                          
+    <p> <pre>                                                                                                                                             
+        logical :: err_string                                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Logical Variable indicating an error in STRING_UTILITIES module                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > TYPE :: ERR_TEXT_TYPE </a> </h4>                                                                                               
+    <p> <pre>                                                                                                                                             
+     Type :: Err_Text_Type                                                                                                                                
+        integer :: nlines                                                                                                                                 
+        character (len=132), dimension(5) :: txt                                                                                                          
+     End Type Err_Text_Type                                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var4"  > IERR_FMT </a> </h4>                                                                                                            
+    <p> <pre>                                                                                                                                             
+        integer :: ierr_fmt                                                                                                                               
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Integer signaling if an error has occurred (/=0) in using the procedure findFMT                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var5"  > MESS_FINDFMT </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        Type (Err_Text_Type) :: Mess_FindFMT                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Text composed of a maximum of 5 lines to inform about position or error                                                                               
+    in free format reading (used by procedure findFMT)                                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun1"  > Logical Function Equal_Sets_Text(Text1,N1,Text2,N2) Result(Equal_sets_texto) </a> </h4>                                        
+    <p> <pre>                                                                                                                                             
+        character(len=*), dimension(:), intent(in) :: Text1   ! In -> String array                                                                        
+        integer,                        intent(in) :: N1      ! In -> Lines on Text1 variable                                                             
+        character(len=*), dimension(:), intent(in) :: Text2   ! In -> String array                                                                        
+        integer,                        intent(in) :: N2      ! In -> Lines on Text2 variable                                                             
+        logical                                    :: Equal_sets_texto                                                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Determine if two sets of text lines are equal irrespective of the                                                                                     
+    order of the lines. The function is true if the two sets of text                                                                                      
+    have the same lines in whatever order.  Two lines are equal only                                                                                      
+    if they have the same length and all their component characters                                                                                       
+    are equal and in the same order.                                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun2"  > Character Function L_Case(Text) Result (Mtext) </a> </h4>                                                                      
+    <p> <pre>                                                                                                                                             
+        character (len=*), intent(in) :: text   !  In -> String: "InPUT Line"                                                                             
+        character (len=len(text))     :: mtex   ! Out -> String: "input line"                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Conversion to lower case, text is not modified                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun3"  > Character Function Pack_String(String) Result (Strp) </a> </h4>                                                                
+    <p> <pre>                                                                                                                                             
+        character (len=*), intent(in) :: String                                                                                                           
+        character (len=*)             :: Strp                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Pack a string: the function provides a string without empty spaces                                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="fun4"  > Character Function U_Case(Text) Result (Mtext) </a> </h4>                                                                      
+    <p> <pre>                                                                                                                                             
+        character (len=*), intent(in) :: text   !  In -> String:"Input Line"                                                                              
+        character (len=len(text))     :: mtext  ! Out -> String:"INPUT LINE"                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Conversion to upper case, text is not modified                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Subroutine Cutst(Line1, Nlong1, Line2, Nlong2) </a> </h4>                                                                      
+    <p> <pre>                                                                                                                                             
+        character(len=*),           intent(in out) :: Line1   !  In -> Input string                                                                       
+                                                              ! Out -> Input string without the first word                                                
+        integer,          optional, intent(   out) :: Nlong1  ! Out -> Give the length of Line1 on Output                                                 
+        character(len=*), optional, intent(   out) :: Line2   ! Out -> The first word of String on Input                                                  
+        integer,          optional, intent(   out) :: Nlong2  ! Out -> Give the length of Line2 on Output                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Removes the first word of the input String.                                                                                                           
+    Provides (optionally) a string with the first word.                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Subroutine FindFmt(Lun,aLine,FMTfields,FMTstring) </a> </h4>                                                                   
+    <p> <pre>                                                                                                                                             
+        Integer ,           intent(in    ) ::  Lun         !  -> Logical unit number                                                                      
+        Character (len=*) , intent(in out) ::  aLine       ! <-> character string to be decoded                                                           
+        Character (len=*) , intent(in    ) ::  FMTfields   ! <-> description of the format fields (e.g. IIFIF)                                            
+        Character (len=*) , intent(   out) ::  FMTstring   ! <-  format of the line (e.g. (I5,I1,F8.0,I4,F7.0,) )                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    The routine "FindFmt" emulates the free format data input                                                                                             
+    Read(unit=String1,fmt="(a,i,2f,..)") aString,i1,R1,R2,...                                                                                             
+    but with additional error checking. Thus, given a description                                                                                         
+    of the expected fields "FindFmt" returns the format of the line                                                                                       
+    to be decoded. Valid field descriptors are:                                                                                                           
+    I:integer; R:real; A:free A format; 1 to 5:A1 to A5                                                                                                   
+                                                                                                                                                          
+    This routine have an associated FindFMT error code (iErr_fmt)                                                                                         
+    -2 : FORTRAN read error                                                                                                                               
+    -1 : End of file                                                                                                                                      
+    0 : No Error                                                                                                                                          
+    1 : empty format descriptor (0 field)                                                                                                                 
+    2 : data string read error                                                                                                                            
+    3 : integer field found real !                                                                                                                        
+    4 : begged dot, sign or "e" character !                                                                                                               
+    5 : invalid character in an integer field !                                                                                                           
+    6 : invalid field in format descriptor !                                                                                                              
+    7 : invalid character in a numeric field !                                                                                                            
+    8 : 0 character in current field !                                                                                                                    
+    9 : format string length exceeded !                                                                                                                   
+    10 : separator missing !                                                                                                                              
+    11 : incomplete E or D format !                                                                                                                       
+    12 : incomplete number !                                                                                                                              
+                                                                                                                                                          
+    An error message is generated ans written to the public variable "Mess_FindFMT"                                                                       
+    Consult the structure of Mess_FindFMT that is of type: Err_Text_Type.                                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > Subroutine Frac_Trans_1Dig(v,CharF) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3), intent( in)   :: V     !In -> Vector: v(1)=0.25, v(2)=-0.4, v(3)=0.33333                                             
+        character (len=* ),          intent(out)   :: CharF ! Out -> String: "(1/4,-2/5,1/3)"                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine returning a string of length=16 describing a                                                                                               
+    3D translation vector written in fractional form as quotient                                                                                          
+    of 1-digit integers with sign.                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > Subroutine Frac_Trans_2Dig(v,CharF) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        real(kind=sp), dimension(3), intent( in) :: V       !  In -> Vector: v(1)=0.3, v(2)=-0.4, v(3)=-5.5                                               
+        character (len=* ),          intent(out) :: CharF   ! Out -> String: "(3/10,-2/5,-11/2)"                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Function returning a string of length=22 describing a                                                                                                 
+    3D translation vector written in fractional form as quotient                                                                                          
+    of 2-digit integers with sign.                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Get_Fraction_1Dig(V,Fracc) </a> </h4>                                                                               
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),      intent( in) :: V       !  In -> Input real(kind=sp) number                                                                    
+        character (len=*),  intent(out) :: Fracc   ! Out -> Fracction in character form                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Get a string with the most simple fraction that uses single digits                                                                                    
+    in numerator and denominator. Used, for instance, to get a character                                                                                  
+    representation of symmetry operators.                                                                                                                 
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Get_Fraction_2Dig(V,Fracc) </a> </h4>                                                                               
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),      intent( in) :: V       !  In -> Input real(kind=sp) number                                                                    
+        character (len=*),  intent(out) :: Fracc   ! Out -> Fracction in character form                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Get a string with the most simple fraction that uses up to two                                                                                        
+    digits in numerator and denominator. Used, for instance, to get a                                                                                     
+    character representation of symmetry operators.                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Get_LogUnit(lun) </a> </h4>                                                                                         
+    <p> <pre>                                                                                                                                             
+       integer,     intent(out) :: lun !First logical unit available                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Provides the number of the first logical unit that is not opened.                                                                                     
+    Useful for getting a logical unit to a file that should be opened                                                                                     
+    of the flight.                                                                                                                                        
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Getnum(Line, Vet, Ivet, Iv) </a> </h4>                                                                              
+    <p> <pre>                                                                                                                                             
+        character(len=*),              intent( in) :: Line    !  In -> Input String to convert                                                            
+        real(kind=sp), dimension(:),   intent(out) :: Vet     ! Out -> Vector of real(kind=sp) numbers                                                    
+        integer,dimension(:),          intent(out) :: Ivet    ! Out -> Vector of integer numbers                                                          
+        integer,                       intent(out) :: Iv      ! Out -> Number of numbers in Vet/Ivet                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Converts a string to numbers and write on VET/IVET if real/integer. Control                                                                           
+    of errors is possible by inquiring the global variables ERR_STRING and                                                                                
+    ERR_MESS_STRING                                                                                                                                       
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub9"  > Subroutine Getnum_Std(Line, Value, Std, Ic) </a> </h4>                                                                         
+    <p> <pre>                                                                                                                                             
+        character(len=*),            intent( in) :: Line    !  In -> Input String                                                                         
+        real(kind=sp), dimension(:), intent(out) :: Value   ! Out -> Vector of values with real(kind=sp) numbers                                          
+        real(kind=sp), dimension(:), intent(out) :: Std     ! Out -> Vector of standard deviation values                                                  
+        integer,                     intent(out) :: Ic      ! Out -> Number of components of vector Value                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Converts a string to a numbers with standard deviation with format: x.fffff(s)                                                                        
+    Control of errors is possible by inquiring the global variables ERR_STRING                                                                            
+    and ERR_MESS_STRING.                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub10" > Subroutine Getword(Line, Dire, Ic) </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*),              intent( in) :: Line   !  In -> Input String                                                                        
+        character(len=*),dimension(:), intent(out) :: Dire   ! Out -> Vector of Words                                                                     
+        integer,                       intent(out) :: Ic     ! Out -> Number of words                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Determines the number of words (Ic) in the string "Line" and generates a                                                                              
+    character vector "Dire" with separated words.                                                                                                         
+    Control of errors is possible by inquiring the global variables ERR_STRING                                                                            
+    and ERR_MESS_STRING.                                                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub11" > Subroutine Init_Err_String() </a> </h4>                                                                                        
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Initializes general error variables for this module as:                                                                                               
+    ERR_STRING=.false. ;  ERR_MESS_STRING=" "                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub12" > Subroutine Init_FindFMT(nline) </a> </h4>                                                                                      
+    <p> <pre>                                                                                                                                             
+       integer, optional, intent(in) :: nline                                                                                                             
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Initializes the subroutine FindFMT.                                                                                                                   
+    Mess_FindFMT (of type Err_Text_Type) is initialized to zero lines.                                                                                    
+    Line_nb is initialized to zero (current line in the file),                                                                                            
+    or Line_nb=line if the optional argument "line" is present.                                                                                           
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub13" > Subroutine Lcase(Line) </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+        character(len=*) :: Line                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Conversion to lower case. Line is modified                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub14" > Subroutine Number_Lines(Filename,n) </a> </h4>                                                                                 
+    <p> <pre>                                                                                                                                             
+        character(len=*), intent(in) :: Filename     !  In -> Name of the file                                                                            
+        integer        , intent(out) :: N            ! Out -> Number of lines in the file                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Return the number of lines contained in a file. If the file is                                                                                        
+    open, a rewind procedure is made.                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub15" > Subroutine Read_Key_Str(Filevar,Nline_Ini,Nline_End,Keyword,String) </a> </h4>                                                 
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:), intent(in)      :: Filevar      !  In -> Input vector of String                                                    
+        integer,                       intent(in out)  :: Nline_Ini    !  In -> Pointer to initial position to search                                     
+                                                                       ! Out -> Pointer to final position in search                                       
+        integer,                       intent(in)      :: Nline_End    !  In -> Pointer to final position to search                                       
+        character(len=*),              intent(in)      :: Keyword      !  In -> Word to search                                                            
+        character(len=*),              intent(out)     :: String       ! Out -> Rest of the input string                                                  
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read a string on "filevar" starting with a particular "keyword" between lines "nline_ini" and                                                         
+    "nline_end".                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub16" > Subroutine Read_Key_Strval(Filevar,Nline_Ini,Nline_End,Keyword,String,Vet,Ivet,Iv) </a> </h4>                                  
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:),          intent(in)      :: Filevar      !  In -> Input vector of String                                           
+        integer,                                intent(in out)  :: Nline_Ini    !  In -> Pointer to initial position to search                            
+                                                                                ! Out -> Pointer to final position in search                              
+        integer,                                intent(in)      :: Nline_End    !  In -> Pointer to final position to search                              
+        character(len=*),                       intent(in)      :: Keyword      !  In -> Word to search                                                   
+        character(len=*),                       intent(out)     :: String       ! Out -> Rest of the input string                                         
+        real(kind=sp),dimension(:),   optional, intent(out)     :: Vet          ! Out -> Vector for real(kind=sp) numbers                                 
+        integer,dimension(:),         optional  intent(out)     :: Ivet         ! Out -> Vector for integer numbers                                       
+        integer,                      optional, intent(out)     :: Iv           ! Out -> Number of numbers                                                
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read a string on "filevar" starting with a particular "keyword" between lines "nline_ini" and                                                         
+    "nline_end". If the string contains numbers they are read and put into "vet/ivet". The variable                                                       
+    "string" contains the input string without the "keyword".                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub17" > Subroutine Read_Key_Value(Filevar,Nline_Ini,Nline_End,Keyword,Vet,Ivet,Iv) </a> </h4>                                          
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:), intent(in)      :: Filevar     !  In -> Input vector of String                                                     
+        integer,                       intent(in out)  :: Nline_Ini   !  In -> Pointer to initial position to search                                      
+                                                                      ! Out -> Pointer to final position in search                                        
+        integer,                       intent(in)      :: Nline_End   !  In -> Pointer to final position to search                                        
+        character(len=*),              intent(in)      :: Keyword     !  In -> Word to search                                                             
+        real(kind=sp),dimension(:),    intent(out)     :: Vet         ! Out -> Vector for real(kind=sp) numbers                                           
+        integer,dimension(:),          intent(out)     :: Ivet        ! Out -> Vector for integer numbers                                                 
+        integer,                       intent(out)     :: Iv          ! Out -> Number of components                                                       
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read a string on "filevar" starting with a particular "keyword" between lines "nline_ini" and                                                         
+    "nline_end". If the string contains numbers they are read and put into "vet/ivet".                                                                    
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub18" > Subroutine Read_Key_Valuest(Filevar,Nline_Ini,Nline_End,Keyword,Vet1,Vet2,Iv) </a> </h4>                                       
+    <p> <pre>                                                                                                                                             
+        character(len=*),dimension(:),  intent(in)     :: Filevar      !  In -> Input vector of String                                                    
+        integer,                        intent(in out) :: Nline_Ini    !  In -> Pointer to initial position to search                                     
+                                                                       ! Out -> Pointer to final position in search                                       
+        integer,                        intent(in)     :: Nline_End    !  In -> Pointer to final position to search                                       
+        character(len=*),               intent(in)     :: Keyword      !  In -> Word to search                                                            
+        real(kind=sp),dimension(:),     intent(out)    :: Vet1         ! Out -> Vector of real(kind=sp) numbers                                           
+        real(kind=sp),dimension(:),     intent(out)    :: Vet2         ! Out -> Vector of standard deviations                                             
+        integer,                        intent(out)    :: Iv           ! Out -> Number of components                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read parameters and standard deviation on the line of "filevar" starting with a particular "keyword".                                                 
+    The search is done between lines "nline_ini" and "nline_end".                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub19" > Subroutine Reading_Lines(Filename,Nlines,Filevar) </a> </h4>                                                                   
+    <p> <pre>                                                                                                                                             
+        character(len= *), intent(in)                :: Filename   !  In -> Filename                                                                      
+        integer,           intent(in)                :: Nlines     !  In -> Number of lines to read                                                       
+        character(len= *), dimension(:), intent(out) :: Filevar    ! Out -> String vector                                                                 
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Read nlines of the file and put the information on Filevar. If the file                                                                               
+    is open, the a rewind procedure is made.                                                                                                              
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub20" > Subroutine SetNum_Std(Value,Std,Line) </a> </h4>                                                                               
+    <p> <pre>                                                                                                                                             
+        real(kind=sp),            intent(in)  :: Value                                                                                                    
+        real(kind=sp),            intent(in)  :: Std                                                                                                      
+        character(len=*),intent (out):: Line                                                                                                              
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    String with real(kind=sp) value and standar deviation                                                                                                 
+    between parenthesis                                                                                                                                   
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub21" > Subroutine Ucase(Line) </a> </h4>                                                                                              
+    <p> <pre>                                                                                                                                             
+        character(len=*) :: Line                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Conversion to upper case. Line is modified                                                                                                            
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod11"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>

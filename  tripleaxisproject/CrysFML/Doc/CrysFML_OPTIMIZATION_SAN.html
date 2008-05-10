@@ -1,0 +1,235 @@
+<html>
+  <head>
+    <title> CrysFML </title>
+  </head>
+  <body bgcolor="#FFFFCC">
+    <h2> <a name="mod29" > OPTIMIZATION_SAN </a> </h2>                                                                                                    
+    <dd>  Module for Global Optimization using Simulated Annealing.                                                                                       
+    Currently there is available only a generic Simulated Anneling subroutine                                                                             
+    That must be called with the name of a user-supplied subroutine to calculate                                                                          
+    the cost function as an argument.                                                                                                                     
+    The calling program must define at least two variables of derived types                                                                               
+    SIMANN_CONDITIONS_TYPE and STATE_VECTOR_TYPE respectively.                                                                                            
+    The generic simulated annealing procedure can use the constant step algorithm                                                                         
+    or the Corana algorithm depending on the values of the corresponding component                                                                        
+    of the SIMANN_CONDITIONS_TYPE user-defined variable. </dd>                                                                                            
+    <dd> <p> <b> <i> Variables </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+      <li> <a href="#var1"  > NP_SAN </a> </li>                                                                                                           
+      <li> <a href="#var2"  > SIMANN_CONDITIONS_TYPE </a> </li>                                                                                           
+      <li> <a href="#var3"  > STATE_VECTOR_TYPE </a> </li>                                                                                                
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Functions </i> </b> </p> </dd>                                                                                                       
+    <ul>                                                                                                                                                  
+    </ul>                                                                                                                                                 
+    <dd> <p> <b> <i> Subroutines </i> </b> </p> </dd>                                                                                                     
+    <ul>                                                                                                                                                  
+      <li> <a href="#sub1"  > SET_SIMANN_COND </a> </li>                                                                                                  
+      <li> <a href="#sub2"  > SET_SIMANN_MSTATEV </a> </li>                                                                                               
+      <li> <a href="#sub3"  > SET_SIMANN_STATEV </a> </li>                                                                                                
+      <li> <a href="#sub4"  > SIMANNEAL_GEN </a> </li>                                                                                                    
+      <li> <a href="#sub5"  > SIMANNEAL_MULTICONF </a> </li>                                                                                              
+      <li> <a href="#sub6"  > WRITE_SIMANN_COND </a> </li>                                                                                                
+      <li> <a href="#sub7"  > WRITE_SIMANN_MSTATEV </a> </li>                                                                                             
+      <li> <a href="#sub8"  > WRITE_SIMANN_STATEV </a> </li>                                                                                              
+    </ul>                                                                                                                                                 
+    </dl>                                                                                                                                                 
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var1"  > NP_SAN </a> </h4>                                                                                                              
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: np_SAN=80                                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Maximum number of parameters in the model                                                                                                             
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var2"  > NP_CONF </a> </h4>                                                                                                             
+    <p> <pre>                                                                                                                                             
+        integer, parameter, public :: np_CONF=30                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Maximum number of initial configurations in paralell                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="var3"  > Type, public       :: SimAnn_Conditions_type </a> </h4>                                                                        
+    <p> <pre>                                                                                                                                             
+      real              :: t_ini       ! Initial temperature                                                                                              
+      real              :: anneal      ! Kirpactrick factor for Annealing                                                                                 
+      real              :: accept      ! Minimum percentage of accepted configurations                                                                    
+      integer           :: initconfig  ! Flag determining if the first configuration is random or read                                                    
+      integer           :: nalgor      ! Flag determining if the Corana algorithm is selected (0) or not (/=0)                                            
+      integer           :: nm_cycl     ! Number of Cycles per temp  in SA searchs                                                                         
+      integer           :: num_temps   ! Maximum number of temperatures in SA                                                                             
+      integer           :: num_therm   ! Number of thermalization cycles in SA                                                                            
+      integer           :: num_conf    ! Number of paralell configurations in SA                                                                          
+      character(len=60) :: Cost_function_name                                                                                                             
+      integer           :: seed=0      ! If different from zero, holds the seed                                                                           
+                                       ! for random number generator                                                                                      
+     End type Opt_Conditions_Type                                                                                                                         
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Derived type containing the conditions for running the                                                                                                
+    Simulated Annealing Algorithm                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub1"  > Type, public  :: MultiState_Vector_Type </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        integer                            :: npar    ! Number of parameters of the model.                                                                
+        integer                            :: nconf   ! Number of configurations.                                                                         
+        integer, dimension(np_SAN,np_CONF) :: code    !=0 fixed parameter, =1 variable parameter                                                          
+        integer, dimension(np_SAN)         :: bound   !=0 fixed boundaries,=1 periodic boundaries                                                         
+        real,    dimension(np_SAN,np_CONF) :: state   !Vector State with the current configuration                                                        
+        real,    dimension(np_SAN,np_CONF) :: stp     !Step vector (one value for each parameter)                                                         
+        real,    dimension(np_SAN)         :: low     !Low-limit value of parameters                                                                      
+        real,    dimension(np_SAN)         :: high    !High-limit value of parameters                                                                     
+        real,    dimension(np_SAN)         :: cost    !Vector with cost of the different configurations                                                   
+        real,    dimension(np_SAN)         :: config  !Vector State with the best configuration                                                           
+        character(len=15),dimension(np_SAN):: nampar !name of parameters of the model                                                                     
+      End Type MultiState_Vector_Type                                                                                                                     
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Derived type containing the parameters and configurations to be optimized,                                                                            
+    the limits, steps, names and best configuration to be searched                                                                                        
+    -by Simulated Annealing Algorithm                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub2"  > Type, public  :: State_Vector_Type </a> </h4>                                                                                  
+    <p> <pre>                                                                                                                                             
+        integer                    :: npar    ! Number of parameters of the model.                                                                        
+        integer, dimension(np_SAN) :: code    !=0 fixed parameter, =1 variable parameter                                                                  
+        integer, dimension(np_SAN) :: bound   !=0 fixed boundaries,=1 periodic boundaries                                                                 
+        real,    dimension(np_SAN) :: state   !Vector State with the current configuration                                                                
+        real,    dimension(np_SAN) :: stp     !Step vector (one value for each parameter)                                                                 
+        real,    dimension(np_SAN) :: low     !Low-limit value of parameters                                                                              
+        real,    dimension(np_SAN) :: high    !High-limit value of parameters                                                                             
+        real,    dimension(np_SAN) :: config  !Vector State with the best configuration                                                                   
+        character(len=15),dimension(np_SAN):: nampar !name of parameters of the model                                                                     
+      End Type State_Vector_Type                                                                                                                          
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Derived type containing the parameters to be optimized,                                                                                               
+    the limits, steps, names and best configuration to be searched                                                                                        
+    -by Simulated Annealing Algorithm                                                                                                                     
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub3"  > ERR_MESS_SAN </a> </h4>                                                                                                        
+    <p> <pre>                                                                                                                                             
+        character (len=150), public  :: err_mess_SAN                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Error message provided if an error condition occurs.                                                                                                  
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub4"  > ERR_SAN </a> </h4>                                                                                                             
+    <p> <pre>                                                                                                                                             
+        logical , public  :: err_SAN                                                                                                                      
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Error flag provided if an error condition occurs                                                                                                      
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub5"  > Subroutine Set_SimAnn_Cond(file_list,c) </a> </h4>                                                                             
+    <p> <pre>                                                                                                                                             
+        type (file_list_type),       intent( in)  :: file_list                                                                                            
+        type(SimAnn_Conditions_type),intent(out)  :: c                                                                                                    
+        Type, public        :: SimAnn_Conditions_type                                                                                                     
+          real              :: t_ini=0.0   ! Initial temperature                                                                                          
+          real              :: anneal=0.0  ! Kirpactrick factor for Annealing                                                                             
+          real              :: accept=0.0  ! Minimum percentage of accepted configurations                                                                
+          integer           :: initconfig=0! Flag determining if the first configuration is random or read                                                
+          integer           :: nalgor=0    ! Flag determining if the Corana algorithm is selected (0) or not (/=0)                                        
+          integer           :: nm_cycl=0   ! Number of Cycles per temp  in SA searchs                                                                     
+          integer           :: num_temps=0 ! Maximum number of temperatures in SA                                                                         
+          integer           :: num_therm=0 ! Number of thermalization cycles in SA                                                                        
+          character(len=60) :: Cost_function_name=" "                                                                                                     
+          integer           :: seed=0      ! If different from zero, holds the seed for random number generator                                           
+        End type SimAnn_Conditions_type                                                                                                                   
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Subroutine for reading and set up the SimAnn_Conditions_type                                                                                          
+    variable "c"                                                                                                                                          
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub6"  > Subroutine Set_SimAnn_MStateV(n,nsol,Con,Bounds,VNam,Vec,vs,cod) </a> </h4>                                                    
+    <p> <pre>                                                                                                                                             
+        integer,                      intent(in) :: n,nsol !number of parameters & configurations                                                         
+        integer,         dimension(:),intent(in) :: con    !Boundary conditions                                                                           
+        real,          dimension(:,:),intent(in) :: Bounds ! (1,:)-> Low, (2,:) -> High, (3,:) -> Step                                                    
+        character(len=*),dimension(:),intent(in) :: VNam   !Names of parameters                                                                           
+        real,            dimension(:),intent(in) :: Vec    !Initial value of parameters                                                                   
+        type(MultiState_Vector_Type), intent(out):: vs     !Initial State vector                                                                          
+        integer,optional,dimension(:),intent(in) :: cod    !If present, cod(i)=0 fix the "i" parameter                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine for setting up the State_Vector_type                                                                                                       
+    variable "vs"                                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub7"  > Subroutine Set_SimAnn_StateV(n,Con,Bounds,VNam,Vec,vs,cod) </a> </h4>                                                          
+    <p> <pre>                                                                                                                                             
+        integer,                      intent(in) :: n      !number of parameters                                                                          
+        integer,         dimension(:),intent(in) :: con    !Boundary conditions                                                                           
+        real,          dimension(:,:),intent(in) :: Bounds ! (1,:)-> Low, (2,:) -> High, (3,:) -> Step                                                    
+        character(len=*),dimension(:),intent(in) :: VNam   !Names of parameters                                                                           
+        real,            dimension(:),intent(in) :: Vec    !Initial value of parameters                                                                   
+        type(State_Vector_Type),      intent(out):: vs     !Initial State vector                                                                          
+        integer,optional,dimension(:),intent(in) :: cod    !If present, cod(i)=0 fix the "i" parameter                                                    
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+                                                                                                                                                          
+    Subroutine for setting up the State_Vector_type                                                                                                       
+    variable "vs"                                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+    <h4> <a name="sub8"  > Subroutine Simanneal_Gen(Model_Funct,c,vs,Ipr,fileSav) </a> </h4>                                                              
+    <p> <pre>                                                                                                                                             
+        type(SimAnn_Conditions_type),intent(in out)  :: c                                                                                                 
+        type(State_Vector_Type),     intent(in out)  :: vs                                                                                                
+        integer,                     intent(in)      :: Ipr                                                                                               
+        character(len=*), optional,  intent(in)      :: filesav                                                                                           
+                                                                                                                                                          
+    </pre> </p>                                                                                                                                           
+    <p>                                                                                                                                                   
+    Interface                                                                                                                                             
+    Subroutine Model_Funct(v,cost)                                                                                                                        
+    real,dimension(:),    intent( in):: v                                                                                                                 
+    real,                 intent(out):: cost                                                                                                              
+    End Subroutine Model_Funct                                                                                                                            
+    End Interface                                                                                                                                         
+                                                                                                                                                          
+    </p>                                                                                                                                                  
+     <a href="#Mod29"> [Top Document] </a>                                                                                                                
+    <hr size="1" noshade>                                                                                                                                 
+  </body>
+</html>
