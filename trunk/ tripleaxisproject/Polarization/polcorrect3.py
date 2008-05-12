@@ -171,6 +171,8 @@ class polarization_correct:
         self.timestamp={}
         self.files=files
         self.cell=cell
+        print 'files',files
+        print 'cellfile polcorrect3',cell
         mymonFlag=False
         for key,myfilestr in files.iteritems():
             mydatareader=readncnr.datareader()
@@ -236,11 +238,16 @@ class polarization_correct:
 
 
     def correct(self,pbflags):
+        print pbflags.Sconstrain
         keys=['pp','mm','pm','mp']
+        print self.counts
+        print self.timestamp
         pbinput=PBindata()
         pboutput=PBoutdata()
         pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
         pbinput.Ef=self.ef.ctypes.data_as(c_double_p)
+        print 'Ei', self.ei
+        print 'Ef',self.ef
         for key in keys:
             if self.counts.has_key(key):
                 if key=='pp':
@@ -254,7 +261,7 @@ class polarization_correct:
                 if key=='pm':
                     mytemp_pm=self.timestamp[key].astype('uint32')
                     pbinput.tpm=mytemp_pm.ctypes.data_as(c_ulong_p)
-                    #print 't0 ',mytemp_pm[0]
+                    #print 't0,pm ',mytemp_pm[0]
                     pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
                     pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
                     #print 'shape ',self.counts[key].shape
@@ -298,6 +305,19 @@ class polarization_correct:
 
 
         #print 'mylength ',self.length
+        #print 'check input'
+        #print 'Cmp',dummyCmp
+        #print 'Emp',dummyEmp
+        #print 'tmp',dummytmp
+
+
+        #print 'check input'
+        #print 'Cpm',dummyCpm
+        #print 'Epm',dummyEpm
+        #print 'tpm',dummytpm
+
+
+
         Spp=N.empty((1,self.length),'float64')
         Smm=N.empty((1,self.length),'float64')
         Spm=N.empty((1,self.length),'float64')
@@ -350,11 +370,67 @@ class polarization_correct:
 ##        pbflags.Spm=[0,0,0,0]
 ##        pbflags.Smp=[0,0,0,0]
 
-        #print 'monitor correct ', pbflags.MonitorCorrect
-        #print 'mono select ',pbflags.MonoSelect
-        #print 'Spm ',pbflags.Spm
-        #print 'Smp ',pbflags.Smp
-        #print 'Sconstrain ', pbflags.Sconstrain
+
+        pbflags.MonitorCorrect=int(pbflags.MonitorCorrect)
+        pbflags.PolMonitorCorrect=int(pbflags.PolMonitorCorrect)
+        pbflags.MonoSelect=int(pbflags.MonoSelect)
+        pbflags.Debug=int(pbflags.Debug)
+        pbflags.SimFlux=int(pbflags.SimFlux)
+        pbflags.SimDeviate=int(pbflags.SimDeviate)
+        pbflags.NoNegativeCS=int(pbflags.NoNegativeCS)
+        pbflags.HalfPolarized=int(pbflags.HalfPolarized)
+        pbflags.CountsEnable[0]=int(pbflags.CountsEnable[0])
+        pbflags.CountsEnable[1]=int(pbflags.CountsEnable[1])
+        pbflags.CountsEnable[2]=int(pbflags.CountsEnable[2])
+        pbflags.CountsEnable[3]=int(pbflags.CountsEnable[3])
+        pbflags.CountsAdd1[0]=int(pbflags.CountsAdd1[0])
+        pbflags.CountsAdd1[1]=int(pbflags.CountsAdd1[1])
+        pbflags.CountsAdd1[2]=int(pbflags.CountsAdd1[2])
+        pbflags.CountsAdd1[3]=int(pbflags.CountsAdd1[3])
+        pbflags.CountsAdd2[0]=int(pbflags.CountsAdd2[0])
+        pbflags.CountsAdd2[1]=int(pbflags.CountsAdd2[1])
+        pbflags.CountsAdd2[2]=int(pbflags.CountsAdd2[2])
+        pbflags.CountsAdd2[3]=int(pbflags.CountsAdd2[3])
+
+        pbflags.Sconstrain[0]=int(pbflags.Sconstrain[0])
+        pbflags.Sconstrain[1]=int(pbflags.Sconstrain[1])
+        pbflags.Sconstrain[2]=int(pbflags.Sconstrain[2])
+        pbflags.Sconstrain[3]=int(pbflags.Sconstrain[3])
+        pbflags.Spp[0]=float(pbflags.Spp[0])
+        pbflags.Spp[1]=float(pbflags.Spp[1])
+        pbflags.Spp[2]=float(pbflags.Spp[2])
+        pbflags.Spp[3]=float(pbflags.Spp[3])
+        pbflags.Smm[0]=float(pbflags.Smm[0])
+        pbflags.Smm[1]=float(pbflags.Smm[1])
+        pbflags.Smm[2]=float(pbflags.Smm[2])
+        pbflags.Smm[3]=float(pbflags.Smm[3])
+        pbflags.Spm[0]=float(pbflags.Spm[0])
+        pbflags.Spm[1]=float(pbflags.Spm[1])
+        pbflags.Spm[2]=float(pbflags.Spm[2])
+        pbflags.Spm[3]=float(pbflags.Spm[3])
+        pbflags.Smp[0]=float(pbflags.Smp[0])
+        pbflags.Smp[1]=float(pbflags.Smp[1])
+        pbflags.Smp[2]=float(pbflags.Smp[2])
+        pbflags.Smp[3]=float(pbflags.Smp[3])
+
+
+
+        print 'Debug',pbflags.Debug
+        print 'SimFlux',pbflags.SimFlux
+        print 'SimDeviate',pbflags.SimDeviate
+        print 'NoNegativeCS',pbflags.NoNegativeCS
+        print 'HalfPolarized', pbflags.HalfPolarized
+        print 'CountsAdd1',pbflags.CountsAdd1
+        print 'CountsAdd2',pbflags.CountsAdd2
+        print 'monitor correct ', pbflags.MonitorCorrect
+        print 'mono select ',pbflags.MonoSelect
+        print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
+        print 'Spm ',pbflags.Spm
+        print 'Smp ',pbflags.Smp
+        print 'Smm ',pbflags.Smm
+        print 'Spp ',pbflags.Spp
+        print 'Sconstrain ', pbflags.Sconstrain
+        print 'CountsEnable ', pbflags.CountsEnable
         mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
         #print Smp[0]
         #print Spm[0]
@@ -373,6 +449,8 @@ class polarization_correct:
         corrected_counts['Emp']=Emp[0]
         self.corrected_counts=corrected_counts
         print
+        print 'inpolcorrect'
+        print corrected_counts
         #append corrected counts to our dataset
         self.outdata={}
         for key in keys:
