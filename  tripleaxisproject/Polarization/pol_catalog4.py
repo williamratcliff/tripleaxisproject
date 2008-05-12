@@ -618,7 +618,7 @@ class CatalogPanel(wx.Panel):
         # dialog is set up to change the current working directory to the path chosen.
 
         defaultDir=os.getcwd()
-        defaultDir=r'c:\bifeo3xtal\jan8_2008\9175\data'
+        defaultDir=r'C:\polcorrecter\data'
         wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
         dlg = wx.FileDialog(
             self, message="Choose a file",

@@ -33,7 +33,7 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
         data=data.tolist()
         for row in range(4):
             data[row][row+1]=''
-            data[0][row]=''
+            data[row][0]=''
 
         #data[0][5]='off off'
         #data[1][5]='off on'
@@ -79,7 +79,7 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
             try:
                 rowvalues.append(float(self.GetValue(row,col)))
             except ValueError:
-                rowvalues.append(0)
+                rowvalues.append(float(0))
         return rowvalues
 
     def GetColValues(self,col):
@@ -89,13 +89,13 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
                 try:
                     colvalues.append(float(self.GetValue(row,col)))
                 except ValueError:
-                    colvalues.append(0)
+                    colvalues.append(int(0))
             else:
                 selected=self.GetValue(row,col)
                 if selected=='x':
-                    colvalues.append(1)
+                    colvalues.append(int(1))
                 else:
-                    colvalues.append(0)
+                    colvalues.append(int(0))
         return colvalues
 
 
@@ -180,6 +180,7 @@ class ConstraintMatrixGrid(gridlib.Grid):
         #attr.SetReadOnly(True)
         #self.SetColAttr(table.GetNumberCols()-1,attr)
         gridlib.EVT_GRID_CELL_LEFT_CLICK(self,self.OnLeftClick)
+        gridlib.Grid.ForceRefresh(self)
         #gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
         #gridlib.EVT_GRID_LABEL_LEFT_DCLICK(self,self.onLeftDClickRowCell)
 
@@ -317,21 +318,21 @@ class FormDialog(sc.SizedDialog):
 
 
     def EvtFilter(self,evt):
-        self.groupdata['pbflags'].MonoSelect=evt.IsChecked()
+        self.groupdata['pbflags'].MonoSelect=int(evt.IsChecked())
     def EvtPrePolarizer(self,evt):
-        self.groupdata['pbflags'].MonitorCorrect=evt.IsChecked()
+        self.groupdata['pbflags'].MonitorCorrect=int(evt.IsChecked())
 
     def EvtPostPolarizer(self,evt):
-        self.groupdata['pbflags'].PolMonitorCorrect=evt.IsChecked()
+        self.groupdata['pbflags'].PolMonitorCorrect=int(evt.IsChecked())
 
     def EvtCountsEnable_onon(self,evt):
-        self.groupdata['pbflags'].CountsEnable[0]=evt.IsChecked()
+        self.groupdata['pbflags'].CountsEnable[0]=int(evt.IsChecked())
     def EvtCountsEnable_offoff(self,evt):
-        self.groupdata['pbflags'].CountsEnable[1]=evt.IsChecked()
+        self.groupdata['pbflags'].CountsEnable[1]=int(evt.IsChecked())
     def EvtCountsEnable_onoff(self,evt):
-        self.groupdata['pbflags'].CountsEnable[2]=evt.IsChecked()
+        self.groupdata['pbflags'].CountsEnable[2]=int(evt.IsChecked())
     def EvtCountsEnable_offon(self,evt):
-        self.groupdata['pbflags'].CountsEnable[3]=evt.IsChecked()
+        self.groupdata['pbflags'].CountsEnable[3]=int(evt.IsChecked())
 
 #pp mm pm mp
     def EvtNSF(self,evt):
@@ -366,7 +367,7 @@ class FormDialog(sc.SizedDialog):
         # dialog is set up to change the current working directory to the path chosen.
 
         defaultDir=os.getcwd()
-        defaultDir=r'c:\bifeo3xtal\jan8_2008\9175\data'
+        defaultDir=r'C:\polcorrecter\data'
         wildcard="cell files (*.txt)|*.txt|All files (*.*)|*.*"
         dlg = wx.FileDialog(
             self, message="Choose a file",

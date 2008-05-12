@@ -12,7 +12,6 @@ copyright 2008, University of Tennessee
 import wx
 import sys
 from sans.guicomm.events import EVT_NEW_PLOT
-
 import FileTreeCtrl4 as FTC
 import pol_catalog4 as polcatalog
 
