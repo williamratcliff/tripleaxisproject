@@ -1,0 +1,13 @@
+#absolute
+#cell c:\mytripleaxisproject\polarization\cells.txt
+#directory c:\bifeo3xtal\jan8_2008\9175\data
+#begin
+mp=fieldscanminusplusreset53631.bt7
+pm=fieldscansplusminusreset53630.bt7
+#end
+#absolute
+#directory c:\bifeo3xtal\jan8_2008\9175\data
+#begin
+pm=fieldscansplusminus53566.bt7
+mp=fieldscanminusplus53567.bt7
+#end

@@ -1,0 +1,15 @@
+EXPORTS
+    Dn @1 DATA
+    PBcorrectData @2
+    PBreaddata @3
+    PBreadflags @4
+    PBsim @5
+    TWOPI @6 DATA
+    deter @7
+    deterC @8
+    dmatrix @9
+    free_dmatrix @10
+    invert @11
+    invertLU @12
+    invertP @13
+    invertPC @14

@@ -1,0 +1,2 @@
+; dlltool --base-file C:\DOCUME~1\ylem\LOCALS~1\Temp/cca02380.base --output-exp polarization.exp --dllname polarization.dll --output-def polarization/libpolarization.def --exclude-symbol=DllMainCRTStartup@12 --def C:\DOCUME~1\ylem\LOCALS~1\Temp/cca02380.def --output-lib polarization/libpolarization.a
+EXPORTS
