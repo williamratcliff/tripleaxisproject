@@ -1,0 +1,41 @@
+# C is the cross-section constraint command
+# first arg is the index 1-4 of the cross-section you wish to constrain
+# where the order is 1=OffOff 2=OnOn 3=PolOn 4=AnalOn
+# The next 4 args are the coefs in the constraint equation:
+# Sindex = C1*Spp + C2*Smm + C3*Spm + C4*Smp
+#  The Cx corresponding to index is automatically set to zero.
+# The following constrains the Spp = Smm = 0.
+#
+# Translating this into the flags structure, for each cross-section
+# you wish to constrain mark the corresponding index in
+# flags.Sconstrain[0-3] as a one, to enable that constraint equation
+# that will have the coefficients in the corresponding
+# flags.Spp for Sconstrain[0]
+# flags.Smm for Sconstrain[1] etc.
+C 1  0. 0. 0. 0.
+C 2  0. 0. 0. 0.
+#
+#C 4  0. 0. 1. 0.
+#D 1 2 4
+#
+# The D command deletes the equations for the listed Counts indices
+# where as for the cross-sections 1=Cpp 2=Cmm 3=Cpm 4=Cmp
+# The following line effectively means you havent msrd OFFOFF and ONON
+# This makes the number of free variables == number of counts equations.
+# i.e. cross-sections to solve for are now only Spm and Smp since
+# Spp and Smm were constrained to be zero above.
+#
+# Translating this into the flags structure, for each counts equation
+# you wish to discard (or was not measured) mark the corresponding index
+# in flags.CountsEnable[0-3] with a zero. By default all 4 equations
+# are initially enabled.
+D 1 2
+# turn on deviates for generating simulated counts with PBsim
+E 1
+#
+# A index1 index2
+# B index1 index2
+# A and B commands allow adding two equations together.
+# You can do this twice thus the A and B.
+# In flags this corresponds to setting two of the indices to one in
+# flags.CountsAdd1 or flags.CountsAdd2

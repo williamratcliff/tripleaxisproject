@@ -1,0 +1,8 @@
+LDFLAGS=-bundle
+DLL=.dyld
+
+all: struct$(DLL)
+
+struct$(DLL): struct.c
+	gcc $(LDFLAGS) -o struct$(DLL) struct.c
+
