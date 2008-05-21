@@ -513,9 +513,9 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         for ckey,myfile in files.iteritems():
             myfile=os.path.join(os.getcwd(),myfile)+'.bt7'
             files[ckey]=myfile
-        files={}
-        files['pm']=r'C:\polcorrecter\data\fieldscansplusminusreset53630.bt7'
-        files['mp']=r'C:\polcorrecter\data\fieldscanminusplusreset53631.bt7'
+        #files={}
+        #files['pm']=r'C:\polcorrecter\data\fieldscansplusminusreset53630.bt7'
+        #files['mp']=r'C:\polcorrecter\data\fieldscanminusplusreset53631.bt7'
         text=self.itemdict['text']+'.polcor'
         print 'driver file', text
         #cellfile='c:\polcorrecter\data\cells.txt'  

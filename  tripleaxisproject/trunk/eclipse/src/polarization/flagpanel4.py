@@ -219,7 +219,7 @@ class FormValidator(wx.PyValidator):
         self.key=key
 
     def Clone(self):
-        return FormValidator(data,key)
+        return FormValidator(self.data,self.key)
 
     def Validate(self,win):
         return True
