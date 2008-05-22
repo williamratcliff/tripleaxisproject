@@ -535,7 +535,7 @@ class CatalogPanel(wx.Panel):
     def AddItem(self,CurrentGroup,data):
         tree=self.filetree_panel.tree
         #CurrentGroup=tree.GetLastChild(self.DataGroup)[0]
-        child = tree.AppendItem(CurrentGroup,data['filename'],ct_type=1)
+        child = tree.AppendItem(CurrentGroup,data['filename'])#,ct_type=1) #ct_type=1 gives check box
         tree.SetItemBold(child, True)
         tree.SetPyData(child, data)
         tree.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
