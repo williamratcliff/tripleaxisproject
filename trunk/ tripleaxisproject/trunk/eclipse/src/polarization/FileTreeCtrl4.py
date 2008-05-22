@@ -396,11 +396,14 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         DataGroup=self.GetFirstChild(self.GetRootItem())[0]
         if self.GetItemParent(item)==DataGroup:
             menu = wx.Menu()
+            item4 = menu.Append(wx.ID_ANY, "Load Reduction Preferences")
+            menu.AppendSeparator()
             item1 = menu.Append(wx.ID_ANY, "Set Reduction Preferences")
             menu.AppendSeparator()
             item2 = menu.Append(wx.ID_ANY, "Reduce Group")
             menu.AppendSeparator()
             item3 = menu.Append(wx.ID_ANY, "Plot Group")
+            
 
             #item10 = menu.Append(wx.ID_ANY, "Delete Item")
             #if item == self.GetRootItem():
@@ -410,6 +413,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             self.Bind(wx.EVT_MENU, self.OnItemSetReductionPreferences, item1)
             self.Bind(wx.EVT_MENU, self.OnItemReduceGroup, item2)
             self.Bind(wx.EVT_MENU, self.OnItemPlot, item3)
+            self.Bind(wx.EVT_MENU, self.OnItemLoad, item4)
             #self.Bind(wx.EVT_MENU, self.OnItemForeground, item2)
             #self.Bind(wx.EVT_MENU, self.OnItemBold, item3)
             #self.Bind(wx.EVT_MENU, self.OnItemFont, item4)
@@ -445,10 +449,236 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             new_plot = Data1D(x, y, dy=dy)
             new_plot.name =data['filename']+' '+data['polstate']
             new_plot.group_id='data'
-            new_plot.xaxis('independent_variable', 'A^{-1}')
+            new_plot.xaxis(str(self.independent_variable), 'A^{-1}')
             new_plot.yaxis("\\rm{Intensity} ","Arb. units")
             wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
 
+    def OnItemLoad(self,event):
+        defaultDir=os.getcwd()
+        defaultDir=r'C:\polcorrecter\data'
+        wildcard="driver files (*.polcor)|*.polcor|All files (*.*)|*.*"
+        dlg = wx.FileDialog(
+            self, message="Choose a file",
+            defaultDir=defaultDir,
+            defaultFile="",
+            wildcard=wildcard,
+            style=wx.OPEN | wx.CHANGE_DIR
+            )
+
+        # Show the dialog and retrieve the user response. If it is the OK response,
+        # process the data.
+        if dlg.ShowModal() == wx.ID_OK:
+            # This returns a Python list of files that were selected.
+            paths = dlg.GetPaths()
+            #self.log.WriteText('You selected %d files:' % len(paths))
+            myfilestr=paths[0].encode('ascii')
+            myfile = open(myfilestr, 'r')
+            mycount=0
+            returnline=['']
+            catalog=[]
+            cellfiles=[]
+            absolute=True
+            inblock=False
+            groupdata=self.itemdict['pydata']
+            pbflags=groupdata['pbflags']
+            pbflags.MonitorCorrect=0
+            pbflags.PolMonitorCorrect=1
+            pbflags.MonoSelect=1
+            pbflags.Debug=0
+            pbflags.SimFlux=0
+            pbflags.SimDeviate=0
+            pbflags.NoNegativeCS=0
+            pbflags.HalfPolarized=0
+            pbflags.CountsEnable=[0,0,0,0]
+            pbflags.CountsAdd1=[0,0,0,0]
+            pbflags.CountsAdd2=[0,0,0,0]
+            pbflags.Sconstrain=[0,0,0,0]
+            pbflags.Spp=[0,0,0,0]
+            pbflags.Smm=[0,0,0,0]
+            pbflags.Spm=[0,0,0,0]
+            pbflags.Smp=[0,0,0,0]
+        
+            while 1:
+                lineStr = myfile.readline()
+                if not(lineStr):
+                    break
+                strippedLine=lineStr.rstrip().lower()
+                tokenized=strippedLine.split()
+                #print 'tokenized ', tokenized
+                directive=tokenized[0]
+                if tokenized[0]==[]:
+                    pass
+                elif tokenized[0]=='#absolute'.lower():
+                    #print 'absolute'
+                    absolute=True
+                    mydirectory=os.curdir
+                elif tokenized[0]=='#directory'.lower():
+                    #print 'directory'
+                    if os.path.isdir(mydirectory):
+                        mydirectory=tokenized[1]
+                    else:
+                        print '%s is not an existing directory!!!'%(tokenized[1],)
+                        break
+                elif tokenized[0]=='#MonitorCorrect'.lower():
+                    pbflags.MonitorCorrect=int(tokenized[1])
+                    #print '##Monitor Correct ',tokenized
+                elif tokenized[0]=='#PolMonitorCorrect'.lower():
+                    pbflags.PolMonitorCorrect=int(tokenized[1])
+                elif tokenized[0]=='#MonoSelect'.lower:
+                    pbflags.MonoSelect=int(tokenized[1])
+                elif tokenized[0]=='#CountsEnable'.lower():
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.CountsEnable[0]=int(tokenized[1])
+                        pbflags.CountsEnable[1]=int(tokenized[2])
+                        pbflags.CountsEnable[2]=int(tokenized[3])
+                        pbflags.CountsEnable[3]=int(tokenized[4])
+                elif tokenized[0]=='#CountsAdd1'.lower():
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.CountsAdd2[0]=int(tokenized[1])
+                        pbflags.CountsAdd2[1]=int(tokenized[2])
+                        pbflags.CountsAdd2[2]=int(tokenized[3])
+                        pbflags.CountsAdd2[3]=int(tokenized[4])
+                elif tokenized[0]=='#CountsAdd2'.lower():
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.CountsAdd2[0]=int(tokenized[1])
+                        pbflags.CountsAdd2[1]=int(tokenized[2])
+                        pbflags.CountsAdd2[2]=int(tokenized[3])
+                        pbflags.CountsAdd2[3]=int(tokenized[4])
+                elif tokenized[0]=='#Sconstrain'.lower():
+                    #print 'Sconstrain ',tokenized
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.Sconstrain[0]=int(tokenized[1])
+                        pbflags.Sconstrain[1]=int(tokenized[2])
+                        pbflags.Sconstrain[2]=int(tokenized[3])
+                        pbflags.Sconstrain[3]=int(tokenized[4])
+                elif tokenized[0]=='#Spp'.lower():
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.Spp[0]=float(tokenized[1])
+                        pbflags.Spp[1]=float(tokenized[2])
+                        pbflags.Spp[2]=float(tokenized[3])
+                        pbflags.Spp[3]=float(tokenized[4])
+                elif tokenized[0]=='#Smm'.lower:
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.Smm[0]=float(tokenized[1])
+                        pbflags.Smm[1]=float(tokenized[2])
+                        pbflags.Smm[2]=float(tokenized[3])
+                        pbflags.Smm[3]=float(tokenized[4])
+                elif tokenized[0]=='#Spm'.lower():
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.Spm[0]=float(tokenized[1])
+                        pbflags.Spm[1]=float(tokenized[2])
+                        pbflags.Spm[2]=float(tokenized[3])
+                        pbflags.Spm[3]=float(tokenized[4])
+                elif tokenized[0]=='#Smp'.lower():
+                    if len(tokenized)!=5:
+                        print 'Too Few Arguments for the %s pragma.  An example of proper use is:'%(directive,)
+                        print '%s 1 0 1 3'%(directive,)
+                        break
+                    else:
+                        pbflags.Smp[0]=float(tokenized[1])
+                        pbflags.Smp[1]=float(tokenized[2])
+                        pbflags.Smp[2]=float(tokenized[3])
+                        pbflags.Smp[3]=float(tokenized[4])
+        
+#                elif tokenized[0]=='#begin'.lower():
+#                    inblock=True
+#                    #print 'begin '
+#                    files={}
+#                elif tokenized[0]=='#end'.lower():
+#                    #print 'end'
+#                    catalog.append(files)
+#                    print 'correcting %s using cellfile %s'%(files,cellfile)
+#                    mypolcor=polarization_correct(files,cellfile)
+#                    corrected_counts=mypolcor.correct(pbflags)
+#                    mypolcor.savefiles()
+#                    print 'corrected'
+#                    if 0:
+#                        key='pm'.lower()
+#                        #pylab.subplot(2,2,1+mycount)
+#                        #pylab.title(key)
+#                        mydatac=mypolcor.mydata
+#                        #pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
+#                        #    marker='s',mfc='blue',linestyle='None')
+#                        #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Spm'],corrected_counts['Epm'], marker='s',mfc='red',linestyle='None')
+#                        #print 'pm'
+#                        #print corrected_counts['Spm']
+#                        key='mp'.lower()
+#                        #pylab.subplot(2,2,2+mycount)
+#                        #pylab.title(key)
+#                        #print 'mp'
+#                        #print corrected_counts['Smp']
+#                        #pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
+#                        #    marker='s',mfc='blue',linestyle='None')
+#                        #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Smp'],corrected_counts['Emp'], marker='s',mfc='red',linestyle='None')
+#                        mycount=mycount+2
+#                    inblock=False
+#                elif inblock==True:
+#                    #print 'inblock'
+#                    toksplit=tokenized[0].split('=')
+#                    #check to make sure that there actually is a file specified!
+#                    if len(toksplit)==2:
+#                        filetok=os.path.join(mydirectory,toksplit[1])
+#                        if os.path.isfile(filetok):
+#                            files[toksplit[0]]=filetok
+#                        else:
+#                            print filetok+' does not exist!!!'
+#                            break
+#                    else:
+#                        pass
+                elif tokenized[0]=='#cell'.lower():
+                    #print 'acellfile'
+                    cellfile=os.path.join(mydirectory,tokenized[1])
+                    groupdata['cellfile']=cellfile
+                    if os.path.isfile(cellfile):
+                        cellfiles.append(cellfile)
+                    else:
+                        print '%s does not exist!'%(cellfile,)
+                        break
+                #elif tokenized[0]=='#Pcell'.lower():
+                #    #print 'pcellfile'
+                #    pcellfile=os.path.join(mydirectory,tokenized[1])
+                #    if os.path.isfile(pcellfile):
+                #        pcellfiles.append(pcellfile)
+                #    else:
+                #        print '%s does not exist!'%(acellfile,)
+                #        break
+            print 'done'
+            myfile.close()
+            print 'closed'
+
+        # Destroy the dialog. Don't do this until you are done with it!
+        # BAD things can happen otherwise!
+        dlg.Destroy()
+
+        return
 
     def OnItemSetReductionPreferences(self,event):
         current_selected=self.current
@@ -479,7 +709,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         if pydata['pbflags'].CountsEnable[3]==0:
             pydata['pbflags'].Sconstrain[3]=1
         dlg=flagpanel.FormDialog(parent=self,id=-1,groupdata=pydata,individualdata=children_data)
-        self.TransferDataToWindow()
+        #self.TransferDataToWindow()
         result=dlg.ShowModal()
         if result==wx.ID_OK:
             print "OK"
@@ -617,7 +847,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                      new_plot = Data1D(x, y, dy=dy)
                      new_plot.name =key+'.corrected'
                      new_plot.group_id='reduced'
-                     new_plot.xaxis('independent_variable', 'A^{-1}')
+                     new_plot.xaxis(str(self.independent_variable), 'A^{-1}')
                      new_plot.yaxis("\\rm{Intensity} ","Arb. units")
                      wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
 

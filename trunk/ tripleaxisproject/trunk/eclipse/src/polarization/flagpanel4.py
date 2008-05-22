@@ -40,18 +40,9 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
         #data[2][5]='on off'
         #data[3][5]='on on'
         self.data=data
-#        self.data.append([1, #selected
-#                        '', #filename
-#                        '', #sequence number
-#                        '', #polarization state
-#                        '', #hsample
-#                        '', #vsample
-#                        ])
+
         return
-            #[1010, "The foo doesn't bar", "major", 1, 'MSW', 1, 1, 1, 1.12],
-            #[1011, "I've got a wicket in my wocket", "wish list", 2, 'other', 0, 0, 0, 1.50],
-            #[1012, "Rectangle() returns a triangle", "critical", 5, 'all', 0, 0, 0, 1.56]
-            #]
+
     #--------------------------------------------------
     # required methods for the wxPyGridTableBase interface
     def GetNumberRows(self):
@@ -147,7 +138,7 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
         return self.CanGetValueAs(row, col, typeName)
 #---------------------------------------------------------------------------
 class ConstraintMatrixGrid(gridlib.Grid):
-    def __init__(self, parent):
+    def __init__(self, parent,pbflags):
         gridlib.Grid.__init__(self, parent, -1)
         table = ConstraintMatrixTable()
         # The second parameter means that the grid is to take ownership of the
@@ -179,6 +170,9 @@ class ConstraintMatrixGrid(gridlib.Grid):
             self.SetReadOnly(row,row+1,True)
         #attr.SetReadOnly(True)
         #self.SetColAttr(table.GetNumberCols()-1,attr)
+        for row in range(table.GetNumberRows()):
+                         if pbflags.Sconstrain[row]==1:
+                             table.SetValue(row,0,'x')
         gridlib.EVT_GRID_CELL_LEFT_CLICK(self,self.OnLeftClick)
         gridlib.Grid.ForceRefresh(self)
         #gridlib.EVT_GRID_CELL_LEFT_DCLICK(self, self.OnLeftDClick)
@@ -213,61 +207,61 @@ class ConstraintMatrixGrid(gridlib.Grid):
         gridlib.Grid.ForceRefresh(self)
 
 
-class FormValidator(wx.PyValidator):
+class mFormValidator(wx.PyValidator):
     def __init__(self,data,key):
         wx.PyValidator.__init__(self)
         self.data=data
         self.key=key
-        print 'FormValidator init'
-        print 'key',key
+        print 'FormValidator init', key
         #self.TransferToWindow()
 
     def Clone(self):
-        return FormValidator(self.data,self.key)
+        return mFormValidator(self.data,self.key)
 
     def Validate(self,win):
         return True
 
     def TransferToWindow(self):
-        print 'TransferToWindow'
+        print 'Form TransferToWindow',self.key
         
         checkctrl=self.GetWindow()
-        key=self.key
-        print 'checkctrl',checkctrl
+        #print 'checkctrl',checkctrl
+        #print self.__dict__
         print 'key',self.key
-        print 'dict', self.data.__dict__
+        print 'dict', self.data._array[self.key]
         #print 'data',self.data.__dict__[self.key]
-        if key=='MonoSelect':
-            checkctrl.SetValue(self.data.MonoSelect)
+        checkctrl.SetValue(self.data._array[self.key])
         return True
 
     def TransferFromWindow(self):
         print 'TransferFromWindow'
         checkctrl=self.GetWindow()
-        self.data.__dict__[self.key]=int(checkctrl.GetValue())
+        self.data._array[self.key]=int(checkctrl.GetValue())
         return True
 
 class ListValidator(wx.PyValidator):
     def __init__(self,data,key,index):
         wx.PyValidator.__init__(self)
+        print 'ListValidator init', key
         self.data=data
         self.key=key
         self.index=index
 
     def Clone(self):
-        return FormValidator(self.data,self.key)
+        return ListValidator(self.data,self.key,self.index)
 
     def Validate(self,win):
         return True
 
     def TransferToWindow(self):
+        print 'List Transfer2Window',self.key
         checkctrl=self.GetWindow()
-        checkctrl.SetValue(self.data.__dict__[self.key][self.index])
+        checkctrl.SetValue(self.data._array[self.key][self.index])
         return True
 
     def TransferFromWindow(self):
         checkctrl=self.GetWindow()
-        self.data.__dict__[self.key][self.index]=int(checkctrl.GetValue())
+        self.data._array[self.key][self.index]=int(checkctrl.GetValue())
         return True
 
 
@@ -275,7 +269,7 @@ class ListValidator(wx.PyValidator):
 class FormDialog(sc.SizedDialog):
     def __init__(self, parent, id,individualdata=None,groupdata=None):
         sc.SizedDialog.__init__(self, None, -1, "Reduction Forms",
-                        style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER| wx.WS_EX_VALIDATE_RECURSIVELY)
+                        style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)#| wx.WS_EX_VALIDATE_RECURSIVELY)
 
         pane = self.GetContentsPane()
         pane.SetSizerType("vertical")
@@ -292,8 +286,9 @@ class FormDialog(sc.SizedDialog):
         FilterPane = sc.SizedPanel(pane, -1)
         FilterPane.SetSizerType("vertical")
         FilterPane.SetSizerProps(expand=True)
-        filter=wx.CheckBox(FilterPane, -1, "Filter Before Polarizer?",validator=FormValidator(groupdata['pbflags'],'MonoSelect'))
+        filter=wx.CheckBox(FilterPane, -1, "Filter Before Polarizer?",validator=mFormValidator(groupdata['pbflags'],'MonoSelect'))
         self.Bind(wx.EVT_CHECKBOX, self.EvtFilter, filter)
+        print 'Filtered'
 
 
         monitorPane = sc.SizedPanel(pane, -1)
@@ -301,13 +296,11 @@ class FormDialog(sc.SizedDialog):
         monitorPane.SetSizerProps(expand=True)
         # row 1
         wx.StaticText(monitorPane, -1, "Monitor Position")
-        prepolarizer=wx.CheckBox(monitorPane, -1, "PrePolarizer",validator=FormValidator(groupdata['pbflags'],'MonitorCorrect'))
-        postpolarizer=wx.CheckBox(monitorPane, -1, "PostPolarizer",validator=FormValidator(groupdata['pbflags'],'PolMonitorCorrect'))
-        #textCtrl = wx.TextCtrl(pane, -1, "Your name here")
-        #textCtrl.SetSizerProps(expand=True)
+        prepolarizer=wx.CheckBox(monitorPane, -1, "PrePolarizer",validator=mFormValidator(groupdata['pbflags'],'MonitorCorrect'))
+        postpolarizer=wx.CheckBox(monitorPane, -1, "PostPolarizer",validator=mFormValidator(groupdata['pbflags'],'PolMonitorCorrect'))
         self.Bind(wx.EVT_CHECKBOX, self.EvtPrePolarizer, prepolarizer)
         self.Bind(wx.EVT_CHECKBOX, self.EvtPostPolarizer, postpolarizer)
-
+        print 'Monitored'
 
         CountsEnablePane = sc.SizedPanel(pane, -1)
         CountsEnablePane.SetSizerType("horizontal")
@@ -323,7 +316,12 @@ class FormDialog(sc.SizedDialog):
         self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_offon, ce2)
         self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_onoff, ce3)
         self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_onon, ce4)
-
+        print 'CountsEnabled'
+        
+        FilterPane.TransferDataToWindow()
+        monitorPane.TransferDataToWindow()
+        CountsEnablePane.TransferDataToWindow()
+        #pane.TransferDataToWindow()
 
 
         CountsAddPane = sc.SizedPanel(pane, -1)
@@ -345,7 +343,7 @@ class FormDialog(sc.SizedDialog):
         ConstraintPane.SetSizerProps(expand=True)
         # row 1
         wx.StaticText(ConstraintPane, -1, "Constraint Matrix")
-        grid = ConstraintMatrixGrid(ConstraintPane)
+        grid = ConstraintMatrixGrid(ConstraintPane,groupdata['pbflags'])
         self.grid=grid
 
         # add dialog buttons
