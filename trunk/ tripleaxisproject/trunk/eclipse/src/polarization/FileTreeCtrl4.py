@@ -183,7 +183,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition,
                  size=wx.DefaultSize,
-                 style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT,
+                 style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT|wx.WS_EX_VALIDATE_RECURSIVELY,
                  log=None):
 
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style)
@@ -454,7 +454,32 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         current_selected=self.current
         pydata=self.itemdict['pydata']
         children_data=self.GetChildData(self.current)
+        files={}
+        for currdata in children_data:
+            key=currdata['polstate']
+            files[key]=currdata['filename']
+        self.files=files 
+        files=copy.deepcopy(self.files)
+        #pp mm pm mp
+        if files.has_key('pp'):
+            pydata['pbflags'].CountsEnable[0]=1
+        if files.has_key('mm'):
+            pydata['pbflags'].CountsEnable[1]=1
+        if files.has_key('pm'):
+            pydata['pbflags'].CountsEnable[2]=1
+        if files.has_key('mp'):
+            pydata['pbflags'].CountsEnable[3]=1
+        
+        if pydata['pbflags'].CountsEnable[0]==0:
+            pydata['pbflags'].Sconstrain[0]=1
+        if pydata['pbflags'].CountsEnable[1]==0:
+            pydata['pbflags'].Sconstrain[1]=1
+        if pydata['pbflags'].CountsEnable[2]==0:
+            pydata['pbflags'].Sconstrain[2]=1
+        if pydata['pbflags'].CountsEnable[3]==0:
+            pydata['pbflags'].Sconstrain[3]=1
         dlg=flagpanel.FormDialog(parent=self,id=-1,groupdata=pydata,individualdata=children_data)
+        self.TransferDataToWindow()
         result=dlg.ShowModal()
         if result==wx.ID_OK:
             print "OK"
@@ -1019,7 +1044,7 @@ class FileTreePanel(wx.Panel):
         self.parent=parent
         wx.Panel.__init__(self,parent,id,style=0)
         mytree=CustomTreeCtrl(self,-1,style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT\
-        | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS|CT.TR_EDIT_LABELS,log=sys.stdout)
+        | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS|CT.TR_EDIT_LABELS| wx.WS_EX_VALIDATE_RECURSIVELY,log=sys.stdout)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(mytree, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
         self.SetSizer(bs)

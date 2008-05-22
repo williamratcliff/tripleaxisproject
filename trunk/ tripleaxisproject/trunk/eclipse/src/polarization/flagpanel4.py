@@ -212,11 +212,15 @@ class ConstraintMatrixGrid(gridlib.Grid):
         #    self.EnableCellEditControl()
         gridlib.Grid.ForceRefresh(self)
 
+
 class FormValidator(wx.PyValidator):
     def __init__(self,data,key):
         wx.PyValidator.__init__(self)
         self.data=data
         self.key=key
+        print 'FormValidator init'
+        print 'key',key
+        #self.TransferToWindow()
 
     def Clone(self):
         return FormValidator(self.data,self.key)
@@ -225,23 +229,58 @@ class FormValidator(wx.PyValidator):
         return True
 
     def TransferToWindow(self):
+        print 'TransferToWindow'
+        
+        checkctrl=self.GetWindow()
+        key=self.key
+        print 'checkctrl',checkctrl
+        print 'key',self.key
+        print 'dict', self.data.__dict__
+        #print 'data',self.data.__dict__[self.key]
+        if key=='MonoSelect':
+            checkctrl.SetValue(self.data.MonoSelect)
         return True
 
     def TransferFromWindow(self):
-        txtctrl=self.GetWindow()
-        self.data[self.key]=txtctrl.GetValue()
+        print 'TransferFromWindow'
+        checkctrl=self.GetWindow()
+        self.data.__dict__[self.key]=int(checkctrl.GetValue())
         return True
+
+class ListValidator(wx.PyValidator):
+    def __init__(self,data,key,index):
+        wx.PyValidator.__init__(self)
+        self.data=data
+        self.key=key
+        self.index=index
+
+    def Clone(self):
+        return FormValidator(self.data,self.key)
+
+    def Validate(self,win):
+        return True
+
+    def TransferToWindow(self):
+        checkctrl=self.GetWindow()
+        checkctrl.SetValue(self.data.__dict__[self.key][self.index])
+        return True
+
+    def TransferFromWindow(self):
+        checkctrl=self.GetWindow()
+        self.data.__dict__[self.key][self.index]=int(checkctrl.GetValue())
+        return True
+
+
 
 class FormDialog(sc.SizedDialog):
     def __init__(self, parent, id,individualdata=None,groupdata=None):
         sc.SizedDialog.__init__(self, None, -1, "Reduction Forms",
-                        style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+                        style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER| wx.WS_EX_VALIDATE_RECURSIVELY)
 
         pane = self.GetContentsPane()
         pane.SetSizerType("vertical")
         self.groupdata=groupdata
         self.cellfile=groupdata['cellfile']
-
         FilePane = sc.SizedPanel(pane, -1)
         FilePane.SetSizerType("vertical")
         FilePane.SetSizerProps(expand=True)
@@ -253,7 +292,7 @@ class FormDialog(sc.SizedDialog):
         FilterPane = sc.SizedPanel(pane, -1)
         FilterPane.SetSizerType("vertical")
         FilterPane.SetSizerProps(expand=True)
-        filter=wx.CheckBox(FilterPane, -1, "Filter Before Polarizer?")
+        filter=wx.CheckBox(FilterPane, -1, "Filter Before Polarizer?",validator=FormValidator(groupdata['pbflags'],'MonoSelect'))
         self.Bind(wx.EVT_CHECKBOX, self.EvtFilter, filter)
 
 
@@ -262,8 +301,8 @@ class FormDialog(sc.SizedDialog):
         monitorPane.SetSizerProps(expand=True)
         # row 1
         wx.StaticText(monitorPane, -1, "Monitor Position")
-        prepolarizer=wx.CheckBox(monitorPane, -1, "PrePolarizer")
-        postpolarizer=wx.CheckBox(monitorPane, -1, "PostPolarizer")
+        prepolarizer=wx.CheckBox(monitorPane, -1, "PrePolarizer",validator=FormValidator(groupdata['pbflags'],'MonitorCorrect'))
+        postpolarizer=wx.CheckBox(monitorPane, -1, "PostPolarizer",validator=FormValidator(groupdata['pbflags'],'PolMonitorCorrect'))
         #textCtrl = wx.TextCtrl(pane, -1, "Your name here")
         #textCtrl.SetSizerProps(expand=True)
         self.Bind(wx.EVT_CHECKBOX, self.EvtPrePolarizer, prepolarizer)
@@ -274,11 +313,12 @@ class FormDialog(sc.SizedDialog):
         CountsEnablePane.SetSizerType("horizontal")
         CountsEnablePane.SetSizerProps(expand=True)
         # row 1
+        #pp mm pm mp
         wx.StaticText(CountsEnablePane, -1, "Enabled Measured Counts")
-        ce1=wx.CheckBox(CountsEnablePane, -1, "off off")
-        ce2=wx.CheckBox(CountsEnablePane, -1, "off on")
-        ce3=wx.CheckBox(CountsEnablePane, -1, "on off")
-        ce4=wx.CheckBox(CountsEnablePane, -1, "on on")
+        ce1=wx.CheckBox(CountsEnablePane, -1, "off off",validator=ListValidator(groupdata['pbflags'],'CountsEnable',1))
+        ce2=wx.CheckBox(CountsEnablePane, -1, "off on",validator=ListValidator(groupdata['pbflags'],'CountsEnable',3))
+        ce3=wx.CheckBox(CountsEnablePane, -1, "on off",validator=ListValidator(groupdata['pbflags'],'CountsEnable',2))
+        ce4=wx.CheckBox(CountsEnablePane, -1, "on on",validator=ListValidator(groupdata['pbflags'],'CountsEnable',0))
         self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_offoff, ce1)
         self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_offon, ce2)
         self.Bind(wx.EVT_CHECKBOX, self.EvtCountsEnable_onoff, ce3)
@@ -310,7 +350,7 @@ class FormDialog(sc.SizedDialog):
 
         # add dialog buttons
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL))
-
+        self.TransferDataToWindow()
         # a little trick to make sure that you can't resize the dialog to
         # less screen space than the controls need
         self.Fit()
