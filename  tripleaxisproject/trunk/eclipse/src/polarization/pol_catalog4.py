@@ -7,6 +7,7 @@ import gridbar
 import FileTreeCtrl4 as FTC
 import wx.lib.customtreectrl as CT
 import polcorrect3 as polcorrect
+from myevents import *
 #import dataplot
 
 
@@ -634,8 +635,16 @@ class CatalogPanel(wx.Panel):
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
             self.files=paths
+            print 'Opening'
+            evt=myEVT_CLEAR_TREE(self.GetId())
+            wx.PostEvent(self.filetree_panel.tree , evt)  #I'm not sure if this or the other is cleaner...  
+            #self.filetree_panel.tree.GetEventHandler().ProcessEvent(evt)  
             self.catalog=classify_files.readfiles(self.files)
-            self.UpdateCatalog()
+            print 'event posted'
+            #evt=ClearTreeEvent(myEVT_CLEAR_TREE,self.GetId())
+            #self.GetEventHandler().ProcessEvent(evt)
+            self.UpdateCatalog()        
+            print 'updated'
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
         dlg.Destroy()

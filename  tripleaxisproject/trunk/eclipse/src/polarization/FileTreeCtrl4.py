@@ -9,12 +9,16 @@ import numpy as N
 from sans.guicomm.events import NewPlotEvent
 from sans.guitools.plottables import Data1D
 import copy
+from myevents import *
 
 #import images
 #try:
 #    import treemixin
 #except ImportError:
 #    from wx.lib.mixins import treemixin
+
+
+
 
 
 penstyle = ["wx.SOLID", "wx.TRANSPARENT", "wx.DOT", "wx.LONG_DASH", "wx.DOT_DASH", "wx.USER_DASH",
@@ -265,6 +269,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         self.Bind(CT.EVT_TREE_SEL_CHANGING, self.OnSelChanging)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
         self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
+        self.Bind(EVT_CLEAR_TREE,self.OnClearTree)
         #self.Bind(wx.EVT_LEFT_DCLICK, self.OnRightUp)
         #else:
         #    for combos in mainframe.treeevents:
@@ -323,7 +328,21 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
         return 1
 
-
+    def OnClearTree(self, event):
+        root=self.GetRootItem()
+        if root!=None:
+            if self.HasChildren(root):
+                raw_data,cookie=self.GetFirstChild(root)
+                if raw_data!=None:
+                    self.DeleteChildren(raw_data)
+                    reduced_data,cookie=self.GetNextChild(root,cookie)
+                    self.DeleteChildren(reduced_data)
+                    
+        
+        
+        print 'Clear Event caught'
+        return
+    
     def OnIdle(self, event):
 
         if self.gauge:
@@ -1274,7 +1293,8 @@ class FileTreePanel(wx.Panel):
         self.parent=parent
         wx.Panel.__init__(self,parent,id,style=0)
         mytree=CustomTreeCtrl(self,-1,style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT\
-        | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS|CT.TR_EDIT_LABELS| wx.WS_EX_VALIDATE_RECURSIVELY,log=sys.stdout)
+        | CT.TR_HIDE_ROOT|CT.TR_TWIST_BUTTONS|CT.TR_EDIT_LABELS| wx.WS_EX_VALIDATE_RECURSIVELY\
+        |CT.TR_MULTIPLE|CT.TR_EXTENDED,log=sys.stdout)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(mytree, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
         self.SetSizer(bs)
