@@ -414,6 +414,12 @@ class polarization_correct:
         pbflags.Smp[3]=float(pbflags.Smp[3])
 
 
+        if self.mydata[key].metadata['count_info']['count_type']=='time':
+            pbflags.MonitorCorrect=0
+            pbflags.PolMonitorCorrect=0
+            
+        
+
 
         print 'Debug',pbflags.Debug
         print 'SimFlux',pbflags.SimFlux
