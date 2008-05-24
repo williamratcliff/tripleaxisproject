@@ -404,8 +404,9 @@ class FormDialog(sc.SizedDialog):
         # Finally, if the directory is changed in the process of getting files, this
         # dialog is set up to change the current working directory to the path chosen.
 
-        defaultDir=os.getcwd()
-        defaultDir=r'C:\polcorrecter\data'
+        #defaultDir=os.getcwd()
+        #defaultDir=r'C:\polcorrecter\data'
+        defaultDir=wx.Config().GetPath()
         wildcard="cell files (*.txt)|*.txt|All files (*.*)|*.*"
         dlg = wx.FileDialog(
             self, message="Choose a file",

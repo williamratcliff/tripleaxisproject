@@ -8,6 +8,7 @@ import FileTreeCtrl4 as FTC
 import wx.lib.customtreectrl as CT
 import polcorrect3 as polcorrect
 from myevents import *
+
 #import dataplot
 
 
@@ -364,6 +365,7 @@ class CatalogPanel(wx.Panel):
 
     def __init__(self,parent,id):
         wx.Panel.__init__(self,parent,id,style=0)
+        self.config=wx.Config()
         grid = CustTableGrid(self)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(grid, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
@@ -473,6 +475,7 @@ class CatalogPanel(wx.Panel):
                         MonitorCorrect=0
                     treenode_data['data']=currdata
                     treenode_data['filename']=filename
+                    treenode_data['absolute_filename']=os.path.join(wx.Config().GetPath(),filename)
                     treenode_data['sequence']=sequence
                     treenode_data['polstate']=polstate
                     #treenode_data['flags']=polcorrect.PBflags()
@@ -528,6 +531,7 @@ class CatalogPanel(wx.Panel):
         groupdata={}
         groupdata['pbflags']=pbflags
         groupdata['cellfile']=''
+        #groupdata['absolute_files']=self.files
         tree.SetPyData(child, groupdata)
         tree.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
         tree.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
@@ -618,8 +622,10 @@ class CatalogPanel(wx.Panel):
         # Finally, if the directory is changed in the process of getting files, this
         # dialog is set up to change the current working directory to the path chosen.
 
-        defaultDir=os.getcwd()
-        defaultDir=r'C:\polcorrecter\data'
+        #defaultDir=os.getcwd()
+        #defaultDir=r'C:\polcorrecter\data'
+        defaultDir=self.config.GetPath()
+        print 'defaultDir', defaultDir
         wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
         dlg = wx.FileDialog(
             self, message="Choose a file",
@@ -634,8 +640,14 @@ class CatalogPanel(wx.Panel):
         if dlg.ShowModal() == wx.ID_OK:
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
+            file0=paths[0]
+            print 'file0',file0
+            cwd=os.path.dirname(file0)
+            print 'cwd',cwd
+            self.config.SetPath(cwd.encode('ascii'))
+            self.config.Flush()
             self.files=paths
-            print 'Opening'
+            print 'Opening', self.config.GetPath()
             evt=myEVT_CLEAR_TREE(self.GetId())
             wx.PostEvent(self.filetree_panel.tree , evt)  #I'm not sure if this or the other is cleaner...  
             #self.filetree_panel.tree.GetEventHandler().ProcessEvent(evt)  

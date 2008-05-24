@@ -706,7 +706,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         files={}
         for currdata in children_data:
             key=currdata['polstate']
-            files[key]=currdata['filename']
+            #files[key]=currdata['filename']
+            files[key]=currdata['absolute_filename']
         self.files=files 
         files=copy.deepcopy(self.files)
         #pp mm pm mp
@@ -785,7 +786,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             polstates.append(data['polstate'])
         files=copy.deepcopy(self.files)
         for ckey,myfile in files.iteritems():
-            myfile=os.path.join(os.getcwd(),myfile)+'.bt7'
+            #myfile=os.path.join(os.getcwd(),myfile)+'.bt7'
+            myfile=myfile+'.bt7'
             files[ckey]=myfile
         #files={}
         #files['pm']=r'C:\polcorrecter\data\fieldscansplusminusreset53630.bt7'
