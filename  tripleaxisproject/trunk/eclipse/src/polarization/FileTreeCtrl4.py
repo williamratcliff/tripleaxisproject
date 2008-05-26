@@ -1138,6 +1138,15 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
         event.Skip()
 
+    def GetDataGroup(self):
+        """Find the datagroup"""
+        root=self.root
+        if self.HasChildren(root):
+            DataGroup,cookie=self.GetFirstChild(root)
+            return DataGroup
+        else:
+            return None
+
 
     def OnSelChanging(self, event):
 
@@ -1148,6 +1157,21 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             if not olditem:
                 olditemtext = "None"
             else:
+                DataGroup=self.GetDataGroup()
+                print 'DataGroup',self.GetItemText(DataGroup)
+                myparent=item.GetParent()
+                if myparent!=None:
+                    print 'myparent', self.GetItemText(myparent)
+                else:
+                    print 'orphan'
+                if item.GetParent()!=DataGroup:
+                    print 'unselected'
+                    event.Veto()
+                    #self.Unselect()
+                    #self.SelectItem(olditem)
+                    #item.SetHilight(set=False)
+                    #self.SelectItem(self)
+                    #self.Refresh(rect=item.Get)
                 olditemtext = self.GetItemText(olditem)
             self.log.write("OnSelChanging: From %s" % olditemtext + " To %s" % self.GetItemText(item) + "\n")
 

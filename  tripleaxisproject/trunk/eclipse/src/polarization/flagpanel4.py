@@ -212,7 +212,7 @@ class mFormValidator(wx.PyValidator):
         wx.PyValidator.__init__(self)
         self.data=data
         self.key=key
-        print 'FormValidator init', key
+        #print 'FormValidator init', key
         #self.TransferToWindow()
 
     def Clone(self):
@@ -222,19 +222,19 @@ class mFormValidator(wx.PyValidator):
         return True
 
     def TransferToWindow(self):
-        print 'Form TransferToWindow',self.key
+        #print 'Form TransferToWindow',self.key
         
         checkctrl=self.GetWindow()
-        #print 'checkctrl',checkctrl
-        #print self.__dict__
-        print 'key',self.key
-        print 'dict', self.data._array[self.key]
+        ##print 'checkctrl',checkctrl
+        ##print self.__dict__
+        #print 'key',self.key
+        #print 'dict', self.data._array[self.key]
         #print 'data',self.data.__dict__[self.key]
         checkctrl.SetValue(self.data._array[self.key])
         return True
 
     def TransferFromWindow(self):
-        print 'TransferFromWindow'
+        #print 'TransferFromWindow'
         checkctrl=self.GetWindow()
         self.data._array[self.key]=int(checkctrl.GetValue())
         return True
@@ -242,7 +242,7 @@ class mFormValidator(wx.PyValidator):
 class ListValidator(wx.PyValidator):
     def __init__(self,data,key,index):
         wx.PyValidator.__init__(self)
-        print 'ListValidator init', key
+        #print 'ListValidator init', key
         self.data=data
         self.key=key
         self.index=index
@@ -254,7 +254,7 @@ class ListValidator(wx.PyValidator):
         return True
 
     def TransferToWindow(self):
-        print 'List Transfer2Window',self.key
+        #print 'List Transfer2Window',self.key
         checkctrl=self.GetWindow()
         checkctrl.SetValue(self.data._array[self.key][self.index])
         return True
