@@ -365,7 +365,9 @@ class CatalogPanel(wx.Panel):
 
     def __init__(self,parent,id):
         wx.Panel.__init__(self,parent,id,style=0)
-        self.config=wx.Config()
+        self.config=wx.Config.Create()
+        wx.Config().SetAppName('PolCorrector')
+        print 'Global Config',wx.CONFIG_USE_GLOBAL_FILE
         grid = CustTableGrid(self)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(grid, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
@@ -624,7 +626,7 @@ class CatalogPanel(wx.Panel):
 
         #defaultDir=os.getcwd()
         #defaultDir=r'C:\polcorrecter\data'
-        defaultDir=self.config.GetPath()
+        defaultDir=wx.Config().GetPath()#         self.config.GetPath()
         print 'defaultDir', defaultDir
         wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
         dlg = wx.FileDialog(
@@ -643,9 +645,9 @@ class CatalogPanel(wx.Panel):
             file0=paths[0]
             print 'file0',file0
             cwd=os.path.dirname(file0)
-            print 'cwd',cwd
-            self.config.SetPath(cwd.encode('ascii'))
-            self.config.Flush()
+            print 'cwd',cwd.encode('ascii')
+            wx.Config().SetPath(cwd.encode('ascii'))
+            wx.Config().Flush()
             self.files=paths
             print 'Opening', self.config.GetPath()
             evt=myEVT_CLEAR_TREE(self.GetId())
