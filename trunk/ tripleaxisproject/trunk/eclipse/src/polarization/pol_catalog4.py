@@ -178,7 +178,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
     #--------------------------------------------------
     # required methods for the wxPyGridTableBase interface
     def GetNumberRows(self):
-        return len(self.rowLabels)
+        return len(self.data)
         #return len(self.data)
     def GetNumberCols(self):
         return len(self.colLabels)
@@ -256,21 +256,30 @@ class CustomDataTable(gridlib.PyGridTableBase):
 
     def DeleteRows(self,pos=0,numRows=1):
         print 'Delete number',self.GetNumberRows()
+        print 'pos',pos
+        print 'numRows', numRows
         if numRows>=0 and numRows<=self.GetNumberRows():
             print 'Delete',numRows
             #for i in range(numRows):
             #    self.data.pop()
-            del self.data[0:numRows]
+            del self.data[pos:pos+numRows]
             msg = gridlib.GridTableMessage(self,            # The table
             gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, # what we did to it
-            numRows,0                                     # how many
+            pos,numRows                                     # how many
             )
             #msg = wx.grid.GridTableMessage(self, 0, numRows)
             self.GetView().ProcessTableMessage(msg)
+            
             print 'Deleted'
+            self.UpdateValues()
             return True
         else:
             return False
+        
+    def UpdateValues( self ):
+            """Update all displayed values"""
+            msg =gridlib.GridTableMessage(self, gridlib.GRIDTABLE_REQUEST_VIEW_GET_VALUES)
+            self.GetView().ProcessTableMessage(msg)
 #---------------------------------------------------------------------------
 class CustTableGrid(gridlib.Grid):
     def __init__(self, parent):
@@ -572,7 +581,8 @@ class CatalogPanel(wx.Panel):
             old_nrows=table.GetNumberRows()
             print 'old_nrows',old_nrows
             if old_nrows >0:
-                gridlib.Grid.DeleteRows(self.grid,numRows=old_nrows,updateLabels=True)
+                print 'numRows before Deletion',old_nrows
+                gridlib.Grid.DeleteRows(self.grid,pos=0,numRows=old_nrows,updateLabels=True)
             for row in range(len(self.catalog.files)):
                 #print 'row',row
                 table.SetValue(row,0,'') # selected=False
@@ -681,7 +691,8 @@ class CatalogPanel(wx.Panel):
             print 'event posted'
             #evt=ClearTreeEvent(myEVT_CLEAR_TREE,self.GetId())
             #self.GetEventHandler().ProcessEvent(evt)
-            self.UpdateCatalog()        
+            self.UpdateCatalog()      
+            gridlib.Grid.ForceRefresh(self.grid)  
             print 'updated'
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!

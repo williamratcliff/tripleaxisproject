@@ -369,7 +369,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         if item:
             self.item = item
             self.log.write("OnRightClick: %s, %s, %s" % (self.GetItemText(item), type(item), item.__class__) + "\n")
-            self.SelectItem(item)
+            #self.SelectItem(item)
         #event.Skip()
 
     def OnRightUp(self, event):
