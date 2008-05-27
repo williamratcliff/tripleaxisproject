@@ -238,16 +238,16 @@ class polarization_correct:
 
 
     def correct(self,pbflags):
-        print pbflags.Sconstrain
+        #print pbflags.Sconstrain
         keys=['pp','mm','pm','mp']
-        print self.counts
-        print self.timestamp
+        #print self.counts
+        #print self.timestamp
         pbinput=PBindata()
         pboutput=PBoutdata()
         pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
         pbinput.Ef=self.ef.ctypes.data_as(c_double_p)
-        print 'Ei', self.ei
-        print 'Ef',self.ef
+        #print 'Ei', self.ei
+        #print 'Ef',self.ef
         for key in keys:
             if self.counts.has_key(key):
                 if key=='pp':
@@ -421,22 +421,22 @@ class polarization_correct:
         
 
 
-        print 'Debug',pbflags.Debug
-        print 'SimFlux',pbflags.SimFlux
-        print 'SimDeviate',pbflags.SimDeviate
-        print 'NoNegativeCS',pbflags.NoNegativeCS
-        print 'HalfPolarized', pbflags.HalfPolarized
-        print 'CountsAdd1',pbflags.CountsAdd1
-        print 'CountsAdd2',pbflags.CountsAdd2
-        print 'monitor correct ', pbflags.MonitorCorrect
-        print 'mono select ',pbflags.MonoSelect
-        print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
-        print 'Spm ',pbflags.Spm
-        print 'Smp ',pbflags.Smp
-        print 'Smm ',pbflags.Smm
-        print 'Spp ',pbflags.Spp
-        print 'Sconstrain ', pbflags.Sconstrain
-        print 'CountsEnable ', pbflags.CountsEnable
+        #print 'Debug',pbflags.Debug
+        #print 'SimFlux',pbflags.SimFlux
+        #print 'SimDeviate',pbflags.SimDeviate
+        #print 'NoNegativeCS',pbflags.NoNegativeCS
+        #print 'HalfPolarized', pbflags.HalfPolarized
+        #print 'CountsAdd1',pbflags.CountsAdd1
+        #print 'CountsAdd2',pbflags.CountsAdd2
+        #print 'monitor correct ', pbflags.MonitorCorrect
+        #print 'mono select ',pbflags.MonoSelect
+        #print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
+        #print 'Spm ',pbflags.Spm
+        #print 'Smp ',pbflags.Smp
+        #print 'Smm ',pbflags.Smm
+        #print 'Spp ',pbflags.Spp
+        #print 'Sconstrain ', pbflags.Sconstrain
+        #print 'CountsEnable ', pbflags.CountsEnable
         mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
         #print Smp[0]
         #print Spm[0]
@@ -454,9 +454,9 @@ class polarization_correct:
         corrected_counts['Smp']=Smp[0]
         corrected_counts['Emp']=Emp[0]
         self.corrected_counts=corrected_counts
-        print
-        print 'inpolcorrect'
-        print corrected_counts
+        #print
+        #print 'inpolcorrect'
+        #print corrected_counts
         #append corrected counts to our dataset
         self.outdata={}
         for key in keys:

@@ -814,6 +814,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         #files['pm']=r'C:\polcorrecter\data\fieldscansplusminusreset53630.bt7'
         #files['mp']=r'C:\polcorrecter\data\fieldscanminusplusreset53631.bt7'
         text=self.itemdict['text']+'.polcor'
+        self.groupdata=self.itemdict['pydata']
         print 'driver file', text
         #cellfile='c:\polcorrecter\data\cells.txt'  
         cellfile=self.groupdata['cellfile']
@@ -876,24 +877,65 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
              corrected_counts=mypolcor.correct(flags)
              mypolcor.savefiles()
 
-             keys=['pp','mm','mp','pm']
-             print 'corrected',corrected_counts.keys()
-             #print corrected_counts['Spm']
-             #print corrected_counts['Smp']
-             for key in polstates:
-                 if corrected_counts.has_key('S'+key):
-                     #x=self.x
-                     y=corrected_counts['S'+key]
-                     dy=corrected_counts['E'+key]
-                     print 'varying',self.independent_variable
-                     new_plot = Data1D(x, y, dy=dy)
-                     new_plot.name =key+'.corrected'
-                     new_plot.group_id='reduced'
-                     new_plot.xaxis(str(self.independent_variable), 'A^{-1}')
-                     new_plot.yaxis("\\rm{Intensity} ","Arb. units")
-                     wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
+#             keys=['pp','mm','mp','pm']
+#             print 'corrected',corrected_counts.keys()
+#             #print corrected_counts['Spm']
+#             #print corrected_counts['Smp']
+#             for key in polstates:
+#                 if corrected_counts.has_key('S'+key):
+#                     #x=self.x
+#                     y=corrected_counts['S'+key]
+#                     dy=corrected_counts['E'+key]
+#                     print 'varying',self.independent_variable
+#                     new_plot = Data1D(x, y, dy=dy)
+#                     new_plot.name =key+'.corrected'
+#                     new_plot.group_id='reduced'
+#                     new_plot.xaxis(str(self.independent_variable), 'A^{-1}')
+#                     new_plot.yaxis("\\rm{Intensity} ","Arb. units")
+#                     wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
+#             self.OnItemPlot(event)              
+        myselections=self.GetSelections()
+        DataGroup=self.GetDataGroup()
+        if myselections!=None:
+            for selected in myselections:
+                if selected.GetParent()==DataGroup and DataGroup!=None:
+                    print 'selected reducing',self.GetItemText(selected)
+                    children_data=self.GetChildData(selected)
+                    polstates=[]
+                    for data in children_data:
+                        #print data
+                        self.varying=data['data'].metadata['count_info']['varying']
+                        self.independent_variable=self.varying[0]
+                        x=data['data'].data[self.independent_variable]
+                        polstates.append(data['polstate'])
+                    #files=copy.deepcopy(self.files)
+                    files={}
+                    for currdata in children_data:
+                        key=currdata['polstate']
+                        files[key]=currdata['absolute_filename']
+                    for ckey,myfile in files.iteritems():
+                        #myfile=os.path.join(os.getcwd(),myfile)+'.bt7'
+                        myfile=myfile+'.bt7'
+                        files[ckey]=myfile
+                    mypolcor=polcorrect.polarization_correct(files,cellfile)
+                    corrected_counts=mypolcor.correct(flags)
+                    mypolcor.savefiles()
+                    keys=['pp','mm','mp','pm']
+                    print 'corrected',corrected_counts.keys()
+                    for key in polstates:
+                     if corrected_counts.has_key('S'+key):
+                         #x=self.x
+                         y=corrected_counts['S'+key]
+                         dy=corrected_counts['E'+key]
+                         print 'varying',self.independent_variable
+                         new_plot = Data1D(x, y, dy=dy)
+                         new_plot.name =self.GetItemText(selected)+key+'.corrected'
+                         new_plot.group_id='reduced '+self.GetItemText(selected)
+                         new_plot.xaxis(str(self.independent_variable), 'A^{-1}')
+                         new_plot.yaxis("\\rm{Intensity} ","Arb. units")
+                         wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
+                    self.OnItemPlot(event)              
 
-             self.OnItemPlot(event)
 
 
 
