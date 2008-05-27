@@ -406,7 +406,7 @@ class FormDialog(sc.SizedDialog):
 
         #defaultDir=os.getcwd()
         #defaultDir=r'C:\polcorrecter\data'
-        defaultDir=wx.Config().GetPath()
+        defaultDir=wx.ConfigBase.Get().GetPath()
         wildcard="cell files (*.txt)|*.txt|All files (*.*)|*.*"
         dlg = wx.FileDialog(
             self, message="Choose a file",

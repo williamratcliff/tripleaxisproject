@@ -193,7 +193,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style)
         self.parent=parent
         alldata = dir(CT)
-
         treestyles = []
         events = []
         for data in alldata:
@@ -225,6 +224,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         #        the item data.
 
         self.root = self.AddRoot("The Root Item")
+        self.config=wx.ConfigBase.Get()
 
         if not(self.GetTreeStyle() & CT.TR_HIDE_ROOT):
             self.SetPyData(self.root, None)
@@ -370,7 +370,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             self.item = item
             self.log.write("OnRightClick: %s, %s, %s" % (self.GetItemText(item), type(item), item.__class__) + "\n")
             self.SelectItem(item)
-
+        #event.Skip()
 
     def OnRightUp(self, event):
 
@@ -447,6 +447,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
             self.PopupMenu(menu)
             menu.Destroy()
+            #event.Skip()
 
     def OnItemPlot(self,event):
         current_selected=self.current
@@ -473,8 +474,9 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             wx.PostEvent(self.parent.parent, NewPlotEvent(plot=new_plot))
 
     def OnItemLoad(self,event):
-        defaultDir=os.getcwd()
-        defaultDir=r'C:\polcorrecter\data'
+        #defaultDir=os.getcwd()
+        #defaultDir=r'C:\polcorrecter\data'
+        defaultDir=self.config.GetPath()
         wildcard="driver files (*.polcor)|*.polcor|All files (*.*)|*.*"
         dlg = wx.FileDialog(
             self, message="Choose a file",
@@ -692,6 +694,14 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             print 'done'
             myfile.close()
             print 'closed'
+            myselections=self.GetSelections()
+            DataGroup=self.GetDataGroup()
+            if myselections!=None:
+                for selected in myselections:
+                    if selected.GetParent()==DataGroup and DataGroup!=None:
+                        print 'selected reduce',self.GetItemText(selected)
+                        self.SetPyData(selected,groupdata)
+
 
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
@@ -765,10 +775,17 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             files={}
             for currdata in children_data:
                 key=currdata['polstate']
-                files[key]=currdata['filename']
+                files[key]=currdata['absolute_filename']
             print files
             self.files=files
-            self.groupdata=dlg.groupdata
+            myselections=self.GetSelections()
+            DataGroup=self.GetDataGroup()
+            if myselections!=None:
+                for selected in myselections:
+                    if selected.GetParent()==DataGroup and DataGroup!=None:
+                        print 'selected reduce',self.GetItemText(selected)
+                        self.SetPyData(selected,dlg.groupdata)
+            #self.groupdata=dlg.groupdata
 
         else:
             print "Cancel"
@@ -784,7 +801,11 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             self.independent_variable=self.varying[0]
             x=data['data'].data[self.independent_variable]
             polstates.append(data['polstate'])
-        files=copy.deepcopy(self.files)
+        #files=copy.deepcopy(self.files)
+        files={}
+        for currdata in children_data:
+            key=currdata['polstate']
+            files[key]=currdata['absolute_filename']
         for ckey,myfile in files.iteritems():
             #myfile=os.path.join(os.getcwd(),myfile)+'.bt7'
             myfile=myfile+'.bt7'
