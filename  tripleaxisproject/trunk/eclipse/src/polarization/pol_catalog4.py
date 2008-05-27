@@ -365,9 +365,23 @@ class CatalogPanel(wx.Panel):
 
     def __init__(self,parent,id):
         wx.Panel.__init__(self,parent,id,style=0)
-        self.config=wx.Config.Create()
-        wx.Config().SetAppName('PolCorrector')
-        print 'Global Config',wx.CONFIG_USE_GLOBAL_FILE
+        cfstr=u'PolCorrecter'
+        #
+        
+        #print 'Global Config',wx.CONFIG_USE_GLOBAL_FILE
+        wx.GetApp().SetAppName(cfstr)
+        wx.GetApp().SetVendorName(cfstr)
+        self.config=wx.ConfigBase.Get()
+        #self.config=wx.Config(cfstr)
+        #self.config=wx.Config(cfstr,style=wx.CONFIG_USE_GLOBAL_FILE)
+        #self.config=wx.Config(cfstr,style=wx.CONFIG_USE_LOCAL_FILE)
+        self.config.SetAppName(cfstr)
+        self.config.SetVendorName(cfstr)
+        self.config.Flush()
+        print 'mypath',self.config.GetPath().encode('ascii')
+        print 'myApp',self.config.GetAppName()
+        print 'myVendor',self.config.GetVendorName(),'internal',wx.GetApp().GetVendorName()
+        print 'mypath',self.config.Read('mypath')
         grid = CustTableGrid(self)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(grid, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
@@ -553,7 +567,7 @@ class CatalogPanel(wx.Panel):
             table=self.grid.GetTable()
             old_nrows=table.GetNumberRows()
             if old_nrows >0:
-                gridlib.Grid.DeleteRows(self.grid,numRows=old_nrows,updateLabels=True)
+                gridlib.Grid.DeleteRows(self.grid,numRows=old_nrows+1,updateLabels=True)
             for row in range(len(self.catalog.files)):
                 #print 'row',row
                 table.SetValue(row,0,'') # selected=False
@@ -626,7 +640,9 @@ class CatalogPanel(wx.Panel):
 
         #defaultDir=os.getcwd()
         #defaultDir=r'C:\polcorrecter\data'
-        defaultDir=wx.Config().GetPath()#         self.config.GetPath()
+        #defaultDir=wx.Config().GetPath()
+        defaultDir=self.config.GetPath().encode('ascii')
+        defaultDir=self.config.Read('mypath').encode('ascii')
         print 'defaultDir', defaultDir
         wildcard="bt7 files (*.bt7)|*.bt7|All files (*.*)|*.*"
         dlg = wx.FileDialog(
@@ -646,10 +662,13 @@ class CatalogPanel(wx.Panel):
             print 'file0',file0
             cwd=os.path.dirname(file0)
             print 'cwd',cwd.encode('ascii')
-            wx.Config().SetPath(cwd.encode('ascii'))
-            wx.Config().Flush()
+            self.config.SetPath(cwd.encode('utf8'))
+            print 'config style', self.config.GetStyle()
+            self.config.Write('mypath',cwd.encode('utf8'))
+            self.config.Flush()
             self.files=paths
             print 'Opening', self.config.GetPath()
+            print 'mypath', self.config.Read('mypath')
             evt=myEVT_CLEAR_TREE(self.GetId())
             wx.PostEvent(self.filetree_panel.tree , evt)  #I'm not sure if this or the other is cleaner...  
             #self.filetree_panel.tree.GetEventHandler().ProcessEvent(evt)  
