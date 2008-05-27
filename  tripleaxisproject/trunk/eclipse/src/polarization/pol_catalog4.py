@@ -178,7 +178,8 @@ class CustomDataTable(gridlib.PyGridTableBase):
     #--------------------------------------------------
     # required methods for the wxPyGridTableBase interface
     def GetNumberRows(self):
-        return len(self.data)
+        return len(self.rowLabels)
+        #return len(self.data)
     def GetNumberCols(self):
         return len(self.colLabels)
     def IsEmptyCell(self, row, col):
@@ -254,14 +255,17 @@ class CustomDataTable(gridlib.PyGridTableBase):
         return self.CanGetValueAs(row, col, typeName)
 
     def DeleteRows(self,pos=0,numRows=1):
-        if numRows>0 and numRows<self.GetNumberRows():
+        print 'Delete number',self.GetNumberRows()
+        if numRows>=0 and numRows<=self.GetNumberRows():
             print 'Delete',numRows
-            for i in range(numRows):
-                self.data.pop()
+            #for i in range(numRows):
+            #    self.data.pop()
+            del self.data[0:numRows]
             msg = gridlib.GridTableMessage(self,            # The table
             gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, # what we did to it
-            numRows                                       # how many
+            numRows,0                                     # how many
             )
+            #msg = wx.grid.GridTableMessage(self, 0, numRows)
             self.GetView().ProcessTableMessage(msg)
             print 'Deleted'
             return True
@@ -566,8 +570,9 @@ class CatalogPanel(wx.Panel):
     def UpdateCatalog(self):
             table=self.grid.GetTable()
             old_nrows=table.GetNumberRows()
+            print 'old_nrows',old_nrows
             if old_nrows >0:
-                gridlib.Grid.DeleteRows(self.grid,numRows=old_nrows+1,updateLabels=True)
+                gridlib.Grid.DeleteRows(self.grid,numRows=old_nrows,updateLabels=True)
             for row in range(len(self.catalog.files)):
                 #print 'row',row
                 table.SetValue(row,0,'') # selected=False
