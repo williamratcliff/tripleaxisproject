@@ -39,12 +39,18 @@ for f in matplotlibdata:
 #
 # packages
 #
+#packages = [
+#    'matplotlib', 'pytz'
+#   ]
+
 packages = [
-    'matplotlib', 'pytz'
+    'matplotlib'
     ]
 
+
+
 includes = []
-excludes = ['OpenGL'] 
+excludes = ['OpenGL','enthought','BaseHTTPServer'] 
 
 dll_excludes = [
     'libgdk_pixbuf-2.0-0.dll', 
