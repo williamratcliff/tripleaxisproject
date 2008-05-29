@@ -411,6 +411,38 @@ class CatalogPanel(wx.Panel):
         #self.filetree_panel=parent.filetree_frame.filetree_panel
         self.filetree_panel = None
 
+        self.popupmenu = wx.Menu()
+        item1 = self.popupmenu.Append(wx.ID_ANY, "Send Group for Reduction")
+        self.popupmenu.AppendSeparator()
+        item2 = self.popupmenu.Append(wx.ID_ANY, "Clear Selections")
+        self.grid.Bind(wx.EVT_MENU, self.OnSendGroup, item1)
+        self.grid.Bind(wx.EVT_MENU, self.OnClearGroups, item2)
+        #self.grid.GetGridWindow().Bind(wx.EVT_CONTEXT_MENU,self.OnShowPopup)
+        self.grid.GetGridWindow().Bind(wx.EVT_RIGHT_UP,self.OnShowPopup)
+
+    def OnShowPopup(self,event):
+        print 'popping'
+        pos=event.GetPosition()
+        #pos=self.ScreenToClient(pos)
+        self.grid.PopupMenu(self.popupmenu,pos)
+        event.Skip()
+
+    
+    def OnSendGroup(self,event):
+        print 'SendingGroup'
+        self.SendGroupToTree()
+        
+    def OnClearGroups(self,event):
+        print 'Clearing Group'
+        table=self.grid.GetTable()
+        nrows=table.GetNumberRows()
+        #print 'old_nrows',old_nrows
+        #for row in range(len(self.catalog.files)):
+        for row in range(nrows):
+            table.SetValue(row,0,'') # selected=False
+        self.grid.ForceRefresh()
+        
+
     def onMouseOver(self, event):
         '''
         Method to calculate where the mouse is pointing and
@@ -441,36 +473,8 @@ class CatalogPanel(wx.Panel):
             event.GetEventObject().SetToolTipString('')
             self.tooltip = ''
 
-    def OnChar(self, event):
-
-        keycode = event.GetKeyCode()
-        keyname = keyMap.get(keycode, None)
-
-        #if keycode == wx.WXK_BACK:
-        #    self.log.write("OnKeyDown: HAHAHAHA! I Vetoed Your Backspace! HAHAHAHA\n")
-        #    return
-
-        if keyname is None:
-            if "unicode" in wx.PlatformInfo:
-                keycode = event.GetUnicodeKey()
-                if keycode <= 127:
-                    keycode = event.GetKeyCode()
-                keyname = "\"" + unichr(event.GetUnicodeKey()) + "\""
-                if keycode < 27:
-                    keyname = "Ctrl-%s" % chr(ord('A') + keycode-1)
-
-            elif keycode < 256:
-                if keycode == 0:
-                    keyname = "NUL"
-                elif keycode < 27:
-                    keyname = "Ctrl-%s" % chr(ord('A') + keycode-1)
-                else:
-                    keyname = "\"%s\"" % chr(keycode)
-            else:
-                keyname = "unknown (%s)" % keycode
-        #keyname=self.keybuff+keyname
-        if keyname=='Ctrl-R' and self.catalog!=None:
-            self.log.write("OnChar: You Pressed '" + keyname + "'\n")
+    def SendGroupToTree(self):
+        if self.catalog!=None:
             table=self.grid.GetTable()
             nrows=table.GetNumberRows()
             ncols=table.GetNumberCols()
@@ -524,6 +528,39 @@ class CatalogPanel(wx.Panel):
                 tree.Expand(self.DataGroup)
                 tree.SelectItem(CurrentGroup)
                 tree.Expand(CurrentGroup)
+
+
+
+    def OnChar(self, event):
+
+        keycode = event.GetKeyCode()
+        keyname = keyMap.get(keycode, None)
+
+        #if keycode == wx.WXK_BACK:
+        #    self.log.write("OnKeyDown: HAHAHAHA! I Vetoed Your Backspace! HAHAHAHA\n")
+        #    return
+
+        if keyname is None:
+            if "unicode" in wx.PlatformInfo:
+                keycode = event.GetUnicodeKey()
+                if keycode <= 127:
+                    keycode = event.GetKeyCode()
+                keyname = "\"" + unichr(event.GetUnicodeKey()) + "\""
+                if keycode < 27:
+                    keyname = "Ctrl-%s" % chr(ord('A') + keycode-1)
+
+            elif keycode < 256:
+                if keycode == 0:
+                    keyname = "NUL"
+                elif keycode < 27:
+                    keyname = "Ctrl-%s" % chr(ord('A') + keycode-1)
+                else:
+                    keyname = "\"%s\"" % chr(keycode)
+            else:
+                keyname = "unknown (%s)" % keycode
+        #keyname=self.keybuff+keyname
+        if keyname=='Ctrl-R' and self.catalog!=None:
+            self.SendGroupToTree()
 
         event.Skip()
 
