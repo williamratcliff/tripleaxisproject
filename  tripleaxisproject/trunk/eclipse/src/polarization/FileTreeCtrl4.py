@@ -798,6 +798,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         for data in children_data:
             #print data
             self.varying=data['data'].metadata['count_info']['varying']
+            #print data['data'].metadata
+            #print 'self.varying',self.varying
             self.independent_variable=self.varying[0]
             x=data['data'].data[self.independent_variable]
             polstates.append(data['polstate'])
