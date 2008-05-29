@@ -171,7 +171,6 @@ class polarization_correct:
         self.timestamp={}
         self.files=files
         self.cell=cell
-        self.mon={}
         print 'files',files
         print 'cellfile polcorrect3',cell
         mymonFlag=False
@@ -186,8 +185,6 @@ class polarization_correct:
             self.mydata[key].data['monitor']=N.array(self.mydata[key].data['monitor'],'float64')*mon0/mon
             self.counts[key]=N.array(self.mydata[key].data[self.mydata[key].metadata['count_info']['signal']])*mon0/mon
             self.errors[key]=N.sqrt(self.counts[key])*mon0/mon
-            self.mon[key]=mon
-            self.mon0=mon0
             self.timestamp[key]=N.array(self.mydata[key].data['timestamp'])
             #TODO currently, we assume that the files are taken at the same points--is this safe?
             self.length=self.counts[key].shape[0]
@@ -251,254 +248,227 @@ class polarization_correct:
         pbinput.Ef=self.ef.ctypes.data_as(c_double_p)
         #print 'Ei', self.ei
         #print 'Ef',self.ef
-                    
+        for key in keys:
+            if self.counts.has_key(key):
+                if key=='pp':
+                    pbinput.tpp=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
+                    pbinput.Cpp=self.counts[key].ctypes.data_as(c_double_p)
+                    pbinput.Epp=self.errors[key].ctypes.data_as(c_double_p)
+                if key=='mm':
+                    pbinput.tmm=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
+                    pbinput.Cmm=self.counts[key].ctypes.data_as(c_double_p)
+                    pbinput.Emm=self.errors[key].data_as(c_double_p)
+                if key=='pm':
+                    mytemp_pm=self.timestamp[key].astype('uint32')
+                    pbinput.tpm=mytemp_pm.ctypes.data_as(c_ulong_p)
+                    #print 't0,pm ',mytemp_pm[0]
+                    pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
+                    pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
+                    #print 'shape ',self.counts[key].shape
+                if key=='mp':
+                    mytemp_mp=self.timestamp[key].astype('uint32')
+                    pbinput.tmp=mytemp_mp.ctypes.data_as(c_ulong_p)
+                    pbinput.Cmp=self.counts[key].ctypes.data_as(c_double_p)
+                    pbinput.Emp=self.errors[key].ctypes.data_as(c_double_p)
 
+            else:
+
+                dummytpp=N.empty((1,self.length),'uint32')
+                dummytmm=N.empty((1,self.length),'uint32')
+                dummytpm=N.empty((1,self.length),'uint32')
+                dummytmp=N.empty((1,self.length),'uint32')
+                dummyCpp=N.empty((1,self.length),'float64')
+                dummyCmm=N.empty((1,self.length),'float64')
+                dummyCpm=N.empty((1,self.length),'float64')
+                dummyCmp=N.empty((1,self.length),'float64')
+                dummyEpp=N.empty((1,self.length),'float64')
+                dummyEmm=N.empty((1,self.length),'float64')
+                dummyEpm=N.empty((1,self.length),'float64')
+                dummyEmp=N.empty((1,self.length),'float64')
+
+                if key=='pp':
+                    pbinput.tpp=dummytpp.ctypes.data_as(c_ulong_p)
+                    pbinput.Cpp=dummyCpp.ctypes.data_as(c_double_p)
+                    pbinput.Epp=dummyEpp.ctypes.data_as(c_double_p)
+                if key=='mm':
+                    pbinput.tmm=dummytmm.ctypes.data_as(c_ulong_p)
+                    pbinput.Cmm=dummyCmm.ctypes.data_as(c_double_p)
+                    pbinput.Emm=dummyEmm.ctypes.data_as(c_double_p)
+                if key=='pm':
+                    pbinput.tpm=dummytpm.ctypes.data_as(c_ulong_p)
+                    pbinput.Cpm=dummyCpm.ctypes.data_as(c_double_p)
+                    pbinput.Epm=dummyEpm.ctypes.data_as(c_double_p)
+                if key=='mp':
+                    pbinput.tmp=dummytmp.ctypes.data_as(c_ulong_p)
+                    pbinput.Cmp=dummyCmp.ctypes.data_as(c_double_p)
+                    pbinput.Emp=dummyEmp.ctypes.data_as(c_double_p)
+
+
+        #print 'mylength ',self.length
+        #print 'check input'
+        #print 'Cmp',dummyCmp
+        #print 'Emp',dummyEmp
+        #print 'tmp',dummytmp
+
+
+        #print 'check input'
+        #print 'Cpm',dummyCpm
+        #print 'Epm',dummyEpm
+        #print 'tpm',dummytpm
+
+
+
+        Spp=N.empty((1,self.length),'float64')
+        Smm=N.empty((1,self.length),'float64')
+        Spm=N.empty((1,self.length),'float64')
+        Smp=N.empty((1,self.length),'float64')
+
+        pboutput.Spp=Spp.ctypes.data_as(c_double_p)
+        pboutput.Smm=Smm.ctypes.data_as(c_double_p)
+        pboutput.Spm=Spm.ctypes.data_as(c_double_p)
+        pboutput.Smp=Smp.ctypes.data_as(c_double_p)
+
+        Epp=N.empty((1,self.length),'float64')
+        Emm=N.empty((1,self.length),'float64')
+        Epm=N.empty((1,self.length),'float64')
+        Emp=N.empty((1,self.length),'float64')
+        R=N.empty((1,self.length),'float64')
+
+        pboutput.Epp=Epp.ctypes.data_as(c_double_p)
+        pboutput.Emm=Emm.ctypes.data_as(c_double_p)
+        pboutput.Epm=Epm.ctypes.data_as(c_double_p)
+        pboutput.Emp=Emp.ctypes.data_as(c_double_p)
+        pboutput.R=R.ctypes.data_as(c_double_p)
+        #pbflags=PBflags()
+
+##        fMonitorCorrect=0
+##        fPolMonitorCorrect=0
+##        if self.mydata[key].metadata['count_info']['count_type']=='monitor':
+##            fPolMonitorCorrect=1
+##            #print 'monitor'
+##        fDebug=0
+##        fSimFlux=0
+##        fSimDeviate=0
+        #-- ++ +- -+ #TODO Check with Ross on the order
+
+
+
+##        pbflags.MonitorCorrect=0#fMonitorCorrect
+##        pbflags.PolMonitorCorrect=fPolMonitorCorrect
+##        pbflags.MonoSelect=1
+##        pbflags.Debug=0#fDebug
+##        pbflags.SimFlux=0#fSimFlux
+##        pbflags.SimDeviate=0#fSimDeviate
+##        pbflags.NoNegativeCS=0
+##        pbflags.HalfPolarized=0
+##        pbflags.CountsEnable=[0,0,1,1]
+##        pbflags.CountsAdd1=[0,0,0,0]
+##        pbflags.CountsAdd2=[0,0,0,0]
+##        pbflags.Sconstrain=[1,1,0,0]
+##        pbflags.Spp=[0,0,0,0]
+##        pbflags.Smm=[0,0,0,0]
+##        pbflags.Spm=[0,0,0,0]
+##        pbflags.Smp=[0,0,0,0]
+
+
+        pbflags.MonitorCorrect=int(pbflags.MonitorCorrect)
+        pbflags.PolMonitorCorrect=int(pbflags.PolMonitorCorrect)
+        pbflags.MonoSelect=int(pbflags.MonoSelect)
+        pbflags.Debug=int(pbflags.Debug)
+        pbflags.SimFlux=int(pbflags.SimFlux)
+        pbflags.SimDeviate=int(pbflags.SimDeviate)
+        pbflags.NoNegativeCS=int(pbflags.NoNegativeCS)
+        pbflags.HalfPolarized=int(pbflags.HalfPolarized)
+        pbflags.CountsEnable[0]=int(pbflags.CountsEnable[0])
+        pbflags.CountsEnable[1]=int(pbflags.CountsEnable[1])
+        pbflags.CountsEnable[2]=int(pbflags.CountsEnable[2])
+        pbflags.CountsEnable[3]=int(pbflags.CountsEnable[3])
+        pbflags.CountsAdd1[0]=int(pbflags.CountsAdd1[0])
+        pbflags.CountsAdd1[1]=int(pbflags.CountsAdd1[1])
+        pbflags.CountsAdd1[2]=int(pbflags.CountsAdd1[2])
+        pbflags.CountsAdd1[3]=int(pbflags.CountsAdd1[3])
+        pbflags.CountsAdd2[0]=int(pbflags.CountsAdd2[0])
+        pbflags.CountsAdd2[1]=int(pbflags.CountsAdd2[1])
+        pbflags.CountsAdd2[2]=int(pbflags.CountsAdd2[2])
+        pbflags.CountsAdd2[3]=int(pbflags.CountsAdd2[3])
+
+        pbflags.Sconstrain[0]=int(pbflags.Sconstrain[0])
+        pbflags.Sconstrain[1]=int(pbflags.Sconstrain[1])
+        pbflags.Sconstrain[2]=int(pbflags.Sconstrain[2])
+        pbflags.Sconstrain[3]=int(pbflags.Sconstrain[3])
+        pbflags.Spp[0]=float(pbflags.Spp[0])
+        pbflags.Spp[1]=float(pbflags.Spp[1])
+        pbflags.Spp[2]=float(pbflags.Spp[2])
+        pbflags.Spp[3]=float(pbflags.Spp[3])
+        pbflags.Smm[0]=float(pbflags.Smm[0])
+        pbflags.Smm[1]=float(pbflags.Smm[1])
+        pbflags.Smm[2]=float(pbflags.Smm[2])
+        pbflags.Smm[3]=float(pbflags.Smm[3])
+        pbflags.Spm[0]=float(pbflags.Spm[0])
+        pbflags.Spm[1]=float(pbflags.Spm[1])
+        pbflags.Spm[2]=float(pbflags.Spm[2])
+        pbflags.Spm[3]=float(pbflags.Spm[3])
+        pbflags.Smp[0]=float(pbflags.Smp[0])
+        pbflags.Smp[1]=float(pbflags.Smp[1])
+        pbflags.Smp[2]=float(pbflags.Smp[2])
+        pbflags.Smp[3]=float(pbflags.Smp[3])
+
+
+        if self.mydata[key].metadata['count_info']['count_type']=='time':
+            pbflags.MonitorCorrect=0
+            pbflags.PolMonitorCorrect=0
+            
+        
+
+
+        #print 'Debug',pbflags.Debug
+        #print 'SimFlux',pbflags.SimFlux
+        #print 'SimDeviate',pbflags.SimDeviate
+        #print 'NoNegativeCS',pbflags.NoNegativeCS
+        #print 'HalfPolarized', pbflags.HalfPolarized
+        #print 'CountsAdd1',pbflags.CountsAdd1
+        #print 'CountsAdd2',pbflags.CountsAdd2
+        #print 'monitor correct ', pbflags.MonitorCorrect
+        #print 'mono select ',pbflags.MonoSelect
+        #print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
+        #print 'Spm ',pbflags.Spm
+        #print 'Smp ',pbflags.Smp
+        #print 'Smm ',pbflags.Smm
+        #print 'Spp ',pbflags.Spp
+        #print 'Sconstrain ', pbflags.Sconstrain
+        #print 'CountsEnable ', pbflags.CountsEnable
+        mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
+        #print Smp[0]
+        #print Spm[0]
+
+        corrected_counts={}
+        corrected_counts['Spp']=Spp[0]
+        corrected_counts['Epp']=Epp[0]
+
+        corrected_counts['Smm']=Smm[0]
+        corrected_counts['Emm']=Emm[0]
+
+        corrected_counts['Spm']=Spm[0]
+        corrected_counts['Epm']=Epm[0]
+
+        corrected_counts['Smp']=Smp[0]
+        corrected_counts['Emp']=Emp[0]
+        self.corrected_counts=corrected_counts
+        #print
+        #print 'inpolcorrect'
+        #print corrected_counts
+        #append corrected counts to our dataset
         self.outdata={}
         for key in keys:
             if self.counts.has_key(key):
-                lastkey=key
                 self.outdata[key]=copy.deepcopy(self.mydata[key])
-                detectors=self.mydata[key].metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
-        detectors.append(self.mydata[lastkey].metadata['count_info']['signal'])
-        for detector in detectors:   
-            for key in keys:
-                if self.counts.has_key(key):
-                    #print 'key_correct', key
-                    #print 'detector', detector
-                    mon0=self.mon0
-                    mon=self.mon[key]
-                    #print 'mon0',mon0
-                    #print 'mon',mon
-                    
-                    self.counts[key]=N.array(self.mydata[key].data[detector])*mon0/mon
-                    #print 'counts'
-                    #print self.counts[key]
-                    #print 'before norm'
-                    #print N.array(self.mydata[key].data[detector])
-                    self.errors[key]=N.sqrt(self.counts[key])*mon0/mon   
-                    #print 'errors'
-                    #print self.errors[key] 
-                    if key=='pp':
-                        pbinput.tpp=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
-                        pbinput.Cpp=self.counts[key].ctypes.data_as(c_double_p)
-                        pbinput.Epp=self.errors[key].ctypes.data_as(c_double_p)
-                    if key=='mm':
-                        pbinput.tmm=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
-                        pbinput.Cmm=self.counts[key].ctypes.data_as(c_double_p)
-                        pbinput.Emm=self.errors[key].ctypes.data_as(c_double_p)
-                    if key=='pm':
-                        mytemp_pm=self.timestamp[key].astype('uint32')
-                        pbinput.tpm=mytemp_pm.ctypes.data_as(c_ulong_p)
-                        #print 't0,pm ',mytemp_pm[0]
-                        pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
-                        pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
-                        #print 'shape ',self.counts[key].shape
-                    if key=='mp':
-                        mytemp_mp=self.timestamp[key].astype('uint32')
-                        pbinput.tmp=mytemp_mp.ctypes.data_as(c_ulong_p)
-                        pbinput.Cmp=self.counts[key].ctypes.data_as(c_double_p)
-                        pbinput.Emp=self.errors[key].ctypes.data_as(c_double_p)
-    
-                else:
-    
-                    dummytpp=N.empty((1,self.length),'uint32')
-                    dummytmm=N.empty((1,self.length),'uint32')
-                    dummytpm=N.empty((1,self.length),'uint32')
-                    dummytmp=N.empty((1,self.length),'uint32')
-                    dummyCpp=N.empty((1,self.length),'float64')
-                    dummyCmm=N.empty((1,self.length),'float64')
-                    dummyCpm=N.empty((1,self.length),'float64')
-                    dummyCmp=N.empty((1,self.length),'float64')
-                    dummyEpp=N.empty((1,self.length),'float64')
-                    dummyEmm=N.empty((1,self.length),'float64')
-                    dummyEpm=N.empty((1,self.length),'float64')
-                    dummyEmp=N.empty((1,self.length),'float64')
-    
-                    if key=='pp':
-                        pbinput.tpp=dummytpp.ctypes.data_as(c_ulong_p)
-                        pbinput.Cpp=dummyCpp.ctypes.data_as(c_double_p)
-                        pbinput.Epp=dummyEpp.ctypes.data_as(c_double_p)
-                    if key=='mm':
-                        pbinput.tmm=dummytmm.ctypes.data_as(c_ulong_p)
-                        pbinput.Cmm=dummyCmm.ctypes.data_as(c_double_p)
-                        pbinput.Emm=dummyEmm.ctypes.data_as(c_double_p)
-                    if key=='pm':
-                        pbinput.tpm=dummytpm.ctypes.data_as(c_ulong_p)
-                        pbinput.Cpm=dummyCpm.ctypes.data_as(c_double_p)
-                        pbinput.Epm=dummyEpm.ctypes.data_as(c_double_p)
-                    if key=='mp':
-                        pbinput.tmp=dummytmp.ctypes.data_as(c_ulong_p)
-                        pbinput.Cmp=dummyCmp.ctypes.data_as(c_double_p)
-                        pbinput.Emp=dummyEmp.ctypes.data_as(c_double_p)
-    
-    
-            #print 'mylength ',self.length
-            #print 'check input'
-            #print 'Cmp',dummyCmp
-            #print 'Emp',dummyEmp
-            #print 'tmp',dummytmp
-    
-    
-            #print 'check input'
-            #print 'Cpm',dummyCpm
-            #print 'Epm',dummyEpm
-            #print 'tpm',dummytpm
-    
-    
-    
-            Spp=N.empty((1,self.length),'float64')
-            Smm=N.empty((1,self.length),'float64')
-            Spm=N.empty((1,self.length),'float64')
-            Smp=N.empty((1,self.length),'float64')
-    
-            pboutput.Spp=Spp.ctypes.data_as(c_double_p)
-            pboutput.Smm=Smm.ctypes.data_as(c_double_p)
-            pboutput.Spm=Spm.ctypes.data_as(c_double_p)
-            pboutput.Smp=Smp.ctypes.data_as(c_double_p)
-    
-            Epp=N.empty((1,self.length),'float64')
-            Emm=N.empty((1,self.length),'float64')
-            Epm=N.empty((1,self.length),'float64')
-            Emp=N.empty((1,self.length),'float64')
-            R=N.empty((1,self.length),'float64')
-    
-            pboutput.Epp=Epp.ctypes.data_as(c_double_p)
-            pboutput.Emm=Emm.ctypes.data_as(c_double_p)
-            pboutput.Epm=Epm.ctypes.data_as(c_double_p)
-            pboutput.Emp=Emp.ctypes.data_as(c_double_p)
-            pboutput.R=R.ctypes.data_as(c_double_p)
-            #pbflags=PBflags()
-    
-    ##        fMonitorCorrect=0
-    ##        fPolMonitorCorrect=0
-    ##        if self.mydata[key].metadata['count_info']['count_type']=='monitor':
-    ##            fPolMonitorCorrect=1
-    ##            #print 'monitor'
-    ##        fDebug=0
-    ##        fSimFlux=0
-    ##        fSimDeviate=0
-            #-- ++ +- -+ #TODO Check with Ross on the order
-    
-    
-    
-    ##        pbflags.MonitorCorrect=0#fMonitorCorrect
-    ##        pbflags.PolMonitorCorrect=fPolMonitorCorrect
-    ##        pbflags.MonoSelect=1
-    ##        pbflags.Debug=0#fDebug
-    ##        pbflags.SimFlux=0#fSimFlux
-    ##        pbflags.SimDeviate=0#fSimDeviate
-    ##        pbflags.NoNegativeCS=0
-    ##        pbflags.HalfPolarized=0
-    ##        pbflags.CountsEnable=[0,0,1,1]
-    ##        pbflags.CountsAdd1=[0,0,0,0]
-    ##        pbflags.CountsAdd2=[0,0,0,0]
-    ##        pbflags.Sconstrain=[1,1,0,0]
-    ##        pbflags.Spp=[0,0,0,0]
-    ##        pbflags.Smm=[0,0,0,0]
-    ##        pbflags.Spm=[0,0,0,0]
-    ##        pbflags.Smp=[0,0,0,0]
-    
-    
-            pbflags.MonitorCorrect=int(pbflags.MonitorCorrect)
-            pbflags.PolMonitorCorrect=int(pbflags.PolMonitorCorrect)
-            pbflags.MonoSelect=int(pbflags.MonoSelect)
-            pbflags.Debug=int(pbflags.Debug)
-            pbflags.SimFlux=int(pbflags.SimFlux)
-            pbflags.SimDeviate=int(pbflags.SimDeviate)
-            pbflags.NoNegativeCS=int(pbflags.NoNegativeCS)
-            pbflags.HalfPolarized=int(pbflags.HalfPolarized)
-            pbflags.CountsEnable[0]=int(pbflags.CountsEnable[0])
-            pbflags.CountsEnable[1]=int(pbflags.CountsEnable[1])
-            pbflags.CountsEnable[2]=int(pbflags.CountsEnable[2])
-            pbflags.CountsEnable[3]=int(pbflags.CountsEnable[3])
-            pbflags.CountsAdd1[0]=int(pbflags.CountsAdd1[0])
-            pbflags.CountsAdd1[1]=int(pbflags.CountsAdd1[1])
-            pbflags.CountsAdd1[2]=int(pbflags.CountsAdd1[2])
-            pbflags.CountsAdd1[3]=int(pbflags.CountsAdd1[3])
-            pbflags.CountsAdd2[0]=int(pbflags.CountsAdd2[0])
-            pbflags.CountsAdd2[1]=int(pbflags.CountsAdd2[1])
-            pbflags.CountsAdd2[2]=int(pbflags.CountsAdd2[2])
-            pbflags.CountsAdd2[3]=int(pbflags.CountsAdd2[3])
-    
-            pbflags.Sconstrain[0]=int(pbflags.Sconstrain[0])
-            pbflags.Sconstrain[1]=int(pbflags.Sconstrain[1])
-            pbflags.Sconstrain[2]=int(pbflags.Sconstrain[2])
-            pbflags.Sconstrain[3]=int(pbflags.Sconstrain[3])
-            pbflags.Spp[0]=float(pbflags.Spp[0])
-            pbflags.Spp[1]=float(pbflags.Spp[1])
-            pbflags.Spp[2]=float(pbflags.Spp[2])
-            pbflags.Spp[3]=float(pbflags.Spp[3])
-            pbflags.Smm[0]=float(pbflags.Smm[0])
-            pbflags.Smm[1]=float(pbflags.Smm[1])
-            pbflags.Smm[2]=float(pbflags.Smm[2])
-            pbflags.Smm[3]=float(pbflags.Smm[3])
-            pbflags.Spm[0]=float(pbflags.Spm[0])
-            pbflags.Spm[1]=float(pbflags.Spm[1])
-            pbflags.Spm[2]=float(pbflags.Spm[2])
-            pbflags.Spm[3]=float(pbflags.Spm[3])
-            pbflags.Smp[0]=float(pbflags.Smp[0])
-            pbflags.Smp[1]=float(pbflags.Smp[1])
-            pbflags.Smp[2]=float(pbflags.Smp[2])
-            pbflags.Smp[3]=float(pbflags.Smp[3])
-    
-    
-            if self.mydata[lastkey].metadata['count_info']['count_type']=='time':
-                pbflags.MonitorCorrect=0
-                pbflags.PolMonitorCorrect=0
-                
-            
-    
-    
-            #print 'Debug',pbflags.Debug
-            #print 'SimFlux',pbflags.SimFlux
-            #print 'SimDeviate',pbflags.SimDeviate
-            #print 'NoNegativeCS',pbflags.NoNegativeCS
-            #print 'HalfPolarized', pbflags.HalfPolarized
-            #print 'CountsAdd1',pbflags.CountsAdd1
-            #print 'CountsAdd2',pbflags.CountsAdd2
-            #print 'monitor correct ', pbflags.MonitorCorrect
-            #print 'mono select ',pbflags.MonoSelect
-            #print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
-            #print 'Spm ',pbflags.Spm
-            #print 'Smp ',pbflags.Smp
-            #print 'Smm ',pbflags.Smm
-            #print 'Spp ',pbflags.Spp
-            #print 'Sconstrain ', pbflags.Sconstrain
-            #print 'CountsEnable ', pbflags.CountsEnable
-            mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
-            #print Smp[0]
-            #print Spm[0]
-    
-            corrected_counts={}
-            corrected_counts['Spp']=Spp[0]
-            corrected_counts['Epp']=Epp[0]
-    
-            corrected_counts['Smm']=Smm[0]
-            corrected_counts['Emm']=Emm[0]
-    
-            corrected_counts['Spm']=Spm[0]
-            corrected_counts['Epm']=Epm[0]
-    
-            corrected_counts['Smp']=Smp[0]
-            corrected_counts['Emp']=Emp[0]
-            self.corrected_counts=corrected_counts
-            #print
-            #print 'inpolcorrect'
-            #print corrected_counts
-            #append corrected counts to our dataset
-            #self.outdata={}
-            for key in keys:
-                if self.counts.has_key(key):
-                    #self.outdata[key]=copy.deepcopy(self.mydata[key])
-                    ##self.mydata[key].data[self.mydata[key].metadata['signal']]
-                    newfield=detector+'_corrected'
-                    print 'key',key
-                    print 'newfield',newfield
-                    self.outdata[key].data[newfield]=corrected_counts['S'+key]
-                    newfield=detector+'_errs_corrected'
-                    self.outdata[key].data[newfield]=corrected_counts['E'+key]
-                    #print 'correcting key ',key,' len ',self.outdata[key].data[newfield].shape
-#        corrected_counts=self.outdata
+                #self.mydata[key].data[self.mydata[key].metadata['signal']]
+                newfield=self.mydata[key].metadata['count_info']['signal']+'_corrected'
+                self.outdata[key].data[newfield]=corrected_counts['S'+key]
+                newfield=self.mydata[key].metadata['count_info']['signal']+'_errs_corrected'
+                self.outdata[key].data[newfield]=corrected_counts['E'+key]
+                #print 'correcting key ',key,' len ',self.outdata[key].data[newfield].shape
+
         return corrected_counts
 
 
