@@ -18,7 +18,8 @@ class datawriter:
             if key=='detector_corrected':
                 detectorpos=count
                 print 'detectorpos ',detectorpos
-            if key=='qx':
+            #print 'writing key',key,'varying',mydata.metadata['count_info']['varying']
+            if key==mydata.metadata['count_info']['varying'][0]:
                 scanpos=count
             count=count+1
         myoutfile=open(myoutfilestr,'wt')
@@ -28,7 +29,7 @@ class datawriter:
             if tokenized[0]=='#signal'.lower():
                 s='#signal'+' '+str(detectorpos)+' '+'detector\n'
             if tokenized[0]=='#scan'.lower():
-                s='#scan'+' '+str(scanpos)+' '+'qx\n'
+                s='#scan'+' '+str(scanpos)+' '+mydata.metadata['count_info']['varying'][0]+'\n'
 
 
 

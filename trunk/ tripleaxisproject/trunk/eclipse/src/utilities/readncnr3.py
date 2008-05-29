@@ -588,6 +588,7 @@ class datareader:
                 myparser=scanparser.scanparser(scanstr)
                 self.metadata['count_info']['varying']=myparser.get_varying()
                 self.metadata['count_info']['ranges']=myparser.ranges
+                #print 'parsed'
                 #if self.metadata['file_info']['filebase']!='fpx':
                 #    self.additional_metadata['parsed_scandescription']=self.parse_scan(scanstr)
 
@@ -811,6 +812,7 @@ if __name__=='__main__':
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
         #myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\fpx53418.bt7'
         #myfilestr=r'c:\13165\13165\data\MagHigh56784.bt7'
+        myfilestr=r'c:\13176\data\CeOFeAs57255.bt7.out'
         mydatareader=datareader()
         #mydata=mydatareader.readbuffer(myfilestr,lines=91)
         mydata=mydatareader.readbuffer(myfilestr)
