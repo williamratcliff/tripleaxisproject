@@ -13,7 +13,7 @@ class psd:
         self.right=right
         self.center=center
         return
-class 
+#class 
 
 if __name__=='__main__':
         mydirectory=r'C:\13165\13165\data'
@@ -28,12 +28,14 @@ if __name__=='__main__':
         ch_eff=N.loadtxt(myfilestr, unpack=True)
         ch_eff=ch_eff.T.flatten()
         #ch_space+0.5*(-ch_space+shift(ch_space,1))+var(var_pos,i)
-
-        mypsd=psd()
+        #print ch_eff
+        mypsd=psd(center=23)
+        #print ch_a4
         #print (ch_a4-ch_a4[mypsd.center])
         ch_boundary=(ch_a4-ch_a4[mypsd.center])+0.5*N.concatenate((N.array([0]),N.diff(ch_a4)))
         ch_boundary[0]=(ch_a4[0]-ch_a4[mypsd.center])-0.5*(ch_a4[1]-ch_a4[0])
-        print ch_boundary
+        ch_space=ch_a4[mypsd.center]-ch_a4
+        print ch_space
         myfilestr=mydirectory+'CeOFeAs56685.bt7'
 #        pylab.plot(N.arange(ch_eff.size),ch_eff,'ro')
 #        pylab.show()
