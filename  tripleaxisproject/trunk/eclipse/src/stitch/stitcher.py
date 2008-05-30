@@ -4,9 +4,32 @@ from utilities import  scriptutil as SU
 import re,os,sys
 from utilities import readncnr3 as readncnr
 import copy
-from reflectometry.reduction import _reduction
+from reflectometry.reduction import rebin
 pi=N.pi
 
+
+
+#class 
+
+def cshift(l, offset):
+   offset %= len(l)
+   return N.concatenate((l[-offset:], l[:-offset]))
+
+def rebin(x,I,xo,Io=None):
+    """
+    Rebin a vector.
+    
+    x are the existing bin edges
+    xo are the new bin edges
+    I are the existing counts (one fewer than edges)
+    
+    Io will be used if present, but be sure that it is a contiguous
+    array of the correct shape and size.
+    """
+    x,I,xo = [_input(v) for v in (x,I,xo)]
+    Io = _output(Io,[len(xo)-1])
+    _reduction.rebin(x,I,xo,Io)
+    return Io
 
 class Psd:
     def __init__(self,left=0,center=21,right=48):
@@ -14,12 +37,6 @@ class Psd:
         self.right=right
         self.center=center
         return
-#class 
-
-def cshift(l, offset):
-   offset %= len(l)
-   return N.concatenate((l[-offset:], l[:-offset]))
-
 
 class Stitch:
     def __init__(self,data,ch_space,ch_boundary,ch_eff,psd,outputwidth=0.1):
@@ -37,12 +54,13 @@ class Stitch:
         
         print self.output_npts
         print self.output_a4
-        print self.a4_end
-        
-        
+        print self.a4_end        
         
     def stitch(self):
         data=self.data
+        for i in range(self.a4.shape[0]):
+            ch_boundary=self.ch_boundary+self.a4[i]
+            
         
         
 
