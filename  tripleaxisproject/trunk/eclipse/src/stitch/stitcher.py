@@ -55,6 +55,22 @@ class Stitch:
         print self.output_npts
         print self.output_a4
         print self.a4_end        
+        detectors=self.data.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
+        self.corrected=False
+        self.counts_ending=''
+        self.errors_ending=''
+        if data.data.has_key(detectors[0]+'_corrected'):
+            self.corrected=True
+            self.counts_ending='_corrected'
+            self.errors_ending='_errs_corrected'
+        i=0
+        z_in={}
+        dz_in={}
+        for detector in detectors:
+            z_in[detector]=N.array(self.data.data[detector+self.counts_ending])*ch_eff[i]
+            dz_in[detector]=N.array(self.data.data[detector+self.errors_ending])*ch_eff[i]
+        
+        
         
     def stitch(self):
         data=self.data
