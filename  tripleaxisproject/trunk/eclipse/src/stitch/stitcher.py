@@ -34,6 +34,6 @@ if __name__=='__main__':
         ch_boundary=(ch_a4-ch_a4[mypsd.center])+0.5*N.concatenate((N.array([0]),N.diff(ch_a4)))
         ch_boundary[0]=(ch_a4[0]-ch_a4[mypsd.center])-0.5*(ch_a4[1]-ch_a4[0])
         print ch_boundary
-
+        myfilestr=mydirectory+'CeOFeAs56685.bt7'
 #        pylab.plot(N.arange(ch_eff.size),ch_eff,'ro')
 #        pylab.show()
