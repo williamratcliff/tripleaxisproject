@@ -77,6 +77,7 @@ class Stitch:
             if ch_eff[i] < 1e-2:
                 mon_in[i]=0
             i=i+1
+        #print mon_in
         #output_tmp=N.zeros(self.output_a4.shape,'float64')
         #dz_output_tmp=N.zeros(self.output_a4.shape,'float64')
         #output_mon=N.zeros(self.output_a4.shape,'float64')
@@ -85,8 +86,8 @@ class Stitch:
         data_norm=N.ones(output_data.shape,'float64')
         for i in range(self.a4.shape[0]):
             ch_boundary=self.ch_boundary+self.a4[i]
-            z_in = self.data_eff[i,:]*ch_eff
-            dz_in = self.data_err_eff[i,:]*ch_eff
+            z_in = self.data_eff[i,:]#*ch_eff
+            dz_in = self.data_err_eff[i,:]#*ch_eff
             #print z_in
             #print dz_in
             ch_boundary=N.flipud(ch_boundary)
@@ -112,6 +113,7 @@ class Stitch:
         self.output_data=output_data/data_norm
         self.output_data_err=N.sqrt(output_data_err)/data_norm
         print 'norm'
+        print data_norm
         #print data_norm.shape
         #print output_mon.shape
         #print dz_output_tmp.shape
@@ -126,8 +128,8 @@ if __name__=='__main__':
         myend='bt7'
         flist=[]
         rlist=[56421,56420,56419]
-        #myfilestr=r'C:\13165\PSD_A4_SpacingApr1108.dat'
-        myfilestr=r'C:\13165\PSD_A4_Spacing.dat'
+        myfilestr=r'C:\13165\PSD_A4_SpacingApr1108.dat'
+        #myfilestr=r'C:\13165\PSD_A4_Spacing.dat'
         ch_a4=N.loadtxt(myfilestr, unpack=True)
         ch_a4=ch_a4.T.flatten()
         myfilestr=r'C:\13165\PSD_Channel_April1208.dat'
@@ -148,15 +150,16 @@ if __name__=='__main__':
         
         #print N.array(ch_space[-1])
         
-        #print ch_space
-        #print ch_boundary
+        print ch_a4
+        print ch_space
+        print ch_boundary
         myfilestr=os.path.join(mydirectory,'CeOFeAs56685.bt7')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
         mystitcher.stitch()
-        print mystitcher.output_a4.shape
-        print mystitcher.output_data.shape
+        print mystitcher.output_a4
+        #print mystitcher.output_data.shape
         #pylab.plot(mystitcher.output_a4[0:-1],mystitcher.output_data)
         pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
         pylab.show()
