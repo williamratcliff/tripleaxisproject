@@ -106,13 +106,13 @@ class Stitch:
             output_mon=N.array(rebin(ch_boundary[self.psd.left:self.psd.right+1],mon_in[self.psd.left:self.psd.right],self.output_a4))
             #drebin,ch_left[range[0]:range[2]+1],z_in[range[0]:range[2]],dz_in[range[0]:range[2]],output_data_left,output_tmp,dz_output_tmp,/histogram,/to_histogram,err=err,emsg=emsg
             
-            print ch_boundary[self.psd.left:self.psd.right+1].tolist()
-            print self.output_a4
+            #print ch_boundary[self.psd.left:self.psd.right+1].tolist()
+            #print self.output_a4
             #print z_in[self.psd.left:self.psd.right].tolist()
-            print self.output_a4.tolist()
+            #print self.output_a4.tolist()
             
             #print mon_in
-            print output_mon
+            #print output_mon
             #print, emsg
             #drebin,ch_left[range[0]:range[2]+1],mon_in[range[0]:range[2]],mon_in[range[0]:range[2]],output_data_left,output_mon,dz_output_mon,/histogram,/to_histogram,err=err,emsg=emsg
             #print output_data.shape
@@ -125,8 +125,8 @@ class Stitch:
             data_norm=data_norm+output_mon
         self.output_data=output_data/data_norm
         self.output_data_err=N.sqrt(output_data_err)/data_norm
-        print 'norm'
-        print data_norm
+        #print 'norm'
+        #print data_norm
         #print data_norm.shape
         #print output_mon.shape
         #print dz_output_tmp.shape
