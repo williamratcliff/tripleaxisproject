@@ -38,10 +38,10 @@ class Stitch:
         self.output_npts=int(N.round(N.absolute(self.a4_end-self.a4_begin)/self.outputwidth))
         self.output_a4=N.arange(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end])+outputwidth,outputwidth)
         
-        print self.output_npts
-        print self.output_a4.shape
-        print self.a4_begin
-        print self.a4_end        
+        #print self.output_npts
+        #print self.output_a4.shape
+        #print self.a4_begin
+        #print self.a4_end        
         detectors=self.data.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         self.corrected=False
         self.counts_ending=''
@@ -60,10 +60,17 @@ class Stitch:
                 dz_in.append(N.array(self.data.data[detector+self.errors_ending])*ch_eff[i])
             else:
                 dz_in.append(N.sqrt(N.array(self.data.data[detector+self.counts_ending]))*ch_eff[i])
-        self.data_eff=N.array(z_in).T
-        self.data_err_eff=N.array(dz_in).T
+            #print detector+self.counts_ending,N.array(self.data.data[detector+self.counts_ending])
+            i=i+1
+        self.data_eff=N.array(z_in)#.T
+        self.data_err_eff=N.array(dz_in)#.T
         
-        print self.data_eff.shape
+        #print self.data_eff[:,0]
+        #print ch_eff
+        #print ch_eff[0]
+        #print z_in^2
+        
+        #print self.data_eff.shape
         #print z_in.shape
         
         
@@ -86,20 +93,26 @@ class Stitch:
         data_norm=N.ones(output_data.shape,'float64')
         for i in range(self.a4.shape[0]):
             ch_boundary=self.ch_boundary+self.a4[i]
-            z_in = self.data_eff[i,:]#*ch_eff
-            dz_in = self.data_err_eff[i,:]#*ch_eff
+            z_in = self.data_eff[:,i]#*ch_eff
+            dz_in = self.data_err_eff[:,i]#*ch_eff
             #print z_in
             #print dz_in
             ch_boundary=N.flipud(ch_boundary)
             z_in=N.flipud(z_in)
             dz_in=N.flipud(dz_in)
             #;output_data_left=reverse(output_data_left)
-            output_tmp=N.array(rebin(ch_boundary[self.psd.left:self.psd.right+1].tolist(),z_in[self.psd.left:self.psd.right].tolist(),self.output_a4.tolist()))
-            dz_output_tmp=N.array(rebin(ch_boundary[self.psd.left:self.psd.right+1].tolist(),dz_in[self.psd.left:self.psd.right].tolist(),self.output_a4.tolist()))
-            output_mon=N.array(rebin(ch_boundary[self.psd.left:self.psd.right+1].tolist(),mon_in[self.psd.left:self.psd.right].tolist(),self.output_a4.tolist()))
+            output_tmp=N.array(rebin(ch_boundary[self.psd.left:self.psd.right+1],z_in[self.psd.left:self.psd.right],self.output_a4))
+            dz_output_tmp=N.array(rebin(ch_boundary[self.psd.left:self.psd.right+1],dz_in[self.psd.left:self.psd.right],self.output_a4))
+            output_mon=N.array(rebin(ch_boundary[self.psd.left:self.psd.right+1],mon_in[self.psd.left:self.psd.right],self.output_a4))
             #drebin,ch_left[range[0]:range[2]+1],z_in[range[0]:range[2]],dz_in[range[0]:range[2]],output_data_left,output_tmp,dz_output_tmp,/histogram,/to_histogram,err=err,emsg=emsg
             
+            print ch_boundary[self.psd.left:self.psd.right+1].tolist()
+            print self.output_a4
+            #print z_in[self.psd.left:self.psd.right].tolist()
+            print self.output_a4.tolist()
             
+            #print mon_in
+            print output_mon
             #print, emsg
             #drebin,ch_left[range[0]:range[2]+1],mon_in[range[0]:range[2]],mon_in[range[0]:range[2]],output_data_left,output_mon,dz_output_mon,/histogram,/to_histogram,err=err,emsg=emsg
             #print output_data.shape
@@ -150,9 +163,9 @@ if __name__=='__main__':
         
         #print N.array(ch_space[-1])
         
-        print ch_a4
-        print ch_space
-        print ch_boundary
+        #print ch_a4
+        #print ch_space
+        #print ch_boundary
         myfilestr=os.path.join(mydirectory,'CeOFeAs56685.bt7')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
