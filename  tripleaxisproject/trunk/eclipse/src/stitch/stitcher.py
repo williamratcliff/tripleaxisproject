@@ -166,12 +166,15 @@ if __name__=='__main__':
         #print ch_a4
         #print ch_space
         #print ch_boundary
-        myfilestr=os.path.join(mydirectory,'CeOFeAs56685.bt7')
+        
+        #myfilestr=os.path.join(mydirectory,'CeOFeAs56685.bt7')
+        mydirectory2=r'C:\13176\data'
+        myfilestr=os.path.join(mydirectory2,'CeOFeAs57255.bt7.out')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
         mystitcher.stitch()
-        print mystitcher.output_a4
+        #print mystitcher.output_a4
         #print mystitcher.output_data.shape
         #pylab.plot(mystitcher.output_a4[0:-1],mystitcher.output_data)
         pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
