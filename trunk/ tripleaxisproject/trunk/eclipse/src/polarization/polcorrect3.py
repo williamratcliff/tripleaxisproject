@@ -260,7 +260,64 @@ class polarization_correct:
                 self.outdata[key]=copy.deepcopy(self.mydata[key])
                 detectors=self.mydata[key].metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         detectors.append(self.mydata[lastkey].metadata['count_info']['signal'])
-        for detector in detectors:   
+        for detector in detectors: 
+            pbinput=PBindata()
+            pboutput=PBoutdata()
+            pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
+            pbinput.Ef=self.ef.ctypes.data_as(c_double_p)
+
+
+            pbflags.MonitorCorrect=int(pbflags.MonitorCorrect)
+            pbflags.PolMonitorCorrect=int(pbflags.PolMonitorCorrect)
+            pbflags.MonoSelect=int(pbflags.MonoSelect)
+            pbflags.Debug=int(pbflags.Debug)
+            pbflags.SimFlux=int(pbflags.SimFlux)
+            pbflags.SimDeviate=int(pbflags.SimDeviate)
+            pbflags.NoNegativeCS=int(pbflags.NoNegativeCS)
+            pbflags.HalfPolarized=int(pbflags.HalfPolarized)
+            pbflags.CountsEnable[0]=int(pbflags.CountsEnable[0])
+            pbflags.CountsEnable[1]=int(pbflags.CountsEnable[1])
+            pbflags.CountsEnable[2]=int(pbflags.CountsEnable[2])
+            pbflags.CountsEnable[3]=int(pbflags.CountsEnable[3])
+            pbflags.CountsAdd1[0]=int(pbflags.CountsAdd1[0])
+            pbflags.CountsAdd1[1]=int(pbflags.CountsAdd1[1])
+            pbflags.CountsAdd1[2]=int(pbflags.CountsAdd1[2])
+            pbflags.CountsAdd1[3]=int(pbflags.CountsAdd1[3])
+            pbflags.CountsAdd2[0]=int(pbflags.CountsAdd2[0])
+            pbflags.CountsAdd2[1]=int(pbflags.CountsAdd2[1])
+            pbflags.CountsAdd2[2]=int(pbflags.CountsAdd2[2])
+            pbflags.CountsAdd2[3]=int(pbflags.CountsAdd2[3])
+    
+            pbflags.Sconstrain[0]=int(pbflags.Sconstrain[0])
+            pbflags.Sconstrain[1]=int(pbflags.Sconstrain[1])
+            pbflags.Sconstrain[2]=int(pbflags.Sconstrain[2])
+            pbflags.Sconstrain[3]=int(pbflags.Sconstrain[3])
+            pbflags.Spp[0]=float(pbflags.Spp[0])
+            pbflags.Spp[1]=float(pbflags.Spp[1])
+            pbflags.Spp[2]=float(pbflags.Spp[2])
+            pbflags.Spp[3]=float(pbflags.Spp[3])
+            pbflags.Smm[0]=float(pbflags.Smm[0])
+            pbflags.Smm[1]=float(pbflags.Smm[1])
+            pbflags.Smm[2]=float(pbflags.Smm[2])
+            pbflags.Smm[3]=float(pbflags.Smm[3])
+            pbflags.Spm[0]=float(pbflags.Spm[0])
+            pbflags.Spm[1]=float(pbflags.Spm[1])
+            pbflags.Spm[2]=float(pbflags.Spm[2])
+            pbflags.Spm[3]=float(pbflags.Spm[3])
+            pbflags.Smp[0]=float(pbflags.Smp[0])
+            pbflags.Smp[1]=float(pbflags.Smp[1])
+            pbflags.Smp[2]=float(pbflags.Smp[2])
+            pbflags.Smp[3]=float(pbflags.Smp[3])
+    
+    
+            if self.mydata[lastkey].metadata['count_info']['count_type']=='time':
+                pbflags.MonitorCorrect=int(0)
+                pbflags.PolMonitorCorrect=int(0)
+
+
+
+
+ 
             for key in keys:
                 if self.counts.has_key(key):
                     #print 'key_correct', key
@@ -270,12 +327,16 @@ class polarization_correct:
                     #print 'mon0',mon0
                     #print 'mon',mon
                     
-                    self.counts[key]=N.array(self.mydata[key].data[detector])*mon0/mon
-                    #print 'counts'
-                    #print self.counts[key]
+                    monfactor=N.array(mon0)/N.array(mon)
+                    if self.mydata[lastkey].metadata['count_info']['count_type']=='time':
+                        monfactor=1.0
+                    #print 'monfactor', monfactor
+                    self.counts[key]=N.array(self.mydata[key].data[detector])*monfactor
+                    print 'counts'
+                    print self.counts[key]
                     #print 'before norm'
                     #print N.array(self.mydata[key].data[detector])
-                    self.errors[key]=N.sqrt(self.counts[key])*mon0/mon   
+                    self.errors[key]=N.sqrt(N.array(self.mydata[key].data[detector]))*monfactor 
                     #print 'errors'
                     #print self.errors[key] 
                     if key=='pp':
@@ -399,52 +460,6 @@ class polarization_correct:
     ##        pbflags.Smp=[0,0,0,0]
     
     
-            pbflags.MonitorCorrect=int(pbflags.MonitorCorrect)
-            pbflags.PolMonitorCorrect=int(pbflags.PolMonitorCorrect)
-            pbflags.MonoSelect=int(pbflags.MonoSelect)
-            pbflags.Debug=int(pbflags.Debug)
-            pbflags.SimFlux=int(pbflags.SimFlux)
-            pbflags.SimDeviate=int(pbflags.SimDeviate)
-            pbflags.NoNegativeCS=int(pbflags.NoNegativeCS)
-            pbflags.HalfPolarized=int(pbflags.HalfPolarized)
-            pbflags.CountsEnable[0]=int(pbflags.CountsEnable[0])
-            pbflags.CountsEnable[1]=int(pbflags.CountsEnable[1])
-            pbflags.CountsEnable[2]=int(pbflags.CountsEnable[2])
-            pbflags.CountsEnable[3]=int(pbflags.CountsEnable[3])
-            pbflags.CountsAdd1[0]=int(pbflags.CountsAdd1[0])
-            pbflags.CountsAdd1[1]=int(pbflags.CountsAdd1[1])
-            pbflags.CountsAdd1[2]=int(pbflags.CountsAdd1[2])
-            pbflags.CountsAdd1[3]=int(pbflags.CountsAdd1[3])
-            pbflags.CountsAdd2[0]=int(pbflags.CountsAdd2[0])
-            pbflags.CountsAdd2[1]=int(pbflags.CountsAdd2[1])
-            pbflags.CountsAdd2[2]=int(pbflags.CountsAdd2[2])
-            pbflags.CountsAdd2[3]=int(pbflags.CountsAdd2[3])
-    
-            pbflags.Sconstrain[0]=int(pbflags.Sconstrain[0])
-            pbflags.Sconstrain[1]=int(pbflags.Sconstrain[1])
-            pbflags.Sconstrain[2]=int(pbflags.Sconstrain[2])
-            pbflags.Sconstrain[3]=int(pbflags.Sconstrain[3])
-            pbflags.Spp[0]=float(pbflags.Spp[0])
-            pbflags.Spp[1]=float(pbflags.Spp[1])
-            pbflags.Spp[2]=float(pbflags.Spp[2])
-            pbflags.Spp[3]=float(pbflags.Spp[3])
-            pbflags.Smm[0]=float(pbflags.Smm[0])
-            pbflags.Smm[1]=float(pbflags.Smm[1])
-            pbflags.Smm[2]=float(pbflags.Smm[2])
-            pbflags.Smm[3]=float(pbflags.Smm[3])
-            pbflags.Spm[0]=float(pbflags.Spm[0])
-            pbflags.Spm[1]=float(pbflags.Spm[1])
-            pbflags.Spm[2]=float(pbflags.Spm[2])
-            pbflags.Spm[3]=float(pbflags.Spm[3])
-            pbflags.Smp[0]=float(pbflags.Smp[0])
-            pbflags.Smp[1]=float(pbflags.Smp[1])
-            pbflags.Smp[2]=float(pbflags.Smp[2])
-            pbflags.Smp[3]=float(pbflags.Smp[3])
-    
-    
-            if self.mydata[lastkey].metadata['count_info']['count_type']=='time':
-                pbflags.MonitorCorrect=0
-                pbflags.PolMonitorCorrect=0
                 
             
     
@@ -492,8 +507,8 @@ class polarization_correct:
                     #self.outdata[key]=copy.deepcopy(self.mydata[key])
                     ##self.mydata[key].data[self.mydata[key].metadata['signal']]
                     newfield=detector+'_corrected'
-                    print 'key',key
-                    print 'newfield',newfield
+                    print 'key',key,'newfield',newfield
+                    #print 'corrected counts',corrected_counts['S'+key]
                     self.outdata[key].data[newfield]=corrected_counts['S'+key]
                     newfield=detector+'_errs_corrected'
                     self.outdata[key].data[newfield]=corrected_counts['E'+key]
