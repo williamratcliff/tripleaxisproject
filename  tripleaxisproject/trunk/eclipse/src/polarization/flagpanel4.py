@@ -32,7 +32,7 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
         data=N.zeros((4,5),'Float64')
         data=data.tolist()
         for col in range(1,5,1):
-            print 'col setup',col
+            #print 'col setup',col
             data[0][col]=str(pbflags.Spp[col-1]) #row,col
             data[1][col]=str(pbflags.Smm[col-1]) #row,col
             data[2][col]=str(pbflags.Spm[col-1]) #row,col
