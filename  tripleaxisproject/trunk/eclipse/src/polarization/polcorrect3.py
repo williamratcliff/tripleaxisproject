@@ -260,7 +260,9 @@ class polarization_correct:
                 self.outdata[key]=copy.deepcopy(self.mydata[key])
                 detectors=self.mydata[key].metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         detectors.append(self.mydata[lastkey].metadata['count_info']['signal'])
-        for detector in detectors: 
+        #for detector in detectors: 
+        detector=detectors[-1]
+        if 1:
             pbinput=PBindata()
             pboutput=PBoutdata()
             pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
@@ -332,8 +334,8 @@ class polarization_correct:
                         monfactor=1.0
                     #print 'monfactor', monfactor
                     self.counts[key]=N.array(self.mydata[key].data[detector])*monfactor
-                    print 'counts'
-                    print self.counts[key]
+                    #print 'counts'
+                    #print self.counts[key]
                     #print 'before norm'
                     #print N.array(self.mydata[key].data[detector])
                     self.errors[key]=N.sqrt(N.array(self.mydata[key].data[detector]))*monfactor 
@@ -464,24 +466,24 @@ class polarization_correct:
             
     
     
-            #print 'Debug',pbflags.Debug
-            #print 'SimFlux',pbflags.SimFlux
-            #print 'SimDeviate',pbflags.SimDeviate
-            #print 'NoNegativeCS',pbflags.NoNegativeCS
-            #print 'HalfPolarized', pbflags.HalfPolarized
-            #print 'CountsAdd1',pbflags.CountsAdd1
-            #print 'CountsAdd2',pbflags.CountsAdd2
-            #print 'monitor correct ', pbflags.MonitorCorrect
-            #print 'mono select ',pbflags.MonoSelect
-            #print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
-            #print 'Spm ',pbflags.Spm
-            #print 'Smp ',pbflags.Smp
-            #print 'Smm ',pbflags.Smm
-            #print 'Spp ',pbflags.Spp
-            #print 'Sconstrain ', pbflags.Sconstrain
-            #print 'CountsEnable ', pbflags.CountsEnable
+            print 'Debug',pbflags.Debug
+            print 'SimFlux',pbflags.SimFlux
+            print 'SimDeviate',pbflags.SimDeviate
+            print 'NoNegativeCS',pbflags.NoNegativeCS
+            print 'HalfPolarized', pbflags.HalfPolarized
+            print 'CountsAdd1',pbflags.CountsAdd1
+            print 'CountsAdd2',pbflags.CountsAdd2
+            print 'monitor correct ', pbflags.MonitorCorrect
+            print 'mono select ',pbflags.MonoSelect
+            print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
+            print 'Spm ',pbflags.Spm
+            print 'Smp ',pbflags.Smp
+            print 'Smm ',pbflags.Smm
+            print 'Spp ',pbflags.Spp
+            print 'Sconstrain ', pbflags.Sconstrain
+            print 'CountsEnable ', pbflags.CountsEnable
             mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
-            #print Smp[0]
+            #print Smm[0]
             #print Spm[0]
     
             corrected_counts={}
@@ -508,13 +510,16 @@ class polarization_correct:
                     ##self.mydata[key].data[self.mydata[key].metadata['signal']]
                     newfield=detector+'_corrected'
                     print 'key',key,'newfield',newfield
-                    #print 'corrected counts',corrected_counts['S'+key]
+                    print 'corrected counts',corrected_counts['S'+key]
                     self.outdata[key].data[newfield]=corrected_counts['S'+key]
                     newfield=detector+'_errs_corrected'
                     self.outdata[key].data[newfield]=corrected_counts['E'+key]
                     #print 'correcting key ',key,' len ',self.outdata[key].data[newfield].shape
+            #corrected_counts_out=corrected_counts
+            if detector==self.mydata[lastkey].metadata['count_info']['signal']:
+                corrected_counts_out=corrected_counts
 #        corrected_counts=self.outdata
-        return corrected_counts
+        return corrected_counts_out
 
 
 def readscript(myfilestr):
