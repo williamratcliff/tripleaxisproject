@@ -17,7 +17,7 @@ class datawriter:
         for key in mydata.data.keys():
             if key=='detector_corrected':
                 detectorpos=count
-                print 'detectorpos ',detectorpos
+                #print 'detectorpos ',detectorpos
             #print 'writing key',key,'varying',mydata.metadata['count_info']['varying']
             if key==mydata.metadata['count_info']['varying'][0]:
                 scanpos=count

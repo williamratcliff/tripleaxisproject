@@ -255,11 +255,11 @@ class CustomDataTable(gridlib.PyGridTableBase):
         return self.CanGetValueAs(row, col, typeName)
 
     def DeleteRows(self,pos=0,numRows=1):
-        print 'Delete number',self.GetNumberRows()
-        print 'pos',pos
-        print 'numRows', numRows
+#        print 'Delete number',self.GetNumberRows()
+#        print 'pos',pos
+#        print 'numRows', numRows
         if numRows>=0 and numRows<=self.GetNumberRows():
-            print 'Delete',numRows
+#            print 'Delete',numRows
             #for i in range(numRows):
             #    self.data.pop()
             del self.data[pos:pos+numRows]
@@ -270,7 +270,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
             #msg = wx.grid.GridTableMessage(self, 0, numRows)
             self.GetView().ProcessTableMessage(msg)
             
-            print 'Deleted'
+#            print 'Deleted'
             self.UpdateValues()
             return True
         else:
@@ -336,7 +336,7 @@ class CustTableGrid(gridlib.Grid):
         gridlib.Grid.ForceRefresh(self)
 
     def OnCellChange(self, evt):
-        print 'Changed'
+#        print 'Changed'
         if self.CanEnableCellControl():
             self.EnableCellEditControl()
         gridlib.Grid.ForceRefresh(self)
@@ -348,7 +348,7 @@ class CustTableGrid(gridlib.Grid):
         col=evt.GetCol()
         table=self.GetTable()
         data=N.array(table.data)
-        print 'before ', data[:,0]
+#        print 'before ', data[:,0]
         col_to_sort=[(i,s) for i,s in enumerate(data[:,col])]
         col_to_sort.sort(lambda x,y: cmp(x[1],y[1]))
         g_col = [i for (i,s) in col_to_sort]
@@ -363,7 +363,7 @@ class CustTableGrid(gridlib.Grid):
             for i in range(data.shape[1]):
                 data[:,i]=data[g_col,i]
             table.data=data.tolist()
-            print 'after',data[:,0]
+#            print 'after',data[:,0]
             gridlib.Grid.AutoSize(self)
             gridlib.Grid.ForceRefresh(self)
         #evt.Skip()
@@ -391,10 +391,10 @@ class CatalogPanel(wx.Panel):
         self.config.SetAppName(cfstr)
         self.config.SetVendorName(cfstr)
         self.config.Flush()
-        print 'mypath',self.config.GetPath().encode('ascii')
-        print 'myApp',self.config.GetAppName()
-        print 'myVendor',self.config.GetVendorName(),'internal',wx.GetApp().GetVendorName()
-        print 'mypath',self.config.Read('mypath')
+#        print 'mypath',self.config.GetPath().encode('ascii')
+#        print 'myApp',self.config.GetAppName()
+#        print 'myVendor',self.config.GetVendorName(),'internal',wx.GetApp().GetVendorName()
+#        print 'mypath',self.config.Read('mypath')
         grid = CustTableGrid(self)
         bs = wx.BoxSizer(wx.VERTICAL)
         bs.Add(grid, 1, wx.GROW|wx.ALL|wx.EXPAND, 5)
@@ -421,7 +421,7 @@ class CatalogPanel(wx.Panel):
         self.grid.GetGridWindow().Bind(wx.EVT_RIGHT_UP,self.OnShowPopup)
 
     def OnShowPopup(self,event):
-        print 'popping'
+#        print 'popping'
         pos=event.GetPosition()
         #pos=self.ScreenToClient(pos)
         self.grid.PopupMenu(self.popupmenu,pos)
@@ -429,11 +429,11 @@ class CatalogPanel(wx.Panel):
 
     
     def OnSendGroup(self,event):
-        print 'SendingGroup'
+#        print 'SendingGroup'
         self.SendGroupToTree()
         
     def OnClearGroups(self,event):
-        print 'Clearing Group'
+#        print 'Clearing Group'
         table=self.grid.GetTable()
         nrows=table.GetNumberRows()
         #print 'old_nrows',old_nrows
@@ -711,26 +711,26 @@ class CatalogPanel(wx.Panel):
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
             file0=paths[0]
-            print 'file0',file0
+#            print 'file0',file0
             cwd=os.path.dirname(file0)
-            print 'cwd',cwd.encode('ascii')
+#            print 'cwd',cwd.encode('ascii')
             self.config.SetPath(cwd.encode('utf8'))
-            print 'config style', self.config.GetStyle()
+#            print 'config style', self.config.GetStyle()
             self.config.Write('mypath',cwd.encode('utf8'))
             self.config.Flush()
             self.files=paths
-            print 'Opening', self.config.GetPath()
-            print 'mypath', self.config.Read('mypath')
+#            print 'Opening', self.config.GetPath()
+#            print 'mypath', self.config.Read('mypath')
             evt=myEVT_CLEAR_TREE(self.GetId())
             wx.PostEvent(self.filetree_panel.tree , evt)  #I'm not sure if this or the other is cleaner...  
             #self.filetree_panel.tree.GetEventHandler().ProcessEvent(evt)  
             self.catalog=classify_files.readfiles(self.files)
-            print 'event posted'
+#            print 'event posted'
             #evt=ClearTreeEvent(myEVT_CLEAR_TREE,self.GetId())
             #self.GetEventHandler().ProcessEvent(evt)
             self.UpdateCatalog()      
             gridlib.Grid.ForceRefresh(self.grid)  
-            print 'updated'
+#            print 'updated'
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
         dlg.Destroy()

@@ -172,8 +172,8 @@ class polarization_correct:
         self.files=files
         self.cell=cell
         self.mon={}
-        print 'files',files
-        print 'cellfile polcorrect3',cell
+#        print 'files',files
+#        print 'cellfile polcorrect3',cell
         mymonFlag=False
         for key,myfilestr in files.iteritems():
             mydatareader=readncnr.datareader()
@@ -245,10 +245,10 @@ class polarization_correct:
         keys=['pp','mm','pm','mp']
         #print self.counts
         #print self.timestamp
-        pbinput=PBindata()
-        pboutput=PBoutdata()
-        pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
-        pbinput.Ef=self.ef.ctypes.data_as(c_double_p)
+        #pbinput=PBindata()
+        #pboutput=PBoutdata()
+        #pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
+        #binput.Ef=self.ef.ctypes.data_as(c_double_p)
         #print 'Ei', self.ei
         #print 'Ef',self.ef
                     
@@ -322,37 +322,37 @@ class polarization_correct:
  
             for key in keys:
                 if self.counts.has_key(key):
-                    #print 'key_correct', key
-                    #print 'detector', detector
                     mon0=self.mon0
                     mon=self.mon[key]
                     #print 'mon0',mon0
-                    #print 'mon',mon
-                    
-                    monfactor=N.array(mon0)/N.array(mon)
+                    #print 'mon',mon                 
+                    monfactor=N.array(mon0,'float64')/N.array(mon,'float64')
                     if self.mydata[lastkey].metadata['count_info']['count_type']=='time':
                         monfactor=1.0
                     #print 'monfactor', monfactor
-                    self.counts[key]=N.array(self.mydata[key].data[detector])*monfactor
-                    #print 'counts'
-                    #print self.counts[key]
+                    self.counts[key]=N.array(self.mydata[key].data[detector],'float64')*monfactor
                     #print 'before norm'
                     #print N.array(self.mydata[key].data[detector])
-                    self.errors[key]=N.sqrt(N.array(self.mydata[key].data[detector]))*monfactor 
-                    #print 'errors'
-                    #print self.errors[key] 
+                    self.errors[key]=N.sqrt(N.array(self.mydata[key].data[detector],'float64'))*monfactor 
+                    #print 'counts',self.counts[key]
+                    #print 'errors',self.errors[key] 
                     if key=='pp':
-                        pbinput.tpp=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
+                        mytemp_pp=self.timestamp[key].astype('uint32')
+                        pbinput.tpp=mytemp_pp.ctypes.data_as(c_ulong_p)
+                        #pbinput.tpp=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
                         pbinput.Cpp=self.counts[key].ctypes.data_as(c_double_p)
                         pbinput.Epp=self.errors[key].ctypes.data_as(c_double_p)
                     if key=='mm':
-                        pbinput.tmm=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
+                        mytemp_mm=self.timestamp[key].astype('uint32')
+                        pbinput.tmm=mytemp_mm.ctypes.data_as(c_ulong_p)
+                        #pbinput.tmm=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
+                        print 't0,mm ',mytemp_mm[0]
                         pbinput.Cmm=self.counts[key].ctypes.data_as(c_double_p)
                         pbinput.Emm=self.errors[key].ctypes.data_as(c_double_p)
                     if key=='pm':
                         mytemp_pm=self.timestamp[key].astype('uint32')
                         pbinput.tpm=mytemp_pm.ctypes.data_as(c_ulong_p)
-                        #print 't0,pm ',mytemp_pm[0]
+                        print 't0,pm ',mytemp_pm[0]
                         pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
                         pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
                         #print 'shape ',self.counts[key].shape
@@ -360,10 +360,8 @@ class polarization_correct:
                         mytemp_mp=self.timestamp[key].astype('uint32')
                         pbinput.tmp=mytemp_mp.ctypes.data_as(c_ulong_p)
                         pbinput.Cmp=self.counts[key].ctypes.data_as(c_double_p)
-                        pbinput.Emp=self.errors[key].ctypes.data_as(c_double_p)
-    
-                else:
-    
+                        pbinput.Emp=self.errors[key].ctypes.data_as(c_double_p)    
+                else:    
                     dummytpp=N.empty((1,self.length),'uint32')
                     dummytmm=N.empty((1,self.length),'uint32')
                     dummytpm=N.empty((1,self.length),'uint32')
@@ -394,19 +392,7 @@ class polarization_correct:
                         pbinput.Cmp=dummyCmp.ctypes.data_as(c_double_p)
                         pbinput.Emp=dummyEmp.ctypes.data_as(c_double_p)
     
-    
-            #print 'mylength ',self.length
-            #print 'check input'
-            #print 'Cmp',dummyCmp
-            #print 'Emp',dummyEmp
-            #print 'tmp',dummytmp
-    
-    
-            #print 'check input'
-            #print 'Cpm',dummyCpm
-            #print 'Epm',dummyEpm
-            #print 'tpm',dummytpm
-    
+        
     
     
             Spp=N.empty((1,self.length),'float64')
@@ -430,12 +416,14 @@ class polarization_correct:
             pboutput.Epm=Epm.ctypes.data_as(c_double_p)
             pboutput.Emp=Emp.ctypes.data_as(c_double_p)
             pboutput.R=R.ctypes.data_as(c_double_p)
-            #pbflags=PBflags()
+
+            
+            pbflags=PBflags()
     
-    ##        fMonitorCorrect=0
-    ##        fPolMonitorCorrect=0
-    ##        if self.mydata[key].metadata['count_info']['count_type']=='monitor':
-    ##            fPolMonitorCorrect=1
+            fMonitorCorrect=0
+            fPolMonitorCorrect=0
+            if self.mydata[lastkey].metadata['count_info']['count_type']=='monitor':
+                fPolMonitorCorrect=1
     ##            #print 'monitor'
     ##        fDebug=0
     ##        fSimFlux=0
@@ -443,49 +431,44 @@ class polarization_correct:
             #-- ++ +- -+ #TODO Check with Ross on the order
     
     
-    
-    ##        pbflags.MonitorCorrect=0#fMonitorCorrect
-    ##        pbflags.PolMonitorCorrect=fPolMonitorCorrect
-    ##        pbflags.MonoSelect=1
-    ##        pbflags.Debug=0#fDebug
-    ##        pbflags.SimFlux=0#fSimFlux
-    ##        pbflags.SimDeviate=0#fSimDeviate
-    ##        pbflags.NoNegativeCS=0
-    ##        pbflags.HalfPolarized=0
-    ##        pbflags.CountsEnable=[0,0,1,1]
-    ##        pbflags.CountsAdd1=[0,0,0,0]
-    ##        pbflags.CountsAdd2=[0,0,0,0]
-    ##        pbflags.Sconstrain=[1,1,0,0]
-    ##        pbflags.Spp=[0,0,0,0]
-    ##        pbflags.Smm=[0,0,0,0]
-    ##        pbflags.Spm=[0,0,0,0]
-    ##        pbflags.Smp=[0,0,0,0]
-    
-    
-                
-            
-    
-    
-            print 'Debug',pbflags.Debug
-            print 'SimFlux',pbflags.SimFlux
-            print 'SimDeviate',pbflags.SimDeviate
-            print 'NoNegativeCS',pbflags.NoNegativeCS
-            print 'HalfPolarized', pbflags.HalfPolarized
-            print 'CountsAdd1',pbflags.CountsAdd1
-            print 'CountsAdd2',pbflags.CountsAdd2
-            print 'monitor correct ', pbflags.MonitorCorrect
-            print 'mono select ',pbflags.MonoSelect
-            print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
-            print 'Spm ',pbflags.Spm
-            print 'Smp ',pbflags.Smp
-            print 'Smm ',pbflags.Smm
-            print 'Spp ',pbflags.Spp
-            print 'Sconstrain ', pbflags.Sconstrain
-            print 'CountsEnable ', pbflags.CountsEnable
-            mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
+            pbflags.MonitorCorrect=0#fMonitorCorrect
+            pbflags.PolMonitorCorrect=0#fPolMonitorCorrect
+            pbflags.MonoSelect=1
+            pbflags.Debug=1#fDebug
+            pbflags.SimFlux=0#fSimFlux
+            pbflags.SimDeviate=0#fSimDeviate
+            pbflags.NoNegativeCS=0
+            pbflags.HalfPolarized=0
+            pbflags.CountsEnable=[0,1,1,0]
+            pbflags.CountsAdd1=[0,0,0,0]
+            pbflags.CountsAdd2=[0,0,0,0]
+            pbflags.Sconstrain=[1,0,0,1]
+            pbflags.Spp=[0,1,0,0]
+            pbflags.Smm=[0,0,0,0]
+            pbflags.Spm=[0,0,0,0]
+            pbflags.Smp=[0,0,1,0]
+            self.cell=r'c:\13176\data\CeOFeCellsMay20081.txt'
+        
+#            print 'Debug',pbflags.Debug
+#            print 'SimFlux',pbflags.SimFlux
+#            print 'SimDeviate',pbflags.SimDeviate
+#            print 'NoNegativeCS',pbflags.NoNegativeCS
+#            print 'HalfPolarized', pbflags.HalfPolarized
+#            print 'CountsAdd1',pbflags.CountsAdd1
+#            print 'CountsAdd2',pbflags.CountsAdd2
+#            print 'monitor correct ', pbflags.MonitorCorrect
+#            print 'mono select ',pbflags.MonoSelect
+#            print 'PolMonitorCorrect',pbflags.PolMonitorCorrect
+#            print 'Spm ',pbflags.Spm
+#            print 'Smp ',pbflags.Smp
+#            print 'Smm ',pbflags.Smm
+#            print 'Spp ',pbflags.Spp
+#            print 'Sconstrain ', pbflags.Sconstrain
+#            print 'CountsEnable ', pbflags.CountsEnable
+            ierr=mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
             #print Smm[0]
             #print Spm[0]
-    
+            print 'ierr',ierr
             corrected_counts={}
             corrected_counts['Spp']=Spp[0]
             corrected_counts['Epp']=Epp[0]
@@ -499,18 +482,15 @@ class polarization_correct:
             corrected_counts['Smp']=Smp[0]
             corrected_counts['Emp']=Emp[0]
             self.corrected_counts=corrected_counts
-            #print
-            #print 'inpolcorrect'
-            #print corrected_counts
-            #append corrected counts to our dataset
-            #self.outdata={}
+
             for key in keys:
                 if self.counts.has_key(key):
                     #self.outdata[key]=copy.deepcopy(self.mydata[key])
                     ##self.mydata[key].data[self.mydata[key].metadata['signal']]
                     newfield=detector+'_corrected'
-                    print 'key',key,'newfield',newfield
-                    print 'corrected counts',corrected_counts['S'+key]
+                    #print 'key',key,'newfield',newfield
+                    #print 'corrected counts',corrected_counts['S'+key]
+                    #print 'corrected Errors',corrected_counts['E'+key]
                     self.outdata[key].data[newfield]=corrected_counts['S'+key]
                     newfield=detector+'_errs_corrected'
                     self.outdata[key].data[newfield]=corrected_counts['E'+key]
@@ -518,7 +498,6 @@ class polarization_correct:
             #corrected_counts_out=corrected_counts
             if detector==self.mydata[lastkey].metadata['count_info']['signal']:
                 corrected_counts_out=corrected_counts
-#        corrected_counts=self.outdata
         return corrected_counts_out
 
 

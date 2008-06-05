@@ -455,17 +455,12 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         children_data=self.GetChildData(self.current)
         i=0
         for data in children_data:
-            #print data
             self.varying=data['data'].metadata['count_info']['varying']
             self.independent_variable=self.varying[0]
             x=data['data'].data[self.independent_variable]
             self.x=x
             y=data['data'].data['detector']
             dy=N.sqrt(y)
-            print 'varying',self.independent_variable
-
-            #from sans.guicomm.events import NewPlotEvent
-            #from sans.guitools.plottables import Data1D
             new_plot = Data1D(x, y, dy=dy)
             new_plot.name =data['filename']+' '+data['polstate']
             new_plot.group_id='data'
@@ -629,51 +624,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                         pbflags.Smp[2]=float(tokenized[3])
                         pbflags.Smp[3]=float(tokenized[4])
         
-#                elif tokenized[0]=='#begin'.lower():
-#                    inblock=True
-#                    #print 'begin '
-#                    files={}
-#                elif tokenized[0]=='#end'.lower():
-#                    #print 'end'
-#                    catalog.append(files)
-#                    print 'correcting %s using cellfile %s'%(files,cellfile)
-#                    mypolcor=polarization_correct(files,cellfile)
-#                    corrected_counts=mypolcor.correct(pbflags)
-#                    mypolcor.savefiles()
-#                    print 'corrected'
-#                    if 0:
-#                        key='pm'.lower()
-#                        #pylab.subplot(2,2,1+mycount)
-#                        #pylab.title(key)
-#                        mydatac=mypolcor.mydata
-#                        #pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
-#                        #    marker='s',mfc='blue',linestyle='None')
-#                        #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Spm'],corrected_counts['Epm'], marker='s',mfc='red',linestyle='None')
-#                        #print 'pm'
-#                        #print corrected_counts['Spm']
-#                        key='mp'.lower()
-#                        #pylab.subplot(2,2,2+mycount)
-#                        #pylab.title(key)
-#                        #print 'mp'
-#                        #print corrected_counts['Smp']
-#                        #pylab.errorbar(mydatac[key].data['qx'],mydatac[key].data['detector'],N.sqrt(mydatac[key].data['detector']),
-#                        #    marker='s',mfc='blue',linestyle='None')
-#                        #pylab.errorbar(mydatac[key].data['qx'],corrected_counts['Smp'],corrected_counts['Emp'], marker='s',mfc='red',linestyle='None')
-#                        mycount=mycount+2
-#                    inblock=False
-#                elif inblock==True:
-#                    #print 'inblock'
-#                    toksplit=tokenized[0].split('=')
-#                    #check to make sure that there actually is a file specified!
-#                    if len(toksplit)==2:
-#                        filetok=os.path.join(mydirectory,toksplit[1])
-#                        if os.path.isfile(filetok):
-#                            files[toksplit[0]]=filetok
-#                        else:
-#                            print filetok+' does not exist!!!'
-#                            break
-#                    else:
-#                        pass
+
                 elif tokenized[0]=='#cell'.lower():
                     #print 'acellfile'
                     cellfile=os.path.join(mydirectory,tokenized[1])
@@ -683,14 +634,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                     else:
                         print '%s does not exist!'%(cellfile,)
                         break
-                #elif tokenized[0]=='#Pcell'.lower():
-                #    #print 'pcellfile'
-                #    pcellfile=os.path.join(mydirectory,tokenized[1])
-                #    if os.path.isfile(pcellfile):
-                #        pcellfiles.append(pcellfile)
-                #    else:
-                #        print '%s does not exist!'%(acellfile,)
-                #        break
             print 'done'
             myfile.close()
             print 'closed'
@@ -817,7 +760,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         #files['mp']=r'C:\polcorrecter\data\fieldscanminusplusreset53631.bt7'
         text=self.itemdict['text']+'.polcor'
         self.groupdata=self.itemdict['pydata']
-        print 'driver file', text
+        self.log.write('driver file '+ text+'\n')
         #cellfile='c:\polcorrecter\data\cells.txt'  
         cellfile=self.groupdata['cellfile']
         flags=self.groupdata['pbflags']
@@ -873,11 +816,11 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
              s='#end'
              f.write(s)
              f.close()
-             print 'files',files
-             print 'cellfile',cellfile
-             mypolcor=polcorrect.polarization_correct(files,cellfile)
-             corrected_counts=mypolcor.correct(flags)
-             mypolcor.savefiles()
+#             self.log.write('files '+files)
+#             self.log.write('cellfile '+cellfile)
+             #mypolcor=polcorrect.polarization_correct(files,cellfile)
+             #corrected_counts=mypolcor.correct(flags)
+             #mypolcor.savefiles()
 
 #             keys=['pp','mm','mp','pm']
 #             print 'corrected',corrected_counts.keys()
@@ -901,7 +844,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
         if myselections!=None:
             for selected in myselections:
                 if selected.GetParent()==DataGroup and DataGroup!=None:
-                    print 'selected reducing',self.GetItemText(selected)
+                    #print 'selected reducing',self.GetItemText(selected)
                     children_data=self.GetChildData(selected)
                     polstates=[]
                     for data in children_data:
@@ -923,13 +866,11 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                     corrected_counts=mypolcor.correct(flags)
                     mypolcor.savefiles()
                     keys=['pp','mm','mp','pm']
-                    print 'corrected',corrected_counts.keys()
+                    #print 'corrected',corrected_counts.keys()
                     for key in polstates:
                      if corrected_counts.has_key('S'+key):
-                         #x=self.x
                          y=corrected_counts['S'+key]
                          dy=corrected_counts['E'+key]
-                         print 'varying',self.independent_variable
                          new_plot = Data1D(x, y, dy=dy)
                          new_plot.name =self.GetItemText(selected)+key+'.corrected'
                          new_plot.group_id='reduced '+self.GetItemText(selected)
