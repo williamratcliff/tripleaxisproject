@@ -15,7 +15,7 @@ class MyApp(wx.App):
 
 
 class ConstraintMatrixTable(gridlib.PyGridTableBase):
-    def __init__(self):
+    def __init__(self,pbflags):
         gridlib.PyGridTableBase.__init__(self)
         #pp mm pm mp
         self.colLabels = ['selected?','on on', 'off off', 'on off','off on']
@@ -31,6 +31,12 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
         #data = []
         data=N.zeros((4,5),'Float64')
         data=data.tolist()
+        for col in range(1,5,1):
+            print 'col setup',col
+            data[0][col]=str(pbflags.Spp[col-1]) #row,col
+            data[1][col]=str(pbflags.Smm[col-1]) #row,col
+            data[2][col]=str(pbflags.Spm[col-1]) #row,col
+            data[3][col]=str(pbflags.Smp[col-1]) #row,col
         for row in range(4):
             data[row][row+1]=''
             data[row][0]=''
@@ -140,7 +146,7 @@ class ConstraintMatrixTable(gridlib.PyGridTableBase):
 class ConstraintMatrixGrid(gridlib.Grid):
     def __init__(self, parent,pbflags):
         gridlib.Grid.__init__(self, parent, -1)
-        table = ConstraintMatrixTable()
+        table = ConstraintMatrixTable(pbflags)
         # The second parameter means that the grid is to take ownership of the
         # table and will destroy it when done.  Otherwise you would need to keep
         # a reference to it and call it's Destroy method later.
