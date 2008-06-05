@@ -1,4 +1,4 @@
-import sys
+import sys, shutil,os
 #SharedLibrary('Pb.dll', ['Pb.c'])
 #SharedLibrary('polarization.dll', ['PBcoef.c','PBcorrect.c','polcorrectTest.c'])
 if sys.platform=='win32':
@@ -10,3 +10,8 @@ else:
 	print 'building on linux'
 	SharedLibrary('polarization2.so', ['libPB.c']) #good
 #SharedLibrary('mylong.dll', ['mylong.c']) #good
+
+
+#mydir=os.getcwd()
+#orig=os.path.join(mydir,'polarization2.dll')
+#shutil.copyfile(orig,r'c:\polcorrecter\polarization2.dll')

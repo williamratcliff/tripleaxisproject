@@ -865,6 +865,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
                     mypolcor=polcorrect.polarization_correct(files,cellfile)
                     corrected_counts=mypolcor.correct(flags)
                     mypolcor.savefiles()
+                    #self.log.flush()
                     keys=['pp','mm','mp','pm']
                     #print 'corrected',corrected_counts.keys()
                     for key in polstates:

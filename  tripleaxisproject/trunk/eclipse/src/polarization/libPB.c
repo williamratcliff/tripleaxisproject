@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #include "PB.h"
 
@@ -283,8 +284,26 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
   unsigned long secs ;
   double temp, err ;
   FILE *fp ;
+  int bob;
 
-  if( CellFile != NULL ) if( PBdefineCells(CellFile) || Ncells < 1 ) return 1 ;
+  printf("inside lib\n");
+  
+  printf("lib CellFile %s\n",CellFile);
+  bob=PBdefineCells(CellFile);
+  printf("lib 1st PBdefine %d\n", bob);
+  printf("lib Ncells %d\n",Ncells);
+  if( CellFile != NULL ) if( PBdefineCells(CellFile) || Ncells < 1 ){
+      printf("lib Ncells %d\n",Ncells);
+      printf("mylib PBdefine %d\n", PBdefineCells(CellFile));
+       return 1 ;}
+
+
+//for( j=0 ; j<npts ; j++ )  {
+//     printf("j=%d Cmm=%f Cpm=%f\n",j,in->Cmm[j],in->Cpm[j] );     
+//     }
+
+
+
 
   if( flgs != NULL ) PBsetflags(flgs) ;
 
@@ -293,8 +312,8 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
 
   constraintTOeqs() ;
 
-  fprintf(stderr,"inside lib\n");
-  fprintf(stderr,"CountsEnable %d %d %d %d\n",flags.CountsEnable[0],flags.CountsEnable[1],flags.CountsEnable[2],flags.CountsEnable[3]);
+  
+  printf("CountsEnable %d %d %d %d\n",flags.CountsEnable[0],flags.CountsEnable[1],flags.CountsEnable[2],flags.CountsEnable[3]);
  
 
 
@@ -2488,7 +2507,7 @@ static int PBdefineCells(char *filename)
 		    &(exper->hsigsq),&(exper->vsigsq),&(exper->xsigsq),
 		    &curvCor,&(exper->angcor)) ;
 
-
+      printf("seconds %d\n",pol->startSecs);
      if( nscan < 19 && *DBG )
        printf("failed read complete cell data %d from %s\n", Ncells,filename) ;
 

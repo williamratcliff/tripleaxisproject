@@ -418,36 +418,36 @@ class polarization_correct:
             pboutput.R=R.ctypes.data_as(c_double_p)
 
             
-            pbflags=PBflags()
-    
-            fMonitorCorrect=0
-            fPolMonitorCorrect=0
-            if self.mydata[lastkey].metadata['count_info']['count_type']=='monitor':
-                fPolMonitorCorrect=1
-    ##            #print 'monitor'
-    ##        fDebug=0
-    ##        fSimFlux=0
-    ##        fSimDeviate=0
-            #-- ++ +- -+ #TODO Check with Ross on the order
-    
-    
-            pbflags.MonitorCorrect=0#fMonitorCorrect
-            pbflags.PolMonitorCorrect=0#fPolMonitorCorrect
-            pbflags.MonoSelect=1
-            pbflags.Debug=1#fDebug
-            pbflags.SimFlux=0#fSimFlux
-            pbflags.SimDeviate=0#fSimDeviate
-            pbflags.NoNegativeCS=0
-            pbflags.HalfPolarized=0
-            pbflags.CountsEnable=[0,1,1,0]
-            pbflags.CountsAdd1=[0,0,0,0]
-            pbflags.CountsAdd2=[0,0,0,0]
-            pbflags.Sconstrain=[1,0,0,1]
-            pbflags.Spp=[0,1,0,0]
-            pbflags.Smm=[0,0,0,0]
-            pbflags.Spm=[0,0,0,0]
-            pbflags.Smp=[0,0,1,0]
-            self.cell=r'c:\13176\data\CeOFeCellsMay20081.txt'
+#            pbflags=PBflags()
+#    
+#            fMonitorCorrect=0
+#            fPolMonitorCorrect=0
+#            if self.mydata[lastkey].metadata['count_info']['count_type']=='monitor':
+#                fPolMonitorCorrect=1
+#    ##            #print 'monitor'
+#    ##        fDebug=0
+#    ##        fSimFlux=0
+#    ##        fSimDeviate=0
+#            #-- ++ +- -+ #TODO Check with Ross on the order
+#    
+#    
+#            pbflags.MonitorCorrect=0#fMonitorCorrect
+#            pbflags.PolMonitorCorrect=0#fPolMonitorCorrect
+#            pbflags.MonoSelect=1
+            pbflags.Debug=9#fDebug
+#            pbflags.SimFlux=0#fSimFlux
+#            pbflags.SimDeviate=0#fSimDeviate
+#            pbflags.NoNegativeCS=0
+#            pbflags.HalfPolarized=0
+#            pbflags.CountsEnable=[0,1,1,0]
+#            pbflags.CountsAdd1=[0,0,0,0]
+#            pbflags.CountsAdd2=[0,0,0,0]
+#            pbflags.Sconstrain=[1,0,0,1]
+#            pbflags.Spp=[0,1,0,0]
+#            pbflags.Smm=[0,0,0,0]
+#            pbflags.Spm=[0,0,0,0]
+#            pbflags.Smp=[0,0,1,0]
+#            self.cell=r'c:\13176\data\CeOFeCellsMay20081.txt'
         
 #            print 'Debug',pbflags.Debug
 #            print 'SimFlux',pbflags.SimFlux
@@ -465,6 +465,7 @@ class polarization_correct:
 #            print 'Spp ',pbflags.Spp
 #            print 'Sconstrain ', pbflags.Sconstrain
 #            print 'CountsEnable ', pbflags.CountsEnable
+            print 'mycell', self.cell
             ierr=mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
             #print Smm[0]
             #print Spm[0]
