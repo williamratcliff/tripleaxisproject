@@ -17,6 +17,7 @@ class SansView():
         """
         #from gui_manager import ViewApp
         self.gui = gui_manager.ViewApp(0)
+        #self.gui = gui_manager.ViewApp()
         
         # Add perspectives to the basic application
         # Additional perspectives can still be loaded
