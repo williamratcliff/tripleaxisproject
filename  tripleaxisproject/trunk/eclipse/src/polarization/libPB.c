@@ -293,8 +293,8 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
 
   constraintTOeqs() ;
 
- printf("inside lib\n");
-  printf("CountsEnable %d %d %d %d\n",flags.CountsEnable[0],flags.CountsEnable[1],flags.CountsEnable[2],flags.CountsEnable[3]);
+  fprintf(stderr,"inside lib\n");
+  fprintf(stderr,"CountsEnable %d %d %d %d\n",flags.CountsEnable[0],flags.CountsEnable[1],flags.CountsEnable[2],flags.CountsEnable[3]);
  
 
 
