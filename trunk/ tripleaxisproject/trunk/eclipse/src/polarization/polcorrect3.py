@@ -192,7 +192,7 @@ class polarization_correct:
             #TODO currently, we assume that the files are taken at the same points--is this safe?
             self.length=self.counts[key].shape[0]
             a2=N.array(self.mydata[key].data['a2'])
-            if self.mydata[key].metadata['count_info']['analyzerdetectormode'].lower()=='diffdet':
+            if self.mydata[key].metadata['count_info']['analyzerdetectormode'].lower() in ['diffdet','psddiff']:
                 #a6=N.array(mydata[key].data['A5'])*2.0
                 a6=a2
             else:
@@ -267,8 +267,6 @@ class polarization_correct:
             pboutput=PBoutdata()
             pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
             pbinput.Ef=self.ef.ctypes.data_as(c_double_p)
-
-
             pbflags.MonitorCorrect=int(pbflags.MonitorCorrect)
             pbflags.PolMonitorCorrect=int(pbflags.PolMonitorCorrect)
             pbflags.MonoSelect=int(pbflags.MonoSelect)
@@ -294,23 +292,22 @@ class polarization_correct:
             pbflags.Sconstrain[1]=int(pbflags.Sconstrain[1])
             pbflags.Sconstrain[2]=int(pbflags.Sconstrain[2])
             pbflags.Sconstrain[3]=int(pbflags.Sconstrain[3])
-            pbflags.Spp[0]=float(pbflags.Spp[0])
-            pbflags.Spp[1]=float(pbflags.Spp[1])
-            pbflags.Spp[2]=float(pbflags.Spp[2])
-            pbflags.Spp[3]=float(pbflags.Spp[3])
-            pbflags.Smm[0]=float(pbflags.Smm[0])
-            pbflags.Smm[1]=float(pbflags.Smm[1])
-            pbflags.Smm[2]=float(pbflags.Smm[2])
-            pbflags.Smm[3]=float(pbflags.Smm[3])
-            pbflags.Spm[0]=float(pbflags.Spm[0])
-            pbflags.Spm[1]=float(pbflags.Spm[1])
-            pbflags.Spm[2]=float(pbflags.Spm[2])
-            pbflags.Spm[3]=float(pbflags.Spm[3])
-            pbflags.Smp[0]=float(pbflags.Smp[0])
-            pbflags.Smp[1]=float(pbflags.Smp[1])
-            pbflags.Smp[2]=float(pbflags.Smp[2])
-            pbflags.Smp[3]=float(pbflags.Smp[3])
-    
+#            pbflags.Spp[0]=float(pbflags.Spp[0])
+#            pbflags.Spp[1]=float(pbflags.Spp[1])
+#            pbflags.Spp[2]=float(pbflags.Spp[2])
+#            pbflags.Spp[3]=float(pbflags.Spp[3])
+#            pbflags.Smm[0]=float(pbflags.Smm[0])
+#            pbflags.Smm[1]=float(pbflags.Smm[1])
+#            pbflags.Smm[2]=float(pbflags.Smm[2])
+#            pbflags.Smm[3]=float(pbflags.Smm[3])
+#            pbflags.Spm[0]=float(pbflags.Spm[0])
+#            pbflags.Spm[1]=float(pbflags.Spm[1])
+#            pbflags.Spm[2]=float(pbflags.Spm[2])
+#            pbflags.Spm[3]=float(pbflags.Spm[3])
+#            pbflags.Smp[0]=float(pbflags.Smp[0])
+#            pbflags.Smp[1]=float(pbflags.Smp[1])
+#            pbflags.Smp[2]=float(pbflags.Smp[2])
+#            pbflags.Smp[3]=float(pbflags.Smp[3])
     
             if self.mydata[lastkey].metadata['count_info']['count_type']=='time':
                 pbflags.MonitorCorrect=int(0)
@@ -465,7 +462,7 @@ class polarization_correct:
 #            print 'Spp ',pbflags.Spp
 #            print 'Sconstrain ', pbflags.Sconstrain
 #            print 'CountsEnable ', pbflags.CountsEnable
-            print 'mycell', self.cell
+#            print 'mycell', self.cell
             ierr=mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
             #print Smm[0]
             #print Spm[0]

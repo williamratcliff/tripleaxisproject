@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <string.h>
+#include <strings.h>
 
 #include "PB.h"
 
@@ -269,6 +269,22 @@ static double Tnorm = 1. ;
   Caller is responsible for storage allocation in
   PBindata and PBoutdata which must have double arrays
   that can hold up to npts.
+
+  NB William Ratcliffe the first to use this has a different
+  ordering of the cross sections so that
+  p stands for flipper ON state ie
+  Cpp is ON-ON
+  My ordering was
+  pp = OFF-OFF
+  mm = ON-ON
+  pm = OFF-ON
+  mp = ON-OFF
+
+  while William has
+  pp = ON-ON
+  mm = OFF-OFF
+  pm = ON-OFF
+  mp = OFF-ON
 */
 
 int PBcorrectData(char *CellFile, PBflags *flgs,
@@ -284,27 +300,19 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
   unsigned long secs ;
   double temp, err ;
   FILE *fp ;
-  int bob;
 
-  printf("inside lib\n");
-  
-  printf("lib CellFile %s\n",CellFile);
-  bob=PBdefineCells(CellFile);
-  printf("lib 1st PBdefine %d\n", bob);
-  printf("lib Ncells %d\n",Ncells);
-  if( CellFile != NULL ) if( PBdefineCells(CellFile) || Ncells < 1 ){
-      printf("lib Ncells %d\n",Ncells);
-      printf("mylib PBdefine %d\n", PBdefineCells(CellFile));
-       return 1 ;}
+  if( CellFile != NULL ) if( PBdefineCells(CellFile) || Ncells < 1 ) return 1 ;
+
+//   fprintf(stderr,"iSmm %f %f %f %f\n",flgs->Smm[0],flgs->Smm[1],flgs->Smm[2],flgs->Smm[3]); 
+//   fprintf(stderr,"iSpp %f %f %f %f\n",flgs->Spp[0],flgs->Spp[1],flgs->Spp[2],flgs->Spp[3]); 
+//   fprintf(stderr,"iSpm %f %f %f %f\n",flgs->Spm[0],flgs->Spm[1],flgs->Spm[2],flgs->Spm[3]); 
+//   fprintf(stderr,"iSmp %f %f %f %f\n",flgs->Smp[0],flgs->Smp[1],flgs->Smp[2],flgs->Smp[3]); 
+//   fprintf(stderr,"Ei %f, Ef %f\n",in->Ei[0],in->Ef[0]);
+//   fprintf(stderr,"Cmm %f, Cpm %f\n",in->Cmm[0],in->Cpm[0]);
+//   fprintf(stderr,"tmm %d, tpm %d\n",in->tmm[0],in->tpm[0]);
 
 
-//for( j=0 ; j<npts ; j++ )  {
-//     printf("j=%d Cmm=%f Cpm=%f\n",j,in->Cmm[j],in->Cpm[j] );     
-//     }
-
-
-
-
+  /* must tanspose the flgs also */
   if( flgs != NULL ) PBsetflags(flgs) ;
 
   if( in == NULL || npts < 1 ) return 0 ;
@@ -312,81 +320,80 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
 
   constraintTOeqs() ;
 
-  
-  printf("CountsEnable %d %d %d %d\n",flags.CountsEnable[0],flags.CountsEnable[1],flags.CountsEnable[2],flags.CountsEnable[3]);
- 
-
-
   /*
     process each data point
+    NB the swap of p-m meanings above is applied in what follows
   */
   for( i=0 ; i<npts ; i++ ) {
     /* first just copy the input to the PBdatapt struct d */
     if( in->Cpp == NULL ) {
-      if( flags.CountsEnable[0] ) {
-	if( *DBG ) printf("NULL Cpp disables that equation\n") ;
-	flags.CountsEnable[0] = 0 ;
-      }
-      d.Y[0] = d.Yr[0] = 0. ; d.Yesq[0] = d.Yresq[0] = 0. ;
-    } else {
-      if( in->tpp == NULL ) return 3 ;
-      secs = in->tpp[i] ;
-      d.Y[0] = d.Yr[0] = in->Cpp[i] ;
-      if( in->Epp == NULL )
-	if( d.Y[0] > 0. ) d.Yesq[0] = d.Yresq[0] = d.Y[0] ;
-	else d.Yesq[0] = d.Yresq[0] = 1. ;
-      else d.Yesq[0] = d.Yresq[0] = in->Epp[i]*in->Epp[i] ;
-    }
-    if( in->Cmm == NULL ) {
       if( flags.CountsEnable[1] ) {
-	if( *DBG ) printf("NULL Cmm disables that equation\n") ;
+	if( *DBG ) printf("NULL Cpp disables that equation\n") ;
 	flags.CountsEnable[1] = 0 ;
       }
       d.Y[1] = d.Yr[1] = 0. ; d.Yesq[1] = d.Yresq[1] = 0. ;
     } else {
-      if( in->tmm == NULL ) return 3 ;
-      secs = in->tmm[i] ;
+      if( in->tpp == NULL ) return 3 ;
+      secs = in->tpp[i] ;
       d.Y[1] = d.Yr[1] = in->Cpp[i] ;
-      if( in->Emm == NULL )
+      if( in->Epp == NULL )
 	if( d.Y[1] > 0. ) d.Yesq[1] = d.Yresq[1] = d.Y[1] ;
 	else d.Yesq[1] = d.Yresq[1] = 1. ;
-      else d.Yesq[1] = d.Yresq[1] = in->Emm[i]*in->Emm[i] ;
+      else d.Yesq[1] = d.Yresq[1] = in->Epp[i]*in->Epp[i] ;
+    }
+    if( in->Cmm == NULL ) {
+      if( flags.CountsEnable[1] ) {
+	if( *DBG ) printf("NULL Cmm disables that equation\n") ;
+	flags.CountsEnable[0] = 0 ;
+      }
+      d.Y[0] = d.Yr[0] = 0. ; d.Yesq[0] = d.Yresq[0] = 0. ;
+    } else {
+      if( in->tmm == NULL ) return 3 ;
+      secs = in->tmm[i] ;
+      d.Y[0] = d.Yr[0] = in->Cmm[i] ;
+      if( in->Emm == NULL )
+	if( d.Y[0] > 0. ) d.Yesq[0] = d.Yresq[0] = d.Y[0] ;
+	else d.Yesq[0] = d.Yresq[0] = 1. ;
+      else d.Yesq[0] = d.Yresq[0] = in->Emm[i]*in->Emm[i] ;
     }
     if( in->Cpm == NULL ) {
-      if( flags.CountsEnable[2] ) {
-	if( *DBG ) printf("NULL Cpm disables that equation\n") ;
-	flags.CountsEnable[2] = 0 ;
-      }
-      d.Y[2] = d.Yr[2] = 0. ; d.Yesq[2] = d.Yresq[2] = 0. ;
-    } else {
-      if( in->tpm == NULL ) return 3 ;
-      secs = in->tpm[i] ;
-      d.Y[2] = d.Yr[2] = in->Cpm[i] ;
-      if( in->Epm == NULL )
-	if( d.Y[2] > 0. ) d.Yesq[2] = d.Yresq[2] = d.Y[2] ;
-	else d.Yesq[2] = d.Yresq[2] = 1. ;
-      else d.Yesq[2] = d.Yresq[2] = in->Epm[i]*in->Epm[i] ;
-    }
-    if( in->Cmp == NULL ) {
       if( flags.CountsEnable[3] ) {
-	if( *DBG ) printf("NULL Cmp disables that equation\n") ;
+	if( *DBG ) printf("NULL Cpm disables that equation\n") ;
 	flags.CountsEnable[3] = 0 ;
       }
       d.Y[3] = d.Yr[3] = 0. ; d.Yesq[3] = d.Yresq[3] = 0. ;
     } else {
-      if( in->tmp == NULL ) return 3 ;
-      secs = in->tmp[i] ;
-      d.Y[3] = d.Yr[3] = in->Cmp[i] ;
-      if( in->Emp == NULL )
+      if( in->tpm == NULL ) return 3 ;
+      secs = in->tpm[i] ;
+      d.Y[3] = d.Yr[3] = in->Cpm[i] ;
+      if( in->Epm == NULL )
 	if( d.Y[3] > 0. ) d.Yesq[3] = d.Yresq[3] = d.Y[3] ;
 	else d.Yesq[3] = d.Yresq[3] = 1. ;
-      else d.Yesq[3] = d.Yresq[3] = in->Emp[i]*in->Emp[i] ;
+      else d.Yesq[3] = d.Yresq[3] = in->Epm[i]*in->Epm[i] ;
+    }
+    if( in->Cmp == NULL ) {
+      if( flags.CountsEnable[2] ) {
+	if( *DBG ) printf("NULL Cmp disables that equation\n") ;
+	flags.CountsEnable[2] = 0 ;
+      }
+      d.Y[2] = d.Yr[2] = 0. ; d.Yesq[2] = d.Yresq[2] = 0. ;
+    } else {
+      if( in->tmp == NULL ) return 3 ;
+      secs = in->tmp[i] ;
+      d.Y[2] = d.Yr[2] = in->Cmp[i] ;
+      if( in->Emp == NULL )
+	if( d.Y[2] > 0. ) d.Yesq[2] = d.Yresq[2] = d.Y[2] ;
+	else d.Yesq[2] = d.Yresq[2] = 1. ;
+      else d.Yesq[2] = d.Yresq[2] = in->Emp[i]*in->Emp[i] ;
     }
 
-    if( in->Cpp == NULL ) d.sec[0] = secs ; else d.sec[0] = in->tpp[i] ;
-    if( in->Cmm == NULL ) d.sec[1] = secs ; else d.sec[1] = in->tmm[i] ;
-    if( in->Cpm == NULL ) d.sec[2] = secs ; else d.sec[2] = in->tpm[i] ;
-    if( in->Cmp == NULL ) d.sec[3] = secs ; else d.sec[3] = in->tmp[i] ;
+
+//    fprintf(stderr,"transformed pp %f mm %f pm %f mp %f \n",d.Y[0], d.Y[1],d.Y[2],d.Y[3]);
+
+    if( in->Cpp == NULL ) d.sec[1] = secs ; else d.sec[1] = in->tpp[i] ;
+    if( in->Cmm == NULL ) d.sec[0] = secs ; else d.sec[0] = in->tmm[i] ;
+    if( in->Cpm == NULL ) d.sec[3] = secs ; else d.sec[3] = in->tpm[i] ;
+    if( in->Cmp == NULL ) d.sec[2] = secs ; else d.sec[2] = in->tmp[i] ;
 
 
     temp = in->Ei[i] ;
@@ -432,19 +439,20 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
     */
 
     /* transfer the corrected S to the PBoutdata struct */
+    /* again use Williams ordering where pp is ON-ON */
     for( j=0 ; j<4 ; j++ ) {
       if( j == 0 ) {
-	out->Spp[i] = d.S[0] ;
-	if(d.Sesq[0]>0.) out->Epp[i] = sqrt(d.Sesq[0]) ; else out->Epp[i]=0. ;
+	out->Spp[i] = d.S[1] ;
+	if(d.Sesq[1]>0.) out->Epp[i] = sqrt(d.Sesq[1]) ; else out->Epp[i]=0. ;
       } else if( j == 1 ) {
-	out->Smm[i] = d.S[1] ;
-	if(d.Sesq[1]>0.) out->Emm[i] = sqrt(d.Sesq[1]) ; else out->Emm[i]=0. ;
+	out->Smm[i] = d.S[0] ;
+	if(d.Sesq[0]>0.) out->Emm[i] = sqrt(d.Sesq[0]) ; else out->Emm[i]=0. ;
       } else if( j == 2 ) {
-	out->Spm[i] = d.S[2] ;
-	if(d.Sesq[2]>0.) out->Epm[i] = sqrt(d.Sesq[2]) ; else out->Epm[i]=0. ;
+	out->Spm[i] = d.S[3] ;
+	if(d.Sesq[3]>0.) out->Epm[i] = sqrt(d.Sesq[3]) ; else out->Epm[i]=0. ;
       } else if( j == 3 ) {
-	out->Smp[i] = d.S[3] ;
-	if(d.Sesq[3]>0.) out->Emp[i] = sqrt(d.Sesq[3]) ; else out->Emp[i]=0. ;
+	out->Smp[i] = d.S[2] ;
+	if(d.Sesq[2]>0.) out->Emp[i] = sqrt(d.Sesq[2]) ; else out->Emp[i]=0. ;
       }
     }
     out->R[i] = d.R ;
@@ -2434,11 +2442,11 @@ static int SIMpolmonitorCorrect(PBdatapt *d)
 
 static int PBdefineCells(char *filename)
 {
-  int i, j, nscan ;
+  int i, j, nscan, nbuf, ich ;
   double cellfac ;
   FILE *fp ;
   char *cp ;
-  char buf[2048] ;
+  char buf[4096] ;
   char PorA[4] ;
   char date[32] ;
   char time[32] ;
@@ -2463,21 +2471,41 @@ static int PBdefineCells(char *filename)
   /* init the number of cells defined to zero */
   Ncells = 0 ;
 
+  /* RWE June 2008 changed to read char by char until nonprint exc tab */
+  nbuf = 0 ;
+  while(1) {
+    ich = fgetc(fp) ;
+    if( (ich >= 32 && ich <= 126) || ich == 9 ) {
+      if( nbuf >= 4094 ) {
+	printf("cell file line length exceded\n") ;
+	return 2 ;
+      }
+      buf[nbuf] = ich ;
+      nbuf++ ;
+      continue ;
+    } else {
+      /* terminate buf on non-printing char */
+      buf[nbuf] = '\0' ;
+    }
+    if( nbuf < 1 ) {
+      if( ich == EOF ) break ;
+      continue ;
+    }
+    nbuf = 0 ;
 
-   while( (fgets(buf, 2047, fp)) != NULL ) {
-     if( strstr(buf, "cellName") ) continue ;
-     if( buf[0] == '#' ) continue ;
-
-     cell = &(expcells[Ncells].cell) ;
-     pol = &(expcells[Ncells].pol) ;
-     exper = &(expcells[Ncells].res) ;
-     eff = &(expcells[Ncells].eff) ;
-
-     curvCor = 1. ;
-     exper->angcor = 1. ;
-     exper->t1 = exper->t2 = 0. ;
-     exper->hsigsq = exper->vsigsq = exper->xsigsq = 0. ;
-     cell->tEmptySlope = 0. ;
+    if( strstr(buf, "cellName") ) continue ;
+    if( buf[0] == '#' ) continue ;
+    
+    cell = &(expcells[Ncells].cell) ;
+    pol = &(expcells[Ncells].pol) ;
+    exper = &(expcells[Ncells].res) ;
+    eff = &(expcells[Ncells].eff) ;
+    
+    curvCor = 1. ;
+    exper->angcor = 1. ;
+    exper->t1 = exper->t2 = 0. ;
+    exper->hsigsq = exper->vsigsq = exper->xsigsq = 0. ;
+    cell->tEmptySlope = 0. ;
 
      /*
        sscanf is choking on a tab delimiter after the %ul read of startSecs
@@ -2491,7 +2519,7 @@ static int PBdefineCells(char *filename)
        If read nsL must correct for the Energy
      */
 
-     nscan = sscanf(buf,"%s %s %s %s %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %s %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+    nscan = sscanf(buf,"%s %s %s %s %lu %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %s %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
 		    cell->name,PorA,date,time,
 		    &(pol->startSecs),
 		    &Energy,&lambda,&(pol->PHe),&(pol->PHeErr),
@@ -2507,11 +2535,10 @@ static int PBdefineCells(char *filename)
 		    &(exper->hsigsq),&(exper->vsigsq),&(exper->xsigsq),
 		    &curvCor,&(exper->angcor)) ;
 
-      printf("seconds %d\n",pol->startSecs);
-     if( nscan < 19 && *DBG )
-       printf("failed read complete cell data %d from %s\n", Ncells,filename) ;
 
-
+    if( nscan < 19 && *DBG )
+      printf("failed read complete cell data %d from %s\n", Ncells,filename) ;
+    
      /*
        convert the startDate to seconds since Jan 1 1971
        replace - with space and pass the string to system call
@@ -2533,49 +2560,113 @@ static int PBdefineCells(char *filename)
        now because I am reading nsL0 at 1 Angstrom
      */
 
-     cell->nsL = curvCor*cell->nsL0 ;
-     cell->nsLerr = curvCor*cell->nsL0err ;
+    cell->nsL = curvCor*cell->nsL0 ;
+    cell->nsLerr = curvCor*cell->nsL0err ;
+    
+    if( PorA[0] == 'P' ) expcells[Ncells].PorA = 0 ;
+    else expcells[Ncells].PorA = 1 ;
+    
+    exper->t1 = -0.5*exper->angcor*(hsigsq + vsigsq) ;
+    exper->t2 =  0.5*exper->xsigsq ;
+    
+    Ncells++ ;
+    if( Ncells >= MAXCELLS && *DBG )
+      printf("read maximum number of experiment cells = %d\n", MAXCELLS) ;
+    
+    if( ich == EOF ) break ;
+  }
+  fclose(fp) ;
+  
+  /*
+    order the cells by install UNIXtime
+  */
+  
+  for( i=0 ; i<Ncells-1 ; i++ ) {
+    for( j=i ; j<Ncells ; j++ ) {
+      if( expcells[j].pol.startSecs < expcells[i].pol.startSecs ) {
+	swap = expcells[j] ;
+	expcells[j] = expcells[i] ;
+	expcells[i] = swap ;
+      }
+    }
+  }
+  
+  return 0 ;
+}
 
-     if( PorA[0] == 'P' ) expcells[Ncells].PorA = 0 ;
-     else expcells[Ncells].PorA = 1 ;
-
-     exper->t1 = -0.5*exper->angcor*(hsigsq + vsigsq) ;
-     exper->t2 =  0.5*exper->xsigsq ;
-
-     Ncells++ ;
-     if( Ncells >= MAXCELLS && *DBG )
-       printf("read maximum number of experiment cells = %d\n", MAXCELLS) ;
-
-   }
-   fclose(fp) ;
-
-   /*
-     order the cells by install UNIXtime
-   */
-
-   for( i=0 ; i<Ncells-1 ; i++ ) {
-     for( j=i ; j<Ncells ; j++ ) {
-       if( expcells[j].pol.startSecs < expcells[i].pol.startSecs ) {
-	 swap = expcells[j] ;
-	 expcells[j] = expcells[i] ;
-	 expcells[i] = swap ;
-       }
-     }
-   }
-
-   return 0 ;
- }
+static void iswap(int *i, int *j)
+{
+  int itemp ;
+  itemp = *i ;
+  *i = *j ;
+  *j = itemp ;
+}
+static void dswap(double *a, double *b)
+{
+  double dtemp ;
+  dtemp = *a ;
+  *a = *b ;
+  *b = dtemp ;
+}
+static void adswap(double *a, double *b)
+{
+  int i ;
+  double dtemp ;
+  for( i=0 ; i<4 ; i++ ) {
+    dtemp = a[i] ;
+    a[i] = b[i] ;
+    b[i] = dtemp ;
+  }
+}
 
 
-
-
- static int PBsetflags(PBflags *flgs)
- {
+static int PBsetflags(PBflags *flgs)
+{
    /* set the global flag structure from the called one */
    if( flgs->MonoSelect >= NmonoCorFunc ) flgs->MonoSelect = 0 ;
    flags = *flgs ;
+   /* for Williams input format must transpose ++ <-> --  +- <-> -+ */
+
+
+//   fprintf(stderr,"bSmm %f %f %f %f\n",flags.Smm[0],flags.Smm[1],flags.Smm[2],flags.Smm[3]); 
+//   fprintf(stderr,"bSpp %f %f %f %f\n",flags.Spp[0],flags.Spp[1],flags.Spp[2],flags.Spp[3]); 
+//   fprintf(stderr,"bSpm %f %f %f %f\n",flags.Spm[0],flags.Spm[1],flags.Spm[2],flags.Spm[3]); 
+//   fprintf(stderr,"bSmp %f %f %f %f\n",flags.Smp[0],flags.Smp[1],flags.Smp[2],flags.Smp[3]); 
+
+
+   iswap(&(flags.CountsEnable[0]),&(flags.CountsEnable[1])) ;
+   iswap(&(flags.CountsEnable[2]),&(flags.CountsEnable[3])) ;
+
+   iswap(&(flags.Sconstrain[0]),&(flags.Sconstrain[1])) ;
+   iswap(&(flags.Sconstrain[2]),&(flags.Sconstrain[3])) ;
+
+   iswap(&(flags.CountsAdd1[0]),&(flags.CountsAdd1[1])) ;
+   iswap(&(flags.CountsAdd1[2]),&(flags.CountsAdd1[3])) ;
+
+   iswap(&(flags.CountsAdd2[0]),&(flags.CountsAdd2[1])) ;
+   iswap(&(flags.CountsAdd2[2]),&(flags.CountsAdd2[3])) ;
+
+
+   dswap(&(flags.Spp[0]),&(flags.Spp[1])) ;
+   dswap(&(flags.Spp[2]),&(flags.Spp[3])) ;
+   dswap(&(flags.Smm[0]),&(flags.Smm[1])) ;
+   dswap(&(flags.Smm[2]),&(flags.Smm[3])) ;
+
+   dswap(&(flags.Spm[0]),&(flags.Spm[1])) ;
+   dswap(&(flags.Spm[2]),&(flags.Spm[3])) ;
+   dswap(&(flags.Smp[0]),&(flags.Smp[1])) ;
+   dswap(&(flags.Smp[2]),&(flags.Smp[3])) ;
+
+   adswap(flags.Spp,flags.Smm) ;
+   adswap(flags.Spm,flags.Smp) ;
+//   fprintf(stderr,"Sconstrain %d %d %d %d\n",flags.Sconstrain[0],flags.Sconstrain[1],flags.Sconstrain[2],flags.Sconstrain[3]);
+ //  fprintf(stderr,"CountsEnable %d %d %d %d\n",flags.CountsEnable[0],flags.CountsEnable[1],flags.CountsEnable[2],flags.CountsEnable[3]); 
+//   fprintf(stderr,"Smm %f %f %f %f\n",flags.Smm[0],flags.Smm[1],flags.Smm[2],flags.Smm[3]); 
+//   fprintf(stderr,"Spp %f %f %f %f\n",flags.Spp[0],flags.Spp[1],flags.Spp[2],flags.Spp[3]); 
+//   fprintf(stderr,"Spm %f %f %f %f\n",flags.Spm[0],flags.Spm[1],flags.Spm[2],flags.Spm[3]); 
+//   fprintf(stderr,"Smp %f %f %f %f\n",flags.Smp[0],flags.Smp[1],flags.Smp[2],flags.Smp[3]); 
    return 0 ;
- }
+}
 
 
  /*
@@ -3141,13 +3232,15 @@ int PBreadflags(char *filename)
   return 0 ;
 }
 
- int PBreaddata(char *filename)
- {
+int PBreaddata(char *filename)
+{
 
    /*
      functionally similar to PBcorrectData but reads from file
      instead of passed data structures
      and reads control flags etc from file.CTRL
+
+     datafiles must be UNIX newline terminated lines
 
      read lines
      Ei Ef Cpp tpp Cmm tmm Cpm tmm Cpm tpm Cmp tmp CppErr CmmErr CpmErr CmpErr
@@ -3228,7 +3321,7 @@ int PBreadflags(char *filename)
        inw = nw/2 - 1 ;
        if( sscanf(cp, "%lf", &dbl)<1 ) {
 	 if( nw < 2 ) {
-	   printf("failed to read lambdaI or lambdaF at data pt # %d\n",n+1) ;
+	   printf("failed to read EI or EF at data pt # %d\n",n+1) ;
 	   fclose(fp) ; fclose(fpout) ;
 	   return 3 ;
 	 } else if( nw < 10 ) {
@@ -3392,7 +3485,190 @@ int PBreadflags(char *filename)
 
 
    return 0 ;
- }
+}
+
+int PBreaddataTOstruct(char *filename, PBindata *in)
+{
+
+   /*
+     read data from file and fill in data structures for it.
+     This assumes the data structures are already allocated with
+     enough space for the data.
+     functionally similar to PBcorrectData but reads from file
+     instead of passed data structures
+     and reads control flags etc from file.CTRL
+
+     datafiles must be UNIX newline terminated lines
+
+     read lines
+     Ei Ef Cpp tpp Cmm tmm Cpm tmm Cpm tpm Cmp tmp CppErr CmmErr CpmErr CmpErr
+     from file and
+     automatically disable any missing counts and constrain the
+     corresponding CS to zero.
+     Then call PBcorrectDatapt
+   */
+
+   PBdatapt d ;
+
+   static char Cstrs[4][4] = {"Cuu","Cdd","Cdu","Cud"} ;
+   static char Sstrs[4][4] = {"Suu","Sdd","Sdu","Sud"} ;
+
+   int i, ierr, j, k, n, is, ic, nw, inw ;
+   int seed, newseed ;
+   char *cp ;
+   char buf[512], labl[64] ;
+   char outfile[512] ;
+   static char MCseed[8] = "MCseed" ;
+   static char MCroot[8] = "MCout" ;
+   char MCfile[16], MCnum[8] ;
+   double S[4] ;
+   double dbl ;
+   double distval ;
+   double iout, fout, err ;
+   double hrsecs, HrStep ;
+   double EI, EF, EIstart, EIstep, EFstart, EFstep ;
+
+   unsigned long ulhrs ;
+   FILE *fp, *fpout, *fpcorrect, *fps ;
+
+
+   if( filename == NULL ) return 1 ;
+
+   flags = defltflags ;
+
+   strcpy(outfile, filename) ;
+   strcat(outfile, ".CTRL") ;
+   ierr = PBreadflags(outfile) ;
+   if( ierr == 1 ) {
+     printf("NO .CTRL file\n") ;
+   } else if( ierr > 1 ) {
+     printf("ERROR in PBreadflags = %d\n", ierr) ;
+     return 2 ;
+   }
+
+   /* make sure flags are applied to constraints */
+   /* constraintTOeqs() ; */
+
+   /* here we dont set any flags, relying only on PBreadflags */
+
+   if( (fp = fopen(filename, "r")) == NULL ) {
+     printf("failed to open %s\n", filename) ;
+     return 2 ;
+   }
+   strcpy(outfile, filename) ;
+   strcat(outfile, ".out") ;
+   if( (fpout = fopen(outfile, "w")) == NULL ) {
+     printf("failed to open %s\n", outfile) ;
+     return 2 ;
+   }
+   fprintf(fpout,"# ") ;
+
+   n = 0 ;
+
+   while( fgets(buf, 511, fp) ) {
+     /* find up to 14 words in buf and try to read each as double */
+     cp = buf ;
+     if( *cp == '#' ) continue ;
+     nw = 0 ;
+
+     while(nw < 14 && *cp != '\n' && *cp != '\0') {
+       /* skip white space */
+       while( *cp == ' ' || *cp == '\t' ) cp++ ;
+       /* break if end of line */
+       if( *cp == '\n' || *cp == '\0' ) break ;
+       /* try to scan this word as a double */
+
+       inw = nw/2 - 1 ;
+       if( sscanf(cp, "%lf", &dbl)<1 ) {
+	 if( nw < 2 ) {
+	   printf("failed to read EI or EF at data pt # %d\n",n+1) ;
+	   fclose(fp) ; fclose(fpout) ;
+	   return 3 ;
+	 } else if( nw < 10 ) {
+	   if( flags.CountsEnable[inw] ) {
+	     printf("invalid counts disables equation index %d and zeros that cross-section\n",inw) ;
+	     /*
+	     flags.CountsEnable[inw] = 0;
+	     flags.Sconstrain[inw] = 1;
+	     for( j=0 ; j<4 ; j++ ) {
+	       if( inw == 0 ) { flags.Spp[j] = 0. ; }
+	       else if( inw == 1 ) { flags.Smm[j] = 0. ; }
+	       else if( inw == 2 ) { flags.Spm[j] = 0. ; }
+	       else if( inw == 3 ) { flags.Smp[j] = 0. ; }
+	     }
+	     constraintTOeqs();
+	     */
+	   }
+	 } else {
+	   d.Yresq[nw-10] = d.Yesq[nw-10] = d.Y[nw-10] ;
+	 }
+       } else {
+	 if( dbl < 0. ) {
+	   printf("read negative value\n") ;
+	   fclose(fp) ; fclose(fpout) ;
+	   return 4 ;
+	 }
+	 if( nw < 2 ) {
+	   if( dbl <= 0. ) {
+	     printf("read non-positive for energy\n") ;
+	     fclose(fp) ; fclose(fpout) ;
+	     return 4 ;
+	   }
+	   dbl /= Dn ;
+	   dbl = TWOPI/sqrt(dbl) ;
+	 }
+	 if( nw == 0 ) {
+	   EI = dbl ;
+	   d.lambI = dbl ;
+	 } else if( nw == 1 ) {
+	   EF = dbl ;
+	   d.lambF = dbl ;
+	 } else if( nw < 10 && nw%2 == 0 ) {
+	   d.Y[inw] = d.Yr[inw] = dbl ;
+	   d.Yesq[inw] = d.Yresq[inw] = dbl ;
+	 } else if( nw < 10 && sscanf(cp, "%lu",&(d.sec[inw])) < 1 ) {
+	   printf("failed to read time stamp as unsigned long pt # %d\n",n+1);
+	   fclose(fp) ; fclose(fpout) ;
+	   return 3 ;
+	 } else if( nw >= 10 && nw < 14 ) {
+	   d.Yesq[nw-10] = d.Yresq[nw-10] = dbl ;
+	 }
+       }
+       /* go to just past this word */
+       while( *cp != ' ' && *cp != '\t' && *cp != '\n' && *cp != '\0' ) cp++ ;
+       nw++ ;
+       if( *cp == '\n' || *cp == '\0' ) break ;
+     }
+
+
+     /*
+       if( flags.MonitorCorrect ) {
+       monitorCorrect(&d) ;
+       } else if ( flags.PolMonitorCorrect ) {
+       polmonitorCorrect(&d);
+       }
+
+       monitor corrections now in PBcoef
+     */
+
+     /* NO MC or PBcorrect */
+
+     /* write to the indata */
+
+     in->Ei[n] = EI ;
+     in->Ef[n] = EF ;
+     in->Cpp[n] = d.Y[0] ;
+
+     n++ ;
+   }
+
+   if( *DBG ) printf("%d data points read and corrected\n",n) ;
+   fclose(fp) ;
+
+
+   return 0 ;
+}
+
 
 /*
   determinant module

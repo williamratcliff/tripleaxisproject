@@ -4,6 +4,11 @@ import sys, shutil,os
 if sys.platform=='win32':
 	print 'building on windows'
 	SharedLibrary('polarization2.dll', ['libPB.c']) #good
+	#print 'I built it!  Now copying'
+    #mydir=os.getcwd()
+    #orig=os.path.join(mydir,'polarization2.dll')
+    #shutil.copyfile(orig,r'c:\polcorrecter\polarization2.dll')
+    #print 'copied'
 elif sys.playform=='mac':
 	print 'I do not know how to build on Macs yet'
 else:
@@ -12,6 +17,3 @@ else:
 #SharedLibrary('mylong.dll', ['mylong.c']) #good
 
 
-#mydir=os.getcwd()
-#orig=os.path.join(mydir,'polarization2.dll')
-#shutil.copyfile(orig,r'c:\polcorrecter\polarization2.dll')
