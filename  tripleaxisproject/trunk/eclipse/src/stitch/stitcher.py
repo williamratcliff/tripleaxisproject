@@ -171,7 +171,7 @@ if __name__=='__main__':
         
         #myfilestr=os.path.join(mydirectory,'CeOFeAs56685.bt7')
         mydirectory2=r'C:\13176\data'
-        myfilestr=os.path.join(mydirectory2,'CeOFeAs57254.bt7.out')
+        myfilestr=os.path.join(mydirectory2,'CeOFeAs57256.bt7.out')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
@@ -188,6 +188,17 @@ if __name__=='__main__':
         print mystitcher.detectors
         print mystitcher.data.data[mystitcher.detectors[-1]+'_corrected']
         pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'s')
+
+        myfilestr=os.path.join(mydirectory2,'CeOFeAs57257.bt7.out')
+        mydatareader=readncnr.datareader()
+        mydata=mydatareader.readbuffer(myfilestr)
+        mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
+        mystitcher.stitch()
+        pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'rs')
+
+        
+        
+        
         #pylab.plot(mystitcher.output_a4[0:-1],mystitcher.output_data,'s')
         #pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
         pylab.show()
