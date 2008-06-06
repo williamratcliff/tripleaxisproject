@@ -41,7 +41,8 @@ class Stitch:
         #print self.output_npts
         #print self.output_a4.shape
         #print self.a4_begin
-        #print self.a4_end        
+        #print self.a4_end 
+        print self.a4       
         detectors=self.data.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         self.corrected=False
         self.counts_ending=''
@@ -80,6 +81,7 @@ class Stitch:
         mon_in=N.ones(self.ch_eff.shape,'float64')
         i=0
         ch_eff=self.ch_eff
+        #ch_eff[[3,7,8]]=0
         for detector in self.detectors:
             if ch_eff[i] < 1e-2:
                 mon_in[i]=0
@@ -173,6 +175,8 @@ if __name__=='__main__':
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
+
+        
         mystitcher.stitch()
         #print mystitcher.output_a4
         #print mystitcher.output_data.shape
