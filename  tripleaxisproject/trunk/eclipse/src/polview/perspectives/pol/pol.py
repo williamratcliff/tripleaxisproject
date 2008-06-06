@@ -51,7 +51,9 @@ class Plugin:
 
         return [(id, self.menu, "Polarization")]
 
-
+    def help(self,event):
+        print 'help!'
+        
     def get_panels(self, parent):
         """
             Create and return a list of panel objects

@@ -2,14 +2,15 @@ EXPORTS
     Dn @1 DATA
     PBcorrectData @2
     PBreaddata @3
-    PBreadflags @4
-    PBsim @5
-    TWOPI @6 DATA
-    deter @7
-    deterC @8
-    dmatrix @9
-    free_dmatrix @10
-    invert @11
-    invertLU @12
-    invertP @13
-    invertPC @14
+    PBreaddataTOstruct @4
+    PBreadflags @5
+    PBsim @6
+    TWOPI @7 DATA
+    deter @8
+    deterC @9
+    dmatrix @10
+    free_dmatrix @11
+    invert @12
+    invertLU @13
+    invertP @14
+    invertPC @15
