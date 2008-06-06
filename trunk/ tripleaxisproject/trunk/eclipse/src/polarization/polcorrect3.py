@@ -260,9 +260,9 @@ class polarization_correct:
                 self.outdata[key]=copy.deepcopy(self.mydata[key])
                 detectors=self.mydata[key].metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         detectors.append(self.mydata[lastkey].metadata['count_info']['signal'])
-        #for detector in detectors: 
-        detector=detectors[-1]
-        if 1:
+        for detector in detectors: 
+        #detector=detectors[-1]
+        #if 1:
             pbinput=PBindata()
             pboutput=PBoutdata()
             pbinput.Ei=self.ei.ctypes.data_as(c_double_p)
@@ -431,7 +431,7 @@ class polarization_correct:
 #            pbflags.MonitorCorrect=0#fMonitorCorrect
 #            pbflags.PolMonitorCorrect=0#fPolMonitorCorrect
 #            pbflags.MonoSelect=1
-            pbflags.Debug=9#fDebug
+#            pbflags.Debug=9#fDebug
 #            pbflags.SimFlux=0#fSimFlux
 #            pbflags.SimDeviate=0#fSimDeviate
 #            pbflags.NoNegativeCS=0
