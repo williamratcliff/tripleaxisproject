@@ -343,13 +343,13 @@ class polarization_correct:
                         mytemp_mm=self.timestamp[key].astype('uint32')
                         pbinput.tmm=mytemp_mm.ctypes.data_as(c_ulong_p)
                         #pbinput.tmm=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
-                        print 't0,mm ',mytemp_mm[0]
+                        #print 't0,mm ',mytemp_mm[0]
                         pbinput.Cmm=self.counts[key].ctypes.data_as(c_double_p)
                         pbinput.Emm=self.errors[key].ctypes.data_as(c_double_p)
                     if key=='pm':
                         mytemp_pm=self.timestamp[key].astype('uint32')
                         pbinput.tpm=mytemp_pm.ctypes.data_as(c_ulong_p)
-                        print 't0,pm ',mytemp_pm[0]
+                        #print 't0,pm ',mytemp_pm[0]
                         pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
                         pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
                         #print 'shape ',self.counts[key].shape
@@ -466,7 +466,7 @@ class polarization_correct:
             ierr=mypolcorrect.PBcorrectData(self.cell,pbflags._pointer,self.length,ctypes.byref(pbinput),ctypes.byref(pboutput))
             #print Smm[0]
             #print Spm[0]
-            print 'ierr',ierr
+            #print 'ierr',ierr
             corrected_counts={}
             corrected_counts['Spp']=Spp[0]
             corrected_counts['Epp']=Epp[0]

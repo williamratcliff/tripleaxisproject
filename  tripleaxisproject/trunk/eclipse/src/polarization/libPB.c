@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <strings.h>
-
 #include "PB.h"
 
 /*
@@ -277,14 +276,16 @@ static double Tnorm = 1. ;
   My ordering was
   pp = OFF-OFF
   mm = ON-ON
-  pm = OFF-ON
   mp = ON-OFF
+  pm = OFF-ON
 
   while William has
   pp = ON-ON
   mm = OFF-OFF
   pm = ON-OFF
   mp = OFF-ON
+
+  So only swap 0 and 1 indices
 */
 
 int PBcorrectData(char *CellFile, PBflags *flgs,
@@ -302,15 +303,6 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
   FILE *fp ;
 
   if( CellFile != NULL ) if( PBdefineCells(CellFile) || Ncells < 1 ) return 1 ;
-
-//   fprintf(stderr,"iSmm %f %f %f %f\n",flgs->Smm[0],flgs->Smm[1],flgs->Smm[2],flgs->Smm[3]); 
-//   fprintf(stderr,"iSpp %f %f %f %f\n",flgs->Spp[0],flgs->Spp[1],flgs->Spp[2],flgs->Spp[3]); 
-//   fprintf(stderr,"iSpm %f %f %f %f\n",flgs->Spm[0],flgs->Spm[1],flgs->Spm[2],flgs->Spm[3]); 
-//   fprintf(stderr,"iSmp %f %f %f %f\n",flgs->Smp[0],flgs->Smp[1],flgs->Smp[2],flgs->Smp[3]); 
-//   fprintf(stderr,"Ei %f, Ef %f\n",in->Ei[0],in->Ef[0]);
-//   fprintf(stderr,"Cmm %f, Cpm %f\n",in->Cmm[0],in->Cpm[0]);
-//   fprintf(stderr,"tmm %d, tpm %d\n",in->tmm[0],in->tpm[0]);
-
 
   /* must tanspose the flgs also */
   if( flgs != NULL ) PBsetflags(flgs) ;
@@ -357,43 +349,40 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
       else d.Yesq[0] = d.Yresq[0] = in->Emm[i]*in->Emm[i] ;
     }
     if( in->Cpm == NULL ) {
-      if( flags.CountsEnable[3] ) {
-	if( *DBG ) printf("NULL Cpm disables that equation\n") ;
-	flags.CountsEnable[3] = 0 ;
-      }
-      d.Y[3] = d.Yr[3] = 0. ; d.Yesq[3] = d.Yresq[3] = 0. ;
-    } else {
-      if( in->tpm == NULL ) return 3 ;
-      secs = in->tpm[i] ;
-      d.Y[3] = d.Yr[3] = in->Cpm[i] ;
-      if( in->Epm == NULL )
-	if( d.Y[3] > 0. ) d.Yesq[3] = d.Yresq[3] = d.Y[3] ;
-	else d.Yesq[3] = d.Yresq[3] = 1. ;
-      else d.Yesq[3] = d.Yresq[3] = in->Epm[i]*in->Epm[i] ;
-    }
-    if( in->Cmp == NULL ) {
       if( flags.CountsEnable[2] ) {
-	if( *DBG ) printf("NULL Cmp disables that equation\n") ;
+	if( *DBG ) printf("NULL Cpm disables that equation\n") ;
 	flags.CountsEnable[2] = 0 ;
       }
       d.Y[2] = d.Yr[2] = 0. ; d.Yesq[2] = d.Yresq[2] = 0. ;
     } else {
-      if( in->tmp == NULL ) return 3 ;
-      secs = in->tmp[i] ;
-      d.Y[2] = d.Yr[2] = in->Cmp[i] ;
-      if( in->Emp == NULL )
+      if( in->tpm == NULL ) return 3 ;
+      secs = in->tpm[i] ;
+      d.Y[2] = d.Yr[2] = in->Cpm[i] ;
+      if( in->Epm == NULL )
 	if( d.Y[2] > 0. ) d.Yesq[2] = d.Yresq[2] = d.Y[2] ;
 	else d.Yesq[2] = d.Yresq[2] = 1. ;
-      else d.Yesq[2] = d.Yresq[2] = in->Emp[i]*in->Emp[i] ;
+      else d.Yesq[2] = d.Yresq[2] = in->Epm[i]*in->Epm[i] ;
     }
-
-
-//    fprintf(stderr,"transformed pp %f mm %f pm %f mp %f \n",d.Y[0], d.Y[1],d.Y[2],d.Y[3]);
+    if( in->Cmp == NULL ) {
+      if( flags.CountsEnable[3] ) {
+	if( *DBG ) printf("NULL Cmp disables that equation\n") ;
+	flags.CountsEnable[3] = 0 ;
+      }
+      d.Y[3] = d.Yr[3] = 0. ; d.Yesq[3] = d.Yresq[3] = 0. ;
+    } else {
+      if( in->tmp == NULL ) return 3 ;
+      secs = in->tmp[i] ;
+      d.Y[3] = d.Yr[3] = in->Cmp[i] ;
+      if( in->Emp == NULL )
+	if( d.Y[3] > 0. ) d.Yesq[3] = d.Yresq[3] = d.Y[3] ;
+	else d.Yesq[3] = d.Yresq[3] = 1. ;
+      else d.Yesq[3] = d.Yresq[3] = in->Emp[i]*in->Emp[i] ;
+    }
 
     if( in->Cpp == NULL ) d.sec[1] = secs ; else d.sec[1] = in->tpp[i] ;
     if( in->Cmm == NULL ) d.sec[0] = secs ; else d.sec[0] = in->tmm[i] ;
-    if( in->Cpm == NULL ) d.sec[3] = secs ; else d.sec[3] = in->tpm[i] ;
-    if( in->Cmp == NULL ) d.sec[2] = secs ; else d.sec[2] = in->tmp[i] ;
+    if( in->Cpm == NULL ) d.sec[2] = secs ; else d.sec[2] = in->tpm[i] ;
+    if( in->Cmp == NULL ) d.sec[3] = secs ; else d.sec[3] = in->tmp[i] ;
 
 
     temp = in->Ei[i] ;
@@ -448,11 +437,11 @@ int PBcorrectData(char *CellFile, PBflags *flgs,
 	out->Smm[i] = d.S[0] ;
 	if(d.Sesq[0]>0.) out->Emm[i] = sqrt(d.Sesq[0]) ; else out->Emm[i]=0. ;
       } else if( j == 2 ) {
-	out->Spm[i] = d.S[3] ;
-	if(d.Sesq[3]>0.) out->Epm[i] = sqrt(d.Sesq[3]) ; else out->Epm[i]=0. ;
+	out->Spm[i] = d.S[2] ;
+	if(d.Sesq[2]>0.) out->Epm[i] = sqrt(d.Sesq[2]) ; else out->Epm[i]=0. ;
       } else if( j == 3 ) {
-	out->Smp[i] = d.S[2] ;
-	if(d.Sesq[2]>0.) out->Emp[i] = sqrt(d.Sesq[2]) ; else out->Emp[i]=0. ;
+	out->Smp[i] = d.S[3] ;
+	if(d.Sesq[3]>0.) out->Emp[i] = sqrt(d.Sesq[3]) ; else out->Emp[i]=0. ;
       }
     }
     out->R[i] = d.R ;
@@ -2538,7 +2527,8 @@ static int PBdefineCells(char *filename)
 
     if( nscan < 19 && *DBG )
       printf("failed read complete cell data %d from %s\n", Ncells,filename) ;
-    
+
+
      /*
        convert the startDate to seconds since Jan 1 1971
        replace - with space and pass the string to system call
@@ -2627,44 +2617,32 @@ static int PBsetflags(PBflags *flgs)
    flags = *flgs ;
    /* for Williams input format must transpose ++ <-> --  +- <-> -+ */
 
-
-//   fprintf(stderr,"bSmm %f %f %f %f\n",flags.Smm[0],flags.Smm[1],flags.Smm[2],flags.Smm[3]); 
-//   fprintf(stderr,"bSpp %f %f %f %f\n",flags.Spp[0],flags.Spp[1],flags.Spp[2],flags.Spp[3]); 
-//   fprintf(stderr,"bSpm %f %f %f %f\n",flags.Spm[0],flags.Spm[1],flags.Spm[2],flags.Spm[3]); 
-//   fprintf(stderr,"bSmp %f %f %f %f\n",flags.Smp[0],flags.Smp[1],flags.Smp[2],flags.Smp[3]); 
-
-
    iswap(&(flags.CountsEnable[0]),&(flags.CountsEnable[1])) ;
-   iswap(&(flags.CountsEnable[2]),&(flags.CountsEnable[3])) ;
+   //iswap(&(flags.CountsEnable[2]),&(flags.CountsEnable[3])) ;
 
    iswap(&(flags.Sconstrain[0]),&(flags.Sconstrain[1])) ;
-   iswap(&(flags.Sconstrain[2]),&(flags.Sconstrain[3])) ;
+   //iswap(&(flags.Sconstrain[2]),&(flags.Sconstrain[3])) ;
 
    iswap(&(flags.CountsAdd1[0]),&(flags.CountsAdd1[1])) ;
-   iswap(&(flags.CountsAdd1[2]),&(flags.CountsAdd1[3])) ;
+   //iswap(&(flags.CountsAdd1[2]),&(flags.CountsAdd1[3])) ;
 
    iswap(&(flags.CountsAdd2[0]),&(flags.CountsAdd2[1])) ;
-   iswap(&(flags.CountsAdd2[2]),&(flags.CountsAdd2[3])) ;
+   //iswap(&(flags.CountsAdd2[2]),&(flags.CountsAdd2[3])) ;
 
 
    dswap(&(flags.Spp[0]),&(flags.Spp[1])) ;
-   dswap(&(flags.Spp[2]),&(flags.Spp[3])) ;
+   //dswap(&(flags.Spp[2]),&(flags.Spp[3])) ;
    dswap(&(flags.Smm[0]),&(flags.Smm[1])) ;
-   dswap(&(flags.Smm[2]),&(flags.Smm[3])) ;
+   //dswap(&(flags.Smm[2]),&(flags.Smm[3])) ;
 
    dswap(&(flags.Spm[0]),&(flags.Spm[1])) ;
-   dswap(&(flags.Spm[2]),&(flags.Spm[3])) ;
+   //dswap(&(flags.Spm[2]),&(flags.Spm[3])) ;
    dswap(&(flags.Smp[0]),&(flags.Smp[1])) ;
-   dswap(&(flags.Smp[2]),&(flags.Smp[3])) ;
+   //dswap(&(flags.Smp[2]),&(flags.Smp[3])) ;
 
    adswap(flags.Spp,flags.Smm) ;
-   adswap(flags.Spm,flags.Smp) ;
-//   fprintf(stderr,"Sconstrain %d %d %d %d\n",flags.Sconstrain[0],flags.Sconstrain[1],flags.Sconstrain[2],flags.Sconstrain[3]);
- //  fprintf(stderr,"CountsEnable %d %d %d %d\n",flags.CountsEnable[0],flags.CountsEnable[1],flags.CountsEnable[2],flags.CountsEnable[3]); 
-//   fprintf(stderr,"Smm %f %f %f %f\n",flags.Smm[0],flags.Smm[1],flags.Smm[2],flags.Smm[3]); 
-//   fprintf(stderr,"Spp %f %f %f %f\n",flags.Spp[0],flags.Spp[1],flags.Spp[2],flags.Spp[3]); 
-//   fprintf(stderr,"Spm %f %f %f %f\n",flags.Spm[0],flags.Spm[1],flags.Spm[2],flags.Spm[3]); 
-//   fprintf(stderr,"Smp %f %f %f %f\n",flags.Smp[0],flags.Smp[1],flags.Smp[2],flags.Smp[3]); 
+   //adswap(flags.Spm,flags.Smp) ;
+
    return 0 ;
 }
 
