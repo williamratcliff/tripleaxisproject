@@ -139,14 +139,6 @@ class CustomDataTable(gridlib.PyGridTableBase):
                           gridlib.GRID_VALUE_STRING, #polarization state
                           gridlib.GRID_VALUE_STRING, #hsample
                           gridlib.GRID_VALUE_STRING, #vsample
-                          gridbar.GRID_VALUE_BAR, #h
-                          gridbar.GRID_VALUE_BAR, #k
-                          gridbar.GRID_VALUE_BAR, #l
-                          gridbar.GRID_VALUE_BAR, #e
-                          gridbar.GRID_VALUE_BAR, #a3
-                          gridbar.GRID_VALUE_BAR, #a4
-                          gridbar.GRID_VALUE_BAR, #temp
-                          gridbar.GRID_VALUE_BAR, #magfield
                           #gridlib.GRID_VALUE_STRING,
                           ]
         self.data = []
@@ -156,14 +148,6 @@ class CustomDataTable(gridlib.PyGridTableBase):
                         '', #polarization state
                         '', #hsample
                         '', #vsample
-                        gridbar.Bar(0,0,(0,10)), #h  (lo,high, range)
-                        gridbar.Bar(0,0,(0,10)), #k
-                        gridbar.Bar(0,0,(0,10)), #l
-                        gridbar.Bar(0,0,(0,10)), #e
-                        gridbar.Bar(0,0,(0,10)), #a3
-                        gridbar.Bar(0,0,(0,10)), #a4
-                        gridbar.Bar(0,0,(0,10)), #temp
-                        gridbar.Bar(0,0,(0,10)), #magfield
                         ])
         return
             #[1010, "The foo doesn't bar", "major", 1, 'MSW', 1, 1, 1, 1.12],
@@ -281,7 +265,6 @@ class CustTableGrid(gridlib.Grid):
         gridlib.Grid.__init__(self, parent, -1)
         table = CustomDataTable()
 
-        gridbar.register(self)
         # The second parameter means that the grid is to take ownership of the
         # table and will destroy it when done.  Otherwise you would need to keep
         # a reference to it and call it's Destroy method later.
@@ -363,6 +346,22 @@ class CustTableGrid(gridlib.Grid):
             gridlib.Grid.ForceRefresh(self)
         #evt.Skip()
         
+class mydict(dict):
+    def __init__(self,*kwargs):
+        dict.__init__(self,*kwargs)      
         
+    def __add__(self,other):
+        result=mydict()
+        for key in self.keys():
+            result[key]=self[key]+other[key]
+        return result
+            
 if __name__=='__main__':
-    frame=
+    a=mydict()
+    a['name']='john'
+    b=mydict()
+    b['name']='smith'    
+    print a['name']
+    print b['name']
+    print a+b
+    
