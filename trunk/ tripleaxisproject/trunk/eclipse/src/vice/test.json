@@ -1,0 +1,8 @@
+{"menu":[
+{"physical coordinates": ["QX", "QY","QZ","E"]},
+{"virtual motors":["HKL","H","K","L"]},
+{"basic motors":
+["A4","DFMRot","A2","A3","A5","A6","DFM","A1","SmplUTilt","SmplLTilt","SmplElev","SmplLTrn","SmplUTrn"]
+}
+]
+}
