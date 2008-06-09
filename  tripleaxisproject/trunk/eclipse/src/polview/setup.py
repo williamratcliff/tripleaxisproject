@@ -81,7 +81,8 @@ setup(
             'excludes':excludes,
             "compressed": 1,
             "optimize": 0,
-            "bundle_files":2,
+            "bundle_files":3,
+            'typelibs' : [('{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}', 0, 1, 1)],
             },
     },
     data_files=matplotlibdata_files
