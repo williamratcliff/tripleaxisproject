@@ -28,23 +28,23 @@ class HelpPanel(wx.Panel):
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.pdf = PDFWindow(self, style=wx.SUNKEN_BORDER)
-
+        self.pdf.LoadFile(r'c:\polcorrecter\polcorrecter.pdf')
         sizer.Add(self.pdf, proportion=1, flag=wx.EXPAND)
-
-        btn = wx.Button(self, wx.NewId(), "Open PDF File")
-        self.Bind(wx.EVT_BUTTON, self.OnOpenButton, btn)
-        btnSizer.Add(btn, proportion=1, flag=wx.EXPAND|wx.ALL, border=5)
-
-        btn = wx.Button(self, wx.NewId(), "Previous Page")
-        self.Bind(wx.EVT_BUTTON, self.OnPrevPageButton, btn)
-        btnSizer.Add(btn, proportion=1, flag=wx.EXPAND|wx.ALL, border=5)
-
-        btn = wx.Button(self, wx.NewId(), "Next Page")
-        self.Bind(wx.EVT_BUTTON, self.OnNextPageButton, btn)
-        btnSizer.Add(btn, proportion=1, flag=wx.EXPAND|wx.ALL, border=5)
-
-        btnSizer.Add((50,-1), proportion=2, flag=wx.EXPAND)
-        sizer.Add(btnSizer, proportion=0, flag=wx.EXPAND)
+        
+#        btn = wx.Button(self, wx.NewId(), "Open PDF File")
+#        self.Bind(wx.EVT_BUTTON, self.OnOpenButton, btn)
+#        btnSizer.Add(btn, proportion=1, flag=wx.EXPAND|wx.ALL, border=5)
+#
+#        btn = wx.Button(self, wx.NewId(), "Previous Page")
+#        self.Bind(wx.EVT_BUTTON, self.OnPrevPageButton, btn)
+#        btnSizer.Add(btn, proportion=1, flag=wx.EXPAND|wx.ALL, border=5)
+#
+#        btn = wx.Button(self, wx.NewId(), "Next Page")
+#        self.Bind(wx.EVT_BUTTON, self.OnNextPageButton, btn)
+#        btnSizer.Add(btn, proportion=1, flag=wx.EXPAND|wx.ALL, border=5)
+#
+#        btnSizer.Add((50,-1), proportion=2, flag=wx.EXPAND)
+#        sizer.Add(btnSizer, proportion=0, flag=wx.EXPAND)
 
         self.SetSizer(sizer)
         self.SetAutoLayout(True)
@@ -105,11 +105,12 @@ class Plugin:
 
     def help(self,event):
         print 'help!'
-        frame = wx.Frame(None, -1, "PDFWindow", size = (640, 480))
-        # make an instance of the class
-        HelpPanel(frame)
-        # show the frame
-        frame.Show(True)
+        if wx.Platform == '__WXMSW__':
+            frame = wx.Frame(None, -1, "PDFWindow", size = (640, 480))
+            # make an instance of the class
+            HelpPanel(frame)
+            # show the frame
+            frame.Show(True)
         
     def get_panels(self, parent):
         """
