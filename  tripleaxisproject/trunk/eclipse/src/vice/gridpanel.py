@@ -5,6 +5,7 @@ from polarization import classify_files2 as classify_files
 from utilities import readncnr3 as readncnr
 import numpy as N
 import wx.aui
+import demjson
 
 
 
@@ -356,12 +357,16 @@ class CustTableGrid(gridlib.Grid):
         #evt.Skip()
 
 class GridPanel(wx.Panel):
-    def __init__(self, parent,data,log=sys.stdout):
+    def __init__(self, parent,data,ice_categories,log=sys.stdout):
         self.log = log
         wx.Panel.__init__(self, parent, -1)
         self.nb = wx.aui.AuiNotebook(self)
-        page = CustTableGrid(self,data)
-        self.nb.AddPage(page, "Welcome")
+        #print ice_categories
+        #print type(ice_categories)
+        for i in range(len(ice_categories)):
+            print ice_categories[i].keys()[0]
+            page = CustTableGrid(self,data)
+            self.nb.AddPage(page, ice_categories[i].keys()[0])
         sizer = wx.BoxSizer()
         sizer.Add(self.nb, 1, wx.EXPAND)
         self.SetSizer(sizer)
@@ -378,6 +383,16 @@ class mydict(dict):
         for key in self.keys():
             result[key]=self[key]+other[key]
         return result
+ 
+def get_config(myfilestr):
+    #print myfilestr
+    myfile=open(myfilestr)
+    jsonstr=myfile.read()
+    myfile.close()
+    #print jsonstr
+    json_obj=demjson.decode(jsonstr)
+    return json_obj['menu']
+ 
             
 if __name__=='__main__':
 #    a=mydict()
@@ -394,9 +409,14 @@ if __name__=='__main__':
     mydatareader=readncnr.datareader()
     mydata=mydatareader.readbuffer(myfilestr)
     print mydata.data.keys()
+    mydirectory=r'C:\mytripleaxisproject\trunk\eclipse\src\vice'
+    jsonfile='test.json'
+    myfilestr=os.path.join(mydirectory,jsonfile)
+    ice_categories=get_config(myfilestr)
+    
     app=MyApp()
     frame=wx.Frame(None,-1,'Grid Catalog',size=(640,200))
-    panel=GridPanel(frame,mydata)
+    panel=GridPanel(frame,mydata,ice_categories)
     frame.Show()
     app.MainLoop()
     
