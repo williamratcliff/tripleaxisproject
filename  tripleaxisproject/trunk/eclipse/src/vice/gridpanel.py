@@ -4,6 +4,7 @@ import sys,os
 from polarization import classify_files2 as classify_files
 from utilities import readncnr3 as readncnr
 import numpy as N
+import wx.aui
 
 
 
@@ -128,27 +129,34 @@ class MyApp(wx.App):
 #---------------------------------------------------------------------------
 
 class CustomDataTable(gridlib.PyGridTableBase):
-    def __init__(self):
+    def __init__(self,colLabels):
         gridlib.PyGridTableBase.__init__(self)
-        self.colLabels = ['Select?', 'filename','seq #', 'polarization state','hsample','vsample','h','k','l','e','a3','a4','temp','magfield']
-        self.rowLabels=['File 0']
-
-        self.dataTypes = [gridlib.GRID_VALUE_STRING, #selected
-                          gridlib.GRID_VALUE_STRING,#filename
-                          gridlib.GRID_VALUE_STRING,#sequence number
-                          gridlib.GRID_VALUE_STRING, #polarization state
-                          gridlib.GRID_VALUE_STRING, #hsample
-                          gridlib.GRID_VALUE_STRING, #vsample
-                          #gridlib.GRID_VALUE_STRING,
-                          ]
+        self.colLabels =colLabels 
+        self.rowLabels=['0']
+        self.dataTypes=[]
+        for i in range(len(colLabels)):
+            self.dataTypes.append(gridlib.GRID_VALUE_STRING)
+#        self.dataTypes = [gridlib.GRID_VALUE_STRING, #selected
+#                          gridlib.GRID_VALUE_STRING,#filename
+#                          gridlib.GRID_VALUE_STRING,#sequence number
+#                          gridlib.GRID_VALUE_STRING, #polarization state
+#                          gridlib.GRID_VALUE_STRING, #hsample
+#                          gridlib.GRID_VALUE_STRING, #vsample
+#                          #gridlib.GRID_VALUE_STRING,
+#                          ]
         self.data = []
-        self.data.append(['', #selected
-                        '', #filename
-                        '', #sequence number
-                        '', #polarization state
-                        '', #hsample
-                        '', #vsample
-                        ])
+        emptydata=[]
+        for i in range(len(colLabels)):
+            emptydata.append('')
+#        self.data.append(['', #selected
+#                        '', #filename
+#                        '', #sequence number
+#                        '', #polarization state
+#                        '', #hsample
+#                        '', #vsample
+#                        ])
+        self.data.append(emptydata)
+        print 'data', self.data
         return
             #[1010, "The foo doesn't bar", "major", 1, 'MSW', 1, 1, 1, 1.12],
             #[1011, "I've got a wicket in my wocket", "wish list", 2, 'other', 0, 0, 0, 1.50],
@@ -214,7 +222,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
         return self.colLabels[col]
     # Called when the grid needs to display labels
     def GetRowLabelValue(self, row):
-        return 'File '+str(row)
+        return str(row)
         #return self.rowLabels[row]
     # Called to determine the kind of editor/renderer to use by
     # default, doesn't necessarily have to be the same type used
@@ -261,9 +269,10 @@ class CustomDataTable(gridlib.PyGridTableBase):
             self.GetView().ProcessTableMessage(msg)
 #---------------------------------------------------------------------------
 class CustTableGrid(gridlib.Grid):
-    def __init__(self, parent):
+    def __init__(self, parent,data,colLabels=['h','k','l','e','a3','a4']):
         gridlib.Grid.__init__(self, parent, -1)
-        table = CustomDataTable()
+        self.colLabels=colLabels
+        table = CustomDataTable(colLabels)
 
         # The second parameter means that the grid is to take ownership of the
         # table and will destroy it when done.  Otherwise you would need to keep
@@ -283,7 +292,7 @@ class CustTableGrid(gridlib.Grid):
         attr=gridlib.GridCellAttr()
         attr.SetReadOnly(True)
         self.SetColAttr(0,attr)
-        for col in range(1,14):
+        for col in range(0,len(colLabels)):
             attr=gridlib.GridCellAttr()
             attr.SetReadOnly(True)
             #attr.SetBackgroundColour('grey' if col%2 else (139, 139, 122))
@@ -345,6 +354,20 @@ class CustTableGrid(gridlib.Grid):
             gridlib.Grid.AutoSize(self)
             gridlib.Grid.ForceRefresh(self)
         #evt.Skip()
+
+class GridPanel(wx.Panel):
+    def __init__(self, parent,data,log=sys.stdout):
+        self.log = log
+        wx.Panel.__init__(self, parent, -1)
+        self.nb = wx.aui.AuiNotebook(self)
+        page = CustTableGrid(self,data)
+        self.nb.AddPage(page, "Welcome")
+        sizer = wx.BoxSizer()
+        sizer.Add(self.nb, 1, wx.EXPAND)
+        self.SetSizer(sizer)
+        sizer.FitInside(self.nb)
+
+
         
 class mydict(dict):
     def __init__(self,*kwargs):
@@ -357,11 +380,23 @@ class mydict(dict):
         return result
             
 if __name__=='__main__':
-    a=mydict()
-    a['name']='john'
-    b=mydict()
-    b['name']='smith'    
-    print a['name']
-    print b['name']
-    print a+b
+#    a=mydict()
+#    a['name']='john'
+#    b=mydict()
+#    b['name']='smith'    
+#    print a['name']
+#    print b['name']
+#    print a+b
+    mydirectory=r'c:\polcorrecter\data'
+    myfilebase='fieldscansplusminusreset53630.bt7'
+    myfilestr=os.path.join(mydirectory,myfilebase)
+    print myfilestr
+    mydatareader=readncnr.datareader()
+    mydata=mydatareader.readbuffer(myfilestr)
+    print mydata.data.keys()
+    app=MyApp()
+    frame=wx.Frame(None,-1,'Grid Catalog',size=(640,200))
+    panel=GridPanel(frame,mydata)
+    frame.Show()
+    app.MainLoop()
     
