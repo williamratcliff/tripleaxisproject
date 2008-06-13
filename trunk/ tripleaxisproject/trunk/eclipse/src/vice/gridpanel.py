@@ -364,14 +364,18 @@ class GridPanel(wx.Panel):
         #print ice_categories
         #print type(ice_categories)
         for i in range(len(ice_categories)):
-            print ice_categories[i].keys()[0]
-            page = CustTableGrid(self,data)
-            self.nb.AddPage(page, ice_categories[i].keys()[0])
+            print ice_categories[i].keys()
+            value=ice_categories[i][ice_categories[i].keys()[0]]        
+            print 'value',value
+            print 'mytype', type(value[0])
+            if type(value[0])==type({}):
+                page = CustTableGrid(self,data)
+                self.nb.AddPage(page, ice_categories[i].keys()[0])
+            
         sizer = wx.BoxSizer()
         sizer.Add(self.nb, 1, wx.EXPAND)
         self.SetSizer(sizer)
         sizer.FitInside(self.nb)
-
 
         
 class mydict(dict):
@@ -415,7 +419,7 @@ if __name__=='__main__':
     ice_categories=get_config(myfilestr)
     
     app=MyApp()
-    frame=wx.Frame(None,-1,'Grid Catalog',size=(640,200))
+    frame=wx.Frame(None,-1,'Grid Catalog',size=(240,200))
     panel=GridPanel(frame,mydata,ice_categories)
     frame.Show()
     app.MainLoop()
