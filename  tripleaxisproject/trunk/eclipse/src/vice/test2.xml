@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <menu>
+    <title>physical coordinates</title>
+
+    <variables>QX,QY,QZ,E</variables>
+  </menu>
+
+  <menu>
+    <title>virtual motors</title>
+
+    <variables>HKL,H,K,L</variables>
+  </menu>
+
+  <menu>
+    <title>basic motors</title>
+
+    <variables>A4,DFMRot,A2,A3,A5,A6,DFM,A1,SmplUTilt,SmplLTilt,SmplElev,SmplLTrn,SmplUTrn</variables>
+  </menu>
+
+  <menu>
+    <title>analyzer</title>
+
+    <submenu>
+      <title>analyzer blades</title>
+
+      <variables>AnalyzerBlade01,AnalyzerBlade02,AnalyzerBlade03,AnalyzerBlade04,AnalyzerBlade05,
+      AnalyzerBlade06,AnalyzerBlade07,AnalyzerBlade08,AnalyzerBlade09,AnalyzerBlade10,
+      AnalyzerBlade11,AnalyzerBlade12,AnalyzerBlade13 </variables>
+    </submenu>
+
+    <submenu>
+      <title>analyzer positions</title>
+
+      <variables>AnalyzerRotation</variables>
+    </submenu>
+  </menu>
+
+  <menu>
+    <title>instrument setup"</title>
+
+    <submenu>
+      <title>collimators</title>
+
+      <variables>PreMonoColl,PostMonoColl,PreAnaColl,PostAnaColl,RC,SC</variables>
+    </submenu>
+
+    <submenu>
+      <title>filters</title>
+
+      <variables>FilRot,FilTilt,FilTran</variables>
+    </submenu>
+
+    <submenu>
+      <title>Apertures</title>
+
+      <variables>ApertHori,ApertVert</variables>
+    </submenu>
+  </menu>
+
+  <menu>
+    <title>monochromator</title>
+
+    <submenu>
+      <title>focus</title>
+
+      <variables>FocusCu,FocusPG</variables>
+    </submenu>
+
+    <submenu>
+      <title>monochromator positions</title>
+
+      <variables>MonoElev,MonoTrans</variables>
+    </submenu>
+
+    <submenu>
+      <title>monochromator blades</title>
+
+      <variables>MonoBlade01,MonoBlade02,MonoBlade03,MonoBlade04,MonoBlade05,
+      MonoBlade06,MonoBlade07,MonoBlade08,MonoBlade09,MonoBlade10 </variables>
+    </submenu>
+  </menu>
+
+  <menu>
+    <title>detectors</title>
+
+    <submenu>
+      <title>primary detector</title>
+
+      <variables>Detector</variables>
+    </submenu>
+
+    <submenu>
+      <title>psd detector</title>
+
+      <variables>PSDet,PSDC00,PSDC01,PSDC02,PSDC03,PSDC04,PSDC05,PSDC06,PSDC07,
+      PSDC08,PSDC09,PSDC10,PSDC11,PSDC12,PSDC13,PSDC14,PSDC15,
+      PSDC16,PSDC17,PSDC18,PSDC19,PSDC20,PSDC21,PSDC22,PSDC23,
+      PSDC24,PSDC25,PSDC26,PSDC27,PSDC28,PSDC29,PSDC30,PSDC31,
+      PSDC32,PSDC33,PSDC34,PSDC35,PSDC36,PSDC37,PSDC38,PSDC39,
+      PSDC40,PSDC41,PSDC42,PSDC43,PSDC44,PSDC45,PSDC46,PSDC47 </variables>
+    </submenu>
+
+    <submenu>
+      <title>door detector</title>
+
+      <variables>TDC00,TDC01,TDC02,TDC03,TDC04,TDC05,TDC06,TDC07,TDC08,TDC09,TDC10
+      </variables>
+    </submenu>
+
+    <submenu>
+      <title>diffraction detector</title>
+
+      <variables>DiffDet,DDC0,DDC1,DDC2 </variables>
+    </submenu>
+
+    <submenu>
+      <title>single detector</title>
+
+      <variables>SingleDet,SDC0,SDC1,SDC2 </variables>
+    </submenu>
+
+    <submenu>
+      <title>counting time</title>
+
+      <variables>Time,Monitor,Monitor2,timestamp </variables>
+    </submenu>
+  </menu>
+
+  <menu>
+    <title>sample environment</title>
+
+    <submenu>
+      <title>temperature</title>
+
+      <variables>Temp,TemperatureControlReading,
+      TemperatureSetpoint,TemperatureHeaterPower </variables>
+    </submenu>
+
+    <submenu>
+      <title>magnetic field</title>
+
+      <variables>Magfield </variables>
+    </submenu>
+
+    <submenu>
+      <title>polarized beam</title>
+
+      <variables>FLIP,EIflip,EFflip,Hsample,Vsample,
+      EIguide,"EIcancel,EFcancel,EFguide,SmplGFRot </variables>
+    </submenu>
+  </menu>
+
+  <menu>
+    <title>user views</title>
+
+    <submenu>
+      <title>simple</title>
+
+      <variables>qx,qy,qz,E,A3,A4,temp,magfield </variables>
+    </submenu>
+
+    <submenu>
+      <title>powder</title>
+
+      <variables>a3,a4 </variables>
+    </submenu>
+  </menu>
+</root>
