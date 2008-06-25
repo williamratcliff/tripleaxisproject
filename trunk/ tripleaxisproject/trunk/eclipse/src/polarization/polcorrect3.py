@@ -192,7 +192,7 @@ class polarization_correct:
             #TODO currently, we assume that the files are taken at the same points--is this safe?
             self.length=self.counts[key].shape[0]
             a2=N.array(self.mydata[key].data['a2'])
-            if self.mydata[key].metadata['count_info']['analyzerdetectormode'].lower() in ['diffdet','psddiff']:
+            if self.mydata[key].metadata['count_info']['analyzerdetectormode'].lower() in ['diffdet','psddiff','psdflat']:
                 #a6=N.array(mydata[key].data['A5'])*2.0
                 a6=a2
             else:
@@ -344,12 +344,14 @@ class polarization_correct:
                         pbinput.tmm=mytemp_mm.ctypes.data_as(c_ulong_p)
                         #pbinput.tmm=self.timestamp[key].astype('uint32').ctypes.data_as(c_ulong_p)
                         #print 't0,mm ',mytemp_mm[0]
+                        #print 'counts',self.counts[key][0]
                         pbinput.Cmm=self.counts[key].ctypes.data_as(c_double_p)
                         pbinput.Emm=self.errors[key].ctypes.data_as(c_double_p)
                     if key=='pm':
                         mytemp_pm=self.timestamp[key].astype('uint32')
                         pbinput.tpm=mytemp_pm.ctypes.data_as(c_ulong_p)
                         #print 't0,pm ',mytemp_pm[0]
+                        #print 'counts',self.counts[key][0]
                         pbinput.Cpm=self.counts[key].ctypes.data_as(c_double_p)
                         pbinput.Epm=self.errors[key].ctypes.data_as(c_double_p)
                         #print 'shape ',self.counts[key].shape
