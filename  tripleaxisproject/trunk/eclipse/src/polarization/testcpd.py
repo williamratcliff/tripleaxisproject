@@ -4,6 +4,8 @@ import pylab
 import numpy as N
 
 
+
+
 if __name__=='__main__':
     mydir=r'c:\cepd\9072\data'
     myfilebase='CePd356111.bt7.out'
@@ -31,8 +33,9 @@ if __name__=='__main__':
     e2=N.array(mydata2.data[varying2])
     I1=N.array(mydata.data[signal1+'_corrected'])
     I1err=N.array(mydata.data[signal1+'_errs_corrected'])
-    I2=N.array(mydata2.data[signal2+'_corrected'])*mon0/mon2[0]
-    I2err=N.array(mydata2.data[signal2+'_errs_corrected'])*mon0/mon2[0]
+    factor=mon0/mon2[0]
+    I2=N.array(mydata2.data[signal2+'_corrected'])*factor#*4/5
+    I2err=N.array(mydata2.data[signal2+'_errs_corrected'])*factor#*4/5
     
     print 'E1',e1
     print 'I',I1

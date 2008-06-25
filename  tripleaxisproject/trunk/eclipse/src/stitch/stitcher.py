@@ -25,7 +25,7 @@ class Psd:
         return
 
 class Stitch:
-    def __init__(self,data,ch_space,ch_boundary,ch_eff,psd,outputwidth=0.1):
+    def __init__(self,data,ch_space,ch_boundary,ch_eff,psd,outputwidth=0.31):
         self.ch_boundary=ch_boundary
         self.ch_eff=ch_eff
         self.ch_space=ch_space
@@ -33,16 +33,17 @@ class Stitch:
         self.psd=psd
         self.outputwidth=outputwidth
         self.a4=N.array(data.data['a4'],'float64')
-        self.a4_begin=self.a4[0]-ch_space[psd.left]
-        self.a4_end=self.a4[-1]-ch_space[psd.right]
+        self.a4_begin=self.a4[0]#-ch_space[psd.left]
+        self.a4_end=self.a4[-1]#-ch_space[psd.right]
+        #print 'begin',self.a4_begin
+        #print 'end',self.a4_end 
         self.output_npts=int(N.round(N.absolute(self.a4_end-self.a4_begin)/self.outputwidth))
         self.output_a4=N.arange(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end])+outputwidth,outputwidth)
-        
         #print self.output_npts
         #print self.output_a4.shape
-        #print self.a4_begin
-        #print self.a4_end 
-        print self.a4       
+        print 'begin',self.a4_begin
+        print 'end',self.a4_end 
+        print 'a4',self.a4       
         detectors=self.data.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         self.corrected=False
         self.counts_ending=''
@@ -135,7 +136,8 @@ class Stitch:
         #print output_data.shape
         #print output_tmp.shape
         
-
+def writefile(myoutfilestr):
+    myoutfile=open(myoutfilestr,'wt')
 
 if __name__=='__main__':
         mydirectory=r'C:\13165\13165\data'
@@ -143,13 +145,23 @@ if __name__=='__main__':
         myend='bt7'
         flist=[]
         rlist=[56421,56420,56419]
-        myfilestr=r'C:\13165\PSD_A4_SpacingApr1108.dat'
-        #myfilestr=r'C:\13165\PSD_A4_Spacing.dat'
+        #myfilestr=r'C:\13165\PSD_A4_SpacingApr1108.dat'
+        myfilestr=r'C:\13188\PSD_A4_Spacing_Jun2008_Ana_85mm_80minRC.dat'
+        
         ch_a4=N.loadtxt(myfilestr, unpack=True)
         ch_a4=ch_a4.T.flatten()
-        myfilestr=r'C:\13165\PSD_Channel_April1208.dat'
+        #myfilestr=r'C:\13165\PSD_Channel_April1208.dat'
+        myfilestr=r'c:\13188\PSD_Channel_Eff_Jun202008_Ana_85mm_80minRC.dat'
         ch_eff=N.loadtxt(myfilestr, unpack=True)
         ch_eff=ch_eff.T.flatten()
+        ch_eff[6]=0.0
+        
+        if 1:
+            pylab.plot(ch_eff,'s')
+            pylab.show()
+            sys.exit()
+        print 'ch_eff', ch_eff
+        print 'ch_a4',ch_a4
         #ch_space+0.5*(-ch_space+shift(ch_space,1))+var(var_pos,i)
         #print ch_eff
         mypsd=Psd(center=23)
@@ -172,6 +184,10 @@ if __name__=='__main__':
         #myfilestr=os.path.join(mydirectory,'CeOFeAs56685.bt7')
         mydirectory2=r'C:\13176\data'
         myfilestr=os.path.join(mydirectory2,'CeOFeAs57256.bt7.out')
+        #ying
+        mydirectory2=r'C:\13188'
+        myfilestr=os.path.join(mydirectory2,'NdOFeAs58081.bt7.out')
+        #myfilestr=os.path.join(mydirectory2,'NdOFeAs58077.bt7.out')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
@@ -187,21 +203,35 @@ if __name__=='__main__':
         print mystitcher.ch_eff
         print mystitcher.detectors
         print mystitcher.data.data[mystitcher.detectors[-1]+'_corrected']
-        pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'s')
-
-        myfilestr=os.path.join(mydirectory2,'CeOFeAs57257.bt7.out')
-        mydatareader=readncnr.datareader()
-        mydata=mydatareader.readbuffer(myfilestr)
-        mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
-        mystitcher.stitch()
-        pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'rs')
-
+        myoutstr=myfilestr+'.stitched'
+        #writefile(myoutstr,mystitcher.a4,mystitcher.data_eff[0,:])
+        tdata=mystitcher.output_data
+        if 1:
+            pylab.plot(mystitcher.output_a4[0:-1],mystitcher.output_data,'s')
+            print 'a',mystitcher.output_a4[0:-1]
+        
+        #pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'s')
+        if 1:
+            #myfilestr=os.path.join(mydirectory2,'CeOFeAs57257.bt7.out')
+            myfilestr=os.path.join(mydirectory2,'NdOFeAs58082.bt7.out')
+            mydatareader=readncnr.datareader()
+            mydata=mydatareader.readbuffer(myfilestr)
+            mystitcher=Stitch(mydata,ch_space,ch_boundary,ch_eff,mypsd)
+            mystitcher.stitch()
+            #pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'rs')
+            print tdata.shape
+            print mystitcher.output_data.shape
+            print 'b',mystitcher.output_a4[0:-1]
+            ddata=mystitcher.output_data#-tdata
+            pylab.plot(mystitcher.output_a4[0:-1],ddata,'rs')
+            #pylab.axis([33,36,])
+    
         
         
-        
+        if 1:
         #pylab.plot(mystitcher.output_a4[0:-1],mystitcher.output_data,'s')
         #pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
-        pylab.show()
+            pylab.show()
         
         
         
