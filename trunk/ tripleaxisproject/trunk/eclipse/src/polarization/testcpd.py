@@ -29,20 +29,23 @@ if __name__=='__main__':
     mon2=N.array(mydata2.data['monitor'])
     
     mon0=mon1[0]
+    factor1=mon0/mon1[0]
+    factor2=mon0/mon2[0]
+    print 'factor',factor2
     e1=N.array(mydata.data[varying1])
     e2=N.array(mydata2.data[varying2])
-    I1=N.array(mydata.data[signal1+'_corrected'])
-    I1err=N.array(mydata.data[signal1+'_errs_corrected'])
-    factor=mon0/mon2[0]
-    I2=N.array(mydata2.data[signal2+'_corrected'])*factor#*4/5
-    I2err=N.array(mydata2.data[signal2+'_errs_corrected'])*factor#*4/5
+    I1=N.array(mydata.data[signal1+'_corrected'])*factor1
+    I1err=N.array(mydata.data[signal1+'_errs_corrected'])*factor1
     
-    print 'E1',e1
-    print 'I',I1
-    print 'I1err',I1err
-    print 'E2',e2
-    print 'I2',I2
-    print 'I2err',I2err 
+    I2=N.array(mydata2.data[signal2+'_corrected'])*factor2#*4/5
+    I2err=N.array(mydata2.data[signal2+'_errs_corrected'])*factor2#*4/5
+    
+    #print 'E1',e1
+    #print 'I',I1
+    #print 'I1err',I1err
+    #print 'E2',e2
+    #print 'I2',I2
+    #print 'I2err',I2err 
     print 'mon1', mon1 
     print 'mon2', mon2
     if 1:
