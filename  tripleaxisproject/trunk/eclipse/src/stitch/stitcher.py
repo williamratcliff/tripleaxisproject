@@ -136,8 +136,13 @@ class Stitch:
         #print output_data.shape
         #print output_tmp.shape
         
-def writefile(myoutfilestr):
-    myoutfile=open(myoutfilestr,'wt')
+    def writefile(self,myoutfilestr):
+        myoutfile=open(myoutfilestr,'wt')
+        a4=self.output_a4[0:-1]
+        counts=self.output_data
+        for i in range(a4.shape[0]):
+            myoutfile.write('%3.3f %3.3f\n'%(a4[i],counts[i]))
+        myoutfile.close()
 
 if __name__=='__main__':
         mydirectory=r'C:\13165\13165\data'
@@ -156,7 +161,7 @@ if __name__=='__main__':
         ch_eff=ch_eff.T.flatten()
         ch_eff[6]=0.0
         
-        if 1:
+        if 0:
             pylab.plot(ch_eff,'s')
             pylab.show()
             sys.exit()
@@ -204,11 +209,11 @@ if __name__=='__main__':
         print mystitcher.detectors
         print mystitcher.data.data[mystitcher.detectors[-1]+'_corrected']
         myoutstr=myfilestr+'.stitched'
-        #writefile(myoutstr,mystitcher.a4,mystitcher.data_eff[0,:])
+        mystitcher.writefile(myoutstr)
         tdata=mystitcher.output_data
         if 1:
             pylab.plot(mystitcher.output_a4[0:-1],mystitcher.output_data,'s')
-            print 'a',mystitcher.output_a4[0:-1]
+            #print 'a',mystitcher.output_a4[0:-1]
         
         #pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'s')
         if 1:
@@ -221,7 +226,7 @@ if __name__=='__main__':
             #pylab.plot(mystitcher.a4,mystitcher.data_eff[0,:],'rs')
             print tdata.shape
             print mystitcher.output_data.shape
-            print 'b',mystitcher.output_a4[0:-1]
+            #print 'b',mystitcher.output_a4[0:-1]
             ddata=mystitcher.output_data#-tdata
             pylab.plot(mystitcher.output_a4[0:-1],ddata,'rs')
             #pylab.axis([33,36,])
