@@ -25,7 +25,7 @@ class Psd:
         return
 
 class Stitch:
-    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.3,masked=[]):
+    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.30,masked=[]):
         
         ch_a4=N.loadtxt(ch_a4_str, unpack=True)
         ch_a4=ch_a4.T.flatten()
@@ -48,7 +48,7 @@ class Stitch:
         self.outputwidth=outputwidth
         self.a4=N.array(data.data['a4'],'float64')
         self.a4_begin=self.a4[0]-ch_space[psd.left]
-        self.a4_end=self.a4[-1]#-ch_space[psd.right]
+        self.a4_end=self.a4[-1]-ch_space[psd.right]
         self.output_npts=int(N.round(N.absolute(self.a4_end-self.a4_begin)/self.outputwidth))
         #self.output_a4=N.arange(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end])+outputwidth,outputwidth)
         self.output_a4=N.linspace(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end]),self.output_npts+1)
@@ -172,8 +172,9 @@ if __name__=='__main__':
         #myfilestr=os.path.join(mydirectory2,'CeOFeAs57256.bt7.out')
         #ying
         mydirectory2=r'C:\13188'
-        myfilestr=os.path.join(mydirectory2,'NdOFeAs58081.bt7.out')
-        #myfilestr=os.path.join(mydirectory2,'NdOFeAs58077.bt7.out')
+        #myfilestr=os.path.join(mydirectory2,'NdOFeAs58081.bt7.out')
+        myfilestr=os.path.join(mydirectory2,'NdOFeAs58075.bt7.out')
+        myfilestr=os.path.join(mydirectory2,'NdOFeAs58054.bt7')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=6)        
@@ -190,10 +191,11 @@ if __name__=='__main__':
         if 1:
             pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
             #print 'a',mystitcher.output_a4[0:-1]
-        if 1:
+        if 0:
             #myfilestr=os.path.join(mydirectory2,'CeOFeAs57257.bt7.out')
-            myfilestr=os.path.join(mydirectory2,'NdOFeAs58082.bt7.out')
-            #myfilestr=os.path.join(mydirectory2,'NdOFeAs58078.bt7.out')
+            #myfilestr=os.path.join(mydirectory2,'NdOFeAs58082.bt7.out')
+            #myfilestr=os.path.join(mydirectory2,'NdOFeAs58076.bt7.out')
+            myfilestr=os.path.join(mydirectory2,'NdOFeAs58047.bt7.out')
             mydatareader=readncnr.datareader()
             mydata=mydatareader.readbuffer(myfilestr)
             mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=6)
