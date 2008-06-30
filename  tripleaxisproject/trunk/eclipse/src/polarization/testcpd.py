@@ -9,8 +9,10 @@ import numpy as N
 if __name__=='__main__':
     mydir=r'c:\cepd\9072\data'
     myfilebase='CePd356111.bt7.out'
+    myfilebase='CePd356123.bt7.out'
     myfilestr1=os.path.join(mydir,myfilebase)
     myfilebase='CePd356136.bt7.out'
+    myfilebase='CePd356130.bt7.out'
     myfilestr2=os.path.join(mydir,myfilebase)   
     myreader=readncnr.datareader()
     mydata=myreader.readbuffer(myfilestr1)
