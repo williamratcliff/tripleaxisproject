@@ -25,7 +25,7 @@ class Psd:
         return
 
 class Stitch:
-    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.30,masked=[]):
+    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.3,masked=[]):
         
         ch_a4=N.loadtxt(ch_a4_str, unpack=True)
         ch_a4=ch_a4.T.flatten()
@@ -58,6 +58,7 @@ class Stitch:
         #print self.output_a4.shape
         print 'begin',self.a4_begin
         print 'end',self.a4_end 
+        print 'boundaries',ch_boundary
         #print 'a4',self.a4       
         detectors=self.data.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         self.corrected=False
@@ -112,6 +113,7 @@ class Stitch:
             #print z_in
             #print dz_in
             ch_boundary=N.flipud(ch_boundary)
+            print 'inline boundary', ch_boundary
             z_in=N.flipud(z_in)
             dz_in=N.flipud(dz_in)
             #;output_data_left=reverse(output_data_left)
@@ -134,12 +136,14 @@ class Stitch:
             #print output_mon.shape
             #print dz_output_tmp.shape
             #print output_tmp^2
-            output_data=output_data+output_tmp*output_mon
-            output_data_err=output_data_err+dz_output_tmp**2*output_mon**2
+            output_data=output_data+output_tmp#*output_mon
+            output_data_err=output_data_err+dz_output_tmp**2#*output_mon**2
+            print 'output_mon',output_mon
             data_norm=data_norm+output_mon
             #print 'data_norm',data_norm
         self.output_data=output_data/data_norm
         self.output_data_err=N.sqrt(output_data_err)/data_norm
+        print 'output_a4', self.output_a4
         #print 'norm'
         #print data_norm
         #print data_norm.shape
@@ -175,6 +179,7 @@ if __name__=='__main__':
         #myfilestr=os.path.join(mydirectory2,'NdOFeAs58081.bt7.out')
         myfilestr=os.path.join(mydirectory2,'NdOFeAs58075.bt7.out')
         myfilestr=os.path.join(mydirectory2,'NdOFeAs58054.bt7')
+        myfilestr=os.path.join(mydirectory2,'plastic57943.bt7')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=6)        
