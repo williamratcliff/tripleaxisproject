@@ -85,6 +85,19 @@ class Stitch:
         self.data_err_eff=N.array(dz_in)#.T
         #print self.data_eff
         #print self.data_err_eff
+        print 'shape',self.data_eff.shape
+        #for i in range(13):
+        #    pylab.plot(self.data_eff[:,i],'s')
+        
+        if 1:
+            ch_space2=ch_a4[psd.center]-ch_a4
+            print ch_space2
+            print self.a4
+            print masked
+            for i,a in enumerate(self.a4):
+                pylab.plot(a+ch_space2,self.data_eff[:,i],'s')
+            pylab.show()
+            sys.exit()
         
 
         
@@ -172,7 +185,7 @@ if __name__=='__main__':
         ch_a4_str=r'C:\13188\PSD_A4_Spacing_Jun2008_Ana_85mm_80minRC.dat'        
         ch_eff_str=r'c:\13188\PSD_Channel_Eff_Jun202008_Ana_85mm_80minRC.dat'
         ch_eff_str=r'c:\13188\eff.dat'
-        mypsd=Psd(center=23)
+        mypsd=Psd(center=22)
 
         
         #me
@@ -180,14 +193,14 @@ if __name__=='__main__':
         #myfilestr=os.path.join(mydirectory2,'CeOFeAs57256.bt7.out')
         #ying
         mydirectory2=r'C:\13188'
-        #myfilestr=os.path.join(mydirectory2,'NdOFeAs58081.bt7.out')
-        myfilestr=os.path.join(mydirectory2,'NdOFeAs58075.bt7.out')
+        myfilestr=os.path.join(mydirectory2,'NdOFeAs58081.bt7.out')
+        myfilestr=os.path.join(mydirectory2,'NdOFeAs58075.bt7')
         myfilestr=os.path.join(mydirectory2,'NdOFeAs58054.bt7')
         #myfilestr=os.path.join(mydirectory2,'plastic_80RC58038.bt7')
         #myfilestr=os.path.join(mydirectory2,'plastic57943.bt7')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
-        mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[6])        
+        mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[7])        
         mystitcher.stitch()
         
         #print mystitcher.data_eff.shape
@@ -210,7 +223,7 @@ if __name__=='__main__':
             myfilestr=os.path.join(mydirectory2,'NdOFeAs58047.bt7.out')
             mydatareader=readncnr.datareader()
             mydata=mydatareader.readbuffer(myfilestr)
-            mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=6)
+            mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[6])
             mystitcher.stitch()
             myoutstr=myfilestr+'.stitched'
             mystitcher.writefile(myoutstr)
