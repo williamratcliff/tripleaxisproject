@@ -49,6 +49,7 @@ class Stitch:
         self.a4=N.array(data.data['a4'],'float64')
         self.a4_begin=self.a4[0]-ch_space[psd.left]
         self.a4_end=self.a4[-1]-ch_space[psd.right]
+        #self.a4_begin=30.0
         self.output_npts=int(N.round(N.absolute(self.a4_end-self.a4_begin)/self.outputwidth))
         #self.output_a4=N.arange(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end])+outputwidth,outputwidth)
         self.output_a4=N.linspace(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end]),self.output_npts+1)
@@ -144,6 +145,8 @@ class Stitch:
         self.output_data=output_data/data_norm
         self.output_data_err=N.sqrt(output_data_err)/data_norm
         print 'output_a4', self.output_a4
+        print 'data_norm', data_norm
+        print 'output',self.output_data
         #print 'norm'
         #print data_norm
         #print data_norm.shape
@@ -168,6 +171,7 @@ if __name__=='__main__':
         #myfilestr=r'C:\13165\PSD_Channel_April1208.dat'
         ch_a4_str=r'C:\13188\PSD_A4_Spacing_Jun2008_Ana_85mm_80minRC.dat'        
         ch_eff_str=r'c:\13188\PSD_Channel_Eff_Jun202008_Ana_85mm_80minRC.dat'
+        ch_eff_str=r'c:\13188\eff.dat'
         mypsd=Psd(center=23)
 
         
@@ -179,10 +183,11 @@ if __name__=='__main__':
         #myfilestr=os.path.join(mydirectory2,'NdOFeAs58081.bt7.out')
         myfilestr=os.path.join(mydirectory2,'NdOFeAs58075.bt7.out')
         myfilestr=os.path.join(mydirectory2,'NdOFeAs58054.bt7')
-        myfilestr=os.path.join(mydirectory2,'plastic57943.bt7')
+        #myfilestr=os.path.join(mydirectory2,'plastic_80RC58038.bt7')
+        #myfilestr=os.path.join(mydirectory2,'plastic57943.bt7')
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
-        mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=6)        
+        mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[6])        
         mystitcher.stitch()
         
         #print mystitcher.data_eff.shape
@@ -194,6 +199,8 @@ if __name__=='__main__':
         mystitcher.writefile(myoutstr)
         tdata=mystitcher.output_data
         if 1:
+            print 'data_eff', mystitcher.data_eff
+            #pylab.plot(mystitcher.data_eff,'s')
             pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
             #print 'a',mystitcher.output_a4[0:-1]
         if 0:
@@ -212,6 +219,7 @@ if __name__=='__main__':
             #print 'b',mystitcher.output_a4[0:-1]
             ddata=mystitcher.output_data#-tdata
             pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='red',mec='black',ecolor='black')
+            
             #pylab.axis([33,36,])
     
         
