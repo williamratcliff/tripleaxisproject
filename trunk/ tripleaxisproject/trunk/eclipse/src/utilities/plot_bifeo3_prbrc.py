@@ -10,10 +10,11 @@ import re
 import readicp
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
-
+import math
 
 from matplotlib.patches import Ellipse
 from rescalculator import lattice_calculator
+from rescalculator.rescalc import rescalculator
 eps=1e-3
 pi=N.pi
 
@@ -24,7 +25,7 @@ pi=N.pi
 
 
 
-def ResPlot(self,H,K,L,W,EXP,fig):
+def ResPlot(H,K,L,W,EXP,myrescal,ax,fig=pylab.figure()):
     """Plot resolution ellipse for a given scan"""
     center=N.round(H.shape[0]/2)
     if center<1:
@@ -41,23 +42,23 @@ def ResPlot(self,H,K,L,W,EXP,fig):
     TextAxesPosition=[0.45, 0.0, 0.5, 0.5]
     GridPoints=101
 
-    [R0,RMS]=self.ResMatS(H,K,L,W,EXP)
+    [R0,RMS]=myrescal.ResMatS(H,K,L,W,EXP)
     #[xvec,yvec,zvec,sample,rsample]=self.StandardSystem(EXP);
-    self.lattice_calculator.StandardSystem()
+    myrescal.lattice_calculator.StandardSystem()
     #print 'shape ',self.lattice_calculator.x.shape
-    qx=self.lattice_calculator.scalar(self.lattice_calculator.x[0,:],self.lattice_calculator.x[1,:],self.lattice_calculator.x[2,:],H,K,L,'latticestar')
-    qy=self.lattice_calculator.scalar(self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],H,K,L,'latticestar')
+    qx=myrescal.lattice_calculator.scalar(myrescal.lattice_calculator.x[0,:],myrescal.lattice_calculator.x[1,:],myrescal.lattice_calculator.x[2,:],H,K,L,'latticestar')
+    qy=myrescal.lattice_calculator.scalar(myrescal.lattice_calculator.y[0,:],myrescal.lattice_calculator.y[1,:],myrescal.lattice_calculator.y[2,:],H,K,L,'latticestar')
     qw=W;
 
     #========================================================================================================
     #find reciprocal-space directions of X and Y axes
 
-    o1=self.lattice_calculator.orient1#[:,0] #EXP['orient1']
-    o2=self.lattice_calculator.orient2#[:,0] #EXP['orient2']
-    pr=self.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
-    o2[0]=self.lattice_calculator.y[0,:]*pr
-    o2[1]=self.lattice_calculator.y[1,:]*pr
-    o2[2]=self.lattice_calculator.y[2,:]*pr
+    o1=myrescal.lattice_calculator.orient1#[:,0] #EXP['orient1']
+    o2=myrescal.lattice_calculator.orient2#[:,0] #EXP['orient2']
+    pr=myrescal.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],myrescal.lattice_calculator.y[0,:],myrescal.lattice_calculator.y[1,:],myrescal.lattice_calculator.y[2,:],'latticestar')
+    o2[0]=myrescal.lattice_calculator.y[0,:]*pr
+    o2[1]=myrescal.lattice_calculator.y[1,:]*pr
+    o2[2]=myrescal.lattice_calculator.y[2,:]*pr
 
     if N.abs(o2[0,center])<1e-5:
          o2[0,center]=0.0
@@ -75,9 +76,9 @@ def ResPlot(self,H,K,L,W,EXP,fig):
 
     #%========================================================================================================
     #%determine the plot range
-    XWidth=max(self.fproject(RMS,0))
-    YWidth=max(self.fproject(RMS,1))
-    WWidth=max(self.fproject(RMS,2))
+    XWidth=max(myrescal.fproject(RMS,0))
+    YWidth=max(myrescal.fproject(RMS,1))
+    WWidth=max(myrescal.fproject(RMS,2))
     XMax=(max(qx)+XWidth*1.5)
     XMin=(min(qx)-XWidth*1.5)
     YMax=(max(qy)+YWidth*1.5)
@@ -88,12 +89,12 @@ def ResPlot(self,H,K,L,W,EXP,fig):
     #print 'qy ',qy
     #print 'XWidth ',XWidth
     #print 'YWidth ',YWidth
-    fig=pylab.figure()
+    #fig=pylab.figure()
     #%========================================================================================================
     #% plot XY projection
 
 
-    proj,sec=self.project(RMS,2)
+    proj,sec=myrescal.project(RMS,2)
     (a,b,c)=N.shape(proj)
     mat=N.copy(proj)
     #print 'proj ', proj.shape
@@ -126,54 +127,44 @@ def ResPlot(self,H,K,L,W,EXP,fig):
         e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
         e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
 
-    #print 'a1_sec ',a1_sec
-    #print 'b1_sec ',b1_sec
-    #print 'theta_sec ',theta_sec
-    #print 'mat_diag_sec ',mat_diag_sec
-
+ 
 
 
 
     rsample='latticestar'
-    oxmax=XMax/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
-    oxmin=XMin/self.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
-    oymax=YMax/self.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
-    oymin=YMin/self.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
-    #print 'a1 ',a1
-    #print 'b1 ',b1
-    #print 'theta ',theta
-    #print 'mat_diag ',mat_diag
-    #x0y0=N.array([1.0,0.0])
+    oxmax=XMax/myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+    oxmin=XMin/myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+    oymax=YMax/myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+    oymin=YMin/myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+ 
     #make right y-axis
-    ax2 = fig.add_subplot(2,2,1)
-    pylab.subplots_adjust(hspace=0.6,wspace=0.3)
-    #ax2.set_xlim(oxmin, oxmax)
-    ax2.set_ylim(oymin[center], oymax[center])
-    ax2.yaxis.tick_right()
-    ax2.yaxis.set_label_position('right')
-    ax2.xaxis.set_major_formatter(pylab.NullFormatter())
-    ax2.xaxis.set_major_locator(pylab.NullLocator())
-    ylabel=r'Q$_y$' +'(units of ['+str(o2[0,center])+' '+str(o2[1,center])+' '+str(o2[2,center])+'])'
-    ax2.set_ylabel(ylabel)
-    #ax2.set_zorder(3)
+    #ax2 = fig.add_subplot(2,2,1)
+    #pylab.subplots_adjust(hspace=0.6,wspace=0.3)
+    #ax2.set_ylim(oymin[center], oymax[center])
+    #ax2.yaxis.tick_right()
+    #ax2.yaxis.set_label_position('right')
+    #ax2.xaxis.set_major_formatter(pylab.NullFormatter())
+    #ax2.xaxis.set_major_locator(pylab.NullLocator())
+    #ylabel=r'Q$_y$' +'(units of ['+str(o2[0,center])+' '+str(o2[1,center])+' '+str(o2[2,center])+'])'
+    #ax2.set_ylabel(ylabel)
     #make top x-axis
     if 1:
-        ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-y top')
-        ax3.xaxis.tick_top()
-        ax3.xaxis.set_label_position('top')
-        ax3.set_xlim(oxmin[center], oxmax[center])
-        ax3.yaxis.set_major_formatter(NullFormatter())
-        ax3.yaxis.set_major_locator(pylab.NullLocator())
-        xlabel=r'Q$_x$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
-        ax3.set_xlabel(xlabel)
+        #ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-y top')
+        #ax3.xaxis.tick_top()
+        #ax3.xaxis.set_label_position('top')
+        #ax3.set_xlim(oxmin[center], oxmax[center])
+        #ax3.yaxis.set_major_formatter(NullFormatter())
+        #ax3.yaxis.set_major_locator(pylab.NullLocator())
+        #xlabel=r'Q$_x$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
+        #ax3.set_xlabel(xlabel)
         #ax3.set_zorder(2)
 
     #make bottom x-axis, left y-axis
     if 1:
-        ax = fig.add_axes(ax2.get_position(), frameon=False,label='x-y')
-        ax.yaxis.tick_left()
-        ax.yaxis.set_label_position('left')
-        ax.xaxis.tick_bottom()
+        #ax = fig.add_axes(ax2.get_position(), frameon=False,label='x-y')
+        #ax.yaxis.tick_left()
+        #ax.yaxis.set_label_position('left')
+        #ax.xaxis.tick_bottom()
         #ax.xaxis.set_label_position('bottom')
         for i in range(c):
             ax.add_artist(e[i])
@@ -185,13 +176,13 @@ def ResPlot(self,H,K,L,W,EXP,fig):
             e_sec[i].set_alpha(0.7)
             e_sec[i].set_facecolor('blue')
 
-        ax.set_xlim(XMin, XMax)
-        ax.set_ylim(YMin, YMax)
-        xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
-        ax.set_xlabel(xlabel)
-        ylabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
-        ax.set_ylabel(ylabel)
-        #ax.set_zorder(1)
+        #ax.set_xlim(XMin, XMax)
+        #ax.set_ylim(YMin, YMax)
+        #xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
+        #ax.set_xlabel(xlabel)
+        #ylabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
+        #ax.set_ylabel(ylabel)
+
 
 
 
@@ -489,7 +480,7 @@ if __name__ == '__main__':
         print 'R0 ',R0
         #exit()
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-        #myrescal.ResPlot(H, K, L, W, setup)
+        ResPlot(H, K, L, W, setup,myrescal,ax,fig)
 
 
 
