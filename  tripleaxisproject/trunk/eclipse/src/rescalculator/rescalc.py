@@ -1354,7 +1354,7 @@ if __name__=="__main__":
         print 'RM '
         print RM.transpose()
         print 'R0 ',R0
-        exit()
+        #exit()
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         #myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
