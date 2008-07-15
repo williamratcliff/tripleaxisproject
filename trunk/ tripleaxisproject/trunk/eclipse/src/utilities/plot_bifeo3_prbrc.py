@@ -148,7 +148,7 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig=pylab.figure()):
     #ylabel=r'Q$_y$' +'(units of ['+str(o2[0,center])+' '+str(o2[1,center])+' '+str(o2[2,center])+'])'
     #ax2.set_ylabel(ylabel)
     #make top x-axis
-    if 1:
+    #if 1:
         #ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-y top')
         #ax3.xaxis.tick_top()
         #ax3.xaxis.set_label_position('top')
