@@ -25,7 +25,7 @@ pi=N.pi
 
 
 
-def ResPlot(H,K,L,W,EXP,myrescal,ax,fig=pylab.figure()):
+def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
     """Plot resolution ellipse for a given scan"""
     center=N.round(H.shape[0]/2)
     if center<1:
@@ -123,7 +123,8 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig=pylab.figure()):
         b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
         thetar_sec=N.arccos(vm_sec[0,0])
         theta_sec.append(math.degrees(thetar_sec))
-        x0y0=N.array([qx[i],qy[i]])
+        x0y0=N.array([H[i],K[i]])
+        print 'x0y0',x0y0
         e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
         e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
 
@@ -167,14 +168,14 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig=pylab.figure()):
         #ax.xaxis.tick_bottom()
         #ax.xaxis.set_label_position('bottom')
         for i in range(c):
-            ax.add_artist(e[i])
+            #ax.add_artist(e[i])
             e[i].set_clip_box(ax.bbox)
             e[i].set_alpha(0.5)
             e[i].set_facecolor('red')
             ax.add_artist(e_sec[i])
             e_sec[i].set_clip_box(ax.bbox)
             e_sec[i].set_alpha(0.7)
-            e_sec[i].set_facecolor('blue')
+            e_sec[i].set_facecolor('black')
 
         #ax.set_xlim(XMin, XMax)
         #ax.set_ylim(YMin, YMax)
@@ -438,18 +439,18 @@ if __name__ == '__main__':
 
 
     if 1:
-        a=N.array([6., 6.],'d')
-        b=N.array([7., 7.],'d')
-        c=N.array([8.,8],'d')
-        alpha=N.array([90,90],'d')
-        beta=N.array([90,90],'d')
-        gamma=N.array([90,90],'d')
+        a=N.array([3.943],'d')
+        b=N.array([2.779],'d')
+        c=N.array([13.86],'d')
+        alpha=N.array([90],'d')
+        beta=N.array([90],'d')
+        gamma=N.array([90],'d')
  #       orient1=N.array([[0,1,1]],'d')
-        orient1=N.array([[1,0,0],[1,0,0]],'d')
-        orient2=N.array([[0,1,0],[0,1,0]],'d')
+        orient1=N.array([[1,0,0]],'d')
+        orient2=N.array([[0,1,0]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([1.5,1.5],'d');K=N.array([0,0.0],'d');L=N.array([0.35,0.35],'d');W=N.array([20,10],'d')
+        H=N.array([.5],'d');K=N.array([0.5],'d');L=N.array([0],'d');W=N.array([0],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
