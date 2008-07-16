@@ -59,7 +59,6 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
     o2[0]=myrescal.lattice_calculator.y[0,:]*pr
     o2[1]=myrescal.lattice_calculator.y[1,:]*pr
     o2[2]=myrescal.lattice_calculator.y[2,:]*pr
-
     if N.abs(o2[0,center])<1e-5:
          o2[0,center]=0.0
     if N.absolute(o2[1,center])<1e-5:
@@ -119,8 +118,16 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
         vm_sec=N.matrix(v)
         vmt_sec=vm_sec.T
         mat_diag_sec=vmt_sec*matm_sec*vm_sec
-        a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0]))
-        b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
+        #print 'a',myrescal.lattice_calculator.a[0]
+        rsample='latticestar'
+        ascale=myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)[0]
+        bscale=myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)[0]
+        print 'ascale',ascale
+        print 'bscale',bscale
+        #ascale=1
+        #bscale=1
+        a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0])/ascale)
+        b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1])/bscale)
         thetar_sec=N.arccos(vm_sec[0,0])
         theta_sec.append(math.degrees(thetar_sec))
         x0y0=N.array([H[i],K[i]])
@@ -451,7 +458,11 @@ if __name__ == '__main__':
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
         delta=.0045
-        H=N.array([.5,.5],'d');K=N.array([0.5+delta,.5-delta],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
+        hc=.5
+        kc=.5
+        H=N.array([hc,hc,hc+2*delta,hc-2*delta],'d');K=N.array([kc+delta,kc-delta,kc+delta/2,kc-delta/2],'d');L=N.array([0,0,0,0],'d');W=N.array([0,0,0,0],'d')
+        #H=N.array([.5,.5+2*delta],'d');K=N.array([0.5+delta,.5+delta/2],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
+        H=N.array([hc],'d');K=N.array([kc],'d');L=N.array([0],'d');W=N.array([0],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -462,7 +473,7 @@ if __name__ == '__main__':
         EXP['sample']={}
         EXP['sample']['mosaic']=25
         EXP['sample']['vmosaic']=25
-        EXP['hcol']=N.array([40, 10, 40, 40],'d')
+        EXP['hcol']=N.array([40, 10, 40, 80],'d')
         EXP['vcol']=N.array([120, 120, 120, 240],'d')
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
@@ -482,6 +493,9 @@ if __name__ == '__main__':
         print 'R0 ',R0
         #exit()
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+        widths=myrescal.CalcWidths(H,K,L,W,setup)
+        print 'YBwidth',widths['YBWidth']
+        print 'XBwidth',widths['XBWidth']
         ResPlot(H, K, L, W, setup,myrescal,ax,fig)
 
 
