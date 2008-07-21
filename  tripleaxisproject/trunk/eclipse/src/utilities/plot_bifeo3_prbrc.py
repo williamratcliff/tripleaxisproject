@@ -50,6 +50,8 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
     qy=myrescal.lattice_calculator.scalar(myrescal.lattice_calculator.y[0,:],myrescal.lattice_calculator.y[1,:],myrescal.lattice_calculator.y[2,:],H,K,L,'latticestar')
     qw=W;
 
+    print 'qx',qx
+    print 'qy',qy
     #========================================================================================================
     #find reciprocal-space directions of X and Y axes
 
@@ -113,24 +115,25 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
     #print 'proj ', proj
     (a,b,c)=N.shape(sec)
     for i in range(c):
+        rsample='latticestar'
+        ascale=myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)[0]
+        bscale=myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)[0]
+        print 'ascale',ascale
+        print 'bscale',bscale
+        ascale=1
+        bscale=1
         matm_sec=N.matrix(mat_sec[:,:,i])
         w_sec,v_sec=N.linalg.eig(matm_sec)
         vm_sec=N.matrix(v)
         vmt_sec=vm_sec.T
         mat_diag_sec=vmt_sec*matm_sec*vm_sec
         #print 'a',myrescal.lattice_calculator.a[0]
-        rsample='latticestar'
-        ascale=myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)[0]
-        bscale=myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)[0]
-        print 'ascale',ascale
-        print 'bscale',bscale
-        #ascale=1
-        #bscale=1
         a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0])/ascale)
         b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1])/bscale)
-        thetar_sec=N.arccos(vm_sec[0,0])
+        thetar_sec=N.arccos(vm_sec[0,0]/ascale)
         theta_sec.append(math.degrees(thetar_sec))
         x0y0=N.array([H[i],K[i]])
+        x0y0=N.array(qx,qy)
         print 'x0y0',x0y0
         e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
         e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
@@ -352,14 +355,22 @@ if __name__ == '__main__':
     mydirectory=r'c:\bifeo3xtal\dec7_2007'
     myfilebase='cmesh'
     myend='bt9'
-    xc,yc,zc=readmeshfiles(mydirectory,'cmesh',myend) #Rm temp
-    xd,yd,zd=readmeshfiles(mydirectory,'dmesh',myend) #0
-    xe,ye,ze=readmeshfiles(mydirectory,'emesh',myend) #-1.3
-    xf,yf,zf=readmeshfiles(mydirectory,'fmesh',myend) #0
-    xg,yg,zg=readmeshfiles(mydirectory,'gmesh',myend) #1.3
-    xh,yh,zh=readmeshfiles(mydirectory,'hmesh',myend) #0
-    xi,yi,zi=readmeshfiles(mydirectory,'imesh',myend) #-1.3
-    xj,yj,zj=readmeshfiles(mydirectory,'jmesh',myend) #0
+    if 0:
+        xc,yc,zc=readmeshfiles(mydirectory,'cmesh',myend) #Rm temp
+    if 1:
+        xd,yd,zd=readmeshfiles(mydirectory,'dmesh',myend) #0
+    if 0:
+        xe,ye,ze=readmeshfiles(mydirectory,'emesh',myend) #-1.3
+    if 0:
+        xf,yf,zf=readmeshfiles(mydirectory,'fmesh',myend) #0
+    if 0:
+        xg,yg,zg=readmeshfiles(mydirectory,'gmesh',myend) #1.3
+    if 0:
+        xh,yh,zh=readmeshfiles(mydirectory,'hmesh',myend) #0
+    if 0:
+        xi,yi,zi=readmeshfiles(mydirectory,'imesh',myend) #-1.3
+    if 0:
+        xj,yj,zj=readmeshfiles(mydirectory,'jmesh',myend) #0
     print 'matplotlib'
 
     if 1:
@@ -458,11 +469,11 @@ if __name__ == '__main__':
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
         delta=.0045
-        hc=.5
+        hc=.503
         kc=.5
-        H=N.array([hc,hc,hc+2*delta,hc-2*delta],'d');K=N.array([kc+delta,kc-delta,kc+delta/2,kc-delta/2],'d');L=N.array([0,0,0,0],'d');W=N.array([0,0,0,0],'d')
+        H=N.array([hc,hc,hc+1*delta,hc-1*delta],'d');K=N.array([kc+delta,kc-delta,kc+delta/2,kc-delta/2],'d');L=N.array([0,0,0,0],'d');W=N.array([0,0,0,0],'d')
         #H=N.array([.5,.5+2*delta],'d');K=N.array([0.5+delta,.5+delta/2],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
-        H=N.array([hc],'d');K=N.array([kc],'d');L=N.array([0],'d');W=N.array([0],'d')
+        #H=N.array([hc],'d');K=N.array([kc],'d');L=N.array([0],'d');W=N.array([0],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -471,8 +482,8 @@ if __name__ == '__main__':
         EXP['ana']['mosaic']=25
         EXP['mono']['mosaic']=25
         EXP['sample']={}
-        EXP['sample']['mosaic']=25
-        EXP['sample']['vmosaic']=25
+        EXP['sample']['mosaic']=35
+        EXP['sample']['vmosaic']=35
         EXP['hcol']=N.array([40, 10, 40, 80],'d')
         EXP['vcol']=N.array([120, 120, 120, 240],'d')
         EXP['infix']=-1 #positive for fixed incident energy
