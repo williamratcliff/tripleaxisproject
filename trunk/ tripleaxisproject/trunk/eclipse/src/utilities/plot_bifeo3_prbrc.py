@@ -132,9 +132,11 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
         b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1])/bscale)
         thetar_sec=N.arccos(vm_sec[0,0]/ascale)
         theta_sec.append(math.degrees(thetar_sec))
-        x0y0=N.array([H[i],K[i]])
-        x0y0=N.array(qx,qy)
+        #x0y0=N.array([H[i],K[i]])
+        x0y0=N.array([qx[i],qy[i]])
         print 'x0y0',x0y0
+        #print i,'qx',qx[i]
+        #print 'qy',qy[i]
         e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
         e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
 
@@ -333,14 +335,18 @@ def readmeshfiles(mydirectory,myfilebase,myend):
     Qy=N.array([])
     Qz=N.array([])
     Counts=N.array([])
+    a=N.array([3.943],'d')
+    b=N.array([2.779],'d')
     for currfile in flist:
         print currfile
         mydata=mydatareader.readbuffer(currfile)
-        Qx=N.concatenate((Qx,N.array(mydata.data['Qx'])))
-        Qy=N.concatenate((Qy,N.array(mydata.data['Qy'])))
+        Qx=N.concatenate((Qx,N.array(mydata.data['Qx'])*2*pi/a[0]))
+        Qy=N.concatenate((Qy,N.array(mydata.data['Qy'])*2*pi/b[0]))
         Qz=N.concatenate((Qz,N.array(mydata.data['Qz'])))
         Counts=N.concatenate((Counts,N.array(mydata.data['Counts'])))
     xa,ya,za=prep_data2(Qx,Qy,Counts);
+    print 'xa',xa.min(),xa.max()
+    print 'qx',Qx.min(),Qx.max()
     return xa,ya,za
 
 
@@ -386,12 +392,12 @@ if __name__ == '__main__':
 
     if 1:
         ax,g=plot_data(xd,yd,zd,fig,1,colorflag=True)
-        #ax.text(.98,.20,'E=0 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
+        ##ax.text(.98,.20,'E=0 KV',fontsize=14,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         ax.set_ylabel(ylabel)
         ax.set_xlabel(xlabel)
-        ax.xaxis.set_major_formatter(NullFormatter())
-        ax.set_ylim(ylim); ax.set_xlim(xlim)
-        #g.ax.ticks=N.arange(0,100,20)
+        #ax.xaxis.set_major_formatter(NullFormatter())
+        #ax.set_ylim(ylim); ax.set_xlim(xlim)
+        ##g.ax.ticks=N.arange(0,100,20)
 
     if 0:
         ax,g=plot_data(xe,ye,ze,fig,2,colorflag=True)
@@ -469,9 +475,13 @@ if __name__ == '__main__':
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
         delta=.0045
-        hc=.503
+        hc=.5035
         kc=.5
-        H=N.array([hc,hc,hc+1*delta,hc-1*delta],'d');K=N.array([kc+delta,kc-delta,kc+delta/2,kc-delta/2],'d');L=N.array([0,0,0,0],'d');W=N.array([0,0,0,0],'d')
+        sq3=N.sqrt(3)
+        H=N.array([hc,hc,hc+1*delta,hc-1*delta],'d');
+        K=N.array([kc+delta,kc-delta,kc+delta*sq3/2,kc-delta*sq3/2],'d');
+        L=N.array([0,0,0,0],'d');
+        W=N.array([0,0,0,0],'d')
         #H=N.array([.5,.5+2*delta],'d');K=N.array([0.5+delta,.5+delta/2],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
         #H=N.array([hc],'d');K=N.array([kc],'d');L=N.array([0],'d');W=N.array([0],'d')
         EXP={}
@@ -482,9 +492,9 @@ if __name__ == '__main__':
         EXP['ana']['mosaic']=25
         EXP['mono']['mosaic']=25
         EXP['sample']={}
-        EXP['sample']['mosaic']=35
-        EXP['sample']['vmosaic']=35
-        EXP['hcol']=N.array([40, 10, 40, 80],'d')
+        EXP['sample']['mosaic']=15
+        EXP['sample']['vmosaic']=15
+        EXP['hcol']=N.array([40, 11, 40, 80],'d')
         EXP['vcol']=N.array([120, 120, 120, 240],'d')
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
