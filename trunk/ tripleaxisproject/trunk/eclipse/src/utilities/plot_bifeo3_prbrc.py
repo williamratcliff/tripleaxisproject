@@ -361,7 +361,7 @@ if __name__ == '__main__':
     mydirectory=r'c:\bifeo3xtal\dec7_2007'
     myfilebase='cmesh'
     myend='bt9'
-    if 0:
+    if 1:
         xc,yc,zc=readmeshfiles(mydirectory,'cmesh',myend) #Rm temp
     if 1:
         xd,yd,zd=readmeshfiles(mydirectory,'dmesh',myend) #0
@@ -477,11 +477,24 @@ if __name__ == '__main__':
         delta=.0045
         hc=.5035
         kc=.5
+        #x-axis is cubic, y-axis is 110
         sq3=N.sqrt(3)
-        H=N.array([hc,hc,hc+1*delta,hc-1*delta],'d');
-        K=N.array([kc+delta,kc-delta,kc+delta*sq3/2,kc-delta*sq3/2],'d');
-        L=N.array([0,0,0,0],'d');
-        W=N.array([0,0,0,0],'d')
+        H=N.array([hc,
+                   hc,
+                   hc+3*delta/2,
+                   hc-3*delta/2,
+                   hc-3*delta/2,
+                   hc+3*delta/2,
+                   ],'d');
+        K=N.array([kc+delta,
+                   kc-delta,
+                   kc+delta/2,
+                   kc-delta/2,
+                   kc+1*delta/2,
+                   kc-delta/2
+                   ],'d');
+        L=N.array([0,0,0,0,0,0],'d');
+        W=N.array([0,0,0,0,0,0],'d')
         #H=N.array([.5,.5+2*delta],'d');K=N.array([0.5+delta,.5+delta/2],'d');L=N.array([0,0],'d');W=N.array([0,0],'d')
         #H=N.array([hc],'d');K=N.array([kc],'d');L=N.array([0],'d');W=N.array([0],'d')
         EXP={}
@@ -492,9 +505,9 @@ if __name__ == '__main__':
         EXP['ana']['mosaic']=25
         EXP['mono']['mosaic']=25
         EXP['sample']={}
-        EXP['sample']['mosaic']=15
-        EXP['sample']['vmosaic']=15
-        EXP['hcol']=N.array([40, 11, 40, 80],'d')
+        EXP['sample']['mosaic']=35
+        EXP['sample']['vmosaic']=35
+        EXP['hcol']=N.array([40, 10.7, 40, 80],'d')
         EXP['vcol']=N.array([120, 120, 120, 240],'d')
         EXP['infix']=-1 #positive for fixed incident energy
         EXP['efixed']=14.7
