@@ -475,7 +475,7 @@ if __name__ == '__main__':
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
         delta=.0045
-        hc=.5035
+        hc=.50#35
         kc=.5
         #x-axis is cubic, y-axis is 110
         sq3=N.sqrt(3)
