@@ -114,6 +114,7 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
     mat_sec=N.copy(sec)
     #print 'proj ', proj
     (a,b,c)=N.shape(sec)
+    print 'reached'
     for i in range(c):
         rsample='latticestar'
         ascale=myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)[0]
@@ -134,6 +135,9 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
         theta_sec.append(math.degrees(thetar_sec))
         #x0y0=N.array([H[i],K[i]])
         x0y0=N.array([qx[i],qy[i]])
+        print 'a1_sec',a1_sec
+        print 'b1_sec',b1_sec
+        print 'theta_sec',math.degrees(thetar_sec)
         print 'x0y0',x0y0
         #print i,'qx',qx[i]
         #print 'qy',qy[i]
@@ -475,7 +479,7 @@ if __name__ == '__main__':
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
         delta=.0045
-        hc=.50#35
+        hc=.5035
         kc=.5
         #x-axis is cubic, y-axis is 110
         sq3=N.sqrt(3)
@@ -505,8 +509,8 @@ if __name__ == '__main__':
         EXP['ana']['mosaic']=25
         EXP['mono']['mosaic']=25
         EXP['sample']={}
-        EXP['sample']['mosaic']=35
-        EXP['sample']['vmosaic']=35
+        EXP['sample']['mosaic']=0#15
+        EXP['sample']['vmosaic']=0#15
         EXP['hcol']=N.array([40, 10.7, 40, 80],'d')
         EXP['vcol']=N.array([120, 120, 120, 240],'d')
         EXP['infix']=-1 #positive for fixed incident energy
