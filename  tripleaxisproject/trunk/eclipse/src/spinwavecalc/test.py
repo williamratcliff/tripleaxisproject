@@ -40,8 +40,11 @@ def generate_hdef(atom_list,Jij,Sxyz):
         N_int=len(atom_list[i].interactions)
         for j in range(N_int):
             print Jij[atom_list[i].interactions[j]]
-            Hij=Sxyz[i]*Jij[atom_list[i].interactions[j]]*Sxyz[atom_list[i].neighbors[j]]
-            Hij=Hij-atom_list[i].Dx*Sxyz[i]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
+            print '1',Sxyz[i]
+            print Sxyz[atom_list[i].neighbors[j]]
+            Hij=Sxyz[i]*Jij[atom_list[i].interactions[j]]#
+            Hij=Hij*Sxyz[atom_list[i].neighbors[j]].transpose()
+            Hij=Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
             Hdef=Hdef+Hij
     return Hdef
 
@@ -83,6 +86,6 @@ if __name__=='__main__':
         Sxyz=generate_sxyz(N_atoms)
         atom_list=generate_atoms()
         Jij=[N.matrix([[1,0,0],[0,1,0],[0,0,1]])]
-        Hdef=generate_hdef(atom_list,Jij,Sxyz)
+        Hdef=generate_hdef(atom_list,Jij,Sabn)
         print Hdef
         
