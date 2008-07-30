@@ -39,14 +39,17 @@ def generate_hdef(atom_list,Jij,Sxyz):
     for i in range(N_atoms):
         N_int=len(atom_list[i].interactions)
         for j in range(N_int):
-            print Jij[atom_list[i].interactions[j]]
-            print '1',Sxyz[i]
-            print Sxyz[atom_list[i].neighbors[j]]
+            #print Jij[atom_list[i].interactions[j]]
+            #print '1',Sxyz[i]
+            #print Sxyz[atom_list[i].neighbors[j]]
             Hij=Sxyz[i]*Jij[atom_list[i].interactions[j]]#
-            Hij=Hij*Sxyz[atom_list[i].neighbors[j]].transpose()
+            #print type(Hij)
+            Sxyz_transpose=N.matrix(Sxyz[atom_list[i].neighbors[j]])
+            Sxyz_transpose=N.reshape(Sxyz_transpose,(3,1))
+            Hij=Hij*Sxyz_transpose
             Hij=Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
             Hdef=Hdef+Hij
-    return Hdef
+    return Hdef[0][0]
 
 def generate_atoms():
     spin0=[0,0,1]
@@ -87,5 +90,16 @@ if __name__=='__main__':
         atom_list=generate_atoms()
         Jij=[N.matrix([[1,0,0],[0,1,0],[0,0,1]])]
         Hdef=generate_hdef(atom_list,Jij,Sabn)
+        S = sympy.Symbol('S')
+        Hdef=Hdef.expand()
+        Hdef=Hdef.as_poly(S)
+        p = sympy.Wild('p',exclude='S')
+        q = sympy.Wild('q',exclude='S')
+        r = sympy.Wild('r',exclude='S')
+        l = sympy.Wild('l',exclude='S')
+        #Hlin=Hdef.match(p*S**2+S*q+l)
         print Hdef
-        
+        print Hdef.coeffs[0]
+        print Hdef.coeffs[1]
+        Hlin=Hdef.coeffs[0]*S**2+Hdef.coeffs[1]*S
+        print Hlin
