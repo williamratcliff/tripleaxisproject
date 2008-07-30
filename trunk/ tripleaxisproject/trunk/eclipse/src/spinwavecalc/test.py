@@ -1,11 +1,12 @@
 import sympy
 import numpy as N
+I=sympy.I
 
 
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0):
         self.spin=spin
-        self.pos=pos
+        self.pos=N.array(pos)
         self.neighbors=neighbors
         self.interactions=interactions
         self.label=label
@@ -63,7 +64,111 @@ def generate_atoms():
     atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
     atomlist=[atom0,atom1]
     return atomlist
-   
+
+def holstein(Hdef):
+        S = sympy.Symbol('S')
+        Hdef=Hdef.expand()
+        Hdef=Hdef.as_poly(S)
+        p = sympy.Wild('p',exclude='S')
+        q = sympy.Wild('q',exclude='S')
+        r = sympy.Wild('r',exclude='S')
+        l = sympy.Wild('l',exclude='S')
+        #Hlin=Hdef.match(p*S**2+S*q+l)
+        #print Hdef
+        #print Hdef.coeffs[0]
+        #print Hdef.coeffs[1]
+        Hlin=Hdef.coeffs[0]*S**2+Hdef.coeffs[1]*S
+        return Hlin
+
+
+def fouriertransform(atom_list,Jij,Hlin,k):
+    N_atoms=len(atom_list)
+    #Hdef=0
+    print 'atom_list',atom_list
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    for i in range(N_atoms):
+        N_int=len(atom_list[i].interactions)
+        ci=sympy.Symbol("c%d"%(i,),commutative=False)
+        cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
+        cki=sympy.Symbol("ck%d"%(i,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
+        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
+        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
+        ri=atom_list[i].pos
+        for j in range(N_atoms):
+            rj=atom_list[j].pos
+            #rj=atom_list[atom_list[i].neighbors[j]].pos
+            cj=sympy.Symbol("c%d"%(j,),commutative=False)
+            cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
+            ckj=sympy.Symbol("ck%d"%(j,),commutative=False)
+            ckdj=sympy.Symbol("ckd%d"%(j,),commutative=False)
+            cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
+            cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
+            diffr=ri-rj
+            kmult=N.dot(k,diffr)
+            t1=1.0/2*(ckdi*cmkdj*sympy.exp(-I*kmult)+
+                      cmkdi*ckdj*sympy.exp(I*kmult)               )
+            t2=1.0/2*(cki*cmkj*sympy.exp(I*kmult)+
+                      cmki*ckj*sympy.exp(-I*kmult)
+                      )
+            t3=1./2*(ckdi*ckj*sympy.exp(-I*kmult)+
+                     cmkdi*cmkj*sympy.exp(I*kmult)
+                     )
+            t4=1./2*(cki*ckdj*sympy.exp(I*kmult)+
+                     cmki*cmkdj*sympy.exp(-I*kmult)
+                     )
+            t5=1.0/2*(ckdj*ckj+cmkdj*cmkj
+                      )
+            print 'i',i,'j',j
+            Hlin=Hlin.subs(cdi*cdj,t1)
+            Hlin=Hlin.subs(ci*cj,t2)
+            Hlin=Hlin.subs(cdi*cj,t3)
+            Hlin=Hlin.subs(ci*cdj,t4)
+            Hlin=Hlin.subs(cdj*cj,t5)
+    #print t1
+    return Hlin
+
+
+def applycommutation(atom_list,Jij,Hfou,k):
+    """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
+    N_atoms=len(atom_list)
+    #Hdef=0
+    print 'atom_list',atom_list
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    for i in range(N_atoms):
+        N_int=len(atom_list[i].interactions)
+        ci=sympy.Symbol("c%d"%(i,),commutative=False)
+        cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
+        cki=sympy.Symbol("ck%d"%(i,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
+        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
+        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
+        for j in range(N_atoms):
+            cj=sympy.Symbol("c%d"%(j,),commutative=False)
+            cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
+            ckj=sympy.Symbol("ck%d"%(j,),commutative=False)
+            ckdj=sympy.Symbol("ckd%d"%(j,),commutative=False)
+            cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
+            cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
+            if i==j:
+                Hfou.subs(cki*ckdj,ckdj*cki+1)
+                Hfou.subs(cki*ckdj,ckdj*cki)
+                Hfou.subs(cmkdi*cmkj,cmkj*cmkdi+1)
+                Hfou.subs(cmkdi*cmkj,cmkj*cmkdi)
+            else:
+                Hfou.subs(cki*cmkj,cmkj*cki)
+                Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
+    
+    
+    return Hfou
+
+
+
+
+
+
     
 if __name__=='__main__':
 
@@ -83,23 +188,23 @@ if __name__=='__main__':
         print r
         print 1./20
     if 1:
-        N_atoms=3
+        N_atoms=2
         Sabn=generate_sabn(N_atoms)
         print Sabn[0]
         Sxyz=generate_sxyz(N_atoms)
         atom_list=generate_atoms()
         Jij=[N.matrix([[1,0,0],[0,1,0],[0,0,1]])]
         Hdef=generate_hdef(atom_list,Jij,Sabn)
-        S = sympy.Symbol('S')
-        Hdef=Hdef.expand()
-        Hdef=Hdef.as_poly(S)
-        p = sympy.Wild('p',exclude='S')
-        q = sympy.Wild('q',exclude='S')
-        r = sympy.Wild('r',exclude='S')
-        l = sympy.Wild('l',exclude='S')
-        #Hlin=Hdef.match(p*S**2+S*q+l)
-        print Hdef
-        print Hdef.coeffs[0]
-        print Hdef.coeffs[1]
-        Hlin=Hdef.coeffs[0]*S**2+Hdef.coeffs[1]*S
-        print Hlin
+        print 'Hdef',Hdef
+        Hlin=holstein(Hdef)
+        print 'Hlin',Hlin
+        kx=sympy.Symbol('kx')
+        ky=sympy.Symbol('ky')
+        kz=sympy.Symbol('kz')
+        k=[kx,ky,kz]
+        Hfou=fouriertransform(atom_list,Jij,Hlin,k)
+        print 'Hfou',Hfou
+        Hcomm=applycommutation(atom_list,Jij,Hfou,k)
+        print 'Hcomm',Hcomm
+        
+        
