@@ -55,7 +55,7 @@ def generate_hdef(atom_list,Jij,Sxyz):
             Sxyz_transpose=N.matrix(Sxyz[atom_list[i].neighbors[j]])
             Sxyz_transpose=N.reshape(Sxyz_transpose,(3,1))
             Hij=Hij*Sxyz_transpose
-            Hij=Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
+            Hij=-Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
             Hdef=Hdef+Hij
     return Hdef[0][0]
 
@@ -75,16 +75,14 @@ def generate_atoms():
 def holstein(Hdef):
         S = sympy.Symbol('S')
         Hdef=Hdef.expand()
-        Hdef=Hdef.as_poly(S)
+        #Hdef=Hdef.as_poly(S)
         p = sympy.Wild('p',exclude='S')
         q = sympy.Wild('q',exclude='S')
         r = sympy.Wild('r',exclude='S')
         l = sympy.Wild('l',exclude='S')
-        #Hlin=Hdef.match(p*S**2+S*q+l)
-        #print Hdef
-        #print Hdef.coeffs[0]
-        #print Hdef.coeffs[1]
-        Hlin=Hdef.coeffs[0]*S**2+Hdef.coeffs[1]*S
+        #Hlin=Hdef.coeffs[0]*S**2+Hdef.coeffs[1]*S
+        Hlin=coeff(Hdef,S**2)*S**2+coeff(Hdef,S)*S
+        
         return Hlin
 
 
@@ -127,7 +125,7 @@ def fouriertransform(atom_list,Jij,Hlin,k):
                      )
             t5=1.0/2*(ckdj*ckj+cmkdj*cmkj
                       )
-            print 'i',i,'j',j
+            #print 'i',i,'j',j
             Hlin=Hlin.subs(cdi*cdj,t1)
             Hlin=Hlin.subs(ci*cj,t2)
             Hlin=Hlin.subs(cdi*cj,t3)
