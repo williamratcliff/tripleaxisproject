@@ -219,13 +219,26 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
     #Hdef=0
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
-    XdX=Hcomm
+    exclude_list=[]
+    coeff_list=[]
     for i in range(2*N_atoms):
         for j in range(2*N_atoms):
             coeff=operator_table_dagger[i]*operator_table[j]
-            print 'coeff',coeff,'i',i,'j',j
-            print Hcomm.match(coeff)
-            
+            #print 'coeff',coeff,'i',i,'j',j
+            exclude_list.append(coeff)
+    for i in range(len(exclude_list)):
+        coeff_list.append(sympy.Wild('A%d'%(i),exclude=exclude_list))
+    coeff_list=N.array(coeff_list)
+    exclude_list2=N.array(exclude_list)
+    expr=N.sum(coeff_list*exclude_list2)
+    print expr
+    #B=sympy.Wild('B',exclude=exclude_list)
+    Hcomm=Hcomm.expand()
+    print Hcomm
+    resultdict=Hcomm.match(expr)
+    print 'done'
+    print 'res',resultdict
+    XdX=sympy.Matrix((3,3))       
     return XdX
 
 
