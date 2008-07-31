@@ -231,7 +231,7 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
     Hcomm=Hcomm.expand()
     XdX=sympy.zero(2*N_atoms)
     g=sympy.zero(2*N_atoms)
-    print 'XdX',XdX    
+    #print 'XdX',XdX    
     for i in range(2*N_atoms):
         curr_row=[]
         for j in range(2*N_atoms):
@@ -239,7 +239,7 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
             #print 'coeff',coeff,'i',i,'j',j
             exclude_list.append(mycoeff)
             currcoeff=coeff(Hcomm,mycoeff)
-            print 'found',currcoeff
+            #print 'found',currcoeff
             if currcoeff!=None:
                 XdX[i,j]=currcoeff
                 curr_row.append(currcoeff)
@@ -265,7 +265,7 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
 
 
     #resultdict=Hcomm.match(expr)
-    print 'done'
+    #print 'done'
     #print 'res',resultdict
      
     #XdX[0][0]=1  
@@ -319,5 +319,5 @@ if __name__=='__main__':
         print 'g',g
         TwogH2=2*g*XdX
         print TwogH2
-        eigs=sympy.eigenvals(TwogH2)
-        print 'eigenvalues', eigs
+        eigs=TwogH2.eigenvals()
+        print 'eigenvalues', sympy.simplify(eigs[1][0])
