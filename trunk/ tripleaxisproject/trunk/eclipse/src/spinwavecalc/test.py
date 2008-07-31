@@ -2,7 +2,14 @@ import sympy
 import numpy as N
 I=sympy.I
 
-
+def coeff(expr, term):
+   expr = sympy.collect(expr, term)
+   symbols = list(term.atoms(sympy.Symbol))
+   w = sympy.Wild("coeff", exclude=symbols)
+   m = expr.match(w*term+sympy.Wild("rest"))
+   if m:
+       return m[w]
+   
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0):
         self.spin=spin
@@ -221,25 +228,48 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
     #print 'Jij',Jij
     exclude_list=[]
     coeff_list=[]
-    for i in range(2*N_atoms):
-        for j in range(2*N_atoms):
-            coeff=operator_table_dagger[i]*operator_table[j]
-            #print 'coeff',coeff,'i',i,'j',j
-            exclude_list.append(coeff)
-    for i in range(len(exclude_list)):
-        coeff_list.append(sympy.Wild('A%d'%(i),exclude=exclude_list))
-    coeff_list=N.array(coeff_list)
-    exclude_list2=N.array(exclude_list)
-    expr=N.sum(coeff_list*exclude_list2)
-    print expr
-    #B=sympy.Wild('B',exclude=exclude_list)
     Hcomm=Hcomm.expand()
-    print Hcomm
-    resultdict=Hcomm.match(expr)
+    XdX=sympy.zero(2*N_atoms)
+    g=sympy.zero(2*N_atoms)
+    print 'XdX',XdX    
+    for i in range(2*N_atoms):
+        curr_row=[]
+        for j in range(2*N_atoms):
+            mycoeff=operator_table_dagger[i]*operator_table[j]
+            #print 'coeff',coeff,'i',i,'j',j
+            exclude_list.append(mycoeff)
+            currcoeff=coeff(Hcomm,mycoeff)
+            print 'found',currcoeff
+            if currcoeff!=None:
+                XdX[i,j]=currcoeff
+                curr_row.append(currcoeff)
+            if i!=j:
+                g[i,j]=0
+            else:
+                if i>=N_atoms:
+                    g[i,j]=-1
+                else:
+                    g[i,j]=1
+                
+            #else:
+            #    XdX[i,j]=0
+            #    curr_row.append(0)
+        #XdX[i]=curr_row
+                
+            
+    #for i in range(len(exclude_list)):
+    #    coeff_list.append(sympy.Wild('A%d'%(i),exclude=exclude_list))
+    #coeff_list2=N.array(coeff_list)
+    #exclude_list2=N.array(exclude_list)
+    #expr=N.sum(coeff_list2*exclude_list2)
+
+
+    #resultdict=Hcomm.match(expr)
     print 'done'
-    print 'res',resultdict
-    XdX=sympy.Matrix((3,3))       
-    return XdX
+    #print 'res',resultdict
+     
+    #XdX[0][0]=1  
+    return XdX,g
 
 
     
@@ -266,7 +296,8 @@ if __name__=='__main__':
         print Sabn[0]
         Sxyz=generate_sxyz(N_atoms)
         atom_list=generate_atoms()
-        Jij=[N.matrix([[1,0,0],[0,1,0],[0,0,1]])]
+        J=sympy.Symbol('J')
+        Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
         Hdef=generate_hdef(atom_list,Jij,Sabn)
         print 'Hdef',Hdef
         Hlin=holstein(Hdef)
@@ -283,6 +314,10 @@ if __name__=='__main__':
         print 'optable',operator_table
         operator_table_dagger=gen_operator_table_dagger(atom_list)
         print 'optable_dagger',operator_table_dagger
-        XdX=gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm)
+        XdX,g=gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm)
         print 'XdX',XdX
-        
+        print 'g',g
+        TwogH2=2*g*XdX
+        print TwogH2
+        eigs=sympy.eigenvals(TwogH2)
+        print 'eigenvalues', eigs
