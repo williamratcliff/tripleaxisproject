@@ -84,7 +84,7 @@ def holstein(Hdef):
 def fouriertransform(atom_list,Jij,Hlin,k):
     N_atoms=len(atom_list)
     #Hdef=0
-    print 'atom_list',atom_list
+    #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
     for i in range(N_atoms):
@@ -134,7 +134,7 @@ def applycommutation(atom_list,Jij,Hfou,k):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
     #Hdef=0
-    print 'atom_list',atom_list
+    #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
     for i in range(N_atoms):
@@ -164,9 +164,69 @@ def applycommutation(atom_list,Jij,Hfou,k):
     
     return Hfou
 
+def gen_operator_table(atom_list):
+    """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
+    N_atoms=len(atom_list)
+    #Hdef=0
+    #print 'atom_list',atom_list
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    operator_table=[]
+    operator_table_minus=[]
+    
+    for i in range(N_atoms):
+        N_int=len(atom_list[i].interactions)
+        ci=sympy.Symbol("c%d"%(i,),commutative=False)
+        cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
+        cki=sympy.Symbol("ck%d"%(i,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
+        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
+        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
+        operator_table.append(cki)
+        operator_table_minus.append(cmkdi)
+    operator_table=[operator_table,operator_table_minus]
+    operator_table=N.ravel(operator_table)
+    return operator_table
 
 
+def gen_operator_table_dagger(atom_list):
+    """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
+    N_atoms=len(atom_list)
+    #Hdef=0
+    #print 'atom_list',atom_list
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    operator_table=[]
+    operator_table_minus=[]
+    
+    for i in range(N_atoms):
+        N_int=len(atom_list[i].interactions)
+        ci=sympy.Symbol("c%d"%(i,),commutative=False)
+        cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
+        cki=sympy.Symbol("ck%d"%(i,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
+        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
+        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
+        operator_table.append(ckdi)
+        operator_table_minus.append(cmki)
+    operator_table=[operator_table,operator_table_minus]
+    operator_table=N.ravel(operator_table)
+    return operator_table
 
+def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
+    """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
+    N_atoms=len(atom_list)
+    #Hdef=0
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    XdX=Hcomm
+    for i in range(2*N_atoms):
+        for j in range(2*N_atoms):
+            coeff=operator_table_dagger[i]*operator_table[j]
+            print 'coeff',coeff,'i',i,'j',j
+            print Hcomm.match(coeff)
+            
+    return XdX
 
 
     
@@ -206,5 +266,10 @@ if __name__=='__main__':
         print 'Hfou',Hfou
         Hcomm=applycommutation(atom_list,Jij,Hfou,k)
         print 'Hcomm',Hcomm
-        
+        operator_table=gen_operator_table(atom_list)
+        print 'optable',operator_table
+        operator_table_dagger=gen_operator_table_dagger(atom_list)
+        print 'optable_dagger',operator_table_dagger
+        XdX=gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm)
+        print 'XdX',XdX
         
