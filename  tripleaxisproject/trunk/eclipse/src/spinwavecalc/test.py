@@ -23,7 +23,7 @@ class atom:
 
 def generate_sabn(N_atoms):
     Sabn=[]
-    S=sympy.Symbol("S")
+    S=sympy.Symbol("S",real=True)
     for i in range(N_atoms):
         c=sympy.Symbol("c%d"%(i,),commutative=False)
         cd=sympy.Symbol("cd%d"%(i,),commutative=False)
@@ -50,6 +50,9 @@ def generate_hdef(atom_list,Jij,Sxyz):
             #print Jij[atom_list[i].interactions[j]]
             #print '1',Sxyz[i]
             #print Sxyz[atom_list[i].neighbors[j]]
+            #print 'i',i,'j',j
+            #currj=Jij[atom_list[i].interactions[j]]
+            #print Jij[0]
             Hij=Sxyz[i]*Jij[atom_list[i].interactions[j]]#
             #print type(Hij)
             Sxyz_transpose=N.matrix(Sxyz[atom_list[i].neighbors[j]])
@@ -65,15 +68,19 @@ def generate_atoms():
     neighbors=[1]
     interactions=[0]
     atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
-    pos0=[0,0.5,0]
-    neighbors=[0]
-    interactions=[0]
+    pos0=[1,0,0]
+    neighbors=[0,2]
+    interactions=[0,0]
     atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
-    atomlist=[atom0,atom1]
+    pos0=[2,0,0]
+    neighbors=[1]
+    interactions=[0]
+    atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2)
+    atomlist=[atom0,atom1,atom2]
     return atomlist
 
 def holstein(Hdef):
-        S = sympy.Symbol('S')
+        S = sympy.Symbol('S',real=True)
         Hdef=Hdef.expand()
         #Hdef=Hdef.as_poly(S)
         p = sympy.Wild('p',exclude='S')
@@ -289,12 +296,12 @@ if __name__=='__main__':
         print r
         print 1./20
     if 1:
-        N_atoms=2
+        N_atoms=3
         Sabn=generate_sabn(N_atoms)
         print Sabn[0]
         Sxyz=generate_sxyz(N_atoms)
         atom_list=generate_atoms()
-        J=sympy.Symbol('J')
+        J=sympy.Symbol('J',real=True)
         Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
         Hdef=generate_hdef(atom_list,Jij,Sabn)
         print 'Hdef',Hdef
@@ -318,4 +325,5 @@ if __name__=='__main__':
         TwogH2=2*g*XdX
         print TwogH2
         eigs=TwogH2.eigenvals()
+        print 'eigs', eigs
         print 'eigenvalues', sympy.simplify(eigs[1][0])

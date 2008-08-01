@@ -9,6 +9,9 @@ def coeff(expr, term):
    if m:
        return m[w]
 
+def exp2Trig(expr):
+    
+
 if __name__=="__main__":
     #a=sympy.Symbol('a')
     #b=sympy.Symbol('b')
@@ -23,6 +26,8 @@ if __name__=="__main__":
     #q=sympy.Wild('q',exclude=['a','b','a*b'])
     #r=sympy.Wild('r',exclude=['a','b','a*b'])
     #pref=expanded.match(p*a**2+q*b**2+r*coeff)
+    H2=a*sympy.exp(4*x)+A*sympy.exp(-4*y)
+    print exp2Tri(H2)
     #print pref
     #print 'collect', sympy.collect(expanded,a)
     print coeff(H,y)
