@@ -1,6 +1,7 @@
 import sympy
 import numpy as N
 I=sympy.I
+pi=N.pi
 
 def coeff(expr, term):
    expr = sympy.collect(expr, term)
@@ -323,7 +324,17 @@ if __name__=='__main__':
         print 'XdX',XdX
         print 'g',g
         TwogH2=2*g*XdX
-        print TwogH2
-        eigs=TwogH2.eigenvals()
-        print 'eigs', eigs
-        print 'eigenvalues', sympy.simplify(eigs[1][0])
+        
+        S=sympy.Symbol('S',real=True)
+        TwogH2=TwogH2.subs(J,1.0)
+        TwogH2=TwogH2.subs(S,1.0)
+        TwogH2=TwogH2.subs(kx,2*pi)
+        Ntwo=N.array(TwogH2)
+        print Ntwo
+        import scipy.linalg
+        l,v=scipy.linalg.eig(Ntwo)
+        print l  
+        #print N.linalg.eigvals(Ntwo)
+        #eigs=TwogH2.eigenvals()
+        #print 'eigs', eigs
+        #print 'eigenvalues', sympy.simplify(eigs[1][0])
