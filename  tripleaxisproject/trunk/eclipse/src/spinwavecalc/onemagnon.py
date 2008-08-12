@@ -5,11 +5,25 @@ pi=N.pi
 
 def coeff(expr, term):
    expr = sympy.collect(expr, term)
+   #print 'expr',expr
    symbols = list(term.atoms(sympy.Symbol))
+   #print 'symbols',symbols
    w = sympy.Wild("coeff", exclude=symbols)
+   #print 'w',w
    m = expr.match(w*term+sympy.Wild("rest"))
-   if m:
+   #print 'm',m
+   m2=expr.match(w*term)
+   #print 'm2',m2
+   res=False
+   if m2!=None:
+       #print 'm2[w]',m2[w]
+       res=m2[w]*term==expr
+   if m and res!=True:
        return m[w]
+   #added the next two lines
+   elif m2:
+       return m2[w]
+       
    
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0):
@@ -32,15 +46,7 @@ def generate_sabn(N_atoms):
         Sabn.append(curr)
     return Sabn
 
-def generate_sabn(N_atoms):
-    Sabn=[]
-    S=sympy.Symbol("S",real=True)
-    for i in range(N_atoms):
-        c=sympy.Symbol("c%d"%(i,),commutative=False)
-        cd=sympy.Symbol("cd%d"%(i,),commutative=False)
-        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/sympy.I,S-cd*c]
-        Sabn.append(curr)
-    return Sabn
+
 
 def generate_sabnt(N_atoms,t=''):
     Sabn=[]
@@ -113,9 +119,17 @@ def holstein(Hdef):
         #Hlin=Hdef.coeffs[0]*S**2+Hdef.coeffs[1]*S
         S2coeff=coeff(Hdef,S**2)
         Scoeff=coeff(Hdef,S)
-        if Scoef
-        Hlin=coeff(Hdef,S**2)*S**2+coeff(Hdef,S)*S
-        
+        Hlin=None
+        #Hlin=coeff(Hdef,S**2)*S**2+coeff(Hdef,S)*S
+        print 'S2Coeff', S2coeff
+        print 'Scoeff',Scoeff
+        if Scoeff!=None and S2coeff!=None:
+            Hlin=coeff(Hdef,S**2)*S**2+coeff(Hdef,S)*S
+        elif Scoeff==None and S2coeff!=None:
+            Hlin=coeff(Hdef,S**2)*S**2
+        elif Scoeff!=None and S2coeff==None:
+            print 'S'
+            Hlin=coeff(Hdef,S)*S
         return Hlin
 
 
@@ -450,9 +464,14 @@ if __name__=='__main__':
         #print 'eigenvalues', sympy.simplify(eigs[1][0])
     if 1:
         Sabnt=generate_sabnt(N_atoms,t='t')
-        SzSz=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=2))
+        SzSz=sympy.expand(multiply_ab(atom_list,Sabnt,a=2,b=2))
         print 'mult',SzSz
-        SzSz_lin=holstein(SzSz)
+        SxSx=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=0))
+        print 'mult',SxSx
+        SzSz_lin=holstein(sympy.expand(SzSz))
         print 'lin',SzSz_lin
-        SzSz_fou=Sfouriertransform(atom_list,SzSz_lin,k)
-        print 'fourier', SzSz_fou
+        SxSx_lin=holstein(sympy.expand(SxSx))
+        print 'lin x',SxSx_lin        
+        if SzSz_lin!=None:
+            SzSz_fou=Sfouriertransform(atom_list,SzSz_lin,k)
+            print 'fourier', SzSz_fou
