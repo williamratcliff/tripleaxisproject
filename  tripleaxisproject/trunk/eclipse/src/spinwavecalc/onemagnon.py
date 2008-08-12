@@ -205,13 +205,16 @@ def applycommutation(atom_list,Jij,Hfou,k):
             cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
             cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
             if i==j:
-                Hfou.subs(cki*ckdj,ckdj*cki+1)
-                Hfou.subs(cki*ckdj,ckdj*cki)
-                Hfou.subs(cmkdi*cmkj,cmkj*cmkdi+1)
-                Hfou.subs(cmkdi*cmkj,cmkj*cmkdi)
+                Hfou=Hfou.subs(cki*ckdj,ckdj*cki+1)
+                
+                Hfou=Hfou.subs(cmkdi*cmkj,cmkj*cmkdi+1)
+                
             else:
-                Hfou.subs(cki*cmkj,cmkj*cki)
-                Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
+                Hfou=Hfou.subs(cki*ckdj,ckdj*cki)
+                Hfou=Hfou.subs(cmkdi*cmkj,cmkj*cmkdi)
+                Hfou=Hfou.subs(cki*cmkj,cmkj*cki)
+                
+                Hfou=Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
     
     
     return Hfou
@@ -401,6 +404,44 @@ def Sfouriertransform(atom_list,Slin,k):
     #print t1
     return Slin
 
+def Sapplycommutation(atom_list,Sfou,k):
+    """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
+    N_atoms=len(atom_list)
+    #Hdef=0
+    #print 'atom_list',atom_list
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    for i in range(N_atoms):
+        N_int=len(atom_list[i].interactions)
+        ci=sympy.Symbol("c%d"%(i,),commutative=False)
+        cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
+        cki=sympy.Symbol("ck%d"%(i,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
+        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
+        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
+        for j in range(N_atoms):
+            cj=sympy.Symbol("c%d"%(j,),commutative=False)
+            cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
+            ckj=sympy.Symbol("ck%d"%(j,),commutative=False)
+            ckdj=sympy.Symbol("ckd%d"%(j,),commutative=False)
+            cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
+            cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
+            if i==j:
+                Sfou=Sfou.subs(cki*ckdj,ckdj*cki+1)
+                #Sfou.subs(cki*ckdj,ckdj*cki)
+                Sfou=Sfou.subs(cmkdi*cmkj,cmkj*cmkdi+1)
+                #Sfou.subs(cmkdi*cmkj,cmkj*cmkdi)
+                nkj=sympy.Symbol("nk%d"%(j,),commutative=True)
+                Sfou=Sfou.subs(ckdj*cki,nkj)
+                Sfou=Sfou.subs(cmkj*cmkdi,nkj)
+            else:
+                #Hfou.subs(cki*cmkj,cmkj*cki)
+                #Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
+                Sfou=Sfou.subs(cki*cmkj,0)
+                Sfou=Sfou.subs(cmkdi*ckdj,0)
+    
+    
+    return Sfou
     
 if __name__=='__main__':
 
@@ -447,7 +488,10 @@ if __name__=='__main__':
         print 'XdX',XdX
         print 'g',g
         TwogH2=2*g*XdX
-        
+        if 1:
+            eigs=TwogH2.eigenvals()
+            print 'eigs', eigs
+            print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
         TwogH2=TwogH2.subs(J,1.0)
         TwogH2=TwogH2.subs(S,1.0)
@@ -475,3 +519,9 @@ if __name__=='__main__':
         if SzSz_lin!=None:
             SzSz_fou=Sfouriertransform(atom_list,SzSz_lin,k)
             print 'fourier', SzSz_fou
+            Scomm=Sapplycommutation(atom_list,SzSz_fou,k)
+            print 'Scomm',Scomm
+            SxSx_fou=Sfouriertransform(atom_list,SxSx_lin,k)
+            print 'fourier x',SxSx_fou
+            Scommx=Sapplycommutation(atom_list,SxSx_fou,k)
+            print 'Scommx',Scommx
