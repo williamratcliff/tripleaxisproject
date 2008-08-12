@@ -490,8 +490,11 @@ if __name__=='__main__':
         TwogH2=2*g*XdX
         if 1:
             #eigs=TwogH2.eigenvals()
-            eigs=TwogH2.eigenvals(multiple=True)
+            x=sympy.Symbol('x')
+            eigs=TwogH2.berkowitz_charpoly(x)
+            
             print 'eigs', eigs
+            print TwogH2.charpoly(x)
             print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
         TwogH2=TwogH2.subs(J,1.0)
