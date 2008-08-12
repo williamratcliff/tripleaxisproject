@@ -489,7 +489,8 @@ if __name__=='__main__':
         print 'g',g
         TwogH2=2*g*XdX
         if 1:
-            eigs=TwogH2.eigenvals()
+            #eigs=TwogH2.eigenvals()
+            eigs=TwogH2.eigenvals(multiple=True)
             print 'eigs', eigs
             print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
