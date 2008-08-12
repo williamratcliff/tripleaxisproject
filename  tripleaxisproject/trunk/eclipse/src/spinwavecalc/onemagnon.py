@@ -419,9 +419,10 @@ if __name__=='__main__':
         TwogH2=TwogH2.subs(kx,2*pi)
         Ntwo=N.array(TwogH2)
         print Ntwo
-        import scipy.linalg
-        l,v=scipy.linalg.eig(Ntwo)
-        print l  
+        if 0:
+            import scipy.linalg
+            l,v=scipy.linalg.eig(Ntwo)
+            print l  
         #print N.linalg.eigvals(Ntwo)
         #eigs=TwogH2.eigenvals()
         #print 'eigs', eigs
