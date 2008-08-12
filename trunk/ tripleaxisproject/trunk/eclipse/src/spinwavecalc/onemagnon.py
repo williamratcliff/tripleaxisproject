@@ -42,6 +42,15 @@ def generate_sabn(N_atoms):
         Sabn.append(curr)
     return Sabn
 
+def generate_sabnt(N_atoms,t=''):
+    Sabn=[]
+    S=sympy.Symbol("S",real=True)
+    for i in range(N_atoms):
+        c=sympy.Symbol("c%d%s"%(i,t),commutative=False)
+        cd=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
+        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/sympy.I,S-cd*c]
+        Sabn.append(curr)
+    return Sabn
 
 
 
@@ -102,6 +111,9 @@ def holstein(Hdef):
         r = sympy.Wild('r',exclude='S')
         l = sympy.Wild('l',exclude='S')
         #Hlin=Hdef.coeffs[0]*S**2+Hdef.coeffs[1]*S
+        S2coeff=coeff(Hdef,S**2)
+        Scoeff=coeff(Hdef,S)
+        if Scoef
         Hlin=coeff(Hdef,S**2)*S**2+coeff(Hdef,S)*S
         
         return Hlin
@@ -297,8 +309,15 @@ def multiply_ab(atom_list,Sxyz,a=0,b=0):
     Sdef=0
     print 'atom_list',atom_list
     print 'Sxyz',Sxyz
+    T=sympy.Symbol('T',commutative=False)
     for i in range(N_atoms):
         N_int=len(atom_list[i].interactions)
+        t=''
+        c=sympy.Symbol("c%d%s"%(i,t),commutative=False)
+        cd=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
+        t='t'
+        ct=sympy.Symbol("c%d%s"%(i,t),commutative=False)
+        cdt=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
         for j in range(N_int):
             #print Jij[atom_list[i].interactions[j]]
             #print '1',Sxyz[i]
@@ -306,12 +325,14 @@ def multiply_ab(atom_list,Sxyz,a=0,b=0):
             #print 'i',i,'j',j
             #currj=Jij[atom_list[i].interactions[j]]
             #print Jij[0]
-            Sij=Sxyz[i]
+            Sij=Sxyz[i][a]
+            Sij=Sij.subs(ct,c)
+            Sij=Sij.subs(cdt,cd)
             #print type(Hij)
             Sxyz_neighbor=Sxyz[atom_list[i].neighbors[j]]
             #print Sij[a]
             #print 'transpose',Sxyz_neighbor[b]
-            Sij=Sij[a]*Sxyz_neighbor[b]
+            Sij=Sij*Sxyz_neighbor[b]#*T
             Sdef=Sdef+Sij
     return Sdef
 
@@ -358,13 +379,13 @@ def Sfouriertransform(atom_list,Slin,k):
             t5=1.0/2*(ckdj*ckj+cmkdj*cmkj
                       )
             #print 'i',i,'j',j
-            Hlin=Hlin.subs(cdi*cdj,t1)
-            Hlin=Hlin.subs(ci*cj,t2)
-            Hlin=Hlin.subs(cdi*cj,t3)
-            Hlin=Hlin.subs(ci*cdj,t4)
-            Hlin=Hlin.subs(cdj*cj,t5)
+            Slin=Slin.subs(cdi*cdj,t1)
+            Slin=Slin.subs(ci*cj,t2)
+            Slin=Slin.subs(cdi*cj,t3)
+            Slin=Slin.subs(ci*cdj,t4)
+            Slin=Slin.subs(cdj*cj,t5)
     #print t1
-    return Hlin
+    return Slin
 
     
 if __name__=='__main__':
@@ -428,8 +449,9 @@ if __name__=='__main__':
         #print 'eigs', eigs
         #print 'eigenvalues', sympy.simplify(eigs[1][0])
     if 1:
-        
-        SzSz=sympy.expand(multiply_ab(atom_list,Sabn,a=2,b=2))
+        Sabnt=generate_sabnt(N_atoms,t='t')
+        SzSz=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=2))
+        print 'mult',SzSz
         SzSz_lin=holstein(SzSz)
         print 'lin',SzSz_lin
         SzSz_fou=Sfouriertransform(atom_list,SzSz_lin,k)
