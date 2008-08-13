@@ -277,8 +277,8 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
     exclude_list=[]
     coeff_list=[]
     Hcomm=Hcomm.expand()
-    XdX=sympy.zero(2*N_atoms)
-    g=sympy.zero(2*N_atoms)
+    XdX=sympy.zeros(2*N_atoms)
+    g=sympy.zeros(2*N_atoms)
     #print 'XdX',XdX    
     for i in range(2*N_atoms):
         curr_row=[]
@@ -489,13 +489,13 @@ if __name__=='__main__':
         print 'g',g
         TwogH2=2*g*XdX
         if 1:
-            #eigs=TwogH2.eigenvals()
+            eigs=TwogH2.eigenvals()
             x=sympy.Symbol('x')
-            eigs=TwogH2.berkowitz_charpoly(x)
+            #eigs=TwogH2.berkowitz_charpoly(x)
             
             print 'eigs', eigs
             print TwogH2.charpoly(x)
-            print 'eigenvalues', sympy.simplify(eigs[1][0])        
+            #print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
         TwogH2=TwogH2.subs(J,1.0)
         TwogH2=TwogH2.subs(S,1.0)
