@@ -92,20 +92,34 @@ def generate_hdef(atom_list,Jij,Sxyz):
     return Hdef[0][0]
 
 def generate_atoms():
-    spin0=[0,0,1]
-    pos0=[0,0,0]
-    neighbors=[1]
-    interactions=[0]
-    atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
-    pos0=[1,0,0]
-    neighbors=[0,2]
-    interactions=[0,0]
-    atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
-    pos0=[2,0,0]
-    neighbors=[1]
-    interactions=[0]
-    atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2)
-    atomlist=[atom0,atom1,atom2]
+    if 0:
+        spin0=[0,0,1]
+        pos0=[0,0,0]
+        neighbors=[1]
+        interactions=[0]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
+        pos0=[1,0,0]
+        neighbors=[0,2]
+        interactions=[0,0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
+        pos0=[2,0,0]
+        neighbors=[1]
+        interactions=[0]
+        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2)
+        atomlist=[atom0,atom1,atom2]
+    if 1:
+        spin0=[0,0,1]
+        pos0=[0,0,0]
+        neighbors=[1]
+        interactions=[0]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
+        
+        pos0=[1,0,0]
+        neighbors=[0]
+        interactions=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
+        atomlist=[atom0,atom1]
+       
     return atomlist
 
 def holstein(Hdef):
@@ -335,6 +349,12 @@ def multiply_ab(atom_list,Sxyz,a=0,b=0):
         t='t'
         ct=sympy.Symbol("c%d%s"%(i,t),commutative=False)
         cdt=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
+        
+        #wq=sympy.Symbol('wq')
+        #t=sympy.Symbol('t')
+        #c=sympy.Symbol("c%d"%(i,),commutative=False)*sympy.exp(-wq*t*I)
+        #cd=sympy.Symbol("cd%d"%(i,),commutative=False)*sympy.exp(wq*t*I)
+
         for j in range(N_int):
             #print Jij[atom_list[i].interactions[j]]
             #print '1',Sxyz[i]
@@ -461,7 +481,7 @@ if __name__=='__main__':
         print r
         print 1./20
     if 1:
-        N_atoms=3
+        N_atoms=2
         Sabn=generate_sabn(N_atoms)
         print Sabn[0]
         Sxyz=generate_sxyz(N_atoms)
@@ -488,13 +508,15 @@ if __name__=='__main__':
         print 'XdX',XdX
         print 'g',g
         TwogH2=2*g*XdX
+        print 'TwogH2',TwogH2
         if 1:
             eigs=TwogH2.eigenvals()
             x=sympy.Symbol('x')
             #eigs=TwogH2.berkowitz_charpoly(x)
             
             print 'eigs', eigs
-            print TwogH2.charpoly(x)
+            #print TwogH2.charpoly(x)
+            eigs=TwogH2.eigenvals()
             #print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
         TwogH2=TwogH2.subs(J,1.0)
@@ -515,10 +537,13 @@ if __name__=='__main__':
         SzSz=sympy.expand(multiply_ab(atom_list,Sabnt,a=2,b=2))
         print 'mult',SzSz
         SxSx=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=0))
+        SxSy=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=1))
         print 'mult',SxSx
         SzSz_lin=holstein(sympy.expand(SzSz))
         print 'lin',SzSz_lin
         SxSx_lin=holstein(sympy.expand(SxSx))
+        SxSy_lin=holstein(sympy.expand(SxSy))
+        print 'lin xy',SzSz_lin
         print 'lin x',SxSx_lin        
         if SzSz_lin!=None:
             SzSz_fou=Sfouriertransform(atom_list,SzSz_lin,k)
@@ -529,3 +554,7 @@ if __name__=='__main__':
             print 'fourier x',SxSx_fou
             Scommx=Sapplycommutation(atom_list,SxSx_fou,k)
             print 'Scommx',Scommx
+            SxSy_fou=Sfouriertransform(atom_list,SxSy_lin,k)
+            print 'fourier xy',SxSy_fou
+            Scommxy=Sapplycommutation(atom_list,SxSy_fou,k)
+            print 'Scommxy',Scommxy            
