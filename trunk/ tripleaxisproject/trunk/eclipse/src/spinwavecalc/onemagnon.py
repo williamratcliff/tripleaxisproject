@@ -341,36 +341,18 @@ def multiply_ab(atom_list,Sxyz,a=0,b=0):
     print 'atom_list',atom_list
     print 'Sxyz',Sxyz
     T=sympy.Symbol('T',commutative=False)
-    for i in range(N_atoms):
-        N_int=len(atom_list[i].interactions)
-        t=''
-        c=sympy.Symbol("c%d%s"%(i,t),commutative=False)
-        cd=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
-        t='t'
-        ct=sympy.Symbol("c%d%s"%(i,t),commutative=False)
-        cdt=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
-        
-        #wq=sympy.Symbol('wq')
-        #t=sympy.Symbol('t')
-        #c=sympy.Symbol("c%d"%(i,),commutative=False)*sympy.exp(-wq*t*I)
-        #cd=sympy.Symbol("cd%d"%(i,),commutative=False)*sympy.exp(wq*t*I)
-
-        for j in range(N_int):
-            #print Jij[atom_list[i].interactions[j]]
-            #print '1',Sxyz[i]
-            #print Sxyz[atom_list[i].neighbors[j]]
-            #print 'i',i,'j',j
-            #currj=Jij[atom_list[i].interactions[j]]
-            #print Jij[0]
-            Sij=Sxyz[i][a]
-            Sij=Sij.subs(ct,c)
-            Sij=Sij.subs(cdt,cd)
-            #print type(Hij)
-            Sxyz_neighbor=Sxyz[atom_list[i].neighbors[j]]
-            #print Sij[a]
-            #print 'transpose',Sxyz_neighbor[b]
-            Sij=Sij*Sxyz_neighbor[b]#*T
-            Sdef=Sdef+Sij
+    Sij0=Sxyz[0][a]
+    t=''
+    c=sympy.Symbol("c%d%s"%(0,t),commutative=False)
+    cd=sympy.Symbol("cd%d%s"%(0,t),commutative=False)
+    t='t'
+    ct=sympy.Symbol("c%d%s"%(0,t),commutative=False)
+    cdt=sympy.Symbol("cd%d%s"%(0,t),commutative=False)
+    Sij0=Sij0.subs(ct,c)
+    Sij0=Sij0.subs(cdt,cd)  
+    for i in range(1,N_atoms):
+        Sdef=Sdef+Sij0*Sxyz[i][b]
+ 
     return Sdef
 
 
@@ -382,46 +364,58 @@ def Sfouriertransform(atom_list,Slin,k):
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
-    for i in range(N_atoms):
+    kxp=sympy.Symbol('kxp')
+    kyp=sympy.Symbol('kyp')
+    kzp=sympy.Symbol('kzp')
+    kp=[kxp,kyp,kzp]
+    wk=sympy.Symbol("wk")
+    wkp=sympy.Symbol("wkp")
+    t=sympy.Symbol("t")
+    ri=atom_list[0].pos
+    
+    kmult=N.dot(k,ri)
+    #kmultp=N.dot(kp,ri)
+    
+    ci=sympy.Symbol("c%d"%(0,),commutative=False)
+    cdi=sympy.Symbol("cd%d"%(0,),commutative=False)
+    cki=sympy.Symbol("ck%d"%(0,),commutative=False)
+    ckdi=sympy.Symbol("ckd%d"%(0,),commutative=False)
+    
+    t1=sympy.exp(I*kmult)*cki
+    t3=sympy.exp(-I*(kmult))*ckdi
+    Slin=Slin.subs(ci,t1)
+    Slin=Slin.subs(cdi,t3)
+
+
+    for i in range(1,N_atoms):
         N_int=len(atom_list[i].interactions)
-        ci=sympy.Symbol("c%d"%(i,),commutative=False)
-        cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
-        cki=sympy.Symbol("ck%d"%(i,),commutative=False)
-        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
-        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
-        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
+        #ci=sympy.Symbol("c%d"%(i,),commutative=False)
+        #cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
+        cit=sympy.Symbol("c%dt"%(i,),commutative=False)
+        cdit=sympy.Symbol("cd%dt"%(i,),commutative=False)
+
+        cki=sympy.Symbol("ck%d"%(0,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(0,),commutative=False)
+        
         ri=atom_list[i].pos
-        for j in range(N_atoms):
-            rj=atom_list[j].pos
-            #rj=atom_list[atom_list[i].neighbors[j]].pos
-            cj=sympy.Symbol("c%d"%(j,),commutative=False)
-            cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
-            ckj=sympy.Symbol("ck%d"%(j,),commutative=False)
-            ckdj=sympy.Symbol("ckd%d"%(j,),commutative=False)
-            cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
-            cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
-            diffr=ri-rj
-            kmult=N.dot(k,diffr)
-            t1=1.0/2*(ckdi*cmkdj*sympy.exp(-I*kmult)+
-                      cmkdi*ckdj*sympy.exp(I*kmult)               )
-            t2=1.0/2*(cki*cmkj*sympy.exp(I*kmult)+
-                      cmki*ckj*sympy.exp(-I*kmult)
-                      )
-            t3=1./2*(ckdi*ckj*sympy.exp(-I*kmult)+
-                     cmkdi*cmkj*sympy.exp(I*kmult)
-                     )
-            t4=1./2*(cki*ckdj*sympy.exp(I*kmult)+
-                     cmki*cmkdj*sympy.exp(-I*kmult)
-                     )
-            t5=1.0/2*(ckdj*ckj+cmkdj*cmkj
-                      )
-            #print 'i',i,'j',j
-            Slin=Slin.subs(cdi*cdj,t1)
-            Slin=Slin.subs(ci*cj,t2)
-            Slin=Slin.subs(cdi*cj,t3)
-            Slin=Slin.subs(ci*cdj,t4)
-            Slin=Slin.subs(cdj*cj,t5)
-    #print t1
+        kmult=N.dot(k,ri)
+        kmultp=N.dot(kp,ri)
+        
+        t2=sympy.exp(I*(kmultp-wk*t))*cki
+                     
+        
+        t4=sympy.exp(-I*(kmultp-wkp*t))*ckdi
+        
+        Slin=Slin.subs(cit,t2)
+        
+        Slin=Slin.subs(cdit,t4)
+    
+    #Note that I have already assumed that k=kp because I didn't include cqp terms
+    Slin=Slin.expand()
+    Slin=Slin.subs(wkp,wk)
+    Slin=Slin.subs(kxp,kx)
+    Slin=Slin.subs(kyp,ky)
+    Slin=Slin.subs(kzp,kz)
     return Slin
 
 def Sapplycommutation(atom_list,Sfou,k):
@@ -433,32 +427,36 @@ def Sapplycommutation(atom_list,Sfou,k):
     #print 'Jij',Jij
     for i in range(N_atoms):
         N_int=len(atom_list[i].interactions)
-        ci=sympy.Symbol("c%d"%(i,),commutative=False)
-        cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
-        cki=sympy.Symbol("ck%d"%(i,),commutative=False)
-        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
-        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
-        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
+        ci=sympy.Symbol("c%d"%(0,),commutative=False)
+        cdi=sympy.Symbol("cd%d"%(0,),commutative=False)
+        cki=sympy.Symbol("ck%d"%(0,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(0,),commutative=False)
+        cmki=sympy.Symbol("cmk%d"%(0,),commutative=False)
+        cmkdi=sympy.Symbol("cmkd%d"%(0,),commutative=False)
         for j in range(N_atoms):
-            cj=sympy.Symbol("c%d"%(j,),commutative=False)
-            cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
-            ckj=sympy.Symbol("ck%d"%(j,),commutative=False)
-            ckdj=sympy.Symbol("ckd%d"%(j,),commutative=False)
-            cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
-            cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
+            cj=sympy.Symbol("c%d"%(0,),commutative=False)
+            cdj=sympy.Symbol("cd%d"%(0,),commutative=False)
+            ckj=sympy.Symbol("ck%d"%(0,),commutative=False)
+            ckdj=sympy.Symbol("ckd%d"%(0,),commutative=False)
+            cmkj=sympy.Symbol("cmk%d"%(0,),commutative=False)
+            cmkdj=sympy.Symbol("cmkd%d"%(0,),commutative=False)
+            Sfou=Sfou.expand()
             if i==j:
                 Sfou=Sfou.subs(cki*ckdj,ckdj*cki+1)
-                #Sfou.subs(cki*ckdj,ckdj*cki)
-                Sfou=Sfou.subs(cmkdi*cmkj,cmkj*cmkdi+1)
                 #Sfou.subs(cmkdi*cmkj,cmkj*cmkdi)
                 nkj=sympy.Symbol("nk%d"%(j,),commutative=True)
-                Sfou=Sfou.subs(ckdj*cki,nkj)
-                Sfou=Sfou.subs(cmkj*cmkdi,nkj)
+                
             else:
-                #Hfou.subs(cki*cmkj,cmkj*cki)
-                #Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
-                Sfou=Sfou.subs(cki*cmkj,0)
-                Sfou=Sfou.subs(cmkdi*ckdj,0)
+                Sfou=Sfou.subs(cki*ckdj,ckdj*cki) #just added
+            
+            Sfou=Sfou.expand()
+            nkj=sympy.Symbol("nk%d"%(j,),commutative=True)
+            Sfou=Sfou.subs(ckdj*cki,nkj)
+            Sfou=Sfou.expand()
+            Sfou=Sfou.subs(cki*ckj,0)
+            Sfou=Sfou.expand()
+            Sfou=Sfou.subs(ckdi*ckdj,0)
+
     
     
     return Sfou
@@ -533,18 +531,21 @@ if __name__=='__main__':
         #print 'eigs', eigs
         #print 'eigenvalues', sympy.simplify(eigs[1][0])
     if 1:
+        print 'one magnon'
+        print ''
+        print ''
         Sabnt=generate_sabnt(N_atoms,t='t')
         SzSz=sympy.expand(multiply_ab(atom_list,Sabnt,a=2,b=2))
-        print 'mult',SzSz
+        print 'mult SzSz',SzSz
         SxSx=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=0))
         SxSy=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=1))
-        print 'mult',SxSx
+        print 'mult SxSx',SxSx
         SzSz_lin=holstein(sympy.expand(SzSz))
-        print 'lin',SzSz_lin
+        print 'lin zz',SzSz_lin
         SxSx_lin=holstein(sympy.expand(SxSx))
         SxSy_lin=holstein(sympy.expand(SxSy))
         print 'lin xy',SzSz_lin
-        print 'lin x',SxSx_lin        
+        print 'lin xx',SxSx_lin        
         if SzSz_lin!=None:
             SzSz_fou=Sfouriertransform(atom_list,SzSz_lin,k)
             print 'fourier', SzSz_fou
@@ -553,7 +554,7 @@ if __name__=='__main__':
             SxSx_fou=Sfouriertransform(atom_list,SxSx_lin,k)
             print 'fourier x',SxSx_fou
             Scommx=Sapplycommutation(atom_list,SxSx_fou,k)
-            print 'Scommx',Scommx
+            print 'Scommx',sympy.simplify(Scommx)
             SxSy_fou=Sfouriertransform(atom_list,SxSy_lin,k)
             print 'fourier xy',SxSy_fou
             Scommxy=Sapplycommutation(atom_list,SxSy_fou,k)
