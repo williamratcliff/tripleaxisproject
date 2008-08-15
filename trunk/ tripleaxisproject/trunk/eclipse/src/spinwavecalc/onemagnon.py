@@ -70,9 +70,9 @@ def generate_sxyz(N_atoms):
 def generate_hdef(atom_list,Jij,Sxyz):
     N_atoms=len(atom_list)
     Hdef=0
-    print 'atom_list',atom_list
+    #print 'atom_list',atom_list
     print 'Sxyz',Sxyz
-    print 'Jij',Jij
+    #print 'Jij',Jij
     for i in range(N_atoms):
         N_int=len(atom_list[i].interactions)
         for j in range(N_int):
@@ -92,7 +92,7 @@ def generate_hdef(atom_list,Jij,Sxyz):
     return Hdef[0][0]
 
 def generate_atoms():
-    if 0:
+    if 1:
         spin0=[0,0,1]
         pos0=[0,0,0]
         neighbors=[1]
@@ -102,12 +102,12 @@ def generate_atoms():
         neighbors=[0,2]
         interactions=[0,0]
         atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
-        pos0=[2,0,0]
+        pos0=[-1,0,0]
         neighbors=[1]
         interactions=[0]
         atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2)
         atomlist=[atom0,atom1,atom2]
-    if 1:
+    if 0:
         spin0=[0,0,1]
         pos0=[0,0,0]
         neighbors=[1]
@@ -135,25 +135,26 @@ def holstein(Hdef):
         Scoeff=coeff(Hdef,S)
         Hlin=None
         #Hlin=coeff(Hdef,S**2)*S**2+coeff(Hdef,S)*S
-        print 'S2Coeff', S2coeff
-        print 'Scoeff',Scoeff
+        #print 'S2Coeff', S2coeff
+        #print 'Scoeff',Scoeff
         if Scoeff!=None and S2coeff!=None:
             Hlin=coeff(Hdef,S**2)*S**2+coeff(Hdef,S)*S
         elif Scoeff==None and S2coeff!=None:
             Hlin=coeff(Hdef,S**2)*S**2
         elif Scoeff!=None and S2coeff==None:
-            print 'S'
+            #print 'S'
             Hlin=coeff(Hdef,S)*S
         return Hlin
 
 
 def fouriertransform(atom_list,Jij,Hlin,k):
     N_atoms=len(atom_list)
+    N_atoms_uc=1
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
-    for i in range(N_atoms):
+    for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
         ci=sympy.Symbol("c%d"%(i,),commutative=False)
         cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
@@ -199,11 +200,12 @@ def fouriertransform(atom_list,Jij,Hlin,k):
 def applycommutation(atom_list,Jij,Hfou,k):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
+    N_atoms_uc=1
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
-    for i in range(N_atoms):
+    for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
         ci=sympy.Symbol("c%d"%(i,),commutative=False)
         cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
@@ -211,7 +213,7 @@ def applycommutation(atom_list,Jij,Hfou,k):
         ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False)
         cmki=sympy.Symbol("cmk%d"%(i,),commutative=False)
         cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False)
-        for j in range(N_atoms):
+        for j in range(N_atoms_uc):
             cj=sympy.Symbol("c%d"%(j,),commutative=False)
             cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
             ckj=sympy.Symbol("ck%d"%(j,),commutative=False)
@@ -226,9 +228,9 @@ def applycommutation(atom_list,Jij,Hfou,k):
             else:
                 Hfou=Hfou.subs(cki*ckdj,ckdj*cki)
                 Hfou=Hfou.subs(cmkdi*cmkj,cmkj*cmkdi)
-                Hfou=Hfou.subs(cki*cmkj,cmkj*cki)
+            Hfou=Hfou.subs(cki*cmkj,cmkj*cki)
                 
-                Hfou=Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
+            Hfou=Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
     
     
     return Hfou
@@ -236,6 +238,7 @@ def applycommutation(atom_list,Jij,Hfou,k):
 def gen_operator_table(atom_list):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
+    N_atoms_uc=1
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -243,7 +246,7 @@ def gen_operator_table(atom_list):
     operator_table=[]
     operator_table_minus=[]
     
-    for i in range(N_atoms):
+    for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
         ci=sympy.Symbol("c%d"%(i,),commutative=False)
         cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
@@ -261,6 +264,7 @@ def gen_operator_table(atom_list):
 def gen_operator_table_dagger(atom_list):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
+    N_atoms_uc=1
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -268,7 +272,7 @@ def gen_operator_table_dagger(atom_list):
     operator_table=[]
     operator_table_minus=[]
     
-    for i in range(N_atoms):
+    for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
         ci=sympy.Symbol("c%d"%(i,),commutative=False)
         cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
@@ -285,18 +289,19 @@ def gen_operator_table_dagger(atom_list):
 def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
+    N_atoms_uc=1
     #Hdef=0
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
     exclude_list=[]
     coeff_list=[]
     Hcomm=Hcomm.expand()
-    XdX=sympy.zeros(2*N_atoms)
-    g=sympy.zeros(2*N_atoms)
+    XdX=sympy.zeros(2*N_atoms_uc)
+    g=sympy.zeros(2*N_atoms_uc)
     #print 'XdX',XdX    
-    for i in range(2*N_atoms):
+    for i in range(2*N_atoms_uc):
         curr_row=[]
-        for j in range(2*N_atoms):
+        for j in range(2*N_atoms_uc):
             mycoeff=operator_table_dagger[i]*operator_table[j]
             #print 'coeff',coeff,'i',i,'j',j
             exclude_list.append(mycoeff)
@@ -308,7 +313,7 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
             if i!=j:
                 g[i,j]=0
             else:
-                if i>=N_atoms:
+                if i>=N_atoms_uc:
                     g[i,j]=-1
                 else:
                     g[i,j]=1
@@ -479,7 +484,7 @@ if __name__=='__main__':
         print r
         print 1./20
     if 1:
-        N_atoms=2
+        N_atoms=3
         Sabn=generate_sabn(N_atoms)
         print Sabn[0]
         Sxyz=generate_sxyz(N_atoms)
@@ -530,7 +535,7 @@ if __name__=='__main__':
         #eigs=TwogH2.eigenvals()
         #print 'eigs', eigs
         #print 'eigenvalues', sympy.simplify(eigs[1][0])
-    if 1:
+    if 0:
         print 'one magnon'
         print ''
         print ''
