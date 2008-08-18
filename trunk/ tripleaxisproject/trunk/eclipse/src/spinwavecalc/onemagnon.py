@@ -95,15 +95,15 @@ def generate_atoms():
     if 1:
         spin0=[0,0,1]
         pos0=[0,0,0]
-        neighbors=[1]
-        interactions=[0]
+        neighbors=[1,2]
+        interactions=[0,0]
         atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
         pos0=[1,0,0]
-        neighbors=[0,2]
-        interactions=[0,0]
+        neighbors=[0]
+        interactions=[0]
         atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
         pos0=[-1,0,0]
-        neighbors=[1]
+        neighbors=[0]
         interactions=[0]
         atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2)
         atomlist=[atom0,atom1,atom2]
@@ -150,6 +150,7 @@ def holstein(Hdef):
 def fouriertransform(atom_list,Jij,Hlin,k):
     N_atoms=len(atom_list)
     N_atoms_uc=1
+    N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -194,13 +195,14 @@ def fouriertransform(atom_list,Jij,Hlin,k):
             Hlin=Hlin.subs(ci*cdj,t4)
             Hlin=Hlin.subs(cdj*cj,t5)
     #print t1
-    return Hlin
+    return Hlin.expand()
 
 
 def applycommutation(atom_list,Jij,Hfou,k):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
     N_atoms_uc=1
+    N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -233,12 +235,13 @@ def applycommutation(atom_list,Jij,Hfou,k):
             Hfou=Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
     
     
-    return Hfou
+    return Hfou.expand()
 
 def gen_operator_table(atom_list):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
     N_atoms_uc=1
+    N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -265,6 +268,7 @@ def gen_operator_table_dagger(atom_list):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
     N_atoms_uc=1
+    N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -290,6 +294,7 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
     N_atoms=len(atom_list)
     N_atoms_uc=1
+    N_atoms_uc=N_atoms
     #Hdef=0
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
@@ -526,7 +531,7 @@ if __name__=='__main__':
         TwogH2=TwogH2.subs(S,1.0)
         TwogH2=TwogH2.subs(kx,2*pi)
         Ntwo=N.array(TwogH2)
-        print Ntwo
+        #print Ntwo
         if 0:
             import scipy.linalg
             l,v=scipy.linalg.eig(Ntwo)
