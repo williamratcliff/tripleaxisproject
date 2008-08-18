@@ -3,6 +3,15 @@ import numpy as N
 I=sympy.I
 pi=N.pi
 
+#translations=[[0,0,0],
+#              [0,0,1],[0,0,-1]
+#              [0,1,0],[0,-1,0]
+#              [0,1,1],[0,1,-1],[0,-1,1],[0,-1,-1]
+#              [1,0,0],[-1,0,0],[]              
+#              ]
+
+
+
 def coeff(expr, term):
    expr = sympy.collect(expr, term)
    #print 'expr',expr
@@ -46,7 +55,13 @@ def generate_sabn(N_atoms):
         Sabn.append(curr)
     return Sabn
 
-
+def generate_translations():
+    translations=[]
+    for i in range(-1,2):
+        for j in range(-1,2):
+            for k in range(-1,2):
+                translations.append([i,j,k])
+    return translations
 
 def generate_sabnt(N_atoms,t=''):
     Sabn=[]
@@ -489,11 +504,15 @@ if __name__=='__main__':
         print r
         print 1./20
     if 1:
+        translations=generate_translations()
+        print 'translations',translations
+        atom_list=generate_atoms()
+        
         N_atoms=3
         Sabn=generate_sabn(N_atoms)
         print Sabn[0]
         Sxyz=generate_sxyz(N_atoms)
-        atom_list=generate_atoms()
+    if 0:     
         J=sympy.Symbol('J',real=True)
         Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
         Hdef=generate_hdef(atom_list,Jij,Sabn)
