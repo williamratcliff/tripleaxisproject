@@ -185,6 +185,11 @@ if __name__=='__main__':
         ch_a4_str=r'C:\13188\PSD_A4_Spacing_Jun2008_Ana_85mm_80minRC.dat'        
         ch_eff_str=r'c:\13188\PSD_Channel_Eff_Jun202008_Ana_85mm_80minRC.dat'
         ch_eff_str=r'c:\13188\eff.dat'
+        
+        #jun
+        ch_a4_str=r'C:\jun\PSD_A4_SpacingApr1108.dat'        
+        ch_eff_str=r'c:\jun\PSD_Channel_EffJune0908.dat'
+
         mypsd=Psd(center=22)
 
         
@@ -198,6 +203,13 @@ if __name__=='__main__':
         myfilestr=os.path.join(mydirectory2,'NdOFeAs58054.bt7')
         #myfilestr=os.path.join(mydirectory2,'plastic_80RC58038.bt7')
         #myfilestr=os.path.join(mydirectory2,'plastic57943.bt7')
+        
+        #jun
+        mydirectory2=r'C:\jun'
+        myfilestr=os.path.join(mydirectory2,'CeOFeAs859490.bt7')
+        #myfilestr=os.path.join(mydirectory2,'CeOFeAs859493.bt7')
+        
+        
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[7])        

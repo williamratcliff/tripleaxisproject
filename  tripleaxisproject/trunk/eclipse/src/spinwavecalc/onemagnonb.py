@@ -35,7 +35,7 @@ def coeff(expr, term):
        
    
 class atom:
-    def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0):
+    def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
         self.spin=spin
         self.pos=N.array(pos)
         self.neighbors=neighbors
@@ -44,6 +44,8 @@ class atom:
         self.Dx=Dx
         self.Dy=Dy
         self.Dz=Dz
+        self.cell=cell
+        self.int_cell=[]
 
 def generate_sabn(N_atoms):
     Sabn=[]
@@ -56,11 +58,14 @@ def generate_sabn(N_atoms):
     return Sabn
 
 def generate_translations():
-    translations=[]
+    translations=[[0,0,0]]
     for i in range(-1,2):
         for j in range(-1,2):
             for k in range(-1,2):
-                translations.append([i,j,k])
+                if i==0 and j==0 and k==0:
+                    continue
+                else:
+                    translations.append([i,j,k])
     return translations
 
 def generate_sabnt(N_atoms,t=''):
@@ -82,13 +87,13 @@ def generate_sxyz(N_atoms):
         Sxyz.append(S)
     return Sxyz
 
-def generate_hdef(atom_list,Jij,Sxyz):
+def generate_hdef(atom_list,Jij,Sxyz,translations,N_atoms_uc,N_atoms):
     N_atoms=len(atom_list)
     Hdef=0
     #print 'atom_list',atom_list
     print 'Sxyz',Sxyz
     #print 'Jij',Jij
-    for i in range(N_atoms):
+    for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
         for j in range(N_int):
             #print Jij[atom_list[i].interactions[j]]
@@ -112,15 +117,23 @@ def generate_atoms():
         pos0=[0,0,0]
         neighbors=[1,2]
         interactions=[0,0]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
-        pos0=[1,0,0]
-        neighbors=[0]
-        interactions=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
+        cell=0
+        int_cell=[5,21]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
+        
         pos0=[-1,0,0]
         neighbors=[0]
         interactions=[0]
-        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2)
+        cell=5
+        int_cell=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+        
+        pos0=[1,0,0]
+        neighbors=[0]
+        interactions=[0]
+        cell=22
+        int_cell=[0]
+        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2,cell=cell,int_cell=int_cell)
         atomlist=[atom0,atom1,atom2]
     if 0:
         spin0=[0,0,1]
@@ -162,10 +175,10 @@ def holstein(Hdef):
         return Hlin
 
 
-def fouriertransform(atom_list,Jij,Hlin,k):
-    N_atoms=len(atom_list)
-    N_atoms_uc=1
-    N_atoms_uc=N_atoms
+def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
+    #N_atoms=len(atom_list)
+    #N_atoms_uc=1
+    #N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -181,13 +194,14 @@ def fouriertransform(atom_list,Jij,Hlin,k):
         ri=atom_list[i].pos
         for j in range(N_atoms):
             rj=atom_list[j].pos
+            j2=0
             #rj=atom_list[atom_list[i].neighbors[j]].pos
             cj=sympy.Symbol("c%d"%(j,),commutative=False)
             cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
-            ckj=sympy.Symbol("ck%d"%(j,),commutative=False)
-            ckdj=sympy.Symbol("ckd%d"%(j,),commutative=False)
-            cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
-            cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
+            ckj=sympy.Symbol("ck%d"%(j2,),commutative=False)
+            ckdj=sympy.Symbol("ckd%d"%(j2,),commutative=False)
+            cmkj=sympy.Symbol("cmk%d"%(j2,),commutative=False)
+            cmkdj=sympy.Symbol("cmkd%d"%(j2,),commutative=False)
             diffr=ri-rj
             kmult=N.dot(k,diffr)
             t1=1.0/2*(ckdi*cmkdj*sympy.exp(-I*kmult)+
@@ -213,11 +227,11 @@ def fouriertransform(atom_list,Jij,Hlin,k):
     return Hlin.expand()
 
 
-def applycommutation(atom_list,Jij,Hfou,k):
+def applycommutation(atom_list,Jij,Hfou,k,N_atoms_uc,N_atoms):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
-    N_atoms=len(atom_list)
-    N_atoms_uc=1
-    N_atoms_uc=N_atoms
+    #N_atoms=len(atom_list)
+    #N_atoms_uc=1
+    #N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -252,11 +266,11 @@ def applycommutation(atom_list,Jij,Hfou,k):
     
     return Hfou.expand()
 
-def gen_operator_table(atom_list):
+def gen_operator_table(atom_list,N_atoms_uc):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
-    N_atoms=len(atom_list)
-    N_atoms_uc=1
-    N_atoms_uc=N_atoms
+    #N_atoms=len(atom_list)
+    #N_atoms_uc=1
+    #N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -279,11 +293,11 @@ def gen_operator_table(atom_list):
     return operator_table
 
 
-def gen_operator_table_dagger(atom_list):
+def gen_operator_table_dagger(atom_list,N_atoms_uc):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
-    N_atoms=len(atom_list)
-    N_atoms_uc=1
-    N_atoms_uc=N_atoms
+    #N_atoms=len(atom_list)
+    #N_atoms_uc=1
+    #N_atoms_uc=N_atoms
     #Hdef=0
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
@@ -305,11 +319,11 @@ def gen_operator_table_dagger(atom_list):
     operator_table=N.ravel(operator_table)
     return operator_table
 
-def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm):
+def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm,N_atoms_uc):
     """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
-    N_atoms=len(atom_list)
-    N_atoms_uc=1
-    N_atoms_uc=N_atoms
+    #N_atoms=len(atom_list)
+    #N_atoms_uc=1
+    #N_atoms_uc=N_atoms
     #Hdef=0
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
@@ -506,32 +520,37 @@ if __name__=='__main__':
     if 1:
         translations=generate_translations()
         print 'translations',translations
+        print translations[0]
+        print translations[5]
+        print translations[22]
         atom_list=generate_atoms()
-        
+        N_atoms_uc=1
         N_atoms=3
         Sabn=generate_sabn(N_atoms)
         print Sabn[0]
         Sxyz=generate_sxyz(N_atoms)
-    if 0:     
+        print len(translations)   
         J=sympy.Symbol('J',real=True)
         Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
-        Hdef=generate_hdef(atom_list,Jij,Sabn)
+        Hdef=generate_hdef(atom_list,Jij,Sabn,translations,N_atoms_uc,N_atoms)
         print 'Hdef',Hdef
+    #if 0:
         Hlin=holstein(Hdef)
         print 'Hlin',Hlin
         kx=sympy.Symbol('kx')
         ky=sympy.Symbol('ky')
         kz=sympy.Symbol('kz')
         k=[kx,ky,kz]
-        Hfou=fouriertransform(atom_list,Jij,Hlin,k)
+        Hfou=fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms)
         print 'Hfou',Hfou
-        Hcomm=applycommutation(atom_list,Jij,Hfou,k)
+    if 1:
+        Hcomm=applycommutation(atom_list,Jij,Hfou,k,N_atoms_uc,N_atoms)
         print 'Hcomm',Hcomm
-        operator_table=gen_operator_table(atom_list)
+        operator_table=gen_operator_table(atom_list,N_atoms_uc)
         print 'optable',operator_table
-        operator_table_dagger=gen_operator_table_dagger(atom_list)
+        operator_table_dagger=gen_operator_table_dagger(atom_list,N_atoms_uc)
         print 'optable_dagger',operator_table_dagger
-        XdX,g=gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm)
+        XdX,g=gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm,N_atoms_uc)
         print 'XdX',XdX
         print 'g',g
         TwogH2=2*g*XdX
