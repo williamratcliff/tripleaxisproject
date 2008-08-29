@@ -8,6 +8,7 @@ from sans.guiframe import gui_manager
 
 # For py2exe, import config here
 import local_config
+import sys
 
 class SansView():
     
