@@ -146,7 +146,7 @@ def generate_atoms():
         atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
         
         pos0=[0.5,0,0]
-        #spin0=[0,0,-1]
+        spin0=[0,0,-1]
         neighbors=[0,3]
         interactions=[0,0]
         cell=5
@@ -154,7 +154,7 @@ def generate_atoms():
         atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
         
         pos0=[-.5,0,0]
-        #spin0=[0,0,-1]
+        spin0=[0,0,-1]
         neighbors=[0]
         interactions=[0]
         cell=5
@@ -162,6 +162,7 @@ def generate_atoms():
         atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
 
         pos0=[1,0,0]
+        spin0=[0,0,1]
         neighbors=[1]
         interactions=[0]
         cell=5
@@ -232,7 +233,7 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
             rj=atom_list[j].pos
             j2=i#atom_list[i].neighbors[j]
             #rj=atom_list[atom_list[i].neighbors[j]].pos
-            print 'j2',j2
+            #print 'j2',j2
             #rj=atom_list[atom_list[i].neighbors[j]].pos
             cj=sympy.Symbol("c%d"%(j,),commutative=False)
             cdj=sympy.Symbol("cd%d"%(j,),commutative=False)
