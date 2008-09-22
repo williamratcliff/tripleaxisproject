@@ -57,6 +57,32 @@ def generate_sabn(N_atoms):
         Sabn.append(curr)
     return Sabn
 
+
+def generate_sxyz(Sabn,atomlist):
+    Sxyz=[]
+    i=0
+    for currS in Sabn:
+        print 'Currs', currS
+        print 'currspin', atomlist[i].spin
+        currS_transpose=N.reshape(currS,(3,1))
+        tempS=N.dot(atomlist[i].spin,currS_transpose)
+        tempS=N.reshape(tempS,(1,3))
+        Sxyz.append(tempS)
+        print 'tempS', tempS
+    return Sxyz
+
+
+#def generate_sxyz(N_atoms):
+#    Sxyz=[]
+#    for i in range(N_atoms):
+#        S=sympy.Symbol("Sxyz%d"%(i,),commutative=False)
+#        Sxyz.append(S)
+#    return Sxyz
+
+
+
+
+
 def generate_translations():
     translations=[[0,0,0]]
     for i in range(-1,2):
@@ -80,12 +106,7 @@ def generate_sabnt(N_atoms,t=''):
 
 
 
-def generate_sxyz(N_atoms):
-    Sxyz=[]
-    for i in range(N_atoms):
-        S=sympy.Symbol("Sxyz%d"%(i,),commutative=False)
-        Sxyz.append(S)
-    return Sxyz
+
 
 def generate_hdef(atom_list,Jij,Sxyz,translations,N_atoms_uc,N_atoms):
     N_atoms=len(atom_list)
@@ -113,7 +134,7 @@ def generate_hdef(atom_list,Jij,Sxyz,translations,N_atoms_uc,N_atoms):
 
 def generate_atoms():
     if 0:
-        spin0=[0,0,1]
+        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
         pos0=[0,0,0]
         neighbors=[1,2]
         interactions=[0,0]
@@ -137,7 +158,7 @@ def generate_atoms():
         atomlist=[atom0,atom1,atom2]
         
     if 1:
-        spin0=[0,0,1]
+        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
         pos0=[0,0,0]
         neighbors=[1,2]
         interactions=[0,0]
@@ -146,7 +167,7 @@ def generate_atoms():
         atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
         
         pos0=[0.5,0,0]
-        spin0=[0,0,-1]
+        spin0=-N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
         neighbors=[0,3]
         interactions=[0,0]
         cell=5
@@ -154,7 +175,7 @@ def generate_atoms():
         atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
         
         pos0=[-.5,0,0]
-        spin0=[0,0,-1]
+        spin0=-N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
         neighbors=[0]
         interactions=[0]
         cell=5
@@ -162,7 +183,7 @@ def generate_atoms():
         atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
 
         pos0=[1,0,0]
-        spin0=[0,0,1]
+        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
         neighbors=[1]
         interactions=[0]
         cell=5
@@ -567,11 +588,12 @@ if __name__=='__main__':
         N_atoms=4
         Sabn=generate_sabn(N_atoms)
         print Sabn[0]
-        Sxyz=generate_sxyz(N_atoms)
+        Sxyz=generate_sxyz(Sabn,atom_list)
         print len(translations)   
         J=sympy.Symbol('J',real=True)
         Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
-        Hdef=generate_hdef(atom_list,Jij,Sabn,translations,N_atoms_uc,N_atoms)
+        #Hdef=generate_hdef(atom_list,Jij,Sabn,translations,N_atoms_uc,N_atoms)
+        Hdef=generate_hdef(atom_list,Jij,Sxyz,translations,N_atoms_uc,N_atoms)
         print 'Hdef',Hdef
     #if 0:
         Hlin=holstein(Hdef)
