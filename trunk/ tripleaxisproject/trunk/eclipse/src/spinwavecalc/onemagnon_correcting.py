@@ -619,10 +619,11 @@ if __name__=='__main__':
         TwogH2=2*g*XdX
         print 'TwogH2',TwogH2
         if 1:
+            print 'calculating'
             eigs=TwogH2.eigenvals()
             x=sympy.Symbol('x')
             #eigs=TwogH2.berkowitz_charpoly(x)
-            
+            print 'calculating'
             print 'eigs', eigs
             #print TwogH2.charpoly(x)
             eigs=TwogH2.eigenvals()
