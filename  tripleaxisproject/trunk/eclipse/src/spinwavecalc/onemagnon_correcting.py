@@ -66,7 +66,9 @@ def generate_sxyz(Sabn,atomlist):
         print 'currspin', atomlist[i].spin
         currS_transpose=N.reshape(currS,(3,1))
         tempS=N.dot(atomlist[i].spin,currS_transpose)
-        tempS=N.reshape(tempS,(1,3))
+        #tempS=N.reshape(tempS,(1,3))
+        tempS=N.array(tempS)
+        tempS=N.ravel(tempS)
         Sxyz.append(tempS)
         print 'tempS', tempS
     return Sxyz
