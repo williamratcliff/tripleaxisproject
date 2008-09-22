@@ -62,15 +62,15 @@ def generate_sxyz(Sabn,atomlist):
     Sxyz=[]
     i=0
     for currS in Sabn:
-        print 'Currs', currS
-        print 'currspin', atomlist[i].spin
+        #print 'Currs', currS
+        #print 'currspin', atomlist[i].spin
         currS_transpose=N.reshape(currS,(3,1))
         tempS=N.dot(atomlist[i].spin,currS_transpose)
         #tempS=N.reshape(tempS,(1,3))
         tempS=N.array(tempS)
         tempS=N.ravel(tempS)
         Sxyz.append(tempS)
-        print 'tempS', tempS
+        #print 'tempS', tempS
     return Sxyz
 
 
@@ -158,8 +158,30 @@ def generate_atoms():
         int_cell=[0]
         atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2,cell=cell,int_cell=int_cell)
         atomlist=[atom0,atom1,atom2]
-        
+
+
     if 1:
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
+        pos0=[0,0,0]
+        neighbors=[1]
+        interactions=[0]
+        cell=0
+        int_cell=[5,21]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
+        
+        pos0=[1.0,0,0]
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
+        neighbors=[0]
+        interactions=[0]
+        cell=5
+        int_cell=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+        
+        atomlist=[atom0,atom1]
+
+
+        
+    if 0:
         spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
         pos0=[0,0,0]
         neighbors=[1,2]
@@ -169,7 +191,7 @@ def generate_atoms():
         atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
         
         pos0=[0.5,0,0]
-        spin0=N.matrix([[-1,0,0],[0,-1,0],[0,0,-1]],'float64')
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
         neighbors=[0,3]
         interactions=[0,0]
         cell=5
@@ -177,7 +199,7 @@ def generate_atoms():
         atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
         
         pos0=[-.5,0,0]
-        spin0=N.matrix([[-1,0,0],[0,-1,0],[0,0,-1]],'float64')
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
         neighbors=[0]
         interactions=[0]
         cell=5
@@ -588,9 +610,14 @@ if __name__=='__main__':
         atom_list=generate_atoms()
         N_atoms_uc=2
         N_atoms=4
+        N_atoms_uc=1
+        N_atoms=2
         Sabn=generate_sabn(N_atoms)
-        print Sabn[0]
+        print 'Sabn',Sabn
         Sxyz=generate_sxyz(Sabn,atom_list)
+        print 'Sxyz', Sxyz
+        
+    if 0:
         print len(translations)   
         J=sympy.Symbol('J',real=True)
         Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
