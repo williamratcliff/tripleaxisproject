@@ -160,7 +160,7 @@ def generate_atoms():
         atomlist=[atom0,atom1,atom2]
         
     if 1:
-        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
         pos0=[0,0,0]
         neighbors=[1,2]
         interactions=[0,0]
@@ -169,7 +169,7 @@ def generate_atoms():
         atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
         
         pos0=[0.5,0,0]
-        spin0=-N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
+        spin0=N.matrix([[-1,0,0],[0,-1,0],[0,0,-1]],'float64')
         neighbors=[0,3]
         interactions=[0,0]
         cell=5
@@ -177,7 +177,7 @@ def generate_atoms():
         atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
         
         pos0=[-.5,0,0]
-        spin0=-N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
+        spin0=N.matrix([[-1,0,0],[0,-1,0],[0,0,-1]],'float64')
         neighbors=[0]
         interactions=[0]
         cell=5
@@ -185,7 +185,7 @@ def generate_atoms():
         atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
 
         pos0=[1,0,0]
-        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
         neighbors=[1]
         interactions=[0]
         cell=5
@@ -620,10 +620,14 @@ if __name__=='__main__':
         print 'TwogH2',TwogH2
         if 1:
             print 'calculating'
-            eigs=TwogH2.eigenvals()
             x=sympy.Symbol('x')
+            eigspoly=TwogH2.berkowitz_charpoly(x)
+            print 'eigspoly'
+            print 'eigs poly',eigspoly
+            print 'recalculating'
+            eigs=TwogH2.eigenvals()
+            #x=sympy.Symbol('x')
             #eigs=TwogH2.berkowitz_charpoly(x)
-            print 'calculating'
             print 'eigs', eigs
             #print TwogH2.charpoly(x)
             eigs=TwogH2.eigenvals()
