@@ -62,14 +62,16 @@ def generate_sxyz(Sabn,atomlist):
     Sxyz=[]
     i=0
     for currS in Sabn:
-        #print 'Currs', currS
-        #print 'currspin', atomlist[i].spin
+        print 'Currs', currS
+        print 'currspin', atomlist[i].spin
         currS_transpose=N.reshape(currS,(3,1))
-        tempS=N.dot(atomlist[i].spin,currS_transpose)
+        #tempS=N.dot(atomlist[i].spin,currS_transpose)
+        tempS=atomlist[i].spin*currS_transpose
         #tempS=N.reshape(tempS,(1,3))
         tempS=N.array(tempS)
         tempS=N.ravel(tempS)
         Sxyz.append(tempS)
+        i=i+1
         #print 'tempS', tempS
     return Sxyz
 
@@ -613,9 +615,9 @@ if __name__=='__main__':
         N_atoms_uc=1
         N_atoms=2
         Sabn=generate_sabn(N_atoms)
-        print 'Sabn',Sabn
+        print 'Sabn',Sabn[0]
         Sxyz=generate_sxyz(Sabn,atom_list)
-        print 'Sxyz', Sxyz
+        print 'Sxyz', Sxyz[0]
         
     if 0:
         print len(translations)   
