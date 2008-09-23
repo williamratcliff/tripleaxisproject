@@ -116,7 +116,7 @@ def generate_hdef(atom_list,Jij,Sxyz,translations,N_atoms_uc,N_atoms):
     N_atoms=len(atom_list)
     Hdef=0
     #print 'atom_list',atom_list
-    print 'Sxyz',Sxyz
+    #print 'Sxyz',Sxyz
     #print 'Jij',Jij
     for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
@@ -605,21 +605,22 @@ if __name__=='__main__':
         print 1./20
     if 1:
         translations=generate_translations()
-        print 'translations',translations
-        print translations[0]
-        print translations[5]
-        print translations[22]
+        #print 'translations',translations
+        #print translations[0]
+        #print translations[5]
+        #print translations[22]
         atom_list=generate_atoms()
         N_atoms_uc=2
         N_atoms=4
         N_atoms_uc=1
         N_atoms=2
         Sabn=generate_sabn(N_atoms)
-        print 'Sabn',Sabn[0]
-        Sxyz=generate_sxyz(Sabn,atom_list)
-        print 'Sxyz', Sxyz[0]
         
-    if 0:
+        Sxyz=generate_sxyz(Sabn,atom_list)
+        print 'Sabn',Sabn
+        print 'Sxyz', Sxyz
+        
+    if 1:
         print len(translations)   
         J=sympy.Symbol('J',real=True)
         Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
@@ -648,11 +649,11 @@ if __name__=='__main__':
         TwogH2=2*g*XdX
         print 'TwogH2',TwogH2
         if 1:
-            print 'calculating'
+            #print 'calculating'
             x=sympy.Symbol('x')
-            eigspoly=TwogH2.berkowitz_charpoly(x)
-            print 'eigspoly'
-            print 'eigs poly',eigspoly
+            #eigspoly=TwogH2.berkowitz_charpoly(x)
+            #print 'eigspoly'
+            #print 'eigs poly',eigspoly
             print 'recalculating'
             eigs=TwogH2.eigenvals()
             #x=sympy.Symbol('x')
