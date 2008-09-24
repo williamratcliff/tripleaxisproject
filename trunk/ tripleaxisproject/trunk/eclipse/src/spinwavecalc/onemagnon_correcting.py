@@ -338,16 +338,16 @@ def applycommutation(atom_list,Jij,Hfou,k,N_atoms_uc,N_atoms):
             cmkj=sympy.Symbol("cmk%d"%(j,),commutative=False)
             cmkdj=sympy.Symbol("cmkd%d"%(j,),commutative=False)
             if i==j:
-                Hfou=Hfou.subs(cki*ckdj,ckdj*cki+1)
+                Hfou=Hfou.expand().subs(cki*ckdj,ckdj*cki+1)
                 
-                Hfou=Hfou.subs(cmkdi*cmkj,cmkj*cmkdi+1)
+                Hfou=Hfou.expand().subs(cmkdi*cmkj,cmkj*cmkdi+1)
                 
             else:
-                Hfou=Hfou.subs(cki*ckdj,ckdj*cki)
-                Hfou=Hfou.subs(cmkdi*cmkj,cmkj*cmkdi)
-            Hfou=Hfou.subs(cki*cmkj,cmkj*cki)
+                Hfou=Hfou.expand().subs(cki*ckdj,ckdj*cki)
+                Hfou=Hfou.expand().subs(cmkdi*cmkj,cmkj*cmkdi)
                 
-            Hfou=Hfou.subs(cmkdi*ckdj,ckdj*cmkdi)
+            Hfou=Hfou.expand().subs(cki*cmkj,cmkj*cki)                
+            Hfou=Hfou.expand().subs(cmkdi*ckdj,ckdj*cmkdi)
     
     
     return Hfou.expand()
