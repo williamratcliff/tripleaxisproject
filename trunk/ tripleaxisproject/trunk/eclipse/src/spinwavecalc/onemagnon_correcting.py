@@ -612,7 +612,7 @@ if __name__=='__main__':
         atom_list=generate_atoms()
         N_atoms_uc=2
         N_atoms=4
-        N_atoms_uc=1
+        N_atoms_uc=2
         N_atoms=2
         Sabn=generate_sabn(N_atoms)
         
