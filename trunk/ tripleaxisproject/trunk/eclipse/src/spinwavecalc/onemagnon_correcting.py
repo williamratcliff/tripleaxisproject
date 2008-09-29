@@ -47,6 +47,106 @@ class atom:
         self.cell=cell
         self.int_cell=[]
 
+
+def generate_atoms():
+    if 0:
+        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
+        pos0=[0,0,0]
+        neighbors=[1,2]
+        interactions=[0,0]
+        cell=0
+        int_cell=[5,21]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
+        
+        pos0=[-1,0,0]
+        neighbors=[0]
+        interactions=[0]
+        cell=5
+        int_cell=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+        
+        pos0=[1,0,0]
+        neighbors=[0]
+        interactions=[0]
+        cell=22
+        int_cell=[0]
+        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2,cell=cell,int_cell=int_cell)
+        atomlist=[atom0,atom1,atom2]
+
+
+    if 1:
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
+        pos0=[0,0,0]
+        neighbors=[1]
+        interactions=[0]
+        cell=0
+        int_cell=[5,21]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
+        
+        pos0=[1,0,0]
+        spin0=N.matrix([[1,0,0],[0,-1,0],[0,0,-1]],'float64')
+        neighbors=[0]
+        interactions=[0]
+        cell=5
+        int_cell=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+        
+        atomlist=[atom0,atom1]
+
+
+        
+    if 0:
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
+        pos0=[0,0,0]
+        neighbors=[1,2]
+        interactions=[0,0]
+        cell=0
+        int_cell=[5,21]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
+        
+        pos0=[0.5,0,0]
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
+        neighbors=[0,3]
+        interactions=[0,0]
+        cell=5
+        int_cell=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+        
+        pos0=[-.5,0,0]
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
+        neighbors=[0]
+        interactions=[0]
+        cell=5
+        int_cell=[0]
+        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+
+        pos0=[1,0,0]
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
+        neighbors=[1]
+        interactions=[0]
+        cell=5
+        int_cell=[0]
+        atom3=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+
+        atomlist=[atom0,atom1,atom2,atom3]
+        
+    if 0:
+        spin0=[0,0,1]
+        pos0=[0,0,0]
+        neighbors=[1]
+        interactions=[0]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
+        
+        pos0=[1,0,0]
+        neighbors=[0]
+        interactions=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
+        atomlist=[atom0,atom1]
+       
+    return atomlist
+
+
+
 def generate_sabn(N_atoms):
     Sabn=[]
     S=sympy.Symbol("S",real=True)
@@ -136,102 +236,6 @@ def generate_hdef(atom_list,Jij,Sxyz,translations,N_atoms_uc,N_atoms):
             Hdef=Hdef+Hij
     return Hdef[0][0]
 
-def generate_atoms():
-    if 0:
-        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
-        pos0=[0,0,0]
-        neighbors=[1,2]
-        interactions=[0,0]
-        cell=0
-        int_cell=[5,21]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
-        
-        pos0=[-1,0,0]
-        neighbors=[0]
-        interactions=[0]
-        cell=5
-        int_cell=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-        
-        pos0=[1,0,0]
-        neighbors=[0]
-        interactions=[0]
-        cell=22
-        int_cell=[0]
-        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2,cell=cell,int_cell=int_cell)
-        atomlist=[atom0,atom1,atom2]
-
-
-    if 1:
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
-        pos0=[0,0,0]
-        neighbors=[1]
-        interactions=[0]
-        cell=0
-        int_cell=[5,21]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
-        
-        pos0=[1.0,0,0]
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
-        neighbors=[0]
-        interactions=[0]
-        cell=5
-        int_cell=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-        
-        atomlist=[atom0,atom1]
-
-
-        
-    if 0:
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
-        pos0=[0,0,0]
-        neighbors=[1,2]
-        interactions=[0,0]
-        cell=0
-        int_cell=[5,21]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
-        
-        pos0=[0.5,0,0]
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
-        neighbors=[0,3]
-        interactions=[0,0]
-        cell=5
-        int_cell=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-        
-        pos0=[-.5,0,0]
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
-        neighbors=[0]
-        interactions=[0]
-        cell=5
-        int_cell=[0]
-        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-
-        pos0=[1,0,0]
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
-        neighbors=[1]
-        interactions=[0]
-        cell=5
-        int_cell=[0]
-        atom3=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-
-        atomlist=[atom0,atom1,atom2,atom3]
-        
-    if 0:
-        spin0=[0,0,1]
-        pos0=[0,0,0]
-        neighbors=[1]
-        interactions=[0]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
-        
-        pos0=[1,0,0]
-        neighbors=[0]
-        interactions=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
-        atomlist=[atom0,atom1]
-       
-    return atomlist
 
 def holstein(Hdef):
         S = sympy.Symbol('S',real=True)
