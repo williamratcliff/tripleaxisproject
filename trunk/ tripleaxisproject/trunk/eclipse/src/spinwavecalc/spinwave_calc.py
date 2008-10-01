@@ -1,6 +1,7 @@
 import sympy
 import numpy as N
-I=sympy.I
+#I=sympy.I
+I=1.0j
 pi=N.pi
 
 #translations=[[0,0,0],
@@ -49,29 +50,7 @@ class atom:
 
 
 def generate_atoms():
-    if 0:
-        spin0=N.matrix([[0,0,1],[0,1,0],[0,0,1]],'float64')
-        pos0=[0,0,0]
-        neighbors=[1,2]
-        interactions=[0,0]
-        cell=0
-        int_cell=[5,21]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
-        
-        pos0=[-1,0,0]
-        neighbors=[0]
-        interactions=[0]
-        cell=5
-        int_cell=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-        
-        pos0=[1,0,0]
-        neighbors=[0]
-        interactions=[0]
-        cell=22
-        int_cell=[0]
-        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=2,cell=cell,int_cell=int_cell)
-        atomlist=[atom0,atom1,atom2]
+
 
 
     if 1:
@@ -94,54 +73,7 @@ def generate_atoms():
         atomlist=[atom0,atom1]
 
 
-        
-    if 0:
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
-        pos0=[0,0,0]
-        neighbors=[1,2]
-        interactions=[0,0]
-        cell=0
-        int_cell=[5,21]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
-        
-        pos0=[0.5,0,0]
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
-        neighbors=[0,3]
-        interactions=[0,0]
-        cell=5
-        int_cell=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-        
-        pos0=[-.5,0,0]
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,-1]],'float64')
-        neighbors=[0]
-        interactions=[0]
-        cell=5
-        int_cell=[0]
-        atom2=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-
-        pos0=[1,0,0]
-        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
-        neighbors=[1]
-        interactions=[0]
-        cell=5
-        int_cell=[0]
-        atom3=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
-
-        atomlist=[atom0,atom1,atom2,atom3]
-        
-    if 0:
-        spin0=[0,0,1]
-        pos0=[0,0,0]
-        neighbors=[1]
-        interactions=[0]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0)
-        
-        pos0=[1,0,0]
-        neighbors=[0]
-        interactions=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1)
-        atomlist=[atom0,atom1]
+ 
        
     return atomlist
 
@@ -153,7 +85,7 @@ def generate_sabn(N_atoms):
     for i in range(N_atoms):
         c=sympy.Symbol("c%d"%(i,),commutative=False)
         cd=sympy.Symbol("cd%d"%(i,),commutative=False)
-        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/sympy.I,S-cd*c]
+        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/I,S-cd*c]
         Sabn.append(curr)
     return Sabn
 
@@ -192,7 +124,7 @@ def generate_sabnt(N_atoms,t=''):
     for i in range(N_atoms):
         c=sympy.Symbol("c%d%s"%(i,t),commutative=False)
         cd=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
-        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/sympy.I,S-cd*c]
+        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/I,S-cd*c]
         Sabn.append(curr)
     return Sabn
 
@@ -395,31 +327,16 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm,N_atoms_uc):
 
 
 
-
-    
-if __name__=='__main__':
-    if 1:
-        translations=generate_translations()
-        #print 'translations',translations
-        #print translations[0]
-        #print translations[5]
-        #print translations[22]
-        atom_list=generate_atoms()
-        N_atoms_uc=2
-        N_atoms=4
-        N_atoms_uc=1
-        N_atoms=2
-        Sabn=generate_sabn(N_atoms)
-        
-        Sxyz=generate_sxyz(Sabn,atom_list)
-        print 'Sabn',Sabn
-        print 'Sxyz', Sxyz
+def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
+    Sabn=generate_sabn(N_atoms)        
+    Sxyz=generate_sxyz(Sabn,atom_list)
+    print 'Sabn',Sabn
+    print 'Sxyz', Sxyz
         
     if 1:
         print len(translations)   
         J=sympy.Symbol('J',real=True)
         Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
-        #Hdef=generate_hdef(atom_list,Jij,Sabn,translations,N_atoms_uc,N_atoms)
         Hdef=generate_hdef(atom_list,Jij,Sxyz,translations,N_atoms_uc,N_atoms)
         print 'Hdef',Hdef
     #if 0:
@@ -464,8 +381,10 @@ if __name__=='__main__':
         TwogH2=TwogH2.subs(J,1.0)
         TwogH2=TwogH2.subs(S,1.0)
         TwogH2=TwogH2.subs(kx,2*pi)
+        #I=sympy.Symbol('I')
+        TwogH2=TwogH2.subs(I,1.0j)
         Ntwo=N.array(TwogH2)
-        #print Ntwo
+        print Ntwo
         if 0:
             import scipy.linalg
             l,v=scipy.linalg.eig(Ntwo)
@@ -474,3 +393,15 @@ if __name__=='__main__':
         #eigs=TwogH2.eigenvals()
         #print 'eigs', eigs
         #print 'eigenvalues', sympy.simplify(eigs[1][0])
+        return eigs 
+
+
+
+    
+if __name__=='__main__':
+    if 1:
+        translations=generate_translations()
+        atom_list=generate_atoms()
+        N_atoms_uc=1
+        N_atoms=2
+        calculate_dispersion(atom_list,N_atoms_uc,N_atoms)
