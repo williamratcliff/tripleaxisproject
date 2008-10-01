@@ -384,8 +384,9 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
         #I=sympy.Symbol('I')
         TwogH2=TwogH2.subs(I,1.0j)
         Ntwo=N.array(TwogH2)
+        print 'Ntwo'
         print Ntwo
-        if 0:
+        if 1:
             import scipy.linalg
             l,v=scipy.linalg.eig(Ntwo)
             print l  
