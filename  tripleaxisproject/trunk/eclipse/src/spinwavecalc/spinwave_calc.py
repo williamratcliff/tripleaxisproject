@@ -2,7 +2,8 @@ import sympy
 import numpy as N
 #I=sympy.I
 I=1.0j
-pi=N.pi
+pi=sympy.pi
+from sympy import exp
 
 #translations=[[0,0,0],
 #              [0,0,1],[0,0,-1]
@@ -201,16 +202,16 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
             cmkdj=sympy.Symbol("cmkd%d"%(j2,),commutative=False,real=True)
             diffr=ri-rj
             kmult=N.dot(k,diffr)
-            t1=1.0/2*(ckdi*cmkdj*sympy.exp(-I*kmult)+
-                      cmkdi*ckdj*sympy.exp(I*kmult)               )
-            t2=1.0/2*(cki*cmkj*sympy.exp(I*kmult)+
-                      cmki*ckj*sympy.exp(-I*kmult)
+            t1=1.0/2*(ckdi*cmkdj*exp(-1j*kmult)+
+                      cmkdi*ckdj*exp(1j*kmult)               )
+            t2=1.0/2*(cki*cmkj*exp(1j*kmult)+
+                      cmki*ckj*exp(-1j*kmult)
                       )
-            t3=1./2*(ckdi*ckj*sympy.exp(-I*kmult)+
-                     cmkdi*cmkj*sympy.exp(I*kmult)
+            t3=1./2*(ckdi*ckj*exp(-1j*kmult)+
+                     cmkdi*cmkj*exp(1j*kmult)
                      )
-            t4=1./2*(cki*ckdj*sympy.exp(I*kmult)+
-                     cmki*cmkdj*sympy.exp(-I*kmult)
+            t4=1./2*(cki*ckdj*exp(1j*kmult)+
+                     cmki*cmkdj*exp(-1j*kmult)
                      )
             t5=1.0/2*(ckdj*ckj+cmkdj*cmkj
                       )
@@ -380,7 +381,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
         S=sympy.Symbol('S',real=True)
         TwogH2=TwogH2.subs(J,1.0)
         TwogH2=TwogH2.subs(S,1.0)
-        TwogH2=TwogH2.subs(kx,2*pi)
+        TwogH2=TwogH2.subs(kx,2*pi/4)
         #I=sympy.Symbol('I')
         TwogH2=TwogH2.subs(I,1.0j)
         Ntwo=N.array(TwogH2)
@@ -389,7 +390,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
         if 1:
             import scipy.linalg
             l,v=scipy.linalg.eig(Ntwo)
-            print l  
+            print l[0]
         #print N.linalg.eigvals(Ntwo)
         #eigs=TwogH2.eigenvals()
         #print 'eigs', eigs
