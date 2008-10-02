@@ -381,6 +381,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
         S=sympy.Symbol('S',real=True)
         TwogH2=TwogH2.subs(J,1.0)
         TwogH2=TwogH2.subs(S,1.0)
+        
         TwogH2=TwogH2.subs(kx,2*pi/4)
         #I=sympy.Symbol('I')
         TwogH2=TwogH2.subs(I,1.0j)
