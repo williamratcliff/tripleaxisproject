@@ -4,6 +4,7 @@ import numpy as N
 I=1.0j
 pi=sympy.pi
 from sympy import exp
+import pylab
 
 #translations=[[0,0,0],
 #              [0,0,1],[0,0,-1]
@@ -379,23 +380,39 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
             eigs=TwogH2.eigenvals()
             #print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
-        TwogH2=TwogH2.subs(J,1.0)
+        TwogH2=TwogH2.subs(J,2.0)
         TwogH2=TwogH2.subs(S,1.0)
-        
-        TwogH2=TwogH2.subs(kx,2*pi/4)
-        #I=sympy.Symbol('I')
-        TwogH2=TwogH2.subs(I,1.0j)
-        Ntwo=N.array(TwogH2)
-        print 'Ntwo'
-        print Ntwo
-        if 1:
-            import scipy.linalg
-            l,v=scipy.linalg.eig(Ntwo)
-            print l[0]
-        #print N.linalg.eigvals(Ntwo)
-        #eigs=TwogH2.eigenvals()
-        #print 'eigs', eigs
-        #print 'eigenvalues', sympy.simplify(eigs[1][0])
+        qrange=[]
+        wrange=[]
+        for q in N.arange(0,2*pi,pi/12):
+            TwogH3=TwogH2.subs(kx,q)
+            #I=sympy.Symbol('I')
+            Ntwo=TwogH3.subs(I,1.0j)
+            m,n=Ntwo.shape
+            #print Ntwo.applyfunc(sympy.Basic.evalf)
+            if 1:
+                for i in range(m):
+                    for j in range(n):
+                        print i,j
+                        print Ntwo[i,j]
+                        Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
+            print 'Ntwo'
+            print Ntwo
+            if 1:
+                import scipy.linalg
+                l,v=scipy.linalg.eig(Ntwo)
+                print l[1]
+                qrange.append(q)
+                wrange.append(l[1])
+            #print N.linalg.eigvals(Ntwo)
+            #eigs=TwogH2.eigenvals()
+            #print 'eigs', eigs
+            #print 'eigenvalues', sympy.simplify(eigs[1][0])
+        wrange=N.real(wrange)
+        print qrange
+        print wrange
+        pylab.plot(qrange,wrange,'s')
+        pylab.show()
         return eigs 
 
 
