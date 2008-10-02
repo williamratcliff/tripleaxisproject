@@ -56,13 +56,14 @@ def generate_atoms():
 
 
     if 1:
+        D=sympy.Symbol('D',real=True)
         spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
         pos0=[0,0,0]
         neighbors=[1]
         interactions=[0]
         cell=0
         int_cell=[5,21]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell)
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell,Dz=D)
         
         pos0=[1,0,0]
         spin0=N.matrix([[1,0,0],[0,-1,0],[0,0,-1]],'float64')
@@ -70,7 +71,7 @@ def generate_atoms():
         interactions=[0]
         cell=5
         int_cell=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell)
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell,Dz=D)
         
         atomlist=[atom0,atom1]
 
@@ -380,10 +381,14 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
             eigs=TwogH2.eigenvals()
             #print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
-        TwogH2=TwogH2.subs(J,2.0)
+        D=sympy.Symbol('D',real=True)
+        TwogH2=TwogH2.subs(J,-1.0)
         TwogH2=TwogH2.subs(S,1.0)
+        TwogH2=TwogH2.subs(D,1.0)
+        
         qrange=[]
-        wrange=[]
+        wrange0=[]
+        wrange1=[]
         for q in N.arange(0,2*pi,pi/12):
             TwogH3=TwogH2.subs(kx,q)
             #I=sympy.Symbol('I')
@@ -393,25 +398,28 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms):
             if 1:
                 for i in range(m):
                     for j in range(n):
-                        print i,j
-                        print Ntwo[i,j]
+                        #print i,j
+                        #print Ntwo[i,j]
                         Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
-            print 'Ntwo'
-            print Ntwo
+            #print 'Ntwo'
+            #print Ntwo
             if 1:
                 import scipy.linalg
                 l,v=scipy.linalg.eig(Ntwo)
-                print l[1]
+                #print l[1]
                 qrange.append(q)
-                wrange.append(l[1])
+                wrange0.append(l[0])
+                wrange1.append(l[1])
             #print N.linalg.eigvals(Ntwo)
             #eigs=TwogH2.eigenvals()
             #print 'eigs', eigs
             #print 'eigenvalues', sympy.simplify(eigs[1][0])
-        wrange=N.real(wrange)
+        wrange0=N.real(wrange0)
+        wrange1=N.real(wrange1)
         print qrange
-        print wrange
-        pylab.plot(qrange,wrange,'s')
+        print wrange1
+        pylab.plot(qrange,wrange0,'s')
+        pylab.plot(qrange,wrange1,'s',color='red')
         pylab.show()
         return eigs 
 
