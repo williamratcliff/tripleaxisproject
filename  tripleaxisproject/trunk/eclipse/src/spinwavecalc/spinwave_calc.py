@@ -66,7 +66,7 @@ def generate_atoms():
         atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell,Dz=D)
         
         pos0=[1,0,0]
-        spin0=N.matrix([[1,0,0],[0,-1,0],[0,0,-1]],'float64')
+        spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,-1]],'float64')
         neighbors=[0]
         interactions=[0]
         cell=5
