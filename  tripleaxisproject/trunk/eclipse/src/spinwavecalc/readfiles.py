@@ -1,4 +1,4 @@
-
+import numpy as N
 
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
@@ -12,6 +12,8 @@ class atom:
         self.Dz=Dz
         self.cell=cell
         self.int_cell=[]
+
+
 
 def generate_atoms():
 
@@ -56,6 +58,8 @@ def read_interactions(myfilestr):
     myFlag=True
         #self.metadata={}
     returnline=['']
+    jmats=[]
+    jnums=[]
     while myFlag:
         tokenized=get_tokenized_line(myfile,returnline=returnline)
         print tokenized
@@ -63,9 +67,41 @@ def read_interactions(myfilestr):
             break
         #print tokenized
         if tokenized==[]:
-            tokenized=['']
-        if tokenized[0].lower()=="#Date".lower():
-            pass
+            break
+        if tokenized[0]=='#number':
+            while 1:
+                tokenized=get_tokenized_line(myfile,returnline=returnline)
+                print 'intoken ',tokenized
+                if tokenized==[]:
+                    break
+                if tokenized[0]!='#atomnumber':
+                    #print tokenized[0]
+                    jnum=float(tokenized[0])
+                    j11=float(tokenized[1])
+                    j12=float(tokenized[2])
+                    j13=float(tokenized[3])
+                    j21=float(tokenized[4])
+                    j22=float(tokenized[5])
+                    j23=float(tokenized[6])
+                    j31=float(tokenized[7])
+                    j32=float(tokenized[8])
+                    j33=float(tokenized[9]) 
+                    jij=N.matrix([[j11,j12,j13],[j21,j22,j23],[j31,j32,j33]],'Float64')
+                    jnums.append(jnum)
+                    jmats.append(jij)
+                else:
+                    while 1:
+                        tokenized=get_tokenized_line(myfile,returnline=returnline)
+                        if not(tokenized):
+                            break
+                        atom_num=tokenized[0]
+                        x,y,z=float(tokenized[1]),float(tokenized[2]),float(tokenized[3])
+                        Dx,Dy,Dz=float(tokenized[4]),float(tokenized[5]),float(tokenized[6])
+                        for i in range(7,1,len(tokenized)):
+                            interacting_spin=float(tokenized[i])
+                            interaction_matrix=float(tokenized[i+1])
+                            
+                                       
     myfile.close()
     
     
