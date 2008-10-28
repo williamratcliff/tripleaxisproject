@@ -1,4 +1,5 @@
 import numpy as N
+import solvespin
 
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
@@ -60,6 +61,7 @@ def read_interactions(myfilestr):
     returnline=['']
     jmats=[]
     jnums=[]
+    atomlist=[]
     while myFlag:
         tokenized=get_tokenized_line(myfile,returnline=returnline)
         print tokenized
@@ -97,17 +99,68 @@ def read_interactions(myfilestr):
                         atom_num=tokenized[0]
                         x,y,z=float(tokenized[1]),float(tokenized[2]),float(tokenized[3])
                         Dx,Dy,Dz=float(tokenized[4]),float(tokenized[5]),float(tokenized[6])
-                        for i in range(7,1,len(tokenized)):
-                            interacting_spin=float(tokenized[i])
-                            interaction_matrix=float(tokenized[i+1])
-                            
-                                       
+                        #spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
+                        pos0=[x,y,z]
+                        atom0=atom(pos=pos0,Dx=Dx,Dy=Dy,Dz=Dz)
+                        neighbors=[]
+                        interactions=[]
+                        print 'range',range(7,len(tokenized),1)
+                        for i in range(7,len(tokenized)-1,1):
+                            interacting_spin=int(tokenized[i])
+                            #print interacting_spin
+                            interaction_matrix=int(tokenized[i+1])
+                            neighbors.append(interacting_spin)
+                            interactions.append(interaction_matrix)
+                        #print 'interactions', interactions
+                        #print 'neighbors', neighbors
+                        atom0.neighbors=neighbors
+                        atom0.interactions=interactions
+                        atomlist.append(atom0)
     myfile.close()
+    #for catom in atomlist:
+    #    print 'pos', catom.pos
+    #    print 'Dx,Dy,Dz',catom.Dx, catom.Dy,catom.Dz
+    #    print 'interactions', catom.interactions
+    #    print 'neighbors', catom.neighbors
+    #print 'jnums', jnums
+    #print 'jmats',jmats
+    return atomlist, jnums, jmats
     
+
+def read_spins(myfilestr):
+    myfile = open(myfilestr, 'r')
+    returnline=['']
+    myFlag=True
+        #self.metadata={}
+    spins=[]
+    while myFlag:
+        tokenized=get_tokenized_line(myfile,returnline=returnline)
+        print tokenized
+        if not(tokenized):
+            break
+        #print tokenized
+        if tokenized[0]=='#atom_number':
+            pass
+        else:
+            spin=N.array([float(tokenized[4]),float(tokenized[5]),float(tokenized[6])],'Float64')
+            sx,sy,sz=spin
+            smat=solvespin.getmatrix(sx, sy, sz)
+            spins.append(smat)
+    myfile.close()
+    smat=N.empty((3,1),'float32')
+    smat=N.matrix(smat)
+    smat[0]=0
+    smat[1]=0
+    smat[2]=1
+    sout=spins[12]*smat
+    print sout
+    return spins
     
     
     
     
 if __name__=="__main__":
-    myfilestr=r'c:\montecarlo.txt'
-    read_interactions(myfilestr)
+    myfilestr=r'c:\spins.txt'
+    spins=read_spins(myfilestr)
+    #myfilestr=r'c:\montecarlo.txt'
+    #atomlist, jnums, jmats=read_interactions(myfilestr)
