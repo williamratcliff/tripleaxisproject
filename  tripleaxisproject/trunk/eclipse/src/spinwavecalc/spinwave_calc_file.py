@@ -366,7 +366,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
         print 'g',g
         TwogH2=2*g*XdX
         print 'TwogH2',TwogH2
-        if 0:
+        if 1:
             #print 'calculating'
             x=sympy.Symbol('x')
             #eigspoly=TwogH2.berkowitz_charpoly(x)
@@ -379,10 +379,10 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
             #eigs=TwogH2.berkowitz_charpoly(x)
             print 'eigs', eigs
             keys=eigs.keys()
-            print 'key',keys[0]
+            #print 'key',keys[0]
             #print keys[0].expand(complex=True)
             #print TwogH2.charpoly(x)
-            eigs=TwogH2.eigenvals()
+            #eigs=TwogH2.eigenvals()
             #print 'eigenvalues', sympy.simplify(eigs[1][0])        
         S=sympy.Symbol('S',real=True)
         D=sympy.Symbol('D',real=True)
@@ -395,7 +395,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
         wrange1=[]
         wrange=[]
         for q in N.arange(0,2*pi,pi/12):
-            TwogH3=TwogH2.subs(ky,q)
+            TwogH3=TwogH2.subs(kx,q)
             #I=sympy.Symbol('I')
             Ntwo=TwogH3.subs(I,1.0j)
             m,n=Ntwo.shape
@@ -413,7 +413,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
                 l,v=scipy.linalg.eig(Ntwo)
                 #print l[1]
                 qrange.append(q)
-                print 'num eigs', l.shape
+                #print 'num eigs', l.shape
                 #wrange0.append(l[0])
                 #wrange1.append(l[3])
                 wrange.append(l)
@@ -423,15 +423,15 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
             #print 'eigenvalues', sympy.simplify(eigs[1][0])
         #wrange0=N.real(wrange0)
         wrange=N.real(wrange)
-        print qrange
-        print wrange
+        #print qrange
+        #print wrange
         wrange=N.array(wrange)
         wrange=wrange.T
         for wrange1 in wrange:
             #pylab.plot(qrange,wrange0,'s')
-            print qrange
-            print wrange1
-            print len(qrange),len(wrange1)
+            #print qrange
+            #print wrange1
+            #print len(qrange),len(wrange1)
             #print inum
             #inum=inum+1
             pylab.plot(qrange,wrange1,'s')
@@ -452,5 +452,10 @@ if __name__=='__main__':
         myfilestr=r'c:\montecarlo.txt'
         atom_list, jnums, jmats=readfiles.read_interactions(myfilestr,spins)
         N_atoms=len(atom_list)
-        N_atoms_uc=2
+        N_atoms_uc=1
+        print N_atoms
         calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
+        print jmats
+        #print spins[0]
+        #print spins[1]
+        #print N.linalg.det(spins[0]), N.linalg.det(spins[1])
