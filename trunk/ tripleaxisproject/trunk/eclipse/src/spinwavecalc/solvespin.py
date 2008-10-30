@@ -81,6 +81,22 @@ def chisq_an(p,sx,sy,sz):
     chisq=(fresult*fresult).sum()
     return chisq
 
+def getmatrix(sx,sy,sz):
+    p0=N.array([0,1,0,1],'d')
+    p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz))
+    a,b,c,s=p    
+    a11=1-2*b**2-2*c**2
+    a12=2*a*b-2*s*c
+    a13=2*a*c+2*s*b
+    a21=2*a*b+2*s*c
+    a22=1-2*a**2-2*c**2
+    a23=2*b*c-2*s*a
+    a31=2*a*c-2*s*b
+    a32=2*b*c+2*s*a
+    a33=1-2*a**2-2*b**2
+    amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float32')  
+    return amat  
+
 
 if __name__=="__main__":
     p0=N.array([0,1,0,1],'d')
