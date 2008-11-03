@@ -159,8 +159,9 @@ def read_spins(myfilestr):
     sout=spins[1]*smat
     #spins[1]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
     #spins[0]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
-    print sout
-    print spins
+    #print sout
+    for currspin in spins:
+        print currspin*smat
     return spins
     
     
