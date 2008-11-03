@@ -64,10 +64,11 @@ def generate_atoms():
         interactions=[0]
         cell=0
         int_cell=[5,21]
-        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell,Dz=D)
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell,Dz=0)
         
         pos0=[1,0,0]
-        spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,-1]],'float64')
+        spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,1]],'float64')
+        spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
         neighbors=[0]
         interactions=[0]
         cell=5
@@ -454,6 +455,7 @@ if __name__=='__main__':
         N_atoms=len(atom_list)
         N_atoms_uc=1
         print N_atoms
+        #atom_list=generate_atoms()
         calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
         print jmats
         #print spins[0]

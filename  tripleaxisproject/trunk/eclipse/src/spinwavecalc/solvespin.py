@@ -83,6 +83,14 @@ def chisq_an(p,sx,sy,sz):
 
 def getmatrix(sx,sy,sz):
     p0=N.array([0,1,0,1],'d')
+    #p0=N.array([0,1,0,1],'d')
+    lowerm=[-1,-1,-1,-1]
+    upperm=[2,2,2,2]
+    p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
+                  schedule='simple',lower=lowerm,upper=upperm,\
+                  maxeval=None, maxaccept=None,dwell=500,maxiter=2000)
+    
+
     p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz))
     a,b,c,s=p    
     a11=1-2*b**2-2*c**2
