@@ -96,6 +96,10 @@ class FormDialog(sc.SizedDialog):
         print 'Directed'
 
 
+        wx.StaticText(DirectionsubPane, -1, "Number of divisions")
+        spinctrl = wx.SpinCtrl(DirectionsubPane, -1, "", (30, 50))
+        spinctrl.SetRange(1,100)
+        spinctrl.SetValue(5)
 
         # add dialog buttons
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL))
