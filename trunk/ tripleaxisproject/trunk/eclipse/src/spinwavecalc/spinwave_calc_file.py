@@ -440,17 +440,10 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
         return wrange 
 
 
-
-    
-if __name__=='__main__':
-    if 1:
-        #translations=generate_translations()
-        #atom_list=generate_atoms()
-        #N_atoms_uc=1
-        #N_atoms=2
-        myfilestr=r'c:\spins.txt'
+def driver(spinsfile,interactionfile):
+        myfilestr=spinsfile#r'c:\spins.txt'
         spins=readfiles.read_spins(myfilestr)
-        myfilestr=r'c:\montecarlo.txt'
+        myfilestr=interactionfile#r'c:\montecarlo.txt'
         atom_list, jnums, jmats=readfiles.read_interactions(myfilestr,spins)
         N_atoms=len(atom_list)
         N_atoms_uc=1
@@ -458,6 +451,15 @@ if __name__=='__main__':
         #atom_list=generate_atoms()
         calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
         print jmats
+
+    
+if __name__=='__main__':
+    if 1:
+        driver(r'c:\spins.txt',r'c:\montecarlo.txt')
+        #translations=generate_translations()
+        #atom_list=generate_atoms()
+        #N_atoms_uc=1
+        #N_atoms=2
         #print spins[0]
         #print spins[1]
         #print N.linalg.det(spins[0]), N.linalg.det(spins[1])
