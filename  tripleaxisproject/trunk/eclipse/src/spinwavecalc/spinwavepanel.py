@@ -17,40 +17,57 @@ class MyApp(wx.App):
 class mFormValidator(wx.PyValidator):
     def __init__(self,data,key):
         wx.PyValidator.__init__(self)
-        self.data=data
-        self.key=key
         #print 'FormValidator init', key
         #self.TransferToWindow()
-
+        self.data=data
+        self.key=key
     def Clone(self):
         return mFormValidator(self.data,self.key)
 
     def Validate(self,win):
-        return True
+        print 'validating'
+        textCtrl=self.GetWindow()
+        text=textCtrl.GetValue()
+        
+        try:
+            value=float(text)
+            textCtrl.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_WINDOW))
+            textCtrl.Refresh()
+            return True
+            
+        except ValueError:
+            wx.MessageBox("This field must be a number","error")
+            textCtrl.SetBackgroundColour("pink")
+            textCtrl.SetFocus()
+            textCtrl.Refresh()
+            return False
+        
 
     def TransferToWindow(self):
-        #print 'Form TransferToWindow',self.key
+        print 'Form TransferToWindow',self.key
         
-        checkctrl=self.GetWindow()
+        textCtrl=self.GetWindow()
         ##print 'checkctrl',checkctrl
         ##print self.__dict__
         #print 'key',self.key
         #print 'dict', self.data._array[self.key]
         #print 'data',self.data.__dict__[self.key]
-        checkctrl.SetValue(self.data._array[self.key])
+        textCtrl.SetValue(self.data.get(self.key,""))
         return True
 
     def TransferFromWindow(self):
         #print 'TransferFromWindow'
-        checkctrl=self.GetWindow()
-        self.data._array[self.key]=int(checkctrl.GetValue())
+        textCtrl=self.GetWindow()
+        self.data[self.key]=textCtrl.GetValue()
+        #self.qfloat=float(textCtrl.GetValue())
         return True    
     
 class FormDialog(sc.SizedDialog):
     def __init__(self, parent, id):
+        valstyle=wx.WS_EX_VALIDATE_RECURSIVELY
         sc.SizedDialog.__init__(self, None, -1, "Calculate Dispersion",
                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)#| wx.WS_EX_VALIDATE_RECURSIVELY)
-
+        self.SetExtraStyle(wx.WS_EX_VALIDATE_RECURSIVELY)
         pane = self.GetContentsPane()
         pane.SetSizerType("vertical")
         FilePane = sc.SizedPanel(pane, -1)
@@ -73,9 +90,9 @@ class FormDialog(sc.SizedDialog):
 
 
 
-        self.kx=1.0
-        self.ky=0.0
-        self.kz=0.0
+        self.kx=str(1.0)
+        self.ky=str(0.0)
+        self.kz=str(0.0)
         DirectionPane = sc.SizedPanel(pane, -1)
         DirectionPane.SetSizerType("vertical")
         DirectionPane.SetSizerProps(expand=True)
@@ -85,15 +102,16 @@ class FormDialog(sc.SizedDialog):
         DirectionsubPane.SetSizerType("horizontal")
         DirectionsubPane.SetSizerProps(expand=True)
         wx.StaticText(DirectionsubPane, -1, "qx")
-        qx=wx.TextCtrl(DirectionsubPane, -1, str(self.kx),validator=mFormValidator(self.kx,self.kx))
-        self.Bind(wx.EVT_TEXT, self.Evtqx, qx)
+        qx=wx.TextCtrl(DirectionsubPane, -1, self.kx,validator=mFormValidator(self.kx,'kx'))
+        #print 'qx', qx
+        #self.Bind(wx.EVT_TEXT, self.Evtqx, qx)
         wx.StaticText(DirectionsubPane, -1, "qy")
-        qy=wx.TextCtrl(DirectionsubPane, -1, str(self.ky),validator=mFormValidator(self.ky,self.ky))
-        self.Bind(wx.EVT_TEXT, self.Evtqx, qy)
+        qy=wx.TextCtrl(DirectionsubPane, -1, self.ky,validator=mFormValidator(self.ky,'ky'))
+        #self.Bind(wx.EVT_TEXT, self.Evtqx, qy)
         wx.StaticText(DirectionsubPane, -1, "qz")
-        qz=wx.TextCtrl(DirectionsubPane, -1, str(self.kz),validator=mFormValidator(self.ky,self.ky))
-        self.Bind(wx.EVT_TEXT, self.Evtqx, qz)
-        print 'Directed'
+        qz=wx.TextCtrl(DirectionsubPane, -1, str(self.kz),validator=mFormValidator(self.kz,'kz'))
+        #self.Bind(wx.EVT_TEXT, self.Evtqx, qz)
+        #print 'Directed'
 
 
         wx.StaticText(DirectionsubPane, -1, "Number of divisions")
@@ -111,7 +129,13 @@ class FormDialog(sc.SizedDialog):
 
 
     def Evtqx(self,evt):
-        self.kx=float(wx.wxTextCtrl.GetValue(self))
+        print self.__dict__
+        print 'event',evt.__dict__
+        textCtrl=evt.control
+        text=textCtrl.GetValue()
+        #sc.SizedDialog.GetW
+        #self.G
+        self.kx=text
  
 
 
@@ -191,6 +215,7 @@ if __name__=='__main__':
     dlg=FormDialog(parent=None,id=-1)
     result=dlg.ShowModal()
     if result==wx.ID_OK:
+        dlg.Validate()
         print "OK"
     else:
         print "Cancel"
