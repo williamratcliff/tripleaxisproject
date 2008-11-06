@@ -440,10 +440,142 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
         return wrange 
 
 
-def driver(spinsfile,interactionfile):
-        myfilestr=spinsfile#r'c:\spins.txt'
+def multiply_ab(atom_list,Sxyz,a=0,b=0):
+    N_atoms=len(atom_list)
+    Sdef=0
+    print 'atom_list',atom_list
+    print 'Sxyz',Sxyz
+    T=sympy.Symbol('T',commutative=False)
+    Sij0=Sxyz[0][a]
+    t=''
+    c=sympy.Symbol("c%d%s"%(0,t),commutative=False)
+    cd=sympy.Symbol("cd%d%s"%(0,t),commutative=False)
+    t='t'
+    ct=sympy.Symbol("c%d%s"%(0,t),commutative=False)
+    cdt=sympy.Symbol("cd%d%s"%(0,t),commutative=False)
+    Sij0=Sij0.subs(ct,c)
+    Sij0=Sij0.subs(cdt,cd)  
+    for i in range(1,N_atoms):
+        Sdef=Sdef+Sij0*Sxyz[i][b]
+ 
+    return Sdef
+
+
+
+
+def Sfouriertransform(atom_list,Slin,k):
+    N_atoms=len(atom_list)
+    #Hdef=0
+    #print 'atom_list',atom_list
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    kxp=sympy.Symbol('kxp')
+    kyp=sympy.Symbol('kyp')
+    kzp=sympy.Symbol('kzp')
+    kp=[kxp,kyp,kzp]
+    wk=sympy.Symbol("wk")
+    wkp=sympy.Symbol("wkp")
+    t=sympy.Symbol("t")
+    ri=atom_list[0].pos
+    
+    kmult=N.dot(k,ri)
+    #kmultp=N.dot(kp,ri)
+    
+    ci=sympy.Symbol("c%d"%(0,),commutative=False)
+    cdi=sympy.Symbol("cd%d"%(0,),commutative=False)
+    cki=sympy.Symbol("ck%d"%(0,),commutative=False)
+    ckdi=sympy.Symbol("ckd%d"%(0,),commutative=False)
+    
+    t1=sympy.exp(I*kmult)*cki
+    t3=sympy.exp(-I*(kmult))*ckdi
+    Slin=Slin.subs(ci,t1)
+    Slin=Slin.subs(cdi,t3)
+
+
+    for i in range(1,N_atoms):
+        N_int=len(atom_list[i].interactions)
+        #ci=sympy.Symbol("c%d"%(i,),commutative=False)
+        #cdi=sympy.Symbol("cd%d"%(i,),commutative=False)
+        cit=sympy.Symbol("c%dt"%(i,),commutative=False)
+        cdit=sympy.Symbol("cd%dt"%(i,),commutative=False)
+
+        cki=sympy.Symbol("ck%d"%(0,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(0,),commutative=False)
+        
+        ri=atom_list[i].pos
+        kmult=N.dot(k,ri)
+        kmultp=N.dot(kp,ri)
+        
+        t2=sympy.exp(I*(kmultp-wk*t))*cki
+                     
+        
+        t4=sympy.exp(-I*(kmultp-wkp*t))*ckdi
+        
+        Slin=Slin.subs(cit,t2)
+        
+        Slin=Slin.subs(cdit,t4)
+    
+    #Note that I have already assumed that k=kp because I didn't include cqp terms
+    Slin=Slin.expand()
+    Slin=Slin.subs(wkp,wk)
+    Slin=Slin.subs(kxp,kx)
+    Slin=Slin.subs(kyp,ky)
+    Slin=Slin.subs(kzp,kz)
+    return Slin
+
+def Sapplycommutation(atom_list,Sfou,k):
+    """Operate commutation relations to put all the 2nd order term as ckd**ck, cmk**cmkd, cmk**ck and ckd**cmkd form"""
+    N_atoms=len(atom_list)
+    #Hdef=0
+    #print 'atom_list',atom_list
+    #print 'Sxyz',Sxyz
+    #print 'Jij',Jij
+    for i in range(N_atoms):
+        N_int=len(atom_list[i].interactions)
+        ci=sympy.Symbol("c%d"%(0,),commutative=False)
+        cdi=sympy.Symbol("cd%d"%(0,),commutative=False)
+        cki=sympy.Symbol("ck%d"%(0,),commutative=False)
+        ckdi=sympy.Symbol("ckd%d"%(0,),commutative=False)
+        cmki=sympy.Symbol("cmk%d"%(0,),commutative=False)
+        cmkdi=sympy.Symbol("cmkd%d"%(0,),commutative=False)
+        for j in range(N_atoms):
+            cj=sympy.Symbol("c%d"%(0,),commutative=False)
+            cdj=sympy.Symbol("cd%d"%(0,),commutative=False)
+            ckj=sympy.Symbol("ck%d"%(0,),commutative=False)
+            ckdj=sympy.Symbol("ckd%d"%(0,),commutative=False)
+            cmkj=sympy.Symbol("cmk%d"%(0,),commutative=False)
+            cmkdj=sympy.Symbol("cmkd%d"%(0,),commutative=False)
+            Sfou=Sfou.expand()
+            if i==j:
+                Sfou=Sfou.subs(cki*ckdj,ckdj*cki+1)
+                #Sfou.subs(cmkdi*cmkj,cmkj*cmkdi)
+                nkj=sympy.Symbol("nk%d"%(j,),commutative=True)
+                
+            else:
+                Sfou=Sfou.subs(cki*ckdj,ckdj*cki) #just added
+            
+            Sfou=Sfou.expand()
+            nkj=sympy.Symbol("nk%d"%(j,),commutative=True)
+            Sfou=Sfou.subs(ckdj*cki,nkj)
+            Sfou=Sfou.expand()
+            Sfou=Sfou.subs(cki*ckj,0)
+            Sfou=Sfou.expand()
+            Sfou=Sfou.subs(ckdi*ckdj,0)
+
+    
+    
+    return Sfou
+
+    
+if __name__=='__main__':
+    if 1:
+        #translations=generate_translations()
+        #atom_list=generate_atoms()
+        #N_atoms_uc=1
+        #N_atoms=2
+        myfilestr=r'c:\spins.txt'
         spins=readfiles.read_spins(myfilestr)
-        myfilestr=interactionfile#r'c:\montecarlo.txt'
+        myfilestr=r'c:\montecarlo.txt'
         atom_list, jnums, jmats=readfiles.read_interactions(myfilestr,spins)
         N_atoms=len(atom_list)
         N_atoms_uc=1
@@ -451,15 +583,36 @@ def driver(spinsfile,interactionfile):
         #atom_list=generate_atoms()
         calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
         print jmats
-
-    
-if __name__=='__main__':
-    if 1:
-        driver(r'c:\spins.txt',r'c:\montecarlo.txt')
-        #translations=generate_translations()
-        #atom_list=generate_atoms()
-        #N_atoms_uc=1
-        #N_atoms=2
         #print spins[0]
         #print spins[1]
         #print N.linalg.det(spins[0]), N.linalg.det(spins[1])
+
+    if 0:
+        print 'one magnon'
+        print ''
+        print ''
+        Sabnt=generate_sabnt(N_atoms,t='t')
+        SzSz=sympy.expand(multiply_ab(atom_list,Sabnt,a=2,b=2))
+        print 'mult SzSz',SzSz
+        SxSx=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=0))
+        SxSy=sympy.expand(multiply_ab(atom_list,Sabnt,a=0,b=1))
+        print 'mult SxSx',SxSx
+        SzSz_lin=holstein(sympy.expand(SzSz))
+        print 'lin zz',SzSz_lin
+        SxSx_lin=holstein(sympy.expand(SxSx))
+        SxSy_lin=holstein(sympy.expand(SxSy))
+        print 'lin xy',SzSz_lin
+        print 'lin xx',SxSx_lin        
+        if SzSz_lin!=None:
+            SzSz_fou=Sfouriertransform(atom_list,SzSz_lin,k)
+            print 'fourier', SzSz_fou
+            Scomm=Sapplycommutation(atom_list,SzSz_fou,k)
+            print 'Scomm',Scomm
+            SxSx_fou=Sfouriertransform(atom_list,SxSx_lin,k)
+            print 'fourier x',SxSx_fou
+            Scommx=Sapplycommutation(atom_list,SxSx_fou,k)
+            print 'Scommx',sympy.simplify(Scommx)
+            SxSy_fou=Sfouriertransform(atom_list,SxSy_lin,k)
+            print 'fourier xy',SxSy_fou
+            Scommxy=Sapplycommutation(atom_list,SxSy_fou,k)
+            print 'Scommxy',Scommxy            
