@@ -48,20 +48,28 @@ class mFormValidator(wx.PyValidator):
         
         textCtrl=self.GetWindow()
         ##print 'checkctrl',checkctrl
-        ##print self.__dict__
-        #print 'key',self.key
-        #print 'dict', self.data._array[self.key]
-        #print 'data',self.data.__dict__[self.key]
+        print self.__dict__
+
         textCtrl.SetValue(self.data.get(self.key,""))
         return True
 
     def TransferFromWindow(self):
-        #print 'TransferFromWindow'
         print 'TransferFromWindow'
         textCtrl=self.GetWindow()
         self.data[self.key]=textCtrl.GetValue()
         #self.qfloat=float(textCtrl.GetValue())
         return True    
+    
+    
+def WalkTree(parent):
+        print 'walking', parent
+        parent.SetExtraStyle(wx.WS_EX_VALIDATE_RECURSIVELY)
+        for child in parent.GetChildren():
+            if child==None:
+                print 'child',child
+            else:
+                WalkTree(child)
+
     
 class FormDialog(sc.SizedDialog):
     def __init__(self, parent, id):
@@ -91,9 +99,7 @@ class FormDialog(sc.SizedDialog):
 
 
 
-        self.kx=str(1.0)
-        self.ky=str(0.0)
-        self.kz=str(0.0)
+
         self.data={}
         self.data['kx']=str(1.0)
         self.data['ky']=str(0.0)
@@ -107,33 +113,33 @@ class FormDialog(sc.SizedDialog):
         DirectionsubPane.SetSizerType("horizontal")
         DirectionsubPane.SetSizerProps(expand=True)
 
-        wx.StaticText(DirectionsubPane, -1, "qx")
-        qx=wx.TextCtrl(DirectionsubPane, -1, self.kx,validator=mFormValidator(self.kx,'kx'))
-        DirectionsubPane.SetExtraStyle(wx.WS_EX_VALIDATE_RECURSIVELY)
-        data={}
         
+
+        DirectionsubPane.SetExtraStyle(wx.WS_EX_VALIDATE_RECURSIVELY)
+        WalkTree(pane)
+        
+        wx.StaticText(DirectionsubPane, -1, "qx")
         qx=wx.TextCtrl(DirectionsubPane, -1, self.data['kx'],validator=mFormValidator(self.data,'kx'))
         #print 'qx', qx
         #self.Bind(wx.EVT_TEXT, self.Evtqx, qx)
         wx.StaticText(DirectionsubPane, -1, "qy")
-        qy=wx.TextCtrl(DirectionsubPane, -1, self.ky,validator=mFormValidator(self.ky,'ky'))
         qy=wx.TextCtrl(DirectionsubPane, -1, self.data['ky'],validator=mFormValidator(self.data,'ky'))
         #self.Bind(wx.EVT_TEXT, self.Evtqx, qy)
         wx.StaticText(DirectionsubPane, -1, "qz")
-        qz=wx.TextCtrl(DirectionsubPane, -1, str(self.kz),validator=mFormValidator(self.kz,'kz'))
         qz=wx.TextCtrl(DirectionsubPane, -1, self.data['kz'],validator=mFormValidator(self.data,'kz'))
         #self.Bind(wx.EVT_TEXT, self.Evtqx, qz)
         #print 'Directed'
 
 
         wx.StaticText(DirectionsubPane, -1, "Number of divisions")
+        self.data['steps']=8
         spinctrl = wx.SpinCtrl(DirectionsubPane, -1, "", (30, 50))
         spinctrl.SetRange(1,100)
-        spinctrl.SetValue(5)
+        spinctrl.SetValue(self.data['steps'])
 
         # add dialog buttons
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL))
-        self.TransferDataToWindow()
+        #self.TransferDataToWindow()
         # a little trick to make sure that you can't resize the dialog to
         # less screen space than the controls need
         self.Fit()
@@ -225,18 +231,10 @@ class FormDialog(sc.SizedDialog):
 if __name__=='__main__':
     app=MyApp()
     dlg=FormDialog(parent=None,id=-1)
-
-
-
-
-
-
     result=dlg.ShowModal()
     if result==wx.ID_OK:
         dlg.Validate()
-
         print "OK"
-
         dlg.TransferDataFromWindow()
         print dlg.data
     else:
