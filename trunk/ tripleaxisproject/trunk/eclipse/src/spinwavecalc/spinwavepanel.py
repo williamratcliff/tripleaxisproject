@@ -56,7 +56,7 @@ class mFormValidator(wx.PyValidator):
         return True
 
     def TransferFromWindow(self):
-        #print 'TransferFromWindow'
+        print 'TransferFromWindow'
         textCtrl=self.GetWindow()
         self.data[self.key]=textCtrl.GetValue()
         #self.qfloat=float(textCtrl.GetValue())
@@ -89,10 +89,10 @@ class FormDialog(sc.SizedDialog):
 
 
 
-
-        self.kx=str(1.0)
-        self.ky=str(0.0)
-        self.kz=str(0.0)
+        self.data={}
+        self.data['kx']=str(1.0)
+        self.data['ky']=str(0.0)
+        self.data['kz']=str(0.0)
         DirectionPane = sc.SizedPanel(pane, -1)
         DirectionPane.SetSizerType("vertical")
         DirectionPane.SetSizerProps(expand=True)
@@ -101,15 +101,16 @@ class FormDialog(sc.SizedDialog):
         DirectionsubPane = sc.SizedPanel(pane, -1)
         DirectionsubPane.SetSizerType("horizontal")
         DirectionsubPane.SetSizerProps(expand=True)
+        DirectionsubPane.SetExtraStyle(wx.WS_EX_VALIDATE_RECURSIVELY)
         wx.StaticText(DirectionsubPane, -1, "qx")
-        qx=wx.TextCtrl(DirectionsubPane, -1, self.kx,validator=mFormValidator(self.kx,'kx'))
+        qx=wx.TextCtrl(DirectionsubPane, -1, self.data['kx'],validator=mFormValidator(self.data,'kx'))
         #print 'qx', qx
         #self.Bind(wx.EVT_TEXT, self.Evtqx, qx)
         wx.StaticText(DirectionsubPane, -1, "qy")
-        qy=wx.TextCtrl(DirectionsubPane, -1, self.ky,validator=mFormValidator(self.ky,'ky'))
+        qy=wx.TextCtrl(DirectionsubPane, -1, self.data['ky'],validator=mFormValidator(self.data,'ky'))
         #self.Bind(wx.EVT_TEXT, self.Evtqx, qy)
         wx.StaticText(DirectionsubPane, -1, "qz")
-        qz=wx.TextCtrl(DirectionsubPane, -1, str(self.kz),validator=mFormValidator(self.kz,'kz'))
+        qz=wx.TextCtrl(DirectionsubPane, -1, self.data['kz'],validator=mFormValidator(self.data,'kz'))
         #self.Bind(wx.EVT_TEXT, self.Evtqx, qz)
         #print 'Directed'
 
@@ -211,12 +212,21 @@ class FormDialog(sc.SizedDialog):
 
 
 if __name__=='__main__':
-    app=MyApp()
-    dlg=FormDialog(parent=None,id=-1)
+    #app=MyApp()
+    app=wx.PySimpleApp()
+    frame=wx.Frame(None,-1,"A Frame",style=wx.DEFAULT_FRAME_STYLE,size=(200,100))
+    frame.SetExtraStyle(wx.WS_EX_VALIDATE_RECURSIVELY)
+    dlg=FormDialog(parent=frame,id=-1)
+    frame.Show()
     result=dlg.ShowModal()
     if result==wx.ID_OK:
-        dlg.Validate()
+        frame.Validate()
         print "OK"
+        #dlg.TransferFromWindow()
+        print dlg.data
     else:
         print "Cancel"
+    
     dlg.Destroy()
+    app.MainLoop()
+    
