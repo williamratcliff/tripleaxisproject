@@ -62,6 +62,19 @@ def chisq_anneal(p,a,b,c,a2,b2,c2,x0,y0,z0,x0p,y0p,z0p):
     return chisq
 
 
+def genmat(a,b,c,s):
+    a11=1-2*b**2-2*c**2
+    a12=2*a*b-2*s*c
+    a13=2*a*c+2*s*b
+    a21=2*a*b+2*s*c
+    a22=1-2*a**2-2*c**2
+    a23=2*b*c-2*s*a
+    a31=2*a*c-2*s*b
+    a32=2*b*c+2*s*a
+    a33=1-2*a**2-2*b**2
+    amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float32')  
+    return amat
+
 def chisq(p,sx,sy,sz):
     a,b,c,s=p   
     eqn1=2*a*c+2*s*b-sx
@@ -76,6 +89,7 @@ def chisq_an(p,sx,sy,sz):
     eqn1=2*a*c+2*s*b-sx
     eqn2=2*b*c-2*s*a-sy
     eqn3=1-2*a**2-2*b**2-sz
+    eqn4=N.linalg.det(genmat(a,b,c,s))-1
     #eqn4=1-a**2-b**2-c**2-s**2
     fresult=N.array([eqn1,eqn2,eqn3],'d')
     chisq=(fresult*fresult).sum()
@@ -83,15 +97,16 @@ def chisq_an(p,sx,sy,sz):
 
 def getmatrix(sx,sy,sz):
     p0=N.array([0,1,0,1],'d')
+    p0=N.array([0,0,0,1],'d')
     #p0=N.array([0,1,0,1],'d')
     lowerm=[-1,-1,-1,-1]
     upperm=[2,2,2,2]
     p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
                   schedule='simple',lower=lowerm,upper=upperm,\
-                  maxeval=None, maxaccept=None,dwell=500,maxiter=2000)
+                  maxeval=None, maxaccept=None,dwell=1000,maxiter=2000)
     
 
-    p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz))
+    p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-25)
     a,b,c,s=p    
     a11=1-2*b**2-2*c**2
     a12=2*a*b-2*s*c
@@ -107,7 +122,8 @@ def getmatrix(sx,sy,sz):
 
 
 if __name__=="__main__":
-    p0=N.array([0,1,0,1],'d')
+    p0=N.array([0,1,0,1],'d')  #rotation about x-axis
+    p0=N.array([0,0,0,1],'d')
     lowerm=[-1,-1,-1,-1]
     upperm=[2,2,2,2]
     sx,sy,sz=[0,0,-1]

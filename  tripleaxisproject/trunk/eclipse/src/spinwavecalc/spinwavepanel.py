@@ -56,7 +56,7 @@ class mFormValidator(wx.PyValidator):
     def TransferFromWindow(self):
         print 'TransferFromWindow'
         textCtrl=self.GetWindow()
-        self.data[self.key]=textCtrl.GetValue()
+        self.data[self.key]=float(textCtrl.GetValue())
         #self.qfloat=float(textCtrl.GetValue())
         return True    
     
