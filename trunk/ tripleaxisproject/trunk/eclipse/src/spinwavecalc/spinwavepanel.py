@@ -132,10 +132,10 @@ class FormDialog(sc.SizedDialog):
 
 
         wx.StaticText(DirectionsubPane, -1, "Number of divisions")
-        self.data['steps']=8
+        self.data['step']=8
         spinctrl = wx.SpinCtrl(DirectionsubPane, -1, "", (30, 50))
         spinctrl.SetRange(1,100)
-        spinctrl.SetValue(self.data['steps'])
+        spinctrl.SetValue(self.data['step'])
         self.Bind(wx.EVT_SPINCTRL,self.EvtSpinCtrl)
         self.spinctrl=spinctrl
         # add dialog buttons

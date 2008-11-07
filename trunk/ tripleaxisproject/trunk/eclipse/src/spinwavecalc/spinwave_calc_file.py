@@ -395,7 +395,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
         wrange0=[]
         wrange1=[]
         wrange=[]
-        for q in N.arange(0,2*pi,pi/steps):
+        for q in N.arange(0,2*pi,2*pi/steps):
             
             currnum=q*direction['kx']
             #print 'currnum x', currnum
