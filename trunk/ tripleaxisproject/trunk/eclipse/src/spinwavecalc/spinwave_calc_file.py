@@ -398,13 +398,13 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
         for q in N.arange(0,2*pi,pi/steps):
             
             currnum=q*direction['kx']
-            print 'currnum x', currnum
+            #print 'currnum x', currnum
             TwogH3=TwogH2.subs(kx,currnum)
             currnum=q*direction['ky']
-            print 'currnum y',currnum
-            TwogH3=TwogH2.subs(ky,currnum)
+            #print 'currnum y',currnum
+            TwogH3=TwogH3.subs(ky,currnum)
             currnum=q*direction['kz']
-            #TwogH3=TwogH2.subs(kz,currnum)
+            TwogH3=TwogH3.subs(kz,currnum)
             #I=sympy.Symbol('I')
             Ntwo=TwogH3.subs(I,1.0j)
             m,n=Ntwo.shape
@@ -414,9 +414,9 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
                     for j in range(n):
                         #print i,j
                         #print Ntwo[i,j]
-                        print 'matching'
-                        print 'kx',Ntwo[i,j].match(kx)
-                        print 'ky',Ntwo[i,j].match(ky)
+                        #print 'matching'
+                        #print 'kx',Ntwo[i,j].match(kx)
+                        #print 'ky',Ntwo[i,j].match(ky)
                         Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
             #print 'Ntwo'
             #print Ntwo
