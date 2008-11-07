@@ -136,7 +136,8 @@ class FormDialog(sc.SizedDialog):
         spinctrl = wx.SpinCtrl(DirectionsubPane, -1, "", (30, 50))
         spinctrl.SetRange(1,100)
         spinctrl.SetValue(self.data['steps'])
-
+        self.Bind(wx.EVT_SPINCTRL,self.EvtSpinCtrl)
+        self.spinctrl=spinctrl
         # add dialog buttons
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL))
         #self.TransferDataToWindow()
@@ -146,14 +147,14 @@ class FormDialog(sc.SizedDialog):
         self.SetMinSize(self.GetSize())
 
 
-    def Evtqx(self,evt):
+    def EvtSpinCtrl(self,evt):
         print self.__dict__
         print 'event',evt.__dict__
-        textCtrl=evt.control
-        text=textCtrl.GetValue()
+        #spinCtrl=evt.control
+        self.data['step']=self.spinctrl.GetValue()
         #sc.SizedDialog.GetW
         #self.G
-        self.kx=text
+        #self.kx=text
  
 
 
