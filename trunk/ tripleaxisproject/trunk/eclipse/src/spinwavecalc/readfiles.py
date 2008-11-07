@@ -62,6 +62,7 @@ def read_interactions(myfilestr,spins):
     jmats=[]
     jnums=[]
     atomlist=[]
+    numcell=0
     while myFlag:
         tokenized=get_tokenized_line(myfile,returnline=returnline)
         print tokenized
@@ -102,6 +103,8 @@ def read_interactions(myfilestr,spins):
                         Dx,Dy,Dz=float(tokenized[4]),float(tokenized[5]),float(tokenized[6])
                         #spin0=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'float64')
                         pos0=[x,y,z]
+                        if N.abs(x)<1.0 and N.abs(y)<1.0 and N.abs(z)<1.0:
+                            numcell=numcell+1
                         atom0=atom(pos=pos0,Dx=Dx,Dy=Dy,Dz=Dz)
                         neighbors=[]
                         interactions=[]
@@ -127,7 +130,7 @@ def read_interactions(myfilestr,spins):
     #    print 'neighbors', catom.neighbors
     #print 'jnums', jnums
     #print 'jmats',jmats
-    return atomlist, jnums, jmats
+    return atomlist, jnums, jmats,numcell
     
 
 def read_spins(myfilestr):
@@ -161,7 +164,9 @@ def read_spins(myfilestr):
     #spins[0]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
     #print sout
     for currspin in spins:
-        print currspin*smat
+        print 'spin',currspin*smat
+        print 'mat', currspin
+        print 'det', N.linalg.det(currspin)
     return spins
     
     
@@ -171,5 +176,6 @@ if __name__=="__main__":
     myfilestr=r'c:\spins.txt'
     spins=read_spins(myfilestr)
     myfilestr=r'c:\montecarlo.txt'
-    atomlist, jnums, jmats=read_interactions(myfilestr,spins)
+    atomlist, jnums, jmats,numcell=read_interactions(myfilestr,spins)
+    print 'numcell', numcell
     #print N.linalg.det(atomlist[0].spin)

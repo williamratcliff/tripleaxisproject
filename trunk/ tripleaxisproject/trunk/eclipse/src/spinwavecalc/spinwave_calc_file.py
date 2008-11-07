@@ -566,6 +566,21 @@ def Sapplycommutation(atom_list,Sfou,k):
     
     return Sfou
 
+def driver(spinfile,interactionfile,direction,steps):
+    myfilestr=spinfile#r'c:\spins.txt'
+    spins=readfiles.read_spins(myfilestr)
+    myfilestr=interactionfile#r'c:\montecarlo.txt'
+    atom_list, jnums, jmats,N_atoms_uc=readfiles.read_interactions(myfilestr,spins)
+    N_atoms=len(atom_list)
+    #N_atoms_uc=1
+    print 'N_atoms',N_atoms,'Natoms_uc',Natoms_uc
+        #atom_list=generate_atoms()
+    calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
+    print jmats
+    print direction
+    print steps
+    print spinfile
+    print interactionfile
     
 if __name__=='__main__':
     if 1:
@@ -573,19 +588,28 @@ if __name__=='__main__':
         #atom_list=generate_atoms()
         #N_atoms_uc=1
         #N_atoms=2
-        myfilestr=r'c:\spins.txt'
-        spins=readfiles.read_spins(myfilestr)
-        myfilestr=r'c:\montecarlo.txt'
-        atom_list, jnums, jmats=readfiles.read_interactions(myfilestr,spins)
-        N_atoms=len(atom_list)
-        N_atoms_uc=1
-        print N_atoms
-        #atom_list=generate_atoms()
-        calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
-        print jmats
-        #print spins[0]
+         #print spins[0]
         #print spins[1]
         #print N.linalg.det(spins[0]), N.linalg.det(spins[1])
+        spinfile=r'c:\spins.txt'
+        #spins=readfiles.read_spins(myfilestr)
+        interactionfile=r'c:\montecarlo.txt'
+        steps=8
+        data={}
+        data['kx']=1.
+        data['ky']=0.
+        data['kz']=0.
+        direction=data
+        driver(spinfile,interactionfile,direction,steps)
+        #atom_list, jnums, jmats=readfiles.read_interactions(myfilestr,spins)
+        #N_atoms=len(atom_list)
+        #N_atoms_uc=1
+        #print N_atoms
+        #atom_list=generate_atoms()
+        #calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
+        #print jmats
+
+
 
     if 0:
         print 'one magnon'
