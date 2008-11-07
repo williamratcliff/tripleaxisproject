@@ -334,7 +334,7 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm,N_atoms_uc):
 
 
 
-def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
+def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
     Sabn=generate_sabn(N_atoms)        
     Sxyz=generate_sxyz(Sabn,atom_list)
     print 'Sabn',Sabn
@@ -395,8 +395,16 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
         wrange0=[]
         wrange1=[]
         wrange=[]
-        for q in N.arange(0,2*pi,pi/12):
-            TwogH3=TwogH2.subs(kx,q)
+        for q in N.arange(0,2*pi,pi/steps):
+            
+            currnum=q*direction['kx']
+            print 'currnum x', currnum
+            TwogH3=TwogH2.subs(kx,currnum)
+            currnum=q*direction['ky']
+            print 'currnum y',currnum
+            TwogH3=TwogH2.subs(ky,currnum)
+            currnum=q*direction['kz']
+            #TwogH3=TwogH2.subs(kz,currnum)
             #I=sympy.Symbol('I')
             Ntwo=TwogH3.subs(I,1.0j)
             m,n=Ntwo.shape
@@ -406,6 +414,9 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij):
                     for j in range(n):
                         #print i,j
                         #print Ntwo[i,j]
+                        print 'matching'
+                        print 'kx',Ntwo[i,j].match(kx)
+                        print 'ky',Ntwo[i,j].match(ky)
                         Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
             #print 'Ntwo'
             #print Ntwo
@@ -573,9 +584,9 @@ def driver(spinfile,interactionfile,direction,steps):
     atom_list, jnums, jmats,N_atoms_uc=readfiles.read_interactions(myfilestr,spins)
     N_atoms=len(atom_list)
     #N_atoms_uc=1
-    print 'N_atoms',N_atoms,'Natoms_uc',Natoms_uc
+    print 'N_atoms',N_atoms,'Natoms_uc',N_atoms_uc
         #atom_list=generate_atoms()
-    calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats)
+    calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats,direction,steps)
     print jmats
     print direction
     print steps
