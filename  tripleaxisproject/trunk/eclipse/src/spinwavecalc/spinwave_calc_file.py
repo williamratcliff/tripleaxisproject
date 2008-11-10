@@ -6,6 +6,8 @@ pi=sympy.pi
 from sympy import exp
 import pylab
 import readfiles
+from sympy import pngview,latex
+import scipy.linalg
 
 #translations=[[0,0,0],
 #              [0,0,1],[0,0,-1]
@@ -14,6 +16,11 @@ import readfiles
 #              [1,0,0],[-1,0,0],[]              
 #              ]
 
+def print_matplotlib(s):
+    pylab.text(0,0,s)
+    pylab.axis('off')
+    pylab.show()
+    return 
 
 
 def coeff(expr, term):
@@ -145,10 +152,23 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
     for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
         for j in range(N_int):
-            Hij=Sxyz[i]*Jij[atom_list[i].interactions[j]]#
+        #            currS_transpose=N.reshape(currS,(3,1))
+        #tempS=atomlist[i].spin*currS_transpose
+        #tempS=N.array(tempS)
+        #tempS=N.ravel(tempS)
+            
+            
+            Hij=N.matrix(Sxyz[i])*atom_list[i].spin.T
+            print 'Hijtemp',Hij.shape
+            Hij=Hij*Jij[atom_list[i].interactions[j]]
+            print 'Hijtemp2', Hij.shape
+            Hij=Hij*atom_list[atom_list[i].neighbors[j]].spin#
+            print 'Hijtemp3', Hij.shape
             Sxyz_transpose=N.matrix(Sxyz[atom_list[i].neighbors[j]])
             Sxyz_transpose=N.reshape(Sxyz_transpose,(3,1))
+            print 'Sxyz.T',Sxyz_transpose.shape
             Hij=Hij*Sxyz_transpose
+            #print 'Hijtemp2',Hij.shape
             Hij=-Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
             Hdef=Hdef+Hij
     return Hdef[0][0]
@@ -344,8 +364,10 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
         #print len(translations)   
         J=sympy.Symbol('J',real=True)
         #Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
-        Hdef=generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms)
+        Hdef=generate_hdef(atom_list,Jij,Sabn,N_atoms_uc,N_atoms)
         print 'Hdef',Hdef
+        #pngview(Hdef)
+        #print_matplotlib(latex(Hdef)) 
     #if 0:
         Hlin=holstein(Hdef)
         print 'Hlin',Hlin
@@ -389,6 +411,8 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
         D=sympy.Symbol('D',real=True)
         #TwogH2=TwogH2.subs(J,-1.0)
         TwogH2=TwogH2.subs(S,1.0)
+        eigs=TwogH2.eigenvals()
+        print 'subbed_eigs',eigs
         #TwogH2=TwogH2.subs(D,1.0)
         
         qrange=[]
@@ -406,9 +430,10 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
             currnum=q*direction['kz']
             TwogH3=TwogH3.subs(kz,currnum)
             #I=sympy.Symbol('I')
-            Ntwo=TwogH3.subs(I,1.0j)
+            Ntwo=TwogH3#.subs(I,1.0j)
             m,n=Ntwo.shape
             #print Ntwo.applyfunc(sympy.Basic.evalf)
+            Nthree=N.empty([m,n],complex)
             if 1:
                 for i in range(m):
                     for j in range(n):
@@ -417,12 +442,14 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
                         #print 'matching'
                         #print 'kx',Ntwo[i,j].match(kx)
                         #print 'ky',Ntwo[i,j].match(ky)
-                        Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
-            #print 'Ntwo'
-            #print Ntwo
+                        #Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
+                        #Ntwo[i,j]=Ntwo[i,j].evalf()
+                        Nthree[i,j]=complex(Ntwo[i,j])#.subs(I,1.0j)
+            print 'Ntwo',Ntwo
+            print 'Nthree',Nthree
             if 1:
-                import scipy.linalg
-                l,v=scipy.linalg.eig(Ntwo)
+                
+                l,v=scipy.linalg.eig(Nthree)
                 #print l[1]
                 qrange.append(q)
                 #print 'num eigs', l.shape
@@ -438,7 +465,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
         #print qrange
         #print wrange
         wrange=N.array(wrange)
-        wrange=wrange.T
+        wrange=N.real(wrange.T)
         for wrange1 in wrange:
             #pylab.plot(qrange,wrange0,'s')
             #print qrange
@@ -605,7 +632,7 @@ if __name__=='__main__':
         spinfile=r'c:\spins.txt'
         #spins=readfiles.read_spins(myfilestr)
         interactionfile=r'c:\montecarlo.txt'
-        steps=8
+        steps=12
         data={}
         data['kx']=1.
         data['ky']=0.
