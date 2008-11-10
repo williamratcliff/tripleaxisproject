@@ -65,7 +65,7 @@ def read_interactions(myfilestr,spins):
     numcell=0
     while myFlag:
         tokenized=get_tokenized_line(myfile,returnline=returnline)
-        print tokenized
+        #print tokenized
         if not(tokenized):
             break
         #print tokenized
@@ -74,7 +74,7 @@ def read_interactions(myfilestr,spins):
         if tokenized[0]=='#number':
             while 1:
                 tokenized=get_tokenized_line(myfile,returnline=returnline)
-                print 'intoken ',tokenized
+                #print 'intoken ',tokenized
                 if tokenized==[]:
                     break
                 if tokenized[0]!='#atomnumber':
@@ -108,7 +108,7 @@ def read_interactions(myfilestr,spins):
                         atom0=atom(pos=pos0,Dx=Dx,Dy=Dy,Dz=Dz)
                         neighbors=[]
                         interactions=[]
-                        print 'range',range(7,len(tokenized),1)
+                       #print 'range',range(7,len(tokenized),1)
                         for i in range(7,len(tokenized)-1,1):
                             interacting_spin=int(tokenized[i])
                             #print interacting_spin
