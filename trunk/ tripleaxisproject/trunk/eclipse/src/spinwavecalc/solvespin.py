@@ -103,7 +103,7 @@ def getmatrix(sx,sy,sz):
     upperm=[2,2,2,2]
     p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
                   schedule='simple',lower=lowerm,upper=upperm,\
-                  maxeval=None, maxaccept=None,dwell=1000,maxiter=2000)
+                  maxeval=None, maxaccept=None,dwell=500,maxiter=500)
     
 
     p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-18)
