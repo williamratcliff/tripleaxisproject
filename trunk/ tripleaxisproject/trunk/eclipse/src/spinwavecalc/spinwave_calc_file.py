@@ -149,6 +149,10 @@ def generate_sabnt(N_atoms,t=''):
 def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
     N_atoms=len(atom_list)
     Hdef=0
+    print 'Jij',len(Jij)
+    
+    
+    
     for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
         for j in range(N_int):
@@ -157,7 +161,7 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
         #tempS=N.array(tempS)
         #tempS=N.ravel(tempS)
             
-            
+            print 'i',i,'j',j
             Hij=N.matrix(Sxyz[i])*atom_list[i].spin.T
             print 'Hijtemp',Hij.shape
             Hij=Hij*Jij[atom_list[i].interactions[j]]
@@ -354,7 +358,7 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm,N_atoms_uc):
 
 
 
-def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
+def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEigs=False):
     Sabn=generate_sabn(N_atoms)        
     Sxyz=generate_sxyz(Sabn,atom_list)
     print 'Sabn',Sabn
@@ -389,7 +393,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
         print 'g',g
         TwogH2=2*g*XdX
         print 'TwogH2',TwogH2
-        if 1:
+        if showEigs:
             #print 'calculating'
             x=sympy.Symbol('x')
             #eigspoly=TwogH2.berkowitz_charpoly(x)
@@ -411,8 +415,8 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps):
         D=sympy.Symbol('D',real=True)
         #TwogH2=TwogH2.subs(J,-1.0)
         TwogH2=TwogH2.subs(S,1.0)
-        eigs=TwogH2.eigenvals()
-        print 'subbed_eigs',eigs
+        #eigs=TwogH2.eigenvals()
+        #print 'subbed_eigs',eigs
         #TwogH2=TwogH2.subs(D,1.0)
         
         qrange=[]
@@ -631,7 +635,8 @@ if __name__=='__main__':
         #print N.linalg.det(spins[0]), N.linalg.det(spins[1])
         spinfile=r'c:\spins.txt'
         #spins=readfiles.read_spins(myfilestr)
-        interactionfile=r'c:\montecarlo.txt'
+        #interactionfile=r'c:\montecarlo.txt'
+        interactionfile=r'c:\montep11.txt'
         steps=12
         data={}
         data['kx']=1.

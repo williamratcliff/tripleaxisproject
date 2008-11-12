@@ -108,8 +108,8 @@ def read_interactions(myfilestr,spins):
                         atom0=atom(pos=pos0,Dx=Dx,Dy=Dy,Dz=Dz)
                         neighbors=[]
                         interactions=[]
-                       #print 'range',range(7,len(tokenized),1)
-                        for i in range(7,len(tokenized)-1,1):
+                        #print 'range',range(7,len(tokenized),1)
+                        for i in range(7,len(tokenized),2):
                             interacting_spin=int(tokenized[i])
                             #print interacting_spin
                             interaction_matrix=int(tokenized[i+1])
@@ -144,7 +144,7 @@ def read_spins(myfilestr):
         print tokenized
         if not(tokenized):
             break
-        #print tokenized
+        print tokenized
         if tokenized[0]=='#atom_number':
             pass
         else:
@@ -175,7 +175,11 @@ def read_spins(myfilestr):
 if __name__=="__main__":
     myfilestr=r'c:\spins.txt'
     spins=read_spins(myfilestr)
-    myfilestr=r'c:\montecarlo.txt'
+    #myfilestr=r'c:\montecarlo.txt'
+    myfilestr=r'c:\montep11.txt'
     atomlist, jnums, jmats,numcell=read_interactions(myfilestr,spins)
     print 'numcell', numcell
+    print jmats
+    print atomlist[0].interactions
+    print atomlist[1].neighbors
     #print N.linalg.det(atomlist[0].spin)

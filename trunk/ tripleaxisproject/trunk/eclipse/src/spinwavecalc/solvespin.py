@@ -106,7 +106,7 @@ def getmatrix(sx,sy,sz):
                   maxeval=None, maxaccept=None,dwell=500,maxiter=500)
     
 
-    p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-18)
+    p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-8)
     a,b,c,s=p    
     a11=1-2*b**2-2*c**2
     a12=2*a*b-2*s*c
