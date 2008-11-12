@@ -457,8 +457,8 @@ def calc_eigs(Hsave,direction,steps):
                         #Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
                         #Ntwo[i,j]=Ntwo[i,j].evalf()
                         Nthree[i,j]=complex(Ntwo[i,j])#.subs(I,1.0j)
-            print 'Ntwo',Ntwo
-            print 'Nthree',Nthree
+            #print 'Ntwo',Ntwo
+            #print 'Nthree',Nthree
             if 1:
                 
                 l,v=scipy.linalg.eig(Nthree)
@@ -625,7 +625,7 @@ def driver(spinfile,interactionfile,direction,steps):
     #N_atoms_uc=1
     print 'N_atoms',N_atoms,'Natoms_uc',N_atoms_uc
         #atom_list=generate_atoms()
-    Hsave=calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats,direction,steps)
+    Hsave=calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats,direction,steps,showEigs=True)
     calc_eigs(Hsave,direction,steps)
     direction={}
     direction['kx']=0.
@@ -652,9 +652,11 @@ if __name__=='__main__':
         #print spins[1]
         #print N.linalg.det(spins[0]), N.linalg.det(spins[1])
         spinfile=r'c:\spins.txt'
+        spinfile=r'c:\spinsp1.txt'
         #spins=readfiles.read_spins(myfilestr)
         #interactionfile=r'c:\montecarlo.txt'
         interactionfile=r'c:\montep11.txt'
+        interactionfile=r'c:\montecarlop1.txt'
         steps=24
         data={}
         data['kx']=1.
