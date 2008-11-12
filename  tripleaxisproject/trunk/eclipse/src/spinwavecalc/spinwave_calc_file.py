@@ -411,6 +411,15 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
             #print TwogH2.charpoly(x)
             #eigs=TwogH2.eigenvals()
             #print 'eigenvalues', sympy.simplify(eigs[1][0])        
+        Hsave=TwogH2
+        return Hsave
+    
+def calc_eigs(Hsave,direction,steps):
+        kx=sympy.Symbol('kx',real=True)
+        ky=sympy.Symbol('ky',real=True)
+        kz=sympy.Symbol('kz',real=True)
+        k=[kx,ky,kz]
+        TwogH2=Hsave
         S=sympy.Symbol('S',real=True)
         D=sympy.Symbol('D',real=True)
         #TwogH2=TwogH2.subs(J,-1.0)
@@ -418,12 +427,11 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
         #eigs=TwogH2.eigenvals()
         #print 'subbed_eigs',eigs
         #TwogH2=TwogH2.subs(D,1.0)
-        
         qrange=[]
         wrange0=[]
         wrange1=[]
         wrange=[]
-        for q in N.arange(0,2*pi,2*pi/steps):
+        for q in N.arange(0,4*pi,4*pi/steps):
             
             currnum=q*direction['kx']
             #print 'currnum x', currnum
@@ -478,8 +486,8 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
             #print inum
             #inum=inum+1
             pylab.plot(qrange,wrange1,'s')
-        pylab.show()
-        return wrange 
+        
+
 
 
 def multiply_ab(atom_list,Sxyz,a=0,b=0):
@@ -617,7 +625,17 @@ def driver(spinfile,interactionfile,direction,steps):
     #N_atoms_uc=1
     print 'N_atoms',N_atoms,'Natoms_uc',N_atoms_uc
         #atom_list=generate_atoms()
-    calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats,direction,steps)
+    Hsave=calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats,direction,steps)
+    calc_eigs(Hsave,direction,steps)
+    direction={}
+    direction['kx']=0.
+    direction['ky']=1.
+    direction['kz']=0.
+    #pylab.Figure()
+    pylab.figure()
+    calc_eigs(Hsave,direction,steps)
+    pylab.show()
+    
     print jmats
     print direction
     print steps
@@ -637,7 +655,7 @@ if __name__=='__main__':
         #spins=readfiles.read_spins(myfilestr)
         #interactionfile=r'c:\montecarlo.txt'
         interactionfile=r'c:\montep11.txt'
-        steps=12
+        steps=24
         data={}
         data['kx']=1.
         data['ky']=0.
