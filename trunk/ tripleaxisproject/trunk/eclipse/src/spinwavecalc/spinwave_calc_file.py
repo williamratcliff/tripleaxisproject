@@ -431,7 +431,7 @@ def calc_eigs(Hsave,direction,steps):
         wrange0=[]
         wrange1=[]
         wrange=[]
-        for q in N.arange(0,4*pi,4*pi/steps):
+        for q in N.arange(0,2*pi,2*pi/steps):
             
             currnum=q*direction['kx']
             #print 'currnum x', currnum
