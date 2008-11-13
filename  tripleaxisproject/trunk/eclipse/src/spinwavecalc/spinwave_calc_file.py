@@ -652,11 +652,11 @@ if __name__=='__main__':
         #print spins[1]
         #print N.linalg.det(spins[0]), N.linalg.det(spins[1])
         spinfile=r'c:\spins.txt'
-        spinfile=r'c:\spinsp1.txt'
+        #spinfile=r'c:\spinsp1.txt'
         #spins=readfiles.read_spins(myfilestr)
-        #interactionfile=r'c:\montecarlo.txt'
-        interactionfile=r'c:\montep11.txt'
-        interactionfile=r'c:\montecarlop1.txt'
+        interactionfile=r'c:\montecarlo.txt'
+        #interactionfile=r'c:\montep11.txt'
+        #interactionfile=r'c:\montecarlop1.txt'
         steps=24
         data={}
         data['kx']=1.
