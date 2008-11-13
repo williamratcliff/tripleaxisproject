@@ -150,6 +150,10 @@ def read_spins(myfilestr):
         else:
             spin=N.array([float(tokenized[4]),float(tokenized[5]),float(tokenized[6])],'Float64')
             sx,sy,sz=spin
+            sm=N.sqrt(sx**2+sy**2+sz**2)
+            sx=sx/sm
+            sy=sy/sm
+            sz=sz/sm
             print 'sx',sx,'sy',sy,'sz',sz
             smat=solvespin.getmatrix(sx, sy, sz)
             spins.append(smat)
