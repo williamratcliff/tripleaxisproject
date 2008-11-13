@@ -473,6 +473,7 @@ def calc_eigs(Hsave,direction,steps):
             #print 'eigs', eigs
             #print 'eigenvalues', sympy.simplify(eigs[1][0])
         #wrange0=N.real(wrange0)
+        print 'wrange',wrange
         wrange=N.real(wrange)
         #print qrange
         #print wrange
