@@ -98,7 +98,7 @@ def chisq_an(p,sx,sy,sz):
     chisq=(fresult*fresult).sum()
     return chisq
 
-def getmatrix(sx,sy,sz,mytol=1e-11,maxiter=8):
+def getmatrix(sx,sy,sz,mytol=1e-10,maxiter=8):
     p0=N.array([0,1,0,1],'d')
     p0=N.array([0,0,0,1],'d')
     #p0=N.array([0,1,0,1],'d')
@@ -147,9 +147,9 @@ def getmatrix(sx,sy,sz,mytol=1e-11,maxiter=8):
         a33=1-2*a**2-2*b**2
         amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float64')  
         sout=amat*smat
-        iter=iter+1
         if (N.abs(sout[0]-sx)<mytol and N.abs(sout[1]-sy)<mytol and N.abs(sout[2]-sz)<mytol) or iter>maxiter:
             flag=False
+        iter=iter+1
         
     return amat  
 
