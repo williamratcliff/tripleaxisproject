@@ -98,7 +98,7 @@ def chisq_an(p,sx,sy,sz):
     chisq=(fresult*fresult).sum()
     return chisq
 
-def getmatrix(sx,sy,sz,mytol=1e-10,maxiter=8):
+def getmatrix(sx,sy,sz,mytol=1e-11,maxiter=8):
     p0=N.array([0,1,0,1],'d')
     p0=N.array([0,0,0,1],'d')
     #p0=N.array([0,1,0,1],'d')
