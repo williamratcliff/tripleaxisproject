@@ -79,9 +79,9 @@ def chisq(p,sx,sy,sz):
     a,b,c,s=p   
     eqn1=2*a*c+2*s*b-sx
     eqn2=2*b*c-2*s*a-sy
-    eqn3=1-2*a**2-2*b**2-sz
-    #eqn4=1-a**2-b**2-c**2-s**2
+    eqn3=1-2*a**2-2*b**2-sz    
     eqn4=N.linalg.det(genmat(a,b,c,s))-1
+    #eqn5=1-a**2-b**2-c**2-s**2
     fresult=N.array([eqn1,eqn2,eqn3,eqn4],'d')
     return fresult
 
@@ -91,8 +91,8 @@ def chisq_an(p,sx,sy,sz):
     eqn2=2*b*c-2*s*a-sy
     eqn3=1-2*a**2-2*b**2-sz
     eqn4=N.linalg.det(genmat(a,b,c,s))-1
-    #eqn4=1-a**2-b**2-c**2-s**2
-    fresult=N.array([eqn1,eqn2,eqn3,eqn4],'d')
+    eqn5=1-a**2-b**2-c**2-s**2
+    fresult=N.array([eqn1,eqn2,eqn3,eqn4,eqn5],'d')
     chisq=(fresult*fresult).sum()
     return chisq
 
@@ -102,9 +102,11 @@ def getmatrix(sx,sy,sz):
     #p0=N.array([0,1,0,1],'d')
     lowerm=[-2,-2,-2,-2]
     upperm=[2,2,2,2]
+    lowerm=[-1,-1,-1,-1]
+    upperm=[1,1,1,1]
     p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
                   schedule='simple',lower=lowerm,upper=upperm,\
-                  maxeval=None, maxaccept=None,dwell=400,maxiter=600)
+                  maxeval=None, maxaccept=None,dwell=400,maxiter=6000)
     
 
     p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-17)
