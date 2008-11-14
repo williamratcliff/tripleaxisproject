@@ -3,6 +3,8 @@ import scipy
 import math
 import scipy.optimize
 from utilities.anneal import anneal
+from scikits.openopt import NLSP
+from scikits.openopt import NLP
 
 
 
@@ -81,8 +83,8 @@ def chisq(p,sx,sy,sz):
     eqn2=2*b*c-2*s*a-sy
     eqn3=1-2*a**2-2*b**2-sz    
     eqn4=N.linalg.det(genmat(a,b,c,s))-1
-    #eqn5=1-a**2-b**2-c**2-s**2
-    fresult=N.array([eqn1,eqn2,eqn3,eqn4],'d')
+    eqn5=1-a**2-b**2-c**2-s**2
+    fresult=N.array([eqn1,eqn2,eqn3,eqn4,eqn5],'d')
     return fresult
 
 def chisq_an(p,sx,sy,sz):
@@ -106,11 +108,25 @@ def getmatrix(sx,sy,sz):
     upperm=[1,1,1,1]
     p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
                   schedule='simple',lower=lowerm,upper=upperm,\
-                  maxeval=None, maxaccept=None,dwell=400,maxiter=6000)
+                  maxeval=None, maxaccept=None,dwell=400,maxiter=600,T0=1000)
     
 
-    p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-17)
-    a,b,c,s=p    
+    #p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-17)
+    print 'p0',p0
+    p = NLSP(chisq, p0,xtol=1e-17)
+    #p = NLP(chisq_an, p0,xtol=1e-17)
+    p.args.f=(sx,sy,sz)
+    p.iprint = 10
+    p.ftol=1e-19
+    p.maxFunEvals = 1e10
+    #p.checkdf()
+    r = p.solve('nssolve')
+    #r = p.solve('scipy_fsolve')
+    #r = p.solve('nlp:ralg')
+    #r = p.solve('ralg')
+    #r = p.solve('scipy_cobyla')
+    print 'solution:', r.xf
+    a,b,c,s=r.xf 
     a11=1-2*b**2-2*c**2
     a12=2*a*b-2*s*c
     a13=2*a*c+2*s*b
@@ -120,7 +136,7 @@ def getmatrix(sx,sy,sz):
     a31=2*a*c-2*s*b
     a32=2*b*c+2*s*a
     a33=1-2*a**2-2*b**2
-    amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float32')  
+    amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float64')  
     return amat  
 
 
@@ -132,32 +148,33 @@ if __name__=="__main__":
     sx,sy,sz=[0,0,-1]
 #use a simple nonlinear solver for finding A solution to our system of equations 
 #    p=scipy.optimize.minpack.fsolve(chisq_quaternion,p0,args=(a,b,c,a2,b2,c2,x0,y0,z0,x0p,y0p,z0p))
-
-
-    #p,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
-    #              schedule='simple',lower=lowerm,upper=upperm,\
-    #              maxeval=None, maxaccept=None,dwell=500,maxiter=2000)
-    
-    p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz))
-    print p
-    a,b,c,s=p
-    
-    a11=1-2*b**2-2*c**2
-    a12=2*a*b-2*s*c
-    a13=2*a*c+2*s*b
-    a21=2*a*b+2*s*c
-    a22=1-2*a**2-2*c**2
-    a23=2*b*c-2*s*a
-    a31=2*a*c-2*s*b
-    a32=2*b*c+2*s*a
-    a33=1-2*a**2-2*b**2
-    amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float32')
-    print amat
-    smat=N.empty((3,1),'float32')
-    smat=N.matrix(smat)
-    smat[0]=0
-    smat[1]=0
-    smat[2]=1
-    sout=amat*smat
-    print sout
-    
+    amat=getmatrix(sx,sy,sz)
+    if 0:
+        #p,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
+        #              schedule='simple',lower=lowerm,upper=upperm,\
+        #              maxeval=None, maxaccept=None,dwell=500,maxiter=2000)
+        
+        p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz))
+        print p
+        a,b,c,s=p
+        
+        a11=1-2*b**2-2*c**2
+        a12=2*a*b-2*s*c
+        a13=2*a*c+2*s*b
+        a21=2*a*b+2*s*c
+        a22=1-2*a**2-2*c**2
+        a23=2*b*c-2*s*a
+        a31=2*a*c-2*s*b
+        a32=2*b*c+2*s*a
+        a33=1-2*a**2-2*b**2
+        amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float32')
+    if 1:
+        print amat
+        smat=N.empty((3,1),'float32')
+        smat=N.matrix(smat)
+        smat[0]=0
+        smat[1]=0
+        smat[2]=1
+        sout=amat*smat
+        print sout
+        
