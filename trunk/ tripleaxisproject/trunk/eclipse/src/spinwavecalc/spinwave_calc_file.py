@@ -625,16 +625,15 @@ def driver(spinfile,interactionfile,direction,steps):
     N_atoms=len(atom_list)
     #N_atoms_uc=1
     print 'N_atoms',N_atoms,'Natoms_uc',N_atoms_uc
-        #atom_list=generate_atoms()
+    #atom_list=generate_atoms()
     Hsave=calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats,direction,steps,showEigs=True)
     calc_eigs(Hsave,direction,steps)
     direction={}
     direction['kx']=0.
     direction['ky']=1.
     direction['kz']=0.
-    #pylab.Figure()
-    pylab.figure()
-    calc_eigs(Hsave,direction,steps)
+    #pylab.figure()
+    #calc_eigs(Hsave,direction,steps)
     pylab.show()
     
     print jmats
