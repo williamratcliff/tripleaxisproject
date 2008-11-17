@@ -84,8 +84,21 @@ def chisq(p,sx,sy,sz):
     eqn3=1-2*a**2-2*b**2-sz    
     eqn4=N.linalg.det(genmat(a,b,c,s))-1
     eqn5=1-a**2-b**2-c**2-s**2
+    fresult=N.array([eqn1,eqn2,eqn3,eqn4,eqn5],'d')
+    return fresult
+
+
+def chisq_f(p,sx,sy,sz):
+    a,b,c,s=p   
+    eqn1=2*a*c+2*s*b-sx
+    eqn2=2*b*c-2*s*a-sy
+    eqn3=1-2*a**2-2*b**2-sz    
+    eqn4=N.linalg.det(genmat(a,b,c,s))-1
+    #eqn5=1-a**2-b**2-c**2-s**2
     fresult=N.array([eqn1,eqn2,eqn3,eqn4],'d')
     return fresult
+
+
 
 def chisq_an(p,sx,sy,sz):
     a,b,c,s=p   
@@ -94,11 +107,11 @@ def chisq_an(p,sx,sy,sz):
     eqn3=1-2*a**2-2*b**2-sz
     eqn4=N.linalg.det(genmat(a,b,c,s))-1
     eqn5=1-a**2-b**2-c**2-s**2
-    fresult=N.array([eqn1,eqn2,eqn3,eqn4],'d')
+    fresult=N.array([eqn1,eqn2,eqn3,eqn4,eqn5],'d')
     chisq=(fresult*fresult).sum()
     return chisq
 
-def getmatrix(sx,sy,sz,mytol=1e-11,maxiter=8):
+def getmatrix(sx,sy,sz,mytol=1e-2,maxiter=4):
     p0=N.array([0,1,0,1],'d')
     p0=N.array([0,0,0,1],'d')
     #p0=N.array([0,1,0,1],'d')
@@ -117,7 +130,7 @@ def getmatrix(sx,sy,sz,mytol=1e-11,maxiter=8):
         print 'iter',iter
         p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
                       schedule='simple',lower=lowerm,upper=upperm,\
-                      maxeval=None, maxaccept=None,dwell=4000,maxiter=6000,T0=1000)
+                      maxeval=None, maxaccept=None,dwell=40,maxiter=60,T0=1000)
         
     
         #p=scipy.optimize.minpack.fsolve(chisq,p0,args=(sx,sy,sz),xtol=1e-17)
