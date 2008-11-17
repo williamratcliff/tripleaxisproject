@@ -657,7 +657,7 @@ if __name__=='__main__':
         interactionfile=r'c:\montecarlo.txt'
         #interactionfile=r'c:\montep11.txt'
         #interactionfile=r'c:\montecarlop1.txt'
-        steps=24
+        steps=100
         data={}
         data['kx']=1.
         data['ky']=0.
