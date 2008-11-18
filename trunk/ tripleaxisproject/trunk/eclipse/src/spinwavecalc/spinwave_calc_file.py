@@ -393,6 +393,19 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
         print 'g',g
         TwogH2=2*g*XdX
         print 'TwogH2',TwogH2
+        m,n=TwogH2.shape
+        if 1:
+                for i in range(m):
+                    for j in range(n):
+                        #print i,j
+                        #print Ntwo[i,j]
+                        #print 'matching'
+                        #print 'kx',Ntwo[i,j].match(kx)
+                        #print 'ky',Ntwo[i,j].match(ky)
+                        #Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
+                        #Ntwo[i,j]=Ntwo[i,j].evalf()
+                        TwogH2[i,j]=TwogH2[i,j].expand(complex=True)#.subs(I,1.0j)
+        print 'trigified',TwogH2
         if showEigs:
             #print 'calculating'
             x=sympy.Symbol('x')
@@ -431,6 +444,7 @@ def calc_eigs(Hsave,direction,steps):
         wrange0=[]
         wrange1=[]
         wrange=[]
+        #wrangec=[]
         for q in N.arange(0,2*pi,2*pi/steps):
             
             currnum=q*direction['kx']
@@ -456,7 +470,9 @@ def calc_eigs(Hsave,direction,steps):
                         #print 'ky',Ntwo[i,j].match(ky)
                         #Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
                         #Ntwo[i,j]=Ntwo[i,j].evalf()
-                        Nthree[i,j]=complex(Ntwo[i,j])#.subs(I,1.0j)
+                        Nthree[i,j]=complex(Ntwo[i,j].expand(complex=True))#.subs(I,1.0j)
+                        if N.absolute(Nthree[i,j])<1e-1:
+                            Nthree[i,j]=0
             #print 'Ntwo',Ntwo
             #print 'Nthree',Nthree
             if 1:
@@ -478,6 +494,7 @@ def calc_eigs(Hsave,direction,steps):
         #print qrange
         #print wrange
         wrange=N.array(wrange)
+        
         wrange=N.real(wrange.T)
         for wrange1 in wrange:
             #pylab.plot(qrange,wrange0,'s')
