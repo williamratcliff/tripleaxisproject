@@ -158,7 +158,7 @@ def read_spins(myfilestr):
             smat=solvespin.getmatrix(sx, sy, sz)
             spins.append(smat)
     myfile.close()
-    smat=N.empty((3,1),'float32')
+    smat=N.empty((3,1),'float64')
     smat=N.matrix(smat)
     smat[0]=0
     smat[1]=0

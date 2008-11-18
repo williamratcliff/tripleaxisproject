@@ -99,7 +99,7 @@ def generate_sabn(N_atoms):
     for i in range(N_atoms):
         c=sympy.Symbol("c%d"%(i,),commutative=False)
         cd=sympy.Symbol("cd%d"%(i,),commutative=False)
-        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/I,S-cd*c]
+        curr=[sympy.sqrt(S/2.0)*(c+cd),sympy.sqrt(S/2.0)*(c-cd)/I,S-cd*c]
         Sabn.append(curr)
     return Sabn
 
@@ -163,16 +163,21 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
             
             print 'i',i,'j',j
             Hij=N.matrix(Sxyz[i])*atom_list[i].spin.T
-            print 'Hijtemp',Hij.shape
+            print 'making Ham'
+            print 'spin i', atom_list[i].spin.T
+            print 'Sxyz i', N.matrix(Sxyz[i]),N.matrix(Sxyz[i]).shape
+            print 'Hijtemp',Hij
             Hij=Hij*Jij[atom_list[i].interactions[j]]
-            print 'Hijtemp2', Hij.shape
+            print 'Jij', Jij[atom_list[i].interactions[j]]
+            print 'Hij*Jij', Hij
             Hij=Hij*atom_list[atom_list[i].neighbors[j]].spin#
             print 'Hijtemp3', Hij.shape
             Sxyz_transpose=N.matrix(Sxyz[atom_list[i].neighbors[j]])
             Sxyz_transpose=N.reshape(Sxyz_transpose,(3,1))
             print 'Sxyz.T',Sxyz_transpose.shape
+            print 'Hij before multiply', Hij
             Hij=Hij*Sxyz_transpose
-            #print 'Hijtemp2',Hij.shape
+            print 'Hij*Sxyz.T',Hij
             Hij=-Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
             Hdef=Hdef+Hij
     return Hdef[0][0]
@@ -471,8 +476,9 @@ def calc_eigs(Hsave,direction,steps):
                         #Ntwo[i,j]=sympy.re(Ntwo[i,j].evalf())
                         #Ntwo[i,j]=Ntwo[i,j].evalf()
                         Nthree[i,j]=complex(Ntwo[i,j].expand(complex=True))#.subs(I,1.0j)
-                        if N.absolute(Nthree[i,j])<1e-1:
-                            Nthree[i,j]=0
+                        if 1:
+                            if N.absolute(Nthree[i,j])<1e-4:
+                                Nthree[i,j]=0
             #print 'Ntwo',Ntwo
             #print 'Nthree',Nthree
             if 1:
