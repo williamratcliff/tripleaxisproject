@@ -77,6 +77,22 @@ def genmat(a,b,c,s):
     amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float64')  
     return amat
 
+def genmat2(x,y,z,s):
+    t=1-c
+    a11=t*x**2+c
+    a12=t*x*y+s*z
+    a13=t*x*z-s*y
+    a21=t*x*y-s*z
+    a22=t*y**2+c
+    a23=t*y*z*s*x
+    a31=t*x*z+s*y
+    a32=t*y*z-s*x
+    a33=t*z**2+c
+    amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float64')  
+    return amat
+
+
+
 def chisq(p,sx,sy,sz):
     a,b,c,s=p   
     eqn1=2*a*c+2*s*b-sx
@@ -87,6 +103,16 @@ def chisq(p,sx,sy,sz):
     fresult=N.array([eqn1,eqn2,eqn3,eqn4,eqn5],'d')
     return fresult
 
+def chisq_web(p,sx,sy,sz):
+    x,y,z,s=p
+    t=1-c   
+    eqn1=t*x*z-s*y-sx
+    eqn2=t*y*z+s*x-sy
+    eqn3=t*z**2+c-sz    
+    eqn4=N.linalg.det(genmat2(a,b,c,s))-1
+    eqn5=1-x**2-y**2-z**2-s**2
+    fresult=N.array([eqn1,eqn2,eqn3,eqn4,eqn5],'d')
+    return fresult
 
 def chisq_f(p,sx,sy,sz):
     a,b,c,s=p   
@@ -111,7 +137,10 @@ def chisq_an(p,sx,sy,sz):
     chisq=(fresult*fresult).sum()
     return chisq
 
-def getmatrix(sx,sy,sz,mytol=1e-35,maxiter=8):
+
+
+
+def getmatrix(sx,sy,sz,mytol=1e-45,maxiter=8):
     p0=N.array([0,1,0,1],'d')
     p0=N.array([0,0,0,1],'d')
     #p0=N.array([0,1,0,1],'d')
@@ -156,17 +185,8 @@ def getmatrix(sx,sy,sz,mytol=1e-35,maxiter=8):
             p=scipy.optimize.minpack.fsolve(chisq_f,p0,args=(sx,sy,sz),xtol=1e-37)
             a,b,c,s=p
             print '2nd soln',p
-            
-        a11=1-2*b**2-2*c**2
-        a12=2*a*b-2*s*c
-        a13=2*a*c+2*s*b
-        a21=2*a*b+2*s*c
-        a22=1-2*a**2-2*c**2
-        a23=2*b*c-2*s*a
-        a31=2*a*c-2*s*b
-        a32=2*b*c+2*s*a
-        a33=1-2*a**2-2*b**2
-        amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float64')  
+ 
+        amat=genmat(a,b,c,s)
         if 1:
             array_err=1e-2
             for i in range(3):
@@ -183,23 +203,14 @@ def getmatrix(sx,sy,sz,mytol=1e-35,maxiter=8):
         iter=iter+1
 
     a,b,c,s=pbest    
-    a11=1-2*b**2-2*c**2
-    a12=2*a*b-2*s*c
-    a13=2*a*c+2*s*b
-    a21=2*a*b+2*s*c
-    a22=1-2*a**2-2*c**2
-    a23=2*b*c-2*s*a
-    a31=2*a*c-2*s*b
-    a32=2*b*c+2*s*a
-    a33=1-2*a**2-2*b**2
-    amat=N.matrix([[a11,a12,a13],[a21,a22,a23],[a31,a32,a33]],'float64')  
+    amat=genmat(a,b,c,s)
     if 1:
             array_err=1e-2
             for i in range(3):
                 for j in range(3):
                     if N.absolute(amat[i,j])<array_err:
                         amat[i,j]=0 
-        
+    print 'amat',amat
     return amat  
 
 
