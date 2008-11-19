@@ -99,7 +99,8 @@ def generate_sabn(N_atoms):
     for i in range(N_atoms):
         c=sympy.Symbol("c%d"%(i,),commutative=False)
         cd=sympy.Symbol("cd%d"%(i,),commutative=False)
-        curr=[sympy.sqrt(S/2.0)*(c+cd),sympy.sqrt(S/2.0)*(c-cd)/I,S-cd*c]
+        curr=sympy.matrices.Matrix([sympy.sqrt(S/2.0)*(c+cd),sympy.sqrt(S/2.0)*(c-cd)/I,S-cd*c])
+        print 'curr',curr, curr.shape
         Sabn.append(curr)
     return Sabn
 
@@ -110,10 +111,12 @@ def generate_sxyz(Sabn,atomlist):
     for currS in Sabn:
         print 'Currs', currS
         print 'currspin', atomlist[i].spin
-        currS_transpose=N.reshape(currS,(3,1))
+        currS_transpose=currS.reshape(3,1)
         tempS=atomlist[i].spin*currS_transpose
-        tempS=N.array(tempS)
-        tempS=N.ravel(tempS)
+        #tempS=N.array(tempS)
+        #tempS=N.ravel(tempS)
+        tempS=tempS.reshape(1,3)
+        print 'tempS',tempS, tempS.shape
         Sxyz.append(tempS)
         i=i+1
     return Sxyz
@@ -163,25 +166,31 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
         #tempS=N.ravel(tempS)
             
             print 'i',i,'j',j
-            Hij=N.matrix(Sxyz[i])*atom_list[i].spin.T
-            print 'making Ham'
-            print 'spin i', atom_list[i].spin.T
-            print 'Sxyz i', N.matrix(Sxyz[i]),N.matrix(Sxyz[i]).shape
-            print 'Hijtemp',Hij
-            Hij=Hij*Jij[atom_list[i].interactions[j]]
-            print 'Jij', Jij[atom_list[i].interactions[j]]
-            print 'Hij*Jij', Hij
-            Hij=Hij*atom_list[atom_list[i].neighbors[j]].spin#
-            print 'Hijtemp3', Hij.shape
-            Sxyz_transpose=N.matrix(Sxyz[atom_list[i].neighbors[j]])
-            Sxyz_transpose=N.reshape(Sxyz_transpose,(3,1))
+            if 0:
+                Hij=N.matrix(Sxyz[i])*atom_list[i].spin.T
+                print 'making Ham'
+                print 'spin i', atom_list[i].spin.T
+                print 'Sxyz i', N.matrix(Sxyz[i]),N.matrix(Sxyz[i]).shape
+                print 'Hijtemp',Hij
+                Hij=Hij*Jij[atom_list[i].interactions[j]]
+                print 'Jij', Jij[atom_list[i].interactions[j]]
+                print 'Hij*Jij', Hij
+                Hij=Hij*atom_list[atom_list[i].neighbors[j]].spin#
+                print 'Hijtemp3', Hij.shape
+            if 1:
+                print 'Sxyz i', N.matrix(Sxyz[i]),N.matrix(Sxyz[i]).shape
+                Hij=Sxyz[i]*Jij[atom_list[i].interactions[j]]
+                print 'S*Jij', Hij,Hij.shape
+            Sxyz_transpose=Sxyz[atom_list[i].neighbors[j]].reshape(3,1)
+            #Sxyz_transpose=Sxyz_transpose.(3,1))
             print 'Sxyz.T',Sxyz_transpose.shape
-            print 'Hij before multiply', Hij
+            print 'Hij before multiply', Hij, Hij.shape
             Hij=Hij*Sxyz_transpose
-            print 'Hij*Sxyz.T',Hij
+            print 'Hij*Sxyz.T',Hij,Hij.shape
+            Hij=Hij[0]
             Hij=-Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
             Hdef=Hdef+Hij
-    return Hdef[0][0]
+    return Hdef
 
 
 def holstein(Hdef):
@@ -365,10 +374,10 @@ def gen_XdX(atom_list,operator_table,operator_table_dagger,Hcomm,N_atoms_uc):
 
 
 def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEigs=False):
-    Sabn=generate_sabn(N_atoms)        
+    Sabn=generate_sabn(N_atoms)       
+    #print 'Sabn',Sabn 
     Sxyz=generate_sxyz(Sabn,atom_list)
-    print 'Sabn',Sabn
-    print 'Sxyz', Sxyz
+    #print 'Sxyz', Sxyz
         
     if 1:
         #print len(translations)   
@@ -481,7 +490,7 @@ def calc_eigs(Hsave,direction,steps):
                         #Ntwo[i,j]=Ntwo[i,j].evalf()
                         Nthree[i,j]=complex(Ntwo[i,j].expand(complex=True))#.subs(I,1.0j)
                         if 1:
-                            if N.absolute(Nthree[i,j])<1e-2:
+                            if N.absolute(Nthree[i,j])<1e-5:
                                 Nthree[i,j]=0
             #print 'Ntwo',Ntwo
             #print 'Nthree',Nthree
