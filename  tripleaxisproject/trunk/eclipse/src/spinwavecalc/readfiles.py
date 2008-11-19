@@ -159,18 +159,20 @@ def read_spins(myfilestr):
             spins.append(smat)
     myfile.close()
     smat=N.empty((3,1),'float64')
-    smat=N.matrix(smat)
+    smat=N.matrix(smat,'float64')
     smat[0]=0
     smat[1]=0
     smat[2]=1
-    sout=spins[1]*smat
+    #sout=spins[1]*smat
     #spins[1]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
     #spins[0]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
     #print sout
+    icount=0
     for currspin in spins:
-        print 'spin',currspin*smat
+        print 'spin',icount,currspin*smat
         print 'mat', currspin
         print 'det', N.linalg.det(currspin)
+        icount=icount+1
     return spins
     
     

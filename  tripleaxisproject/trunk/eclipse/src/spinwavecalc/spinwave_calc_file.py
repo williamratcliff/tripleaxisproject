@@ -153,7 +153,8 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
     
     
     
-    for i in range(N_atoms_uc):
+    #for i in range(N_atoms):
+    for i in range(N_atoms_uc): #correct
         N_int=len(atom_list[i].interactions)
         for j in range(N_int):
         #            currS_transpose=N.reshape(currS,(3,1))
@@ -373,7 +374,8 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
         #print len(translations)   
         J=sympy.Symbol('J',real=True)
         #Jij=[N.matrix([[J,0,0],[0,J,0],[0,0,J]])]
-        Hdef=generate_hdef(atom_list,Jij,Sabn,N_atoms_uc,N_atoms)
+        #Hdef=generate_hdef(atom_list,Jij,Sabn,N_atoms_uc,N_atoms)
+        Hdef=generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms)
         print 'Hdef',Hdef
         #pngview(Hdef)
         #print_matplotlib(latex(Hdef)) 
@@ -411,6 +413,8 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
                         #Ntwo[i,j]=Ntwo[i,j].evalf()
                         TwogH2[i,j]=TwogH2[i,j].expand(complex=True)#.subs(I,1.0j)
         print 'trigified',TwogH2
+        print TwogH2[0,1]
+        
         if showEigs:
             #print 'calculating'
             x=sympy.Symbol('x')
@@ -420,13 +424,13 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
             print 'shape', TwogH2.shape
             print 'recalculating'
             eigs=TwogH2.eigenvals()
-            #x=sympy.Symbol('x')
+            x=sympy.Symbol('x')
             #eigs=TwogH2.berkowitz_charpoly(x)
             print 'eigs', eigs
             keys=eigs.keys()
             #print 'key',keys[0]
             #print keys[0].expand(complex=True)
-            #print TwogH2.charpoly(x)
+            print 'charpoly',TwogH2.charpoly(x)
             #eigs=TwogH2.eigenvals()
             #print 'eigenvalues', sympy.simplify(eigs[1][0])        
         Hsave=TwogH2
@@ -477,7 +481,7 @@ def calc_eigs(Hsave,direction,steps):
                         #Ntwo[i,j]=Ntwo[i,j].evalf()
                         Nthree[i,j]=complex(Ntwo[i,j].expand(complex=True))#.subs(I,1.0j)
                         if 1:
-                            if N.absolute(Nthree[i,j])<1e-4:
+                            if N.absolute(Nthree[i,j])<1e-2:
                                 Nthree[i,j]=0
             #print 'Ntwo',Ntwo
             #print 'Nthree',Nthree
