@@ -161,7 +161,7 @@ def getmatrix(sx,sy,sz,mytol=1e-45,maxiter=8):
         print 'iter',iter
         p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
                       schedule='simple',lower=lowerm,upper=upperm,\
-                      maxeval=None, maxaccept=None,dwell=200,maxiter=600,T0=10000)
+                      maxeval=None, maxaccept=None,dwell=100,maxiter=600,T0=10000)
         
     
         
@@ -205,12 +205,12 @@ def getmatrix(sx,sy,sz,mytol=1e-45,maxiter=8):
     a,b,c,s=pbest    
     amat=genmat(a,b,c,s)
     if 1:
-            array_err=1e-2
+            array_err=1e-5
             for i in range(3):
                 for j in range(3):
                     if N.absolute(amat[i,j])<array_err:
                         amat[i,j]=0 
-    print 'amat',amat
+    #print 'amat',amat
     return amat  
 
 
