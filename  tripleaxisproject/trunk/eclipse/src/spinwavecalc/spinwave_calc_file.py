@@ -90,6 +90,42 @@ def generate_atoms():
     return atomlist
 
 
+def generate_atoms_rot():
+
+
+
+    if 1:
+        D=sympy.Symbol('D',real=True)
+        spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
+        #spin0=sympy.matrices.Matrix(spin0)
+        pos0=[0,0,0]
+        neighbors=[1]
+        interactions=[0]
+        cell=0
+        int_cell=[5,21]
+        atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell,Dz=0)
+        
+        pos0=[1,0,0]
+        spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,1]],'float64')
+        P=sympy.Symbol('P',real=True,commutative=True)
+        spin0=sympy.matrices.Matrix([[sympy.cos(P),-sympy.sin(P),0],[sympy.sin(P),sympy.cos(P),0],[0,0,1]])
+        print 'spin0 analaytic', spin0
+        #spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
+        #spin0=spin0.subs(P,sympy.pi)
+        print 'spin0 converted',spin0
+        neighbors=[0]
+        interactions=[0]
+        cell=5
+        int_cell=[0]
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell,Dz=D)
+        
+        atomlist=[atom0,atom1]
+
+
+ 
+       
+    return atomlist
+
 
 
 
@@ -97,10 +133,10 @@ def generate_sabn(N_atoms):
     Sabn=[]
     S=sympy.Symbol("S",real=True)
     for i in range(N_atoms):
-        c=sympy.Symbol("c%d"%(i,),commutative=False)
-        cd=sympy.Symbol("cd%d"%(i,),commutative=False)
+        c=sympy.Symbol('c%d'%(i,),commutative=False)
+        cd=sympy.Symbol('cd%d'%(i,),commutative=False)
         curr=sympy.matrices.Matrix([sympy.sqrt(S/2.0)*(c+cd),sympy.sqrt(S/2.0)*(c-cd)/I,S-cd*c])
-        print 'curr',curr, curr.shape
+        #print 'curr',curr, curr.shape
         Sabn.append(curr)
     return Sabn
 
@@ -109,14 +145,14 @@ def generate_sxyz(Sabn,atomlist):
     Sxyz=[]
     i=0
     for currS in Sabn:
-        print 'Currs', currS
-        print 'currspin', atomlist[i].spin
+        #print 'Currs', currS
+        #print 'currspin', atomlist[i].spin
         currS_transpose=currS.reshape(3,1)
         tempS=atomlist[i].spin*currS_transpose
         #tempS=N.array(tempS)
         #tempS=N.ravel(tempS)
         tempS=tempS.reshape(1,3)
-        print 'tempS',tempS, tempS.shape
+        #print 'tempS',tempS, tempS.shape
         Sxyz.append(tempS)
         i=i+1
     return Sxyz
@@ -226,25 +262,29 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
     #print 'atom_list',atom_list
     #print 'Sxyz',Sxyz
     #print 'Jij',Jij
+    print 'fourier'
+    print Hlin
+    #Hlin=Hlin.expand()
+    #print Hlin
     for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
-        ci=sympy.Symbol("c%d"%(i,),commutative=False,real=True)
-        cdi=sympy.Symbol("cd%d"%(i,),commutative=False,real=True)
-        cki=sympy.Symbol("ck%d"%(i,),commutative=False,real=True)
-        ckdi=sympy.Symbol("ckd%d"%(i,),commutative=False,real=True)
-        cmki=sympy.Symbol("cmk%d"%(i,),commutative=False,real=True)
-        cmkdi=sympy.Symbol("cmkd%d"%(i,),commutative=False,real=True)
+        ci=sympy.Symbol('c%d'%(i,),commutative=False,real=True)
+        cdi=sympy.Symbol('cd%d'%(i,),commutative=False,real=True)
+        cki=sympy.Symbol('ck%d'%(i,),commutative=False,real=True)
+        ckdi=sympy.Symbol('ckd%d'%(i,),commutative=False,real=True)
+        cmki=sympy.Symbol('cmk%d'%(i,),commutative=False,real=True)
+        cmkdi=sympy.Symbol('cmkd%d'%(i,),commutative=False,real=True)
         ri=atom_list[i].pos
         N_int=len(atom_list[i].interactions)
         for j in range(N_atoms):
             rj=atom_list[j].pos
             j2=i#atom_list[i].neighbors[j]
-            cj=sympy.Symbol("c%d"%(j,),commutative=False,real=True)
-            cdj=sympy.Symbol("cd%d"%(j,),commutative=False,real=True)
-            ckj=sympy.Symbol("ck%d"%(j2,),commutative=False,real=True)
-            ckdj=sympy.Symbol("ckd%d"%(j2,),commutative=False,real=True)
-            cmkj=sympy.Symbol("cmk%d"%(j2,),commutative=False,real=True)
-            cmkdj=sympy.Symbol("cmkd%d"%(j2,),commutative=False,real=True)
+            cj=sympy.Symbol('c%d'%(j,),commutative=False,real=True)
+            cdj=sympy.Symbol('cd%d'%(j,),commutative=False,real=True)
+            ckj=sympy.Symbol('ck%d'%(j2,),commutative=False,real=True)
+            ckdj=sympy.Symbol('ckd%d'%(j2,),commutative=False,real=True)
+            cmkj=sympy.Symbol('cmk%d'%(j2,),commutative=False,real=True)
+            cmkdj=sympy.Symbol('cmkd%d'%(j2,),commutative=False,real=True)
             diffr=ri-rj
             kmult=N.dot(k,diffr)
             t1=1.0/2*(ckdi*cmkdj*exp(-1j*kmult)+
@@ -252,22 +292,43 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
             t2=1.0/2*(cki*cmkj*exp(1j*kmult)+
                       cmki*ckj*exp(-1j*kmult)
                       )
-            t3=1./2*(ckdi*ckj*exp(-1j*kmult)+
+            t3=1.0/2*(ckdi*ckj*exp(-1j*kmult)+
                      cmkdi*cmkj*exp(1j*kmult)
                      )
-            t4=1./2*(cki*ckdj*exp(1j*kmult)+
+            t4=1.0/2*(cki*ckdj*exp(1j*kmult)+
                      cmki*cmkdj*exp(-1j*kmult)
                      )
             t5=1.0/2*(ckdj*ckj+cmkdj*cmkj
                       )
-            #print 'i',i,'j',j
-            Hlin=Hlin.subs(cdi*cdj,t1)
-            Hlin=Hlin.subs(ci*cj,t2)
-            Hlin=Hlin.subs(cdi*cj,t3)
-            Hlin=Hlin.subs(ci*cdj,t4)
-            Hlin=Hlin.subs(cdj*cj,t5)
+            print 'i',i,'j',j
+            print 'ci',ci,'cj',cj,'cdi',cdi,'cdj',cdj
+            print 't1',t1
+            print 't2',t2
+            print 't3',t3
+            print 't4',t4
+            print 't5',t5
+            f1=cdi*cdj
+            print 'f1',f1
+            Hlin=Hlin.subs(f1,t1)
+            print 'H1',Hlin
+            f2=ci*cj
+            print 'f2',f2
+            Hlin=Hlin.subs(f2,t2)
+            print 'H2',Hlin
+            f3=cdi*cj
+            print 'f3',f3
+            Hlin=Hlin.subs(f3,t3)
+            print 'H3',Hlin
+            f4=ci*cdj
+            print 'f4',f4
+            Hlin=Hlin.subs(f4,t4)
+            print 'H4',Hlin
+            f5=cdj*cj
+            print 'f5',f5
+            Hlin=Hlin.subs(f5,t5)
+            print 'H5',Hlin
     #print t1
-    return Hlin.expand()
+    return Hlin#.expand()
 
 
 def applycommutation(atom_list,Jij,Hfou,k,N_atoms_uc,N_atoms):
@@ -386,6 +447,7 @@ def calculate_dispersion(atom_list,N_atoms_uc,N_atoms,Jij,direction,steps,showEi
         #Hdef=generate_hdef(atom_list,Jij,Sabn,N_atoms_uc,N_atoms)
         Hdef=generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms)
         print 'Hdef',Hdef
+        print type(Hdef)
         #pngview(Hdef)
         #print_matplotlib(latex(Hdef)) 
     #if 0:
@@ -662,6 +724,7 @@ def driver(spinfile,interactionfile,direction,steps):
     #N_atoms_uc=1
     print 'N_atoms',N_atoms,'Natoms_uc',N_atoms_uc
     #atom_list=generate_atoms()
+    atom_list=generate_atoms_rot()
     Hsave=calculate_dispersion(atom_list,N_atoms_uc,N_atoms,jmats,direction,steps,showEigs=True)
     calc_eigs(Hsave,direction,steps)
     direction={}
@@ -670,7 +733,7 @@ def driver(spinfile,interactionfile,direction,steps):
     direction['kz']=0.
     #pylab.figure()
     #calc_eigs(Hsave,direction,steps)
-    pylab.show()
+    #pylab.show()
     
     print jmats
     print direction
