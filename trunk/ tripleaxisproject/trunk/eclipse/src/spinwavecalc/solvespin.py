@@ -140,7 +140,7 @@ def chisq_an(p,sx,sy,sz):
 
 
 
-def getmatrix(sx,sy,sz,mytol=1e-45,maxiter=8):
+def getmatrix(sx,sy,sz,mytol=1e-45,maxiter=2):
     p0=N.array([0,1,0,1],'d')
     p0=N.array([0,0,0,1],'d')
     #p0=N.array([0,1,0,1],'d')
@@ -161,7 +161,7 @@ def getmatrix(sx,sy,sz,mytol=1e-45,maxiter=8):
         print 'iter',iter
         p0,jmin=anneal(chisq_an,p0,args=(sx,sy,sz),\
                       schedule='simple',lower=lowerm,upper=upperm,\
-                      maxeval=None, maxaccept=None,dwell=100,maxiter=600,T0=10000)
+                      maxeval=None, maxaccept=None,dwell=10,maxiter=600,T0=10000)
         
     
         
