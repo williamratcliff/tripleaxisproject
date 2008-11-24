@@ -1,5 +1,6 @@
 import numpy as N
 import solvespin
+import sympy
 
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
@@ -89,7 +90,8 @@ def read_interactions(myfilestr,spins):
                     j31=float(tokenized[7])
                     j32=float(tokenized[8])
                     j33=float(tokenized[9]) 
-                    jij=N.matrix([[j11,j12,j13],[j21,j22,j23],[j31,j32,j33]],'Float64')
+                    #jij=N.matrix([[j11,j12,j13],[j21,j22,j23],[j31,j32,j33]],'Float64')
+                    jij=sympy.matrices.Matrix([[j11,j12,j13],[j21,j22,j23],[j31,j32,j33]])
                     jnums.append(jnum)
                     jmats.append(jij)
                 else:
