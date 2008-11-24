@@ -109,6 +109,9 @@ def generate_atoms_rot():
         #spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,1]],'float64')
         #spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,1]],'float64')
         P=sympy.Symbol('P',real=True,commutative=True)
+        W=sympy.Symbol('W',real=True,commutative=True)
+        X=sympy.Symbol('X',real=True,commutative=True)
+        #spin0=sympy.matrices.Matrix([[W,-X,0],[W,X,0],[0,0,1]])
         spin0=sympy.matrices.Matrix([[cos(P),-sin(P),0],[sin(P),cos(P),0],[0,0,1]])
         print 'spin0 analaytic', spin0
         #spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
@@ -135,8 +138,8 @@ def generate_sabn(N_atoms):
     Sabn=[]
     S=sympy.Symbol("S",real=True)
     for i in range(N_atoms):
-        c=sympy.Symbol('c%d'%(i,),commutative=False)
-        cd=sympy.Symbol('cd%d'%(i,),commutative=False)
+        c=sympy.Symbol('c%d'%(i,),commutative=False,real=True)
+        cd=sympy.Symbol('cd%d'%(i,),commutative=False,real=True)
         curr=sympy.matrices.Matrix([sympy.sqrt(S/2.0)*(c+cd),sympy.sqrt(S/2.0)*(c-cd)/I,S-cd*c])
         Sabn.append(curr.reshape(3,1))
     return Sabn
