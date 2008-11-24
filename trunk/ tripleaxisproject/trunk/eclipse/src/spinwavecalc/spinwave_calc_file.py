@@ -1,9 +1,9 @@
 import sympy
 import numpy as N
 #I=sympy.I
-I=1.0j
-pi=sympy.pi
-from sympy import exp
+#I=1.0j
+#pi=sympy.pi
+from sympy import exp,I,pi,sin,cos
 import pylab
 import readfiles
 from sympy import pngview,latex
@@ -48,7 +48,7 @@ def coeff(expr, term):
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
         self.spin=spin
-        self.pos=N.array(pos)
+        self.pos=N.array(pos,'float64')
         self.neighbors=neighbors
         self.interactions=interactions
         self.label=label
@@ -106,9 +106,10 @@ def generate_atoms_rot():
         atom0=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=0,cell=cell,int_cell=int_cell,Dz=0)
         
         pos0=[1,0,0]
-        spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,1]],'float64')
+        #spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,1]],'float64')
+        #spin0=N.matrix([[-1,0,0],[0,1,0],[0,0,1]],'float64')
         P=sympy.Symbol('P',real=True,commutative=True)
-        spin0=sympy.matrices.Matrix([[sympy.cos(P),-sympy.sin(P),0],[sympy.sin(P),sympy.cos(P),0],[0,0,1]])
+        spin0=sympy.matrices.Matrix([[cos(P),-sin(P),0],[sin(P),cos(P),0],[0,0,1]])
         print 'spin0 analaytic', spin0
         #spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
         #spin0=spin0.subs(P,sympy.pi)
@@ -130,29 +131,24 @@ def generate_atoms_rot():
 
 
 def generate_sabn(N_atoms):
+    "generate spins in local coordinate system, with Z as quantization axis"
     Sabn=[]
     S=sympy.Symbol("S",real=True)
     for i in range(N_atoms):
         c=sympy.Symbol('c%d'%(i,),commutative=False)
         cd=sympy.Symbol('cd%d'%(i,),commutative=False)
         curr=sympy.matrices.Matrix([sympy.sqrt(S/2.0)*(c+cd),sympy.sqrt(S/2.0)*(c-cd)/I,S-cd*c])
-        #print 'curr',curr, curr.shape
-        Sabn.append(curr)
+        Sabn.append(curr.reshape(3,1))
     return Sabn
 
 
 def generate_sxyz(Sabn,atomlist):
+    "transform spins from local coordinate system to global system"
     Sxyz=[]
     i=0
     for currS in Sabn:
-        #print 'Currs', currS
-        #print 'currspin', atomlist[i].spin
-        currS_transpose=currS.reshape(3,1)
-        tempS=atomlist[i].spin*currS_transpose
-        #tempS=N.array(tempS)
-        #tempS=N.ravel(tempS)
+        tempS=atomlist[i].spin*currS
         tempS=tempS.reshape(1,3)
-        #print 'tempS',tempS, tempS.shape
         Sxyz.append(tempS)
         i=i+1
     return Sxyz
@@ -175,9 +171,9 @@ def generate_sabnt(N_atoms,t=''):
     Sabn=[]
     S=sympy.Symbol("S",real=True)
     for i in range(N_atoms):
-        c=sympy.Symbol("c%d%s"%(i,t),commutative=False)
-        cd=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
-        curr=[sympy.sqrt(S/2)*(c+cd),sympy.sqrt(S/2)*(c-cd)/I,S-cd*c]
+        ci=sympy.Symbol("c%d%s"%(i,t),commutative=False)
+        cdi=sympy.Symbol("cd%d%s"%(i,t),commutative=False)
+        curr=[sympy.sqrt(S/2)*(ci+cdi),sympy.sqrt(S/2)*(ci-cdi)/I,S-cdi*ci]
         Sabn.append(curr)
     return Sabn
 
@@ -186,6 +182,7 @@ def generate_sabnt(N_atoms,t=''):
 
 
 def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
+    "generate the hamiltonian for a set of interacting spins defined by Sxyz"
     N_atoms=len(atom_list)
     Hdef=0
     print 'Jij',len(Jij)
@@ -195,12 +192,7 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
     #for i in range(N_atoms):
     for i in range(N_atoms_uc): #correct
         N_int=len(atom_list[i].interactions)
-        for j in range(N_int):
-        #            currS_transpose=N.reshape(currS,(3,1))
-        #tempS=atomlist[i].spin*currS_transpose
-        #tempS=N.array(tempS)
-        #tempS=N.ravel(tempS)
-            
+        for j in range(N_int):            
             print 'i',i,'j',j
             if 0:
                 Hij=N.matrix(Sxyz[i])*atom_list[i].spin.T
@@ -224,13 +216,18 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
             Hij=Hij*Sxyz_transpose
             print 'Hij*Sxyz.T',Hij,Hij.shape
             Hij=Hij[0]
+            #Hij=Hij+myterm
             Hij=-Hij-atom_list[i].Dx*Sxyz[i][0]**2-atom_list[i].Dy*Sxyz[i][1]**2-atom_list[i].Dz*Sxyz[i][2]**2
             Hdef=Hdef+Hij
+    print 'generated hdef'
+    print Hdef,Hdef.atoms(sympy.Symbol)
     return Hdef
 
 
 def holstein(Hdef):
         S = sympy.Symbol('S',real=True)
+        print 'holstein'
+        print Hdef.atoms(sympy.Symbol)
         Hdef=Hdef.expand()
         #Hdef=Hdef.as_poly(S)
         p = sympy.Wild('p',exclude='S')
@@ -264,7 +261,10 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
     #print 'Jij',Jij
     print 'fourier'
     print Hlin
+    print Hlin.atoms(sympy.Symbol)
+    print 'expand'
     #Hlin=Hlin.expand()
+    print Hlin.atoms(sympy.Symbol)
     #print Hlin
     for i in range(N_atoms_uc):
         N_int=len(atom_list[i].interactions)
@@ -287,19 +287,11 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
             cmkdj=sympy.Symbol('cmkd%d'%(j2,),commutative=False,real=True)
             diffr=ri-rj
             kmult=N.dot(k,diffr)
-            t1=1.0/2*(ckdi*cmkdj*exp(-1j*kmult)+
-                      cmkdi*ckdj*exp(1j*kmult)               )
-            t2=1.0/2*(cki*cmkj*exp(1j*kmult)+
-                      cmki*ckj*exp(-1j*kmult)
-                      )
-            t3=1.0/2*(ckdi*ckj*exp(-1j*kmult)+
-                     cmkdi*cmkj*exp(1j*kmult)
-                     )
-            t4=1.0/2*(cki*ckdj*exp(1j*kmult)+
-                     cmki*cmkdj*exp(-1j*kmult)
-                     )
-            t5=1.0/2*(ckdj*ckj+cmkdj*cmkj
-                      )
+            t1=1.0/2*(ckdi*cmkdj*exp(-I*kmult)+cmkdi*ckdj*exp(I*kmult)               )
+            t2=1.0/2*(cki*cmkj*exp(I*kmult)+cmki*ckj*exp(-I*kmult))
+            t3=1.0/2*(ckdi*ckj*exp(-I*kmult)+cmkdi*cmkj*exp(I*kmult))
+            t4=1.0/2*(cki*ckdj*exp(I*kmult)+cmki*cmkdj*exp(-I*kmult))
+            t5=1.0/2*(ckdj*ckj+cmkdj*cmkj)
             print 'i',i,'j',j
             print 'ci',ci,'cj',cj,'cdi',cdi,'cdj',cdj
             print 't1',t1
@@ -307,26 +299,31 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
             print 't3',t3
             print 't4',t4
             print 't5',t5
+            a1=sympy.Symbol('a1')
+            a2=sympy.Symbol('a2')
+            a3=sympy.Symbol('a3')
+            a4=sympy.Symbol('a4')
+            a5=sympy.Symbol('a5')
             f1=cdi*cdj
-            print 'f1',f1
+            print 'f1',f1,f1.atoms(sympy.Symbol)
             Hlin=Hlin.subs(f1,t1)
-            print 'H1',Hlin
+            print 'H1',Hlin,Hlin.atoms(sympy.Symbol)
             f2=ci*cj
-            print 'f2',f2
+            print 'f2',f2,f2.atoms(sympy.Symbol)
             Hlin=Hlin.subs(f2,t2)
-            print 'H2',Hlin
+            print 'H2',Hlin,Hlin.atoms(sympy.Symbol)
             f3=cdi*cj
-            print 'f3',f3
+            print 'f3',f3,f3.atoms(sympy.Symbol)
             Hlin=Hlin.subs(f3,t3)
-            print 'H3',Hlin
+            print 'H3',Hlin,Hlin.atoms(sympy.Symbol)
             f4=ci*cdj
-            print 'f4',f4
+            print 'f4',f4,f4.atoms(sympy.Symbol)
             Hlin=Hlin.subs(f4,t4)
-            print 'H4',Hlin
+            print 'H4',Hlin,Hlin.atoms(sympy.Symbol)
             f5=cdj*cj
-            print 'f5',f5
+            print 'f5',f5,f5.atoms(sympy.Symbol)
             Hlin=Hlin.subs(f5,t5)
-            print 'H5',Hlin
+            print 'H5',Hlin,Hlin.atoms(sympy.Symbol)
     #print t1
     return Hlin#.expand()
 
