@@ -194,8 +194,8 @@ def generate_hdef(atom_list,Jij,Sxyz,N_atoms_uc,N_atoms):
     "generate the hamiltonian for a set of interacting spins defined by Sxyz"
     N_atoms=len(atom_list)
     Hdef=0
-    print 'Jij',len(Jij)
-    
+    print 'Jij',Jij,len(Jij)
+
     
     
     #for i in range(N_atoms):
@@ -303,17 +303,17 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
             t4=1.0/2*(cki*ckdj*exp(I*kmult)+cmki*cmkdj*exp(-I*kmult))
             t5=1.0/2*(ckdj*ckj+cmkdj*cmkj)
             print 'i',i,'j',j
-            print 'ci',ci,'cj',cj,'cdi',cdi,'cdj',cdj
-            print 't1',t1
-            print 't2',t2
-            print 't3',t3
-            print 't4',t4
-            print 't5',t5
-            a1=sympy.Symbol('a1')
-            a2=sympy.Symbol('a2')
-            a3=sympy.Symbol('a3')
-            a4=sympy.Symbol('a4')
-            a5=sympy.Symbol('a5')
+            #print 'ci',ci,'cj',cj,'cdi',cdi,'cdj',cdj
+            #print 't1',t1
+            #print 't2',t2
+            #print 't3',t3
+            #print 't4',t4
+            #print 't5',t5
+            #a1=sympy.Symbol('a1')
+            #a2=sympy.Symbol('a2')
+            #a3=sympy.Symbol('a3')
+            #a4=sympy.Symbol('a4')
+            #a5=sympy.Symbol('a5')
             f1=cdi*cdj
             print 'f1',f1,f1.atoms(sympy.Symbol)
             Hlin=Hlin.subs(f1,t1)
@@ -726,6 +726,7 @@ def driver(spinfile,interactionfile,direction,steps):
     myfilestr=spinfile#r'c:\spins.txt'
     myspins=readfiles.read_spins(myfilestr)
     spins=readfiles.find_collinear(myspins)
+    print 'driver spins',spins
     myfilestr=interactionfile#r'c:\montecarlo.txt'
     atom_list, jnums, jmats,N_atoms_uc=readfiles.read_interactions(myfilestr,spins)
     N_atoms=len(atom_list)
@@ -741,6 +742,7 @@ def driver(spinfile,interactionfile,direction,steps):
     direction['kz']=0.
     #pylab.figure()
     #calc_eigs(Hsave,direction,steps)
+    
     pylab.show()
     
     print jmats
