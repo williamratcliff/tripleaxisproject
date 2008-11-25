@@ -4,8 +4,12 @@ import sympy
 import copy
 
 class atom:
-    def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
+    def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=None,interactions=None,label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
         self.spin=spin
+        if neighbors==None:
+            neighbors=[]
+        if interactions==None:
+            interactions=[]
         self.pos=N.array(pos)
         self.neighbors=neighbors
         self.interactions=interactions
