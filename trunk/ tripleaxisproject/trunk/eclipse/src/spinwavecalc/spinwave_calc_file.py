@@ -112,6 +112,7 @@ def generate_atoms_rot():
         W=sympy.Symbol('W',real=True,commutative=True)
         X=sympy.Symbol('X',real=True,commutative=True)
         #spin0=sympy.matrices.Matrix([[W,-X,0],[W,X,0],[0,0,1]])
+        #P=0
         spin0=sympy.matrices.Matrix([[cos(P),-sin(P),0],[sin(P),cos(P),0],[0,0,1]])
         print 'spin0 analaytic', spin0
         #spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
@@ -121,7 +122,7 @@ def generate_atoms_rot():
         interactions=[0]
         cell=5
         int_cell=[0]
-        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell,Dz=D)
+        atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions,label=1,cell=cell,int_cell=int_cell,Dz=0)
         
         atomlist=[atom0,atom1]
 
@@ -269,7 +270,8 @@ def fouriertransform(atom_list,Jij,Hlin,k,N_atoms_uc,N_atoms):
     #Hlin=Hlin.expand()
     print Hlin.atoms(sympy.Symbol)
     #print Hlin
-    for i in range(N_atoms_uc):
+    #for i in range(N_atoms):
+    for i in range(N_atoms_uc): #correct
         N_int=len(atom_list[i].interactions)
         ci=sympy.Symbol('c%d'%(i,),commutative=False,real=True)
         cdi=sympy.Symbol('cd%d'%(i,),commutative=False,real=True)

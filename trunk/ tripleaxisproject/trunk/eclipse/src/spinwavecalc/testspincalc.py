@@ -35,8 +35,8 @@ def generate_hdef(N_atoms_uc):
         W=sympy.Symbol('W',real=True,commutative=True)
         X=sympy.Symbol('X',real=True,commutative=True)
         spin0=sympy.matrices.Matrix([[W,-X,0],[W,X,0],[0,0,1]])
-        #spin0=sympy.matrices.Matrix([[cos(P),-sin(P),0],[sin(P),cos(P),0],[0,0,1]])
-        spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
+        spin0=sympy.matrices.Matrix([[cos(P),-sin(P),0],[sin(P),cos(P),0],[0,0,1]])
+        #spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
         neighbors=[0]
         interactions=[0]
         atom1=atom(spin=spin0,pos=pos0,neighbors=neighbors,interactions=interactions)
