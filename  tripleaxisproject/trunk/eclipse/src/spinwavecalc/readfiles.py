@@ -215,7 +215,7 @@ def isparallel(a,b,eps=1e-4):
 
 class Collinear_group():
     def __init__(self,parallel=None,antiparallel=None):
-        print 'init'
+        #print 'init'
         if parallel==None:
             parallel=[]
         if antiparallel==None:
@@ -223,29 +223,30 @@ class Collinear_group():
         self.parallel=parallel
         self.antiparallel=antiparallel
         self.rmatrix=None
-        print 'parinit',self.parallel,parallel
+        self.armatrix=None
+        #print 'parinit',self.parallel,parallel
 
 
 
 
 def find_collinear(spins):
-    print 'find collinear'
+    #print 'find collinear'
     collinear_groups=[]
     rmatrices=[]
     flag=True
     spins=copy.deepcopy(spins)
     spins.reverse()
-    print 'spins',spins
+    #print 'spins',spins
     spin=N.array(spins.pop(),'float64')
-    print '1st spin',spin
+    #print '1st spin',spin
     rmat=findmat(spin)
     myg=Collinear_group()
     myg.parallel.append(copy.deepcopy(spin))
     myg.rmatrix=rmat
     rmatrices.append(rmat)
     collinear_groups.append(myg)
-    print collinear_groups[0].parallel
-    print 'remaining', spins
+    #print collinear_groups[0].parallel
+    #print 'remaining', spins
     while flag:
         try:   
             spin=spins.pop()
@@ -253,25 +254,28 @@ def find_collinear(spins):
             #print 'remain',spins
             ct=0
             for currgroup in collinear_groups:
-                print 'currgroup', currgroup.parallel
+                #print 'currgroup', currgroup.parallel
                 test_spin=copy.deepcopy(currgroup.parallel[0])
-                print 'test spin',test_spin
+                #print 'test spin',test_spin
                 if iscollinear(spin,test_spin):
                     ispar=isparallel(spin,test_spin)
                     if ispar==1:
-                        print 'par'
+                        #print 'par'
                         currgroup.parallel.append(copy.deepcopy(spin))
                         ct=ct+1
                         rmatrices.append(currgroup.rmatrix)
                         break
                     elif ispar==-1:
-                        print 'antipar'
+                        #print 'antipar'
                         currgroup.antiparallel.append(copy.deepcopy(spin))
                         ct=ct+1
-                        rmatrices.append(-currgroup.rmatrix)
+                        if currgroup.armatrix==None:
+                            rmat=findmat(spin)
+                            currgroup.armatrix=rmat
+                        rmatrices.append(currgroup.armatrix)
                         break              
             if ct==0:
-                print 'new group'
+                #print 'new group'
                 mycol=Collinear_group()
                 mycol.parallel.append(copy.deepcopy(spin))
                 rmat=findmat(spin)
@@ -285,11 +289,12 @@ def find_collinear(spins):
         except IndexError:
             flag=False
     
-    print 'final'
-    for currgroup in collinear_groups:
-        print 'groups'
-        print 'parallel',currgroup.parallel
-        print 'antiparallel',currgroup.antiparallel
+    if 0:
+        print 'final'
+        for currgroup in collinear_groups:
+            print 'groups'
+            print 'parallel',currgroup.parallel
+            print 'antiparallel',currgroup.antiparallel
     return rmatrices
         
     
