@@ -222,6 +222,7 @@ class Collinear_group():
             antiparallel=[]
         self.parallel=parallel
         self.antiparallel=antiparallel
+        self.rmatrix=None
         print 'parinit',self.parallel,parallel
 
 
@@ -230,14 +231,18 @@ class Collinear_group():
 def find_collinear(spins):
     print 'find collinear'
     collinear_groups=[]
+    rmatrices=[]
     flag=True
     spins=copy.deepcopy(spins)
     spins.reverse()
     print 'spins',spins
     spin=N.array(spins.pop(),'float64')
     print '1st spin',spin
+    rmat=findmat(spin)
     myg=Collinear_group()
     myg.parallel.append(copy.deepcopy(spin))
+    myg.rmatrix=rmat
+    rmatrices.append(rmat)
     collinear_groups.append(myg)
     print collinear_groups[0].parallel
     print 'remaining', spins
@@ -257,22 +262,27 @@ def find_collinear(spins):
                         print 'par'
                         currgroup.parallel.append(copy.deepcopy(spin))
                         ct=ct+1
+                        rmatrices.append(currgroup.rmatrix)
                         break
                     elif ispar==-1:
                         print 'antipar'
                         currgroup.antiparallel.append(copy.deepcopy(spin))
                         ct=ct+1
+                        rmatrices.append(-currgroup.rmatrix)
                         break              
             if ct==0:
                 print 'new group'
                 mycol=Collinear_group()
                 mycol.parallel.append(copy.deepcopy(spin))
+                rmat=findmat(spin)
+                mycol.rmatrix=rmat
+                rmatrices.append(rmat)
                 collinear_groups.append(mycol)
                 #for cgroup in collinear_groups:
                 #    print 'collinear_groups par',cgroup.parallel
                 #    print 'collinear_groups antipar',cgroup.antiparallel
 
-        except:
+        except IndexError:
             flag=False
     
     print 'final'
@@ -280,6 +290,7 @@ def find_collinear(spins):
         print 'groups'
         print 'parallel',currgroup.parallel
         print 'antiparallel',currgroup.antiparallel
+    return rmatrices
         
     
     
@@ -298,7 +309,26 @@ if __name__=="__main__":
     myspins.append(N.array([2,0,0],'float64'))
     myspins.append(N.array([0,-2,0],'float64'))
     myspins.append(N.array([1,1,0],'float64'))
-    find_collinear(myspins)
+    myspins=spins
+    rmatrices=find_collinear(myspins)
+    print rmatrices
+    if 1:
+        smat=N.empty((3,1),'float64')
+        smat=N.matrix(smat,'float64')
+        smat[0]=0
+        smat[1]=0
+        smat[2]=1
+        #sout=spins[1]*smat
+        #spins[1]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
+        #spins[0]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
+        #print sout
+        icount=0
+        for rmat in rmatrices:
+            print 'spin',icount,rmat*smat,'realspin',myspins[icount]
+            print 'mat', rmat
+            print 'det', N.linalg.det(rmat)
+            icount=icount+1
+
     #myfilestr=r'c:\montecarlo.txt'
     if 0:
         myfilestr=r'c:\montep11.txt'
