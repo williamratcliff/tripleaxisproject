@@ -1,6 +1,7 @@
 import numpy as N
 import solvespin
 import sympy
+import copy
 
 class atom:
     def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
@@ -143,51 +144,153 @@ def read_spins(myfilestr):
     spins=[]
     while myFlag:
         tokenized=get_tokenized_line(myfile,returnline=returnline)
-        print tokenized
+        #print tokenized
         if not(tokenized):
             break
-        print tokenized
+        #print tokenized
         if tokenized[0]=='#atom_number':
             pass
         else:
             spin=N.array([float(tokenized[4]),float(tokenized[5]),float(tokenized[6])],'Float64')
             sx,sy,sz=spin
-            sm=N.sqrt(sx**2+sy**2+sz**2)
-            sx=sx/sm
-            sy=sy/sm
-            sz=sz/sm
-            print 'sx',sx,'sy',sy,'sz',sz
-            smat=solvespin.getmatrix(sx, sy, sz)
-            spins.append(smat)
+            spins.append(spin)
+            #sm=N.sqrt(sx**2+sy**2+sz**2)
+            #sx=sx/sm
+            #sy=sy/sm
+            #sz=sz/sm
+            #print 'sx',sx,'sy',sy,'sz',sz
+            #smat=solvespin.getmatrix(sx, sy, sz)
+            #spins.append(smat)
     myfile.close()
-    smat=N.empty((3,1),'float64')
-    smat=N.matrix(smat,'float64')
-    smat[0]=0
-    smat[1]=0
-    smat[2]=1
-    #sout=spins[1]*smat
-    #spins[1]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
-    #spins[0]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
-    #print sout
-    icount=0
-    for currspin in spins:
-        print 'spin',icount,currspin*smat
-        print 'mat', currspin
-        print 'det', N.linalg.det(currspin)
-        icount=icount+1
+    if 0:
+        smat=N.empty((3,1),'float64')
+        smat=N.matrix(smat,'float64')
+        smat[0]=0
+        smat[1]=0
+        smat[2]=1
+        #sout=spins[1]*smat
+        #spins[1]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
+        #spins[0]=N.matrix([[1,0,0],[0,1,0],[0,0,1]],'Float64')
+        #print sout
+        icount=0
+        for currspin in spins:
+            print 'spin',icount,currspin*smat
+            print 'mat', currspin
+            print 'det', N.linalg.det(currspin)
+            icount=icount+1
     return spins
     
+    
+def iscollinear(a,b,eps=1e-6):
+    cross=N.abs(N.cross(a,b))<=eps
+    if cross[0]*cross[1]*cross[2]:
+        return True
+    else:
+        return False
+
+def isparallel(a,b,eps=1e-4):
+    _a=N.array(a,'float64')/N.sqrt(N.dot(a,a))
+    _b=N.array(b,'float64')/N.sqrt(N.dot(b,b))
+    pr=N.dot(a,b)
+    if pr>=1-eps:
+        return 1
+    if pr<=-1+eps:
+        return -1
+    else:
+        return 0
+
+class Collinear_group():
+    def __init__(self,parallel=None,antiparallel=None):
+        print 'init'
+        if parallel==None:
+            parallel=[]
+        if antiparallel==None:
+            antiparallel=[]
+        self.parallel=parallel
+        self.antiparallel=antiparallel
+        print 'parinit',self.parallel,parallel
+
+
+
+
+def find_collinear(spins):
+    print 'find collinear'
+    collinear_groups=[]
+    flag=True
+    spins=copy.deepcopy(spins)
+    spins.reverse()
+    print 'spins',spins
+    spin=N.array(spins.pop(),'float64')
+    print '1st spin',spin
+    myg=Collinear_group()
+    myg.parallel.append(copy.deepcopy(spin))
+    collinear_groups.append(myg)
+    print collinear_groups[0].parallel
+    print 'remaining', spins
+    while flag:
+        try:   
+            spin=spins.pop()
+            print 'spin',spin
+            #print 'remain',spins
+            ct=0
+            for currgroup in collinear_groups:
+                print 'currgroup', currgroup.parallel
+                test_spin=copy.deepcopy(currgroup.parallel[0])
+                print 'test spin',test_spin
+                if iscollinear(spin,test_spin):
+                    ispar=isparallel(spin,test_spin)
+                    if ispar==1:
+                        print 'par'
+                        currgroup.parallel.append(copy.deepcopy(spin))
+                        ct=ct+1
+                        break
+                    elif ispar==-1:
+                        print 'antipar'
+                        currgroup.antiparallel.append(copy.deepcopy(spin))
+                        ct=ct+1
+                        break              
+            if ct==0:
+                print 'new group'
+                mycol=Collinear_group()
+                mycol.parallel.append(copy.deepcopy(spin))
+                collinear_groups.append(mycol)
+                #for cgroup in collinear_groups:
+                #    print 'collinear_groups par',cgroup.parallel
+                #    print 'collinear_groups antipar',cgroup.antiparallel
+
+        except:
+            flag=False
+    
+    print 'final'
+    for currgroup in collinear_groups:
+        print 'groups'
+        print 'parallel',currgroup.parallel
+        print 'antiparallel',currgroup.antiparallel
+        
     
     
     
 if __name__=="__main__":
     myfilestr=r'c:\spins.txt'
     spins=read_spins(myfilestr)
+    a=[1,0,0]
+    b=[-2,0,0]
+    print iscollinear(a,b)
+    print isparallel(a,b)
+    myspins=[]
+    myspins.append(N.array([1,0,0],'float64'))
+    myspins.append(N.array([-1,0,0],'float64'))
+    myspins.append(N.array([0,1,0],'float64'))
+    myspins.append(N.array([2,0,0],'float64'))
+    myspins.append(N.array([0,-2,0],'float64'))
+    myspins.append(N.array([1,1,0],'float64'))
+    find_collinear(myspins)
     #myfilestr=r'c:\montecarlo.txt'
-    myfilestr=r'c:\montep11.txt'
-    atomlist, jnums, jmats,numcell=read_interactions(myfilestr,spins)
-    print 'numcell', numcell
-    print jmats
-    print atomlist[0].interactions
-    print atomlist[1].neighbors
-    #print N.linalg.det(atomlist[0].spin)
+    if 0:
+        myfilestr=r'c:\montep11.txt'
+        atomlist, jnums, jmats,numcell=read_interactions(myfilestr,spins)
+        print 'numcell', numcell
+        print jmats
+        print atomlist[0].interactions
+        print atomlist[1].neighbors
+        #print N.linalg.det(atomlist[0].spin)
