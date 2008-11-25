@@ -184,7 +184,17 @@ def read_spins(myfilestr):
             icount=icount+1
     return spins
     
-    
+def findmat(spin):
+        sx,sy,sz=spin
+        sm=N.sqrt(sx**2+sy**2+sz**2)
+        sx=sx/sm
+        sy=sy/sm
+        sz=sz/sm
+        #print 'sx',sx,'sy',sy,'sz',sz
+        smat=solvespin.getmatrix(sx, sy, sz)
+        return smat
+        #spins.append(smat)
+  
 def iscollinear(a,b,eps=1e-6):
     cross=N.abs(N.cross(a,b))<=eps
     if cross[0]*cross[1]*cross[2]:
