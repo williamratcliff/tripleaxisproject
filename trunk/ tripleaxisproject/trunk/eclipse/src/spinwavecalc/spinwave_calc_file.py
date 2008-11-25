@@ -46,9 +46,13 @@ def coeff(expr, term):
        
    
 class atom:
-    def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=[],interactions=[],label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
+    def __init__(self,spin=[0,0,1],pos=[0,0,0],neighbors=None,interactions=None,label=0,Dx=0,Dy=0,Dz=0,cell=0,int_cell=[]):
         self.spin=spin
-        self.pos=N.array(pos,'float64')
+        if neighbors==None:
+            neighbors=[]
+        if interactions==None:
+            interactions=[]
+        self.pos=N.array(pos)
         self.neighbors=neighbors
         self.interactions=interactions
         self.label=label
@@ -114,6 +118,7 @@ def generate_atoms_rot():
         #spin0=sympy.matrices.Matrix([[W,-X,0],[W,X,0],[0,0,1]])
         #P=0
         spin0=sympy.matrices.Matrix([[cos(P),-sin(P),0],[sin(P),cos(P),0],[0,0,1]])
+        spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
         print 'spin0 analaytic', spin0
         #spin0=sympy.matrices.Matrix([[1,0,0],[0,1,0],[0,0,1]])
         #spin0=spin0.subs(P,sympy.pi)
