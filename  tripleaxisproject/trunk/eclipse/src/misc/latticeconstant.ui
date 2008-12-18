@@ -1,0 +1,200 @@
+<ui version="4.0" >
+ <class>latticepane</class>
+ <widget class="QDockWidget" name="latticepane" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>796</width>
+    <height>644</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents" >
+   <widget class="Line" name="line" >
+    <property name="geometry" >
+     <rect>
+      <x>50</x>
+      <y>250</y>
+      <width>651</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation" >
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7" >
+    <property name="geometry" >
+     <rect>
+      <x>160</x>
+      <y>140</y>
+      <width>421</width>
+      <height>109</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:36pt; font-weight:600;">Lattice Constants&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_2" >
+    <property name="geometry" >
+     <rect>
+      <x>54</x>
+      <y>297</y>
+      <width>203</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label" >
+    <property name="geometry" >
+     <rect>
+      <x>42</x>
+      <y>252</y>
+      <width>16</width>
+      <height>110</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>a</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2" >
+    <property name="geometry" >
+     <rect>
+      <x>263</x>
+      <y>252</y>
+      <width>16</width>
+      <height>110</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>b</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3" >
+    <property name="geometry" >
+     <rect>
+      <x>485</x>
+      <y>252</y>
+      <width>16</width>
+      <height>110</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>c</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_5" >
+    <property name="geometry" >
+     <rect>
+      <x>275</x>
+      <y>297</y>
+      <width>204</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>496</x>
+      <y>297</y>
+      <width>203</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_6" >
+    <property name="geometry" >
+     <rect>
+      <x>276</x>
+      <y>414</y>
+      <width>202</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4" >
+    <property name="geometry" >
+     <rect>
+      <x>42</x>
+      <y>370</y>
+      <width>16</width>
+      <height>109</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Courier New,courier';">&amp;alpha;&lt;/p>&lt;/body>&lt;/html></string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5" >
+    <property name="geometry" >
+     <rect>
+      <x>264</x>
+      <y>370</y>
+      <width>16</width>
+      <height>109</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt;">&amp;Beta;&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6" >
+    <property name="geometry" >
+     <rect>
+      <x>484</x>
+      <y>370</y>
+      <width>16</width>
+      <height>109</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt;">&amp;gamma;&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_4" >
+    <property name="geometry" >
+     <rect>
+      <x>496</x>
+      <y>414</y>
+      <width>203</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_3" >
+    <property name="geometry" >
+     <rect>
+      <x>55</x>
+      <y>414</y>
+      <width>203</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
