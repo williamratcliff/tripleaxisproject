@@ -90,15 +90,19 @@ if __name__ == '__main__':
     if 1:
         ax1=pylab.errorbar(dataset['temp1'],dataset['Counts1'],dataset['errors1'],
                    marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
-    if 0:
-        pylab.plot(dataset['temp2'],dataset['Counts2'],dataset['errors2'],
-                   marker='s',linestyle='None',mfc='red',mec='red',ecolor='black')
     if 1:    
         ax2=pylab.errorbar(dataset['temp3'],dataset['Counts3'],dataset['errors3'],
                    marker='s',linestyle='None',mfc='blue',mec='blue',ecolor='blue')
+
+    ax3=pylab.twinx()
+    if 1:
+        pylab.errorbar(dataset['temp2'],dataset['Counts2'],dataset['errors2'],
+                   marker='s',linestyle='None',mfc='red',mec='red',ecolor='black')
     
     #print ax2
     
     #ax2[0].get_axes().set_yscale('log')
-    pylab.savefig(r'c:\nimn2o4_order.pdf')
-    #pylab.show()
+    if 0:
+        pylab.savefig(r'c:\nimn2o4_order2.pdf')
+    if 1:
+        pylab.show()
