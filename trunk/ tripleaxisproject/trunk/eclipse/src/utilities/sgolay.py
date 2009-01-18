@@ -1,4 +1,6 @@
-def savitzky_golay(data, kernel = 11, order = 4):
+import numpy
+import pylab
+def savitzky_golay(data, kernel = 11, order = 4,deriv=0):
     """
         applies a Savitzky-Golay filter
         input parameters:
@@ -25,7 +27,8 @@ def savitzky_golay(data, kernel = 11, order = 4):
     half_window = (kernel -1) // 2
     b = numpy.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
     # since we don't want the derivative, else choose [1] or [2], respectively
-    m = numpy.linalg.pinv(b).A[0]
+    #print numpy.linalg.pinv(b).A
+    m = numpy.linalg.pinv(b).A[deriv]
     window_size = len(m)
     half_window = (window_size-1) // 2
 
@@ -64,3 +67,15 @@ def savitzky_golay(data, kernel = 11, order = 4):
                 value += weight * data[i + offset]
             smooth_data.append(value)
     return numpy.array(smooth_data)
+
+if __name__=='__main__':
+    x=numpy.arange(-10,9.9,.1)
+    y=x**2
+    yd1=savitzky_golay(y,deriv=1)/.1
+    yd2=savitzky_golay(y,deriv=2)/(.1)**2
+    print yd1.shape
+    print y.shape
+    #pylab.plot(x,y)
+    #pylab.plot(x,yd1)
+    pylab.plot(x,yd2)
+    pylab.show()
