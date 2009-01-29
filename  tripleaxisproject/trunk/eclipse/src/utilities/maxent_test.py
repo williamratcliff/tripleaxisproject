@@ -18,13 +18,15 @@ def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
     delta=.035;
     #outfile='c:\structfactors_density.dat'
     #fid=fopen([outfile],'w');
-    for xi in x:
-        for zi in z:
+    for xia in range(xn):
+        for zia in range(zn):
             fsum=0
+            xi=x[xia]
+            zi=z[zia]
             Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
             cosqr=N.cos(2*pi*1*(h*xi+l*zi));
             fsum=(Aj*cosqr).sum()  
-            print xi,zi,'sum',fsum 
+            #print xi,zi,'sum',fsum 
             #for i=1:n
             #    currf=fq(i);
             #    h=Qs(i,1);%/q(i);
@@ -36,10 +38,11 @@ def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
             #    %fprintf('h=%f k=%f l=%f currf=%f Aj%f
             #    %eiqr=%f\n',h*q(i),k*q(i),l*q(i),currf,Aj,eiqr)
             #end     
-            P[zi,xi]=fsum
+            #P[zi,xi]=fsum
+            P[xia,zia]=fsum
                 #fprintf(fid,'%3.5g  %3.5g  %3.5g  \n',xi,zi,P(zi,xi));
-        #end
-   # end
+    #print P
+    print P.shape
     if 1:
         pylab.pcolor(X,Z,P)
         pylab.show()
