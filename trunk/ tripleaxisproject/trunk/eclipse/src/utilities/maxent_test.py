@@ -140,6 +140,7 @@ def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
                 fmodel=fsum_up[i]-fsum_down[i]
                 cosqr=N.cos(2*pi*1*(h[i]*xi+l[i]*zi));
                 chi=chi+2*(fmodel-fq[i])/fqerr[i]**2*cosqr
+                print i
             grad[xia,zia]=chi.sum()
             
     grad_up=grad.flatten()
