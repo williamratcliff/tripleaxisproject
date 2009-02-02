@@ -80,9 +80,74 @@ def fourier_p(h,k,l,P,xstep=0.01,zstep=0.01):
             #    print xi,zi,P[xia,zia]
     return 2*fsum/xn/zn
 
+def transform_p(p,Mx,Mz,M):
+    pup_n=len(p)/2
+    pup=p[0:M]
+    pdown=p[M::]
+    #print 'pup',pup.shape
+    #print 'pdown',pdown.shape
+    p_up=pup.reshape(Mx,Mz)
+    p_down=pdown.reshape(Mx,Mz)
+    return p_up,p_down
+     
+     
 
+def chisq(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
+    M=len(p)/2
+    Mx=1.0/xstep
+    Mz=1.0/zstep
+    #print M,Mx,Mz
+    fsum_up=N.zeros(h.shape)
+    fsum_down=N.zeros(h.shape)
+    chi=N.zeros(h.shape)
+    P_up,P_down=transform_p(p,Mx,Mz,M)
+    for i in range(len(h)):
+        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
+        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
+        fmodel=fsum_up[i]-fsum_down[i]
+        chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
+        #print h[i],k[i],l[i],fq[i],chi[i]
+    
+    return chi.sum()
+    
 
+def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
+    M=len(p)/2
+    Mx=1.0/xstep
+    Mz=1.0/zstep
+    #print M,Mx,Mz
+    fsum_up=N.zeros(h.shape)
+    fsum_down=N.zeros(h.shape)
+    chi=N.zeros(h.shape)
+    P_up,P_down=transform_p(p,Mx,Mz,M)
 
+    x=N.arange(0.0,1.0,xstep)
+    z=N.arange(0.0,1.0,zstep)
+    xn=len(x)
+    zn=len(z)
+    grad=N.zeros(P_up.shape)
+    for xia in range(xn):
+        for zia in range(zn):
+            xi=x[xia]
+            zi=z[zia]
+            #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
+            #cosqr=N.cos(2*pi*1*(h*xi+l*zi));
+            #fsum=fsum+P[xia,zia]*cosqr  
+            chi=0
+            for i in range(len(h)):
+                fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
+                fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
+                fmodel=fsum_up[i]-fsum_down[i]
+                cosqr=N.cos(2*pi*1*(h[i]*xi+l[i]*zi));
+                chi=chi+2*(fmodel-fq[i])/fqerr[i]**2*cosqr
+            grad[xia,zia]=chi.sum()
+            
+    grad_up=grad.flatten()
+    grad_down=-grad_up
+    grad=N.concatenate((grad_up,grad_down))
+        #print h[i],k[i],l[i],fq[i],chi[i]
+    
+    return grad
 
 
 
@@ -96,20 +161,30 @@ if __name__=="__main__":
     bob=N.loadtxt(myfilestr)
     print bob
     print bob.shape
-    h,k,l,fq,sig=N.loadtxt(myfilestr).T
+    h,k,l,fq,fqerr=N.loadtxt(myfilestr).T
     print h
     X,Z,P=plotdensity(h,k,l,fq)
+    pu=P.flatten()
+    pd=N.zeros(len(pu))
+    p=N.concatenate((pu,pd))
+    print len(pu)
+    print len(pd)
+    print len(p)
+    chi=chisq(p,h,k,l,fq,fqerr)
+    print chi
+    grad=chisq_grad(p,h,k,l,fq,fqerr)
+    print 'gradient',grad
     if 0:
         pylab.pcolor(X,Z,P)
         pylab.show()    
     fsum=fourier_p(h[0],k[0],l[0],P)
     fsum=N.zeros(h.shape)
-    if 1:
+    if 0:
         for i in range(len(h)):
             fsum[i]=fourier_p(h[i],k[i],l[i],P)
             print h[i],k[i],l[i],fq[i],fsum[i],fq[i]/fsum[i]
     
-    if 1:
+    if 0:
         q=N.sqrt(h**2+l**2)  #Note, 107 is off by a factor of 2!
         pylab.plot(q,fsum,'s')
         #pylab.twinx()
