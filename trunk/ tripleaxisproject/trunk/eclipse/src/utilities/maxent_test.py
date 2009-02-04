@@ -118,6 +118,8 @@ def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     #print M,Mx,Mz
     fsum_up=N.zeros(h.shape)
     fsum_down=N.zeros(h.shape)
+    fmodel=N.zeros(h.shape)
+    
     chi=N.zeros(h.shape)
     P_up,P_down=transform_p(p,Mx,Mz,M)
 
@@ -126,6 +128,10 @@ def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     xn=len(x)
     zn=len(z)
     grad=N.zeros(P_up.shape)
+    for i in range(len(h)):
+        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
+        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
+        fmodel[i]=fsum_up[i]-fsum_down[i]
     for xia in range(xn):
         for zia in range(zn):
             xi=x[xia]
@@ -135,12 +141,12 @@ def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
             #fsum=fsum+P[xia,zia]*cosqr  
             chi=0
             for i in range(len(h)):
-                fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
-                fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
-                fmodel=fsum_up[i]-fsum_down[i]
+                #fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
+                #fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
+                #fmodel=fsum_up[i]-fsum_down[i]
                 cosqr=N.cos(2*pi*1*(h[i]*xi+l[i]*zi));
-                chi=chi+2*(fmodel-fq[i])/fqerr[i]**2*cosqr
-                print i
+                chi=chi+2*(fmodel[i]-fq[i])/fqerr[i]**2*cosqr
+                #print i
             grad[xia,zia]=chi.sum()
             
     grad_up=grad.flatten()
