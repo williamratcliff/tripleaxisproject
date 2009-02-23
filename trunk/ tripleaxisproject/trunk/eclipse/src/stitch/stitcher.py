@@ -31,6 +31,11 @@ class Stitch:
         ch_a4=ch_a4.T.flatten()
         ch_eff=N.loadtxt(ch_eff_str, unpack=True)
         ch_eff=ch_eff.T.flatten()
+        
+        if 1:
+            pylab.plot(ch_eff,'s')
+            pylab.show()
+            sys.exit()
         #ch_eff=N.ones(ch_eff.shape)
         self.ch_eff_orig=ch_eff
         ch_eff[masked]=0.0
@@ -189,6 +194,11 @@ if __name__=='__main__':
         #jun
         ch_a4_str=r'C:\jun\PSD_A4_SpacingApr1108.dat'        
         ch_eff_str=r'c:\jun\PSD_Channel_EffJune0908.dat'
+        
+        
+        #clarina LiFeas
+        ch_a4_str=r'C:\NaFeAs2\PSD_spacing_40minradial_Feb142009.dat'
+        ch_eff_str=r'C:\NaFeAs2\PSD_efficiency_40minradial_Feb142009.dat'
 
         mypsd=Psd(center=22)
 
@@ -206,9 +216,12 @@ if __name__=='__main__':
         
         #jun
         mydirectory2=r'C:\jun'
-        myfilestr=os.path.join(mydirectory2,'CeOFeAs859490.bt7')
-        #myfilestr=os.path.join(mydirectory2,'CeOFeAs859493.bt7')
+        #myfilestr=os.path.join(mydirectory2,'LiFeA002.bt9')
+        myfilestr=os.path.join(mydirectory2,'CeOFeAs859493.bt7')
         
+        #clarina LiFeAs
+        mydirectory2=r'C:\NaFeAs2'
+        myfilestr=os.path.join(mydirectory2,'NaFeAs68019.bt7')
         
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
