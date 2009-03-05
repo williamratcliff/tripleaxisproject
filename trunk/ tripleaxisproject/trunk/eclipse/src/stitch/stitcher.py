@@ -25,7 +25,7 @@ class Psd:
         return
 
 class Stitch:
-    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.1,masked=[]):
+    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.25,masked=[]):
         
         ch_a4=N.loadtxt(ch_a4_str, unpack=True)
         ch_a4=ch_a4.T.flatten()
@@ -157,7 +157,7 @@ class Stitch:
             #print output_tmp^2
             output_data=output_data+output_tmp*output_mon
             output_data_err=output_data_err+dz_output_tmp**2*output_mon**2
-            print 'output_mon',output_mon
+            #print 'output_mon',output_mon
             data_norm=data_norm+output_mon
             #print 'data_norm',data_norm
         self.output_data=output_data/data_norm
@@ -239,7 +239,7 @@ if __name__=='__main__':
         mystitcher.writefile(myoutstr)
         tdata=mystitcher.output_data
         if 1:
-            print 'data_eff', mystitcher.data_eff
+            #print 'data_eff', mystitcher.data_eff
             #pylab.plot(mystitcher.data_eff,'s')
             pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
             #print 'a',mystitcher.output_a4[0:-1]
