@@ -25,14 +25,14 @@ class Psd:
         return
 
 class Stitch:
-    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.3,masked=[]):
+    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.1,masked=[]):
         
         ch_a4=N.loadtxt(ch_a4_str, unpack=True)
         ch_a4=ch_a4.T.flatten()
         ch_eff=N.loadtxt(ch_eff_str, unpack=True)
         ch_eff=ch_eff.T.flatten()
         
-        if 1:
+        if 0:
             pylab.plot(ch_eff,'s')
             pylab.show()
             sys.exit()
@@ -52,8 +52,8 @@ class Stitch:
         
         self.outputwidth=outputwidth
         self.a4=N.array(data.data['a4'],'float64')
-        self.a4_begin=self.a4[0]-ch_space[psd.left]
-        self.a4_end=self.a4[-1]-ch_space[psd.right]
+        self.a4_begin=self.a4[0]-abs(ch_space[psd.right]) #right is lower a4
+        self.a4_end=self.a4[-1]+abs(ch_space[psd.left]) #left is higher a4
         #self.a4_begin=30.0
         self.output_npts=int(N.round(N.absolute(self.a4_end-self.a4_begin)/self.outputwidth))
         #self.output_a4=N.arange(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end])+outputwidth,outputwidth)
@@ -94,7 +94,7 @@ class Stitch:
         #for i in range(13):
         #    pylab.plot(self.data_eff[:,i],'s')
         
-        if 1:
+        if 0:
             ch_space2=ch_a4[psd.center]-ch_a4
             print ch_space2
             print self.a4
@@ -155,16 +155,16 @@ class Stitch:
             #print output_mon.shape
             #print dz_output_tmp.shape
             #print output_tmp^2
-            output_data=output_data+output_tmp#*output_mon
-            output_data_err=output_data_err+dz_output_tmp**2#*output_mon**2
+            output_data=output_data+output_tmp*output_mon
+            output_data_err=output_data_err+dz_output_tmp**2*output_mon**2
             print 'output_mon',output_mon
             data_norm=data_norm+output_mon
             #print 'data_norm',data_norm
         self.output_data=output_data/data_norm
         self.output_data_err=N.sqrt(output_data_err)/data_norm
-        print 'output_a4', self.output_a4
+        #print 'output_a4', self.output_a4
         print 'data_norm', data_norm
-        print 'output',self.output_data
+        #print 'output',self.output_data
         #print 'norm'
         #print data_norm
         #print data_norm.shape
@@ -200,7 +200,7 @@ if __name__=='__main__':
         ch_a4_str=r'C:\NaFeAs2\PSD_spacing_40minradial_Feb142009.dat'
         ch_eff_str=r'C:\NaFeAs2\PSD_efficiency_40minradial_Feb142009.dat'
 
-        mypsd=Psd(center=22)
+        mypsd=Psd(center=23)
 
         
         #me
@@ -222,10 +222,12 @@ if __name__=='__main__':
         #clarina LiFeAs
         mydirectory2=r'C:\NaFeAs2'
         myfilestr=os.path.join(mydirectory2,'NaFeAs68019.bt7')
+        myfilestr=os.path.join(mydirectory2,'plastic69167.bt7')
+        
         
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
-        mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[7])        
+        mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[])        
         mystitcher.stitch()
         
         #print mystitcher.data_eff.shape
@@ -246,6 +248,7 @@ if __name__=='__main__':
             #myfilestr=os.path.join(mydirectory2,'NdOFeAs58082.bt7.out')
             #myfilestr=os.path.join(mydirectory2,'NdOFeAs58076.bt7.out')
             myfilestr=os.path.join(mydirectory2,'NdOFeAs58047.bt7.out')
+            
             mydatareader=readncnr.datareader()
             mydata=mydatareader.readbuffer(myfilestr)
             mystitcher=Stitch(mydata,ch_a4_str,ch_eff_str,mypsd,masked=[6])
@@ -260,9 +263,12 @@ if __name__=='__main__':
             
             #pylab.axis([33,36,])
     
-        
+            
         
         if 1:
+            #print mystitcher.output_a4[0:-1]
+            print mystitcher.output_a4[0]
+            print mystitcher.output_a4[-1]
             pylab.show()
         
         
