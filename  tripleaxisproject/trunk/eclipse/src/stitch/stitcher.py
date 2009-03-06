@@ -18,24 +18,21 @@ def cshift(l, offset):
 
 
 class Psd:
-    def __init__(self,left=0,center=21,right=48):
+    def __init__(self,left=0,center=21,right=47):
         self.left=left
         self.right=right
         self.center=center
         return
 
 class Stitch:
-    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.25,masked=[]):
+    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.15,masked=[]):
         
         ch_a4=N.loadtxt(ch_a4_str, unpack=True)
         ch_a4=ch_a4.T.flatten()
         ch_eff=N.loadtxt(ch_eff_str, unpack=True)
         ch_eff=ch_eff.T.flatten()
         
-        if 0:
-            pylab.plot(ch_eff,'s')
-            pylab.show()
-            sys.exit()
+
         #ch_eff=N.ones(ch_eff.shape)
         self.ch_eff_orig=ch_eff
         ch_eff[masked]=0.0
@@ -43,12 +40,16 @@ class Stitch:
         self.data=data
         self.psd=psd
         ch_space=ch_a4[psd.center]-ch_a4
+        print 'ch_space1', ch_space
         ch_space=N.concatenate((ch_space,[ch_space[-1]]))
+        print 'ch_space2',ch_space
+        print 'shifted',cshift(ch_space,1)
         ch_boundary=ch_space+0.5*(-ch_space+cshift(ch_space,1))
         ch_boundary[0]=ch_space[0]+0.5*(ch_space[0]-ch_space[1])
-        ch_boundary[-1]=ch_space[-2]-(ch_space[-3]-ch_space[-2])
+        ch_boundary[-1]=ch_space[-2]-0.5*(ch_space[-3]-ch_space[-2])
         self.ch_space=ch_space
         self.ch_boundary=ch_boundary
+
         
         self.outputwidth=outputwidth
         self.a4=N.array(data.data['a4'],'float64')
@@ -58,13 +59,22 @@ class Stitch:
         self.output_npts=int(N.round(N.absolute(self.a4_end-self.a4_begin)/self.outputwidth))
         #self.output_a4=N.arange(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end])+outputwidth,outputwidth)
         self.output_a4=N.linspace(N.min([self.a4_begin,self.a4_end]),N.max([self.a4_begin,self.a4_end]),self.output_npts+1)
-        print 'output',self.output_a4
+        #print 'output',self.output_a4
         #self.output_npts=self.output_a4.shape[0]
         #print self.output_npts
         #print self.output_a4.shape
         print 'begin',self.a4_begin
         print 'end',self.a4_end 
         print 'boundaries',ch_boundary
+
+        if 0:
+            pylab.plot(ch_boundary,'s')
+            #pylab.plot(ch_a4,'s')
+            #pylab.plot(ch_eff,'s')
+            pylab.show()
+            sys.exit()
+
+        
         #print 'a4',self.a4       
         detectors=self.data.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
         self.corrected=False
@@ -99,8 +109,11 @@ class Stitch:
             print ch_space2
             print self.a4
             print masked
+            a4size=self.a4.shape[0]
             for i,a in enumerate(self.a4):
-                pylab.plot(a+ch_space2,self.data_eff[:,i],'s')
+                #pylab.plot(a+ch_space2,self.data_eff[:,i],'s')
+                if i in [a4size-3,a4size-2,a4size-1]:
+                    pylab.plot(a+ch_space2,self.data_eff[:,i],'s')
             pylab.show()
             sys.exit()
         
@@ -150,8 +163,8 @@ class Stitch:
             #print 'output_mon',output_mon
             #print, emsg
             #drebin,ch_left[range[0]:range[2]+1],mon_in[range[0]:range[2]],mon_in[range[0]:range[2]],output_data_left,output_mon,dz_output_mon,/histogram,/to_histogram,err=err,emsg=emsg
-            #print output_data.shape
-            #print output_tmp#.shape
+            print output_data.shape
+            print output_tmp.shape
             #print output_mon.shape
             #print dz_output_tmp.shape
             #print output_tmp^2
