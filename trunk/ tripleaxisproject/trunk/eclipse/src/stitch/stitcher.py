@@ -18,14 +18,14 @@ def cshift(l, offset):
 
 
 class Psd:
-    def __init__(self,left=0,center=21,right=47):
+    def __init__(self,left=0,center=21,right=37):
         self.left=left
         self.right=right
         self.center=center
         return
 
 class Stitch:
-    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.15,masked=[]):
+    def __init__(self,data,ch_a4_str,ch_eff_str,psd,outputwidth=0.31,masked=[]):
         
         ch_a4=N.loadtxt(ch_a4_str, unpack=True)
         ch_a4=ch_a4.T.flatten()
@@ -138,13 +138,14 @@ class Stitch:
         output_data=0.0*self.output_a4[0:-1]
         output_data_err=N.zeros(output_data.shape,'float64')
         data_norm=N.zeros(output_data.shape,'float64')
+        mon_in=z_in=N.flipud(mon_in)
         for i in range(self.a4.shape[0]):
-            ch_boundary=self.ch_boundary+self.a4[i]
+            #ch_boundary=self.ch_boundary+self.a4[i]
             z_in = self.data_eff[:,i]#*ch_eff
             dz_in = self.data_err_eff[:,i]#*ch_eff
             #print z_in
             #print dz_in
-            ch_boundary=N.flipud(ch_boundary)
+            ch_boundary=N.flipud(self.ch_boundary+self.a4[i])
             print 'inline boundary', ch_boundary
             z_in=N.flipud(z_in)
             dz_in=N.flipud(dz_in)
@@ -168,13 +169,18 @@ class Stitch:
             #print output_mon.shape
             #print dz_output_tmp.shape
             #print output_tmp^2
-            output_data=output_data+output_tmp*output_mon
-            output_data_err=output_data_err+dz_output_tmp**2*output_mon**2
+            output_data=output_data+output_tmp#*output_mon
+            output_data_err=output_data_err+dz_output_tmp**2#*output_mon**2
             #print 'output_mon',output_mon
             data_norm=data_norm+output_mon
             #print 'data_norm',data_norm
-        self.output_data=output_data/data_norm
-        self.output_data_err=N.sqrt(output_data_err)/data_norm
+            
+            
+            
+        idx=N.where(data_norm>0)
+        self.output_data=output_data[idx]/data_norm[idx]
+        self.output_data_err=N.sqrt(output_data_err[idx])/data_norm[idx]
+        self.output_a4=self.output_a4[idx]
         #print 'output_a4', self.output_a4
         print 'data_norm', data_norm
         #print 'output',self.output_data
@@ -254,7 +260,8 @@ if __name__=='__main__':
         if 1:
             #print 'data_eff', mystitcher.data_eff
             #pylab.plot(mystitcher.data_eff,'s')
-            pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+            #pylab.errorbar(mystitcher.output_a4[0:-1],mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+            pylab.errorbar(mystitcher.output_a4,mystitcher.output_data,mystitcher.output_data_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
             #print 'a',mystitcher.output_a4[0:-1]
         if 0:
             #myfilestr=os.path.join(mydirectory2,'CeOFeAs57257.bt7.out')
