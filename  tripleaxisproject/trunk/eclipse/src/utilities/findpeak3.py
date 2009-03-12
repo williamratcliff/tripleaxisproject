@@ -105,19 +105,23 @@ def findpeak(x,y,npeaks):
 #    
 #    
         for i in range(npeaks):    
-            full_height = y[N.floor(indices[i])]
+            full_height = y[N.floor(indices[i])-1]
             half_height = 0.5*full_height;
 #          % Descend down the peak until you get lower than the half height
             elevation = full_height;
             incrementr = 0;
+            print 'elevation', elevation
             while elevation > half_height:
 #             % go down the right side of the peak
-                elevation = y[N.floor(indices[i])+incrementr];
+                elevation = y[N.floor(indices[i])+incrementr+1];
                 incrementr = incrementr+1;
                 no_widthr = 0;
                 if (N.floor(indices[i])+incrementr+1 > ny):
                     no_widthr = 1;
+                    print 'nowidthr'
                     break;
+            print 'incrementr', incrementr
+            print 'elevationr',elevation
 #               %goto, no_width_found
 #          #%now go to the left side of the peak
 #          #% Descend down the peak until you get lower than the half height
@@ -125,17 +129,20 @@ def findpeak(x,y,npeaks):
             incrementl = 0;
             while elevation > half_height:
 #             % go down the right side of the peak
-                elevation = y[N.floor(indices[i])+incrementl];
+                elevation = y[N.floor(indices[i])+incrementl-1];
                 incrementl = incrementl-1;
                 no_widthl = 0;
                 if (N.floor(indices[i])+incrementl-1 < 0):
                     no_widthl = 1;
                     break;
 #               %goto, no_width_found
- 
+            print 'elevationl',elevation
+            print 'incrementl', incrementl
             no_width=N.min(no_widthl,no_widthr);
-            increment=N.min(abs(incrementl),incrementr);
-#    
+            increment=N.min(N.abs(incrementl),incrementr);
+            
+            print 'increment', increment
+            print 'no_width', no_width
 #    
 #    
 #     #%     no_width_found:
@@ -181,8 +188,8 @@ def matlab_gaussian(x,p):
 
 if __name__=="__main__":
     x=N.arange(-1,1,.1)
-    y=fp_gaussian(x,1,0,.5)
-    p=[100,0,.1]
+    #y=fp_gaussian(x,1,0,.5)
+    p=[100,0.2,.2]
     y=matlab_gaussian(x,p)
     if 0:
         pylab.plot(x,y,'s')
