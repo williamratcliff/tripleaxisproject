@@ -105,7 +105,7 @@ def findpeak(x,y,npeaks):
 #    
 #    
 #    
-        for i in range(npeaks):    
+        for i in range(npeaks):   
             full_height = y[N.floor(indices[i])]
             half_height = 0.5*full_height;
 #          % Descend down the peak until you get lower than the half height
@@ -126,7 +126,7 @@ def findpeak(x,y,npeaks):
                 
             incrementr=incrementr-1  #error on the side of making it too narrow!
             print 'incrementr', incrementr
-            print 'elevationr',elevation
+            print 'elevationr',y[N.floor(indices[i])+incrementr]
             print 'no_widthr',no_widthr
 #               %goto, no_width_found
 #          #%now go to the left side of the peak
@@ -144,9 +144,10 @@ def findpeak(x,y,npeaks):
                 
                 
 #               %goto, no_width_found
-            print 'elevationl',elevation
+            
             incrementl=incrementl+1
             print 'incrementl', incrementl
+            print 'elevationl',y[N.floor(indices[i])+incrementl]
             print 'no_widthl',no_widthl
             no_width=N.min([no_widthl,no_widthr]);
             increment=N.min([N.abs(incrementl),incrementr]);
@@ -157,14 +158,15 @@ def findpeak(x,y,npeaks):
 #            
 #    
 #     #%     no_width_found:
-            if no_width:
+            if no_width==1:
+                print 'no width found'
                 width = 2.0*(x[ny]-xpeaks[i]);
             else:
                 width = 2.0*(x[N.floor(indices[i])+increment]-xpeaks[i]);             
             if i == 0:
               fwhm = width
             else:
-              fwhm = [fwhm,width]
+              fwhm = N.hstack(([fwhm],[width]))
           
 #      #     %plot([(xpeaks(i)-fwhm(i)/2) (xpeaks(i)+fwhm(i)/2)],[half_height half_height]); hold on;
 #      end
@@ -172,7 +174,9 @@ def findpeak(x,y,npeaks):
 #    
 #      #%b=length(fwhm);
 #      #%fwhm=fwhm(b);
-    p=N.hstack((xpeaks,N.abs(fwhm)))
+
+    print 'xpeaks',xpeaks
+    p=N.hstack((xpeaks[0:npeaks],N.abs(fwhm)))
     print p
 #      return p
     return p
@@ -198,15 +202,15 @@ def matlab_gaussian(x,p):
 
 
 if __name__=="__main__":
-    x=N.arange(-3,3,.05)
+    x=N.arange(-3,4,.005)
     #y=fp_gaussian(x,1,0,.5)
     p=[100,0,.2]
     y=matlab_gaussian(x,p)
-    #p=[100,2,.2]
-    #y=y+matlab_gaussian(x,p)
+    p=[1000,3,.1]
+    y=y+matlab_gaussian(x,p)
     if 0:
         pylab.plot(x,y,'s')
         pylab.show()
         sys.exit()
-    findpeak(x,y,1)
+    findpeak(x,y,2)
     #
