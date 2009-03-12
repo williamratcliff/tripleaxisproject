@@ -2,7 +2,7 @@ import numpy as N
 import pylab
 from sgolay import savitzky_golay as savitzky_golay
 import sys
-
+import scipy.interpolate as interpolate
 pi=N.pi
 
 def findpeak(x,y,npeaks):
@@ -64,100 +64,100 @@ def findpeak(x,y,npeaks):
     indices = 0.5*(2*wh_cross-1);
     print indices
 #    
-#    no_width = 0;
+    no_width = 0;
 #    
-#    if n_crossings > 0
+    if n_crossings > 0:
 #    #% Ok, now which ones of these are peaks?
-#       ysupport=1:length(y);
-#       ymax=interp1(ysupport,y,indices);
+        
+        
+        #ymax=interp1(ysupport,y,indices);
+        ysupport=range(len(y))
+        print 'ysupport',ysupport
+        yinterpolater=interpolate.interp1d(ysupport,y,fill_value=0.0,kind='linear',copy=True,bounds_error=False)
+        ymax=yinterpolater(indices)
+        print 'y_interpolated',ymax
 #     #%  ymax = interpolate(y,indices)
+        ymin = N.min(ymax)
+        print 'ymin',ymin
+        print 'npeaks',npeaks
+        for i in range(npeaks):
+            this_max=max(ymax)
+            max_index=N.nonzero(ymax==this_max)
+            #max_index = find(ymax==this_max);
+            if i ==0:
+                best_index = indices[max_index]
+            else:    
+                best_index =N.hstack((best_index, indices[max_index]));
+            ymax[max_index] = ymin;
+        indices = best_index;
+        
+        print 'indices',indices
+        xsupport=range(len(x))
+        xinterpolater=interpolate.interp1d(xsupport,x,fill_value=0.0,kind='linear',copy=True,bounds_error=False)        
+        xpeaks=xinterpolater(indices)
+        print 'xpeaks',xpeaks
+        
+        #xsupport=1:length(x);
+        #xpeaks = interp1(xsupport,x,indices);
+#        xpeaks=xpeaks(1:npeaks);
 #    
-#       ymin = min(ymax);
-#       for i = 0:npeaks-1
-#    
-#         #%this_max = max(ymax,max_index)
-#            this_max=max(ymax);
-#            max_index = find(ymax==this_max);
-#         if i ==0
-#             best_index = indices(max_index);
-#         else
-#    
-#             best_index = [best_index indices(max_index)];
-#    
-#         end
-#         ymax(max_index) = ymin;
-#        end
-#       indices = best_index;
-#    
-#       xsupport=1:length(x);
-#       xpeaks = interp1(xsupport,x,indices);
-#       xpeaks=xpeaks(1:npeaks);
 #    
 #    
 #    
-#    
-#       for i = 1:npeaks
-#    
-#           full_height = y(floor(indices(i)));
-#           half_height = 0.5*full_height;
+        for i in range(npeaks):    
+            full_height = y[N.floor(indices[i])]
+            half_height = 0.5*full_height;
 #          % Descend down the peak until you get lower than the half height
-#          elevation = full_height;
-#          incrementr = 0;
-#          while elevation > half_height
+            elevation = full_height;
+            incrementr = 0;
+            while elevation > half_height:
 #             % go down the right side of the peak
-#             elevation = y(floor(indices(i))+incrementr);
-#             incrementr = incrementr+1;
-#             no_widthr = 0;
-#             if (floor(indices(i))+incrementr+1 > ny)
-#               no_widthr = 1;
-#               break;
+                elevation = y[N.floor(indices[i])+incrementr];
+                incrementr = incrementr+1;
+                no_widthr = 0;
+                if (N.floor(indices[i])+incrementr+1 > ny):
+                    no_widthr = 1;
+                    break;
 #               %goto, no_width_found
-#            end
-#          end
 #          #%now go to the left side of the peak
 #          #% Descend down the peak until you get lower than the half height
-#          elevation = full_height;
-#          incrementl = 0;
-#          while elevation > half_height
+            elevation = full_height;
+            incrementl = 0;
+            while elevation > half_height:
 #             % go down the right side of the peak
-#             elevation = y(floor(indices(i))+incrementl);
-#             incrementl = incrementl-1;
-#             no_widthl = 0;
-#             if (floor(indices(i))+incrementl-1 < 0)
-#               no_widthl = 1;
-#               break;
+                elevation = y[N.floor(indices[i])+incrementl];
+                incrementl = incrementl-1;
+                no_widthl = 0;
+                if (N.floor(indices[i])+incrementl-1 < 0):
+                    no_widthl = 1;
+                    break;
 #               %goto, no_width_found
-#            end
-#          end
-#    
-#    
-#    
-#          no_width=min(no_widthl,no_widthr);
-#          increment=min(abs(incrementl),incrementr);
+ 
+            no_width=N.min(no_widthl,no_widthr);
+            increment=N.min(abs(incrementl),incrementr);
 #    
 #    
 #    
 #     #%     no_width_found:
-#          if no_width
-#              width = 2.0*(x(ny)-xpeaks(i));
-#          else
-#             width = 2.0*(x(floor(indices(i))+increment)-xpeaks(i));
-#         end
-#    
-#          if i == 1
-#              fwhm = width;
-#          else
-#              fwhm = [fwhm width];
-#          end
+            if no_width:
+                width = 2.0*(x[ny]-xpeaks[i]);
+            else:
+                width = 2.0*(x[N.floor(indices[i])+increment]-xpeaks[i]);             
+            if i == 0:
+              fwhm = width
+            else:
+              fwhm = [fwhm,width]
+          
 #      #     %plot([(xpeaks(i)-fwhm(i)/2) (xpeaks(i)+fwhm(i)/2)],[half_height half_height]); hold on;
 #      end
 #      #%hold off;
 #    
 #      #%b=length(fwhm);
 #      #%fwhm=fwhm(b);
-#      p=[xpeaks (abs(fwhm))];
+    p=N.hstack((xpeaks,N.abs(fwhm)))
+    print p
 #      return p
-    return 
+    return p
     
 
 
