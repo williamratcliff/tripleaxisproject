@@ -427,17 +427,20 @@ class rescalculator:
 #            %---------------------------------------------------------------------------------------------
 #            %Normalization to flux on monitor
             if moncor==1:
-                print 'Moncor'
-                print R0_
-                print 'RM in Moncor'
-                print RM_
+                #print 'Moncor'
+                #print R0_
+                #print 'RM in Moncor'
+                #print RM_
                 g=G[0:4][:,0:4]
                 f=F[0:2][:,0:2]
+                c=C[0:2][:,0:4]
                 #print 'f'
                 #print f
                 #print 'g'
                 #print g
-                c=C[0:2][:,0:4]
+                #print 'c'
+                #print c
+                
                 t[0,0]=-1./(2*L0)#  %mistake in paper
                 t[0,2]=N.cos(thetam)*(1./L1mon-1./L0)/2
                 t[0,3]=N.sin(thetam)*(1./L0+1./L1mon-2./(monorh*N.sin(thetam)))/2
@@ -461,6 +464,8 @@ class rescalculator:
                                                                   N.linalg.det(N.linalg.inv(N.dot(d,N.dot(N.linalg.inv(s+t.transpose()*f*t),d.transpose())))+g)) #%Popovici
                 else:
                     Rmon=Rm*(2*pi)**2/(8*pi*N.sin(thetam))*N.sqrt(N.linalg.det(f)/N.linalg.det(g+N.dot(c.transpose(),N.dot(f,c)))) #%Cooper-Nathans
+                    #print 'Cooper Nathans'
+                    #print 'Rmon', Rmon
                 R0_=R0_/Rmon
                 R0_=R0_*ki #%1/ki monitor efficiency
                 #print 'R01', R0_
@@ -474,16 +479,28 @@ class rescalculator:
             R0_=R0_*kf/ki
 #            %---------------------------------------------------------------------------------------------
 #            %Take care of sample mosaic if needed [S. A. Werner & R. Pynn, J. Appl. Phys. 42, 4736, (1971)]
+            #print 'R0_ before mosaic', R0_
+            #print RM_
             if 'mosaic' in sample:
                 etas = sample['mosaic']*CONVERT1;
-                etasv=etas
+                #print 'sample',sample
                 if 'vmosaic' in sample:
+                    #print 'vertical'
                     etasv = sample['vmosaic']*CONVERT1
+                    #print 'etasv',etasv
+                else:
+                    etasv=etas
+                
+                #print 'etas',etas, 'etasv',etasv
                 R0_=R0_/N.sqrt((1.+(q*etas)**2*RM_[3,3])*(1.0+(q*etasv)**2*RM_[1,1]))
                 Minv=N.linalg.inv(RM_)
                 Minv[1,1]=Minv[1,1]+q**2*etas**2
                 Minv[3,3]=Minv[3,3]+q**2*etasv**2
                 RM_=N.linalg.inv(Minv)
+                #print 'mosaic'
+                #print 'R0_', R0_
+                #print 'RM_'
+                #print RM_
 #            %---------------------------------------------------------------------------------------------
 #            %Take care of analyzer reflectivity if needed [I. Zaliznyak, BNL]
             if ('thickness' in ana) & ('Q' in ana):
@@ -1052,10 +1069,10 @@ class rescalculator:
             Mxy=RM[0,1,i]
             th_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Myy)/Q[i])
             
-            print 'RM',RM[:,:,i]
-            print 'det', N.sqrt(N.linalg.det(RM[:,:,i]))
-            print 'sqrt',N.sqrt(Myy)
-            print 'Q', Q[i]
+            #print 'RM',RM[:,:,i]
+            #print 'det', N.sqrt(N.linalg.det(RM[:,:,i]))
+            #print 'sqrt',N.sqrt(Myy)
+            #print 'Q', Q[i]
             tth_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Mxx)/Q[i])
             if qscan!=None:
                 q_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Mxx*qx[i]**2+2*Mxy*qx[i]*qy[i]+Myy*qy[i]**2)/Q[i])
@@ -1069,9 +1086,9 @@ class rescalculator:
     def CalcWidths(self,H,K,L,W,EXP):
         """Calculates the full width of Bragg Peaks"""
         Q=self.lattice_calculator.modvec(H,K,L,'latticestar')
-        print 'Q ',Q
+        #print 'Q ',Q
         npts=self.lattice_calculator.npts
-        print 'npts ',npts
+        #print 'npts ',npts
         center=N.round(H.shape[0]/2)
         if center<1:
              center=0
@@ -1361,7 +1378,7 @@ if __name__=="__main__":
                         orient2=newinput['orient2'])
         myrescal.__init__(mylattice)
         Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
-        print 'Q', Q
+        #print 'Q', Q
         R0,RM=myrescal.ResMat(Q,W,setup)
         print 'RM '
         print RM.transpose()
