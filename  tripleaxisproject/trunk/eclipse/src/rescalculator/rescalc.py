@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as N
 import pylab
 import math
@@ -7,6 +8,7 @@ from matplotlib.ticker import NullFormatter, MultipleLocator
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
 import copy
+
 
 import lattice_calculator
 eps=1e-3
@@ -117,24 +119,24 @@ class rescalculator:
             ep=1
             if 'dir2' in EXP[ind]:
                 ep= EXP[ind]['dir2']
-            monitorw=1
-            monitorh=1
-            beamw=1
-            beamh=1
-            monow=1
-            monoh=1
-            monod=1
-            anaw=1
-            anah=1
-            anad=1
-            detectorw=1
-            detectorh=1
+            monitorw=1.0
+            monitorh=1.0
+            beamw=1.0
+            beamh=1.0
+            monow=1.0
+            monoh=1.0
+            monod=1.0
+            anaw=1.0
+            anah=1.0
+            anad=1.0
+            detectorw=1.0
+            detectorh=1.0
             sshape=N.eye(3)
-            L0=1
-            L1=1
-            L1mon=1
-            L2=1
-            L3=1
+            L0=1.0
+            L1=1.0
+            L1mon=1.0
+            L2=1.0
+            L3=1.0
             monorv=1e6
             monorh=1e6
             anarv=1e6
@@ -425,6 +427,10 @@ class rescalculator:
 #            %---------------------------------------------------------------------------------------------
 #            %Normalization to flux on monitor
             if moncor==1:
+                print 'Moncor'
+                print R0_
+                print 'RM in Moncor'
+                print RM_
                 g=G[0:4][:,0:4]
                 f=F[0:2][:,0:2]
                 #print 'f'
@@ -1045,6 +1051,11 @@ class rescalculator:
             Mxx=RM[0,0,i]
             Mxy=RM[0,1,i]
             th_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Myy)/Q[i])
+            
+            print 'RM',RM[:,:,i]
+            print 'det', N.sqrt(N.linalg.det(RM[:,:,i]))
+            print 'sqrt',N.sqrt(Myy)
+            print 'Q', Q[i]
             tth_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Mxx)/Q[i])
             if qscan!=None:
                 q_correction.append(N.sqrt(N.linalg.det(RM[:,:,i]))/N.sqrt(Mxx*qx[i]**2+2*Mxy*qx[i]*qy[i]+Myy*qy[i]**2)/Q[i])
@@ -1322,10 +1333,10 @@ if __name__=="__main__":
         gamma=N.array([90,90],'d')
  #       orient1=N.array([[0,1,1]],'d')
         orient1=N.array([[1,0,0],[1,0,0]],'d')
-        orient2=N.array([[0,1,0],[0,1,0]],'d')
+        orient2=N.array([[0,0,1],[0,0,1]],'d')
         mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                orient1=orient1,orient2=orient2)
-        H=N.array([1.5,1.5],'d');K=N.array([0,0.0],'d');L=N.array([0.35,0.35],'d');W=N.array([20,10],'d')
+        H=N.array([1.5,1.5],'d');K=N.array([0,0.0],'d');L=N.array([5.0,5.0],'d');W=N.array([0,0],'d')
         EXP={}
         EXP['ana']={}
         EXP['ana']['tau']='pg(002)'
@@ -1350,6 +1361,7 @@ if __name__=="__main__":
                         orient2=newinput['orient2'])
         myrescal.__init__(mylattice)
         Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
+        print 'Q', Q
         R0,RM=myrescal.ResMat(Q,W,setup)
         print 'RM '
         print RM.transpose()
@@ -1359,6 +1371,6 @@ if __name__=="__main__":
         #myrescal.ResPlot(H, K, L, W, setup)
         print 'RMS'
         print RMS.transpose()[0]
-        print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,1,0],[1,1,0]])
+        print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
         print myrescal.CalcWidths(H,K,L,W,setup)
         print 'setup length ',len(setup)
