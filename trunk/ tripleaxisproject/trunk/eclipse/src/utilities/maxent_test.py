@@ -202,26 +202,48 @@ def chisq_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     
     return grad
 
-
-def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
-    M=len(p)/2
+def S_grad(p,h,k,l,fq,fqerr,A=1.0,xstep=0.01,zstep=0.01):
+    M=int(len(p)/2)
     Mx=1.0/xstep
     Mz=1.0/zstep
     #print M,Mx,Mz
-    print '2M',2*M
-    fsum_up=N.zeros(h.shape)
-    fsum_down=N.zeros(h.shape)
-    fmodel=N.zeros(h.shape)
-    
-    hessian=N.zeros((2*M,2*M))
+    #print '2M',2*M
+    #fsum_up=N.zeros(h.shape)
+    #fsum_down=N.zeros(h.shape)
+    #fmodel=N.zeros(h.shape)
+    gradient=N.zeros(2*M)
     pos=range(M)
-    hessian[pos,pos]=-1./p[0:M]
-    hessian[pos,2*pos+1]=-1/p[M+1:2*M]
-    #P_up,P_down=transform_p(p,Mx,Mz,M)
-    
-    
-    
-    return hessian
+    posm=range(M,2*M)
+    #print 'pos',pos
+    #print 'posm',posm
+    hrows=range(2*M)
+    hcols=hrows
+    gradient[pos]=N.log(A)-N.log(p[0:M])
+    gradient[posm]=N.log(A)-N.log(p[M+1:2*M])
+    #P_up,P_down=transform_p(p,Mx,Mz,M)    
+    return hrows,hcols,gradient
+
+
+def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
+    M=int(len(p)/2)
+    Mx=1.0/xstep
+    Mz=1.0/zstep
+    #print M,Mx,Mz
+    #print '2M',2*M
+    #fsum_up=N.zeros(h.shape)
+    #fsum_down=N.zeros(h.shape)
+    #fmodel=N.zeros(h.shape)
+    hessian=N.zeros(2*M)
+    pos=range(M)
+    posm=range(M,2*M)
+    #print 'pos',pos
+    #print 'posm',posm
+    hrows=range(2*M)
+    hcols=hrows
+    hessian[pos]=-1./p[0:M]
+    hessian[posm]=-1/p[M+1:2*M]
+    #P_up,P_down=transform_p(p,Mx,Mz,M)    
+    return hrows,hcols,hessian
 
 
 
@@ -240,13 +262,15 @@ if __name__=="__main__":
     print 'len pu',len(pu)
     print 'len pd',len(pd)
     print 'len p',len(p)
-    chi=chisq(p,h,k,l,fq,fqerr)
-    print 'chi',chi
-    grad=chisq_grad(p,h,k,l,fq,fqerr)
-    print 'gradient',grad
-    
-    s_hess=S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01)
-    print 'S_hessian', s_hess
+    if 0:
+        chi=chisq(p,h,k,l,fq,fqerr)
+        print 'chi',chi
+        grad=chisq_grad(p,h,k,l,fq,fqerr)
+        print 'gradient',grad
+    sgrad_rows,sgrad_cols,s_grad=S_grad(p,h,k,l,fq,fqerr,A=1,xstep=0.01,zstep=0.01)
+    print 'S_grad', s_grad
+    srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01)
+    print 'S_hessian',s_hess
     if 0:
         pylab.pcolor(X,Z,P)
         pylab.show()    
