@@ -208,6 +208,7 @@ def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     Mx=1.0/xstep
     Mz=1.0/zstep
     #print M,Mx,Mz
+    print '2M',2*M
     fsum_up=N.zeros(h.shape)
     fsum_down=N.zeros(h.shape)
     fmodel=N.zeros(h.shape)
@@ -236,11 +237,11 @@ if __name__=="__main__":
     pu=P.flatten()
     pd=N.zeros(len(pu))
     p=N.concatenate((pu,pd))
-    print len(pu)
-    print len(pd)
-    print len(p)
+    print 'len pu',len(pu)
+    print 'len pd',len(pd)
+    print 'len p',len(p)
     chi=chisq(p,h,k,l,fq,fqerr)
-    print chi
+    print 'chi',chi
     grad=chisq_grad(p,h,k,l,fq,fqerr)
     print 'gradient',grad
     
