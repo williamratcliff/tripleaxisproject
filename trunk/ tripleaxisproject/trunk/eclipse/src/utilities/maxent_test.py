@@ -212,41 +212,15 @@ def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     fsum_down=N.zeros(h.shape)
     fmodel=N.zeros(h.shape)
     
-    chi=N.zeros(h.shape)
-    P_up,P_down=transform_p(p,Mx,Mz,M)
-
-    x=N.arange(0.0,1.0,xstep)
-    z=N.arange(0.0,1.0,zstep)
-    xn=len(x)
-    zn=len(z)
-    grad=N.zeros(P_up.shape)
-    for i in range(len(h)):
-        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
-        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
-        fmodel[i]=fsum_up[i]-fsum_down[i]
-    for xia in range(xn):
-        for zia in range(zn):
-            xi=x[xia]
-            zi=z[zia]
-            #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
-            #cosqr=N.cos(2*pi*1*(h*xi+l*zi));
-            #fsum=fsum+P[xia,zia]*cosqr  
-            chi=0
-            for i in range(len(h)):
-                #fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
-                #fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
-                #fmodel=fsum_up[i]-fsum_down[i]
-                cosqr=N.cos(2*pi*1*(h[i]*xi+l[i]*zi));
-                chi=chi+2*(fmodel[i]-fq[i])/fqerr[i]**2*cosqr
-                #print i
-            grad[xia,zia]=chi.sum()
-            
-    grad_up=grad.flatten()
-    grad_down=-grad_up
-    grad=N.concatenate((grad_up,grad_down))
-        #print h[i],k[i],l[i],fq[i],chi[i]
+    hessian=N.zeros((2*M,2*M))
+    pos=range(M)
+    hessian[pos,pos]=-1./p[0:M]
+    hessian[pos,2*pos+1]=-1/p[M+1:2*M]
+    #P_up,P_down=transform_p(p,Mx,Mz,M)
     
-    return grad
+    
+    
+    return hessian
 
 
 
@@ -269,6 +243,9 @@ if __name__=="__main__":
     print chi
     grad=chisq_grad(p,h,k,l,fq,fqerr)
     print 'gradient',grad
+    
+    s_hess=S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01)
+    print 'S_hessian', s_hess
     if 0:
         pylab.pcolor(X,Z,P)
         pylab.show()    
