@@ -245,12 +245,21 @@ def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     #P_up,P_down=transform_p(p,Mx,Mz,M)    
     return hrows,hcols,hessian
 
-def precompute(h,k,l,xstep=0.01,zstep=0.01):
+
+def precompute_r(xstep=0.01,zstep=0.01):
     x=N.arange(0.0,1.0,xstep)
     z=N.arange(0.0,1.0,zstep)
     xn=len(x)
     zn=len(z)
-    X,Z=N.meshgrid(x,z)
+    #X,Z=N.meshgrid(x,z)
+    return x,z
+
+def precompute_cos(h,k,l,x,z):
+    x=N.arange(0.0,1.0,xstep)
+    z=N.arange(0.0,1.0,zstep)
+    xn=len(x)
+    zn=len(z)
+    #X,Z=N.meshgrid(x,z)
     #fsum=0.0
     #delta=.065;
     #%delta=.1;
@@ -263,13 +272,15 @@ def precompute(h,k,l,xstep=0.01,zstep=0.01):
         hc=h[i]
         kc=k[i]
         lc=l[i]
+        cosmat=N.zeros((xn,zn))
         for xia in range(xn):
             for zia in range(zn):
                 xi=x[xia]
                 zi=z[zia]
                 #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
-                cosqr=N.cos(2*pi*1*(hc*xi+lc*zi));
-                coslist.append(cosqr)  
+                cosqr=N.cos(2*pi*1*(hc*xi+lc*zi))
+                cosmat[xia,zia]=cosqr
+        coslist.append(cosqr)  
     return coslist
 if __name__=="__main__":
     
@@ -286,8 +297,9 @@ if __name__=="__main__":
     print 'len pu',len(pu)
     print 'len pd',len(pd)
     print 'len p',len(p)
-    coslist=precompute(h,k,l)
-    #print 'coslist',coslist
+    x,z=precompute_r()
+    coslist=precompute(h,k,l,x,z)
+    print 'coslist',coslist[0]
     if 0:
         chi=chisq(p,h,k,l,fq,fqerr)
         print 'chi',chi
