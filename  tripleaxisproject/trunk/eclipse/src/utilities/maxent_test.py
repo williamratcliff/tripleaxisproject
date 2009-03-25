@@ -245,8 +245,32 @@ def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     #P_up,P_down=transform_p(p,Mx,Mz,M)    
     return hrows,hcols,hessian
 
-
-
+def precompute(h,k,l,xstep=0.01,zstep=0.01):
+    x=N.arange(0.0,1.0,xstep)
+    z=N.arange(0.0,1.0,zstep)
+    xn=len(x)
+    zn=len(z)
+    X,Z=N.meshgrid(x,z)
+    #fsum=0.0
+    #delta=.065;
+    #%delta=.1;
+    #delta=.035;
+    #outfile='c:\structfactors_density.dat'
+    #fid=fopen([outfile],'w');
+    #fsum=0.0
+    coslist=[]
+    for i in range(len(h)):
+        hc=h[i]
+        kc=k[i]
+        lc=l[i]
+        for xia in range(xn):
+            for zia in range(zn):
+                xi=x[xia]
+                zi=z[zia]
+                #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
+                cosqr=N.cos(2*pi*1*(hc*xi+lc*zi));
+                coslist.append(cosqr)  
+    return coslist
 if __name__=="__main__":
     
     myfilestr=r'c:\structfactors.dat'
@@ -262,15 +286,17 @@ if __name__=="__main__":
     print 'len pu',len(pu)
     print 'len pd',len(pd)
     print 'len p',len(p)
+    coslist=precompute(h,k,l)
+    #print 'coslist',coslist
     if 0:
         chi=chisq(p,h,k,l,fq,fqerr)
         print 'chi',chi
         grad=chisq_grad(p,h,k,l,fq,fqerr)
         print 'gradient',grad
-    sgrad_rows,sgrad_cols,s_grad=S_grad(p,h,k,l,fq,fqerr,A=1,xstep=0.01,zstep=0.01)
-    print 'S_grad', s_grad
-    srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01)
-    print 'S_hessian',s_hess
+        sgrad_rows,sgrad_cols,s_grad=S_grad(p,h,k,l,fq,fqerr,A=1,xstep=0.01,zstep=0.01)
+        print 'S_grad', s_grad
+        srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01)
+        print 'S_hessian',s_hess
     if 0:
         pylab.pcolor(X,Z,P)
         pylab.show()    
