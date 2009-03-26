@@ -255,8 +255,8 @@ def precompute_r(xstep=0.01,zstep=0.01):
     return x,z
 
 def precompute_cos(h,k,l,x,z):
-    x=N.arange(0.0,1.0,xstep)
-    z=N.arange(0.0,1.0,zstep)
+   # x=N.arange(0.0,1.0,xstep)
+   # z=N.arange(0.0,1.0,zstep)
     xn=len(x)
     zn=len(z)
     #X,Z=N.meshgrid(x,z)
@@ -280,7 +280,7 @@ def precompute_cos(h,k,l,x,z):
                 #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
                 cosqr=N.cos(2*pi*1*(hc*xi+lc*zi))
                 cosmat[xia,zia]=cosqr
-        coslist.append(cosqr)  
+        coslist.append(cosmat)  
     return coslist
 if __name__=="__main__":
     
@@ -298,7 +298,7 @@ if __name__=="__main__":
     print 'len pd',len(pd)
     print 'len p',len(p)
     x,z=precompute_r()
-    coslist=precompute(h,k,l,x,z)
+    coslist=precompute_cos(h,k,l,x,z)
     print 'coslist',coslist[0]
     if 0:
         chi=chisq(p,h,k,l,fq,fqerr)
