@@ -70,7 +70,7 @@ def neg_sum_grad(p):
 
 
 
-def fourier_p(h,k,l,P,xstep=0.01,zstep=0.01):
+def fourier_p(h,k,l,P,xstep=0.1,zstep=0.1):
     x=N.arange(0.0,1.0,xstep)
     z=N.arange(0.0,1.0,zstep)
     xn=len(x)
@@ -108,7 +108,7 @@ def transform_p(p,Mx,Mz,M):
      
      
 
-def chisq(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
+def chisq(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
     M=len(p)/2
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -128,7 +128,7 @@ def chisq(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
    
 
 
-def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
+def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
     M=len(p)/2
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -176,7 +176,7 @@ def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
 
 
 
-def S_grad(p,h,k,l,fq,fqerr,A=1.0,xstep=0.01,zstep=0.01):
+def S_grad(p,h,k,l,fq,fqerr,A=1.0,xstep=0.1,zstep=0.1):
     M=int(len(p)/2)
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -198,7 +198,7 @@ def S_grad(p,h,k,l,fq,fqerr,A=1.0,xstep=0.01,zstep=0.01):
     return hrows,hcols,gradient
 
 
-def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
+def S_hessian(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
     M=int(len(p)/2)
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -220,7 +220,7 @@ def S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01):
     return hrows,hcols,hessian
 
 
-def precompute_r(xstep=0.01,zstep=0.01):
+def precompute_r(xstep=0.1,zstep=0.1):
     x=N.arange(0.0,1.0,xstep)
     z=N.arange(0.0,1.0,zstep)
     xn=len(x)
@@ -258,7 +258,7 @@ def precompute_cos(h,k,l,x,z):
         coslist.append(N.hstack((cosmat,cosmat)))  
     return coslist
 
-def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.01,zstep=0.01):
+def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.1,zstep=0.1):
     
     #v is the vector we are muliplying by
     M=len(p)/2
@@ -302,6 +302,7 @@ if __name__=="__main__":
     pu=P.flatten()
     pd=N.zeros(len(pu))
     p=N.concatenate((pu,pd))
+    p=N.ones(100)
     print 'len pu',len(pu)
     print 'len pd',len(pd)
     print 'len p',len(p)
@@ -318,9 +319,9 @@ if __name__=="__main__":
         print 'chi',chi
         grad=chisq_grad(p,h,k,l,fq,fqerr)
         print 'gradient',grad
-        sgrad_rows,sgrad_cols,s_grad=S_grad(p,h,k,l,fq,fqerr,A=1,xstep=0.01,zstep=0.01)
+        sgrad_rows,sgrad_cols,s_grad=S_grad(p,h,k,l,fq,fqerr,A=1)
         print 'S_grad', s_grad
-        srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr,xstep=0.01,zstep=0.01)
+        srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr)
         print 'S_hessian',s_hess
     if 0:
         pylab.pcolor(X,Z,P)
