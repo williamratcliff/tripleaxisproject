@@ -255,7 +255,7 @@ def precompute_cos(h,k,l,x,z):
                 cosqr=N.cos(2*pi*1*(hc*xi+lc*zi))
                 cosmat.append(cosqr)
                 #cosmat[xia,zia]=cosqr
-        coslist.append(cosmat)  
+        coslist.append(N.hstack((cosmat,cosmat)))  
     return coslist
 
 def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.01,zstep=0.01):
@@ -271,13 +271,18 @@ def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.01,zstep=0.01):
     
     xn=len(x)
     zn=len(z)
-    
+    print 'sizes'
+    print 'cosk',len(coslist[0])
+    print 'flist', len(flist)
+    print 'fqerr', len(fqerr)
+    print 'v',len(v)
+    print 'p',len(p)
     for i in range(vlen):
         for j in range(vlen):
             tot=0
             al=0
             for cosk in coslist:
-                tot=tot+cosk[i]*cosk[j]*flist[i]*flist[j]/ferr[al]**2
+                tot=tot+cosk[i]*cosk[j]*flist[i]*flist[j]/fqerr[al]**2
                 al=al+1;
             vout[i]=vout[i]+v[j]*tot
     
