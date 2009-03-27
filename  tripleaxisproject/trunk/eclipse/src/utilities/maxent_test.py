@@ -258,54 +258,33 @@ def precompute_cos(h,k,l,x,z):
         coslist.append(cosmat)  
     return coslist
 
-def chisq_hessian(p,fqerr,v,coslist,x,z,flist,xstep=0.01,zstep=0.01):
+def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.01,zstep=0.01):
     
     #v is the vector we are muliplying by
     M=len(p)/2
     Mx=1.0/xstep
     Mz=1.0/zstep
     #print M,Mx,Mz
-    P_up,P_down=transform_p(p,Mx,Mz,M)
     vlen=len(v)
-    peln=len(p)
-    vout=N.ones(vlen)
+    plen=len(p)
+    vout=N.zeros(vlen)
     
     xn=len(x)
     zn=len(z)
     
     for i in range(vlen):
         for j in range(vlen):
+            tot=0
+            al=0
             for cosk in coslist:
-            
+                tot=tot+cosk[i]*cosk[j]*flist[i]*flist[j]/ferr[al]**2
+                al=al+1;
+            vout[i]=vout[i]+v[j]*tot
     
-    grad=N.zeros(P_up.shape)
-    for i in range(len(h)):
-        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
-        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
-        fmodel[i]=fsum_up[i]-fsum_down[i]
-    for xia in range(xn):
-        for zia in range(zn):
-            xi=x[xia]
-            zi=z[zia]
-            #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
-            #cosqr=N.cos(2*pi*1*(h*xi+l*zi));
-            #fsum=fsum+P[xia,zia]*cosqr  
-            chi=0
-            for i in range(len(h)):
-                #fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
-                #fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
-                #fmodel=fsum_up[i]-fsum_down[i]
-                cosqr=N.cos(2*pi*1*(h[i]*xi+l[i]*zi));
-                chi=chi+2*(fmodel[i]-fq[i])/fqerr[i]**2*cosqr
-                #print i
-            grad[xia,zia]=chi.sum()
-            
-    grad_up=grad.flatten()
-    grad_down=-grad_up
-    grad=N.concatenate((grad_up,grad_down))
-        #print h[i],k[i],l[i],fq[i],chi[i]
-    
-    return grad
+    vout=2*vout/M**2
+    return vout
+
+
 if __name__=="__main__":
     
     myfilestr=r'c:\structfactors.dat'
@@ -327,6 +306,8 @@ if __name__=="__main__":
     flist=N.ones(len(p))
     M=len(p)/2
     flist[M::]=-flist[M::]
+    vout=chisq_hessian(p,fqerr,p,coslist,flist)
+    print 'vout', vout
     if 0:
         chi=chisq(p,h,k,l,fq,fqerr)
         print 'chi',chi
