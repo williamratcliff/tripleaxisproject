@@ -258,7 +258,7 @@ def precompute_cos(h,k,l,x,z):
         coslist.append(cosmat)  
     return coslist
 
-def chisq_hessian(p,h,k,l,fq,fqerr,v,coslist,x,z,flist,xstep=0.01,zstep=0.01):
+def chisq_hessian(p,fqerr,v,coslist,x,z,flist,xstep=0.01,zstep=0.01):
     
     #v is the vector we are muliplying by
     M=len(p)/2
@@ -266,9 +266,18 @@ def chisq_hessian(p,h,k,l,fq,fqerr,v,coslist,x,z,flist,xstep=0.01,zstep=0.01):
     Mz=1.0/zstep
     #print M,Mx,Mz
     P_up,P_down=transform_p(p,Mx,Mz,M)
+    vlen=len(v)
+    peln=len(p)
+    vout=N.ones(vlen)
     
     xn=len(x)
     zn=len(z)
+    
+    for i in range(vlen):
+        for j in range(vlen):
+            for cosk in coslist:
+            
+    
     grad=N.zeros(P_up.shape)
     for i in range(len(h)):
         fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
@@ -315,7 +324,7 @@ if __name__=="__main__":
     x,z=precompute_r()
     coslist=precompute_cos(h,k,l,x,z)
     print 'coslist',coslist[0]
-    flist=ones(len(p))
+    flist=N.ones(len(p))
     M=len(p)/2
     flist[M::]=-flist[M::]
     if 0:
