@@ -4,7 +4,8 @@ import dct
 import pylab
 from openopt import NLP
 A=1.0
-
+xstep=0.05
+zstep=0.05
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
@@ -90,8 +91,8 @@ def fourier_p(h,k,l,P,x,z,cosqr):
             xi=x[xia]
             zi=z[zia]
             #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
-            cosqr=N.cos(2*pi*1*(h*xi+l*zi));
-            fsum=fsum+P[xia,zia]*cosqr  
+            #cosqr=N.cos(2*pi*1*(h*xi+l*zi));
+            fsum=fsum+P[xia,zia]*cosqr[xia,zia]  
             #print xi,zi,'sum',fsum,cosqr, P[xia,zia]
             #if abs(P[xia,zia])>0:
             #    print xi,zi,P[xia,zia]
@@ -99,18 +100,22 @@ def fourier_p(h,k,l,P,x,z,cosqr):
 
 
 def transform_p(p,Mx,Mz,M):
-    pup_n=len(p)/2
+    #pup_n=len(p)/2
     pup=p[0:M]
     pdown=p[M::]
+    #print 'Mtrans',Mx,Mz,M
     #print 'pup',pup.shape
     #print 'pdown',pdown.shape
+    #print 'p',p.shape
     p_up=pup.reshape(Mx,Mz)
     p_down=pdown.reshape(Mx,Mz)
     return p_up,p_down
      
      
 
-def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1):
+def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list):
+    global xstep
+    global zstep
     M=len(p)/2
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -130,7 +135,9 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1):
    
 
 
-def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
+def chisq_grad(p,h,k,l,fq,fqerr):
+    global xstep
+    global zstep
     M=len(p)/2
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -178,7 +185,10 @@ def chisq_grad(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
 
 
 
-def S_grad(p,h,k,l,fq,fqerr,A=1.0,xstep=0.1,zstep=0.1):
+def S_grad(p,h,k,l,fq,fqerr):
+    global xstep
+    global zstep
+    global A
     M=int(len(p)/2)
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -200,7 +210,9 @@ def S_grad(p,h,k,l,fq,fqerr,A=1.0,xstep=0.1,zstep=0.1):
     return hrows,hcols,gradient
 
 
-def S_hessian(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
+def S_hessian(p,h,k,l,fq,fqerr):
+    global xstep
+    global zstep
     M=int(len(p)/2)
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -222,7 +234,9 @@ def S_hessian(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
     return hrows,hcols,hessian
 
 
-def precompute_r(xstep=0.1,zstep=0.1):
+def precompute_r():
+    global xstep
+    global zstep
     x=N.arange(0.0,1.0,xstep)
     z=N.arange(0.0,1.0,zstep)
     xn=len(x)
@@ -263,8 +277,9 @@ def precompute_cos(h,k,l,x,z):
         cosmat_list.append(cosmat_2d)  
     return coslist,cosmat_list
 
-def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.1,zstep=0.1):
-    
+def chisq_hessian(p,fqerr,v,coslist,flist):
+    global xstep
+    global zstep
     #v is the vector we are muliplying by
     M=len(p)/2
     Mx=1.0/xstep
@@ -289,6 +304,7 @@ def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.1,zstep=0.1):
             for cosk in coslist:
                 tot=tot+cosk[i]*cosk[j]*flist[i]*flist[j]/fqerr[al]**2
                 al=al+1;
+            print 'tot',tot,v[j]
             vout[i]=vout[i]+v[j]*tot
             print 'vout',i,j,vout[i]
     vout=2*vout/M**2
@@ -309,33 +325,44 @@ def max_wrap(p,coslist,cosmat_list,x,z):
     return f
 
 if __name__=="__main__":
-    
+    global xstep
+    global zstep
     myfilestr=r'c:\structfactors.dat'
     bob=N.loadtxt(myfilestr)
-    print bob
-    print bob.shape
+    #print bob
+    #print bob.shape
     h,k,l,fq,fqerr=N.loadtxt(myfilestr).T
-    print h
-    X,Z,P=plotdensity(h,k,l,fq)
-    pu=P.flatten()
-    pd=N.zeros(len(pu))
-    p=N.concatenate((pu,pd))
-    p0=N.ones(200)
-    print 'len pu',len(pu)
-    print 'len pd',len(pd)
-    print 'len p',len(p)
+    #print h
+    #X,Z,P=plotdensity(h,k,l,fq)
+    #pu=P.flatten()
+    #pd=N.zeros(len(pu))
+    #p=N.concatenate((pu,pd))
+    #xstep=.05
+    #zstep=.05
+    Mx=1.0/xstep
+    Mz=1.0/zstep
+    M=Mx*Mz
+    print 'M', M,Mx,Mz
+    p0=N.ones(M*2)
+    #print 'len pu',len(pu)
+    #print 'len pd',len(pd)
+    #print 'len p',len(p)
+    
     x,z=precompute_r()
+    X,Z=N.meshgrid(x,z)
     coslist,cosmat_list=precompute_cos(h,k,l,x,z)
-    print 'coslist',coslist[0]
+    #print 'coslist',coslist[0]
     flist=N.ones(len(p0))
-    M=len(p)/2
+    
+    
     flist[M::]=-flist[M::]
     #vout=chisq_hessian(p,fqerr,p,coslist,flist)
     #print 'vout', vout
     
 #    print 'pos',pos_sum(p0)
 #    print 'neg',neg_sum(p0)
-    p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
+#    p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
+    p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
     # f(x) gradient (optional):
     #p.df = S_grad
     
@@ -372,8 +399,10 @@ if __name__=="__main__":
 #h2 = lambda x: (x[-2]-1.5)**4
 #p.h = [h1, h2]
     h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
-    p.h=[pos_sum,neg_sum,chisq]
+    #p.h=[pos_sum,neg_sum,chisq]
+    p.h=[pos_sum,neg_sum]
     p.args.h=h_args
+    p.args.f=h_args
 # dh(x)/dx: non-lin eq constraints gradients (optional):
 #def DH(x):
 #    r = zeros((2, p.n))
@@ -409,7 +438,17 @@ if __name__=="__main__":
     p.maxTime = 4000
     print 'solving'
     r = p.solve('algencan')
-    print 'solution:', r.xf
+    print 'done'
+    pout=r.xf
+    print 'solution:', pout
+
+    print len(pout)
+    
+    P_up,P_down=transform_p(pout,Mx,Mz,M)
+    P=P_up-P_down
+    
+    
+    
     
     
     if 0:
@@ -421,9 +460,10 @@ if __name__=="__main__":
         print 'S_grad', s_grad
         srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr)
         print 'S_hessian',s_hess
-    if 0:
+    if 1:
         pylab.pcolor(X,Z,P)
-        pylab.show()    
+        pylab.show()
+    if 0:    
         fsum=fourier_p(h[0],k[0],l[0],P)
         fsum=N.zeros(h.shape)
     if 0:
