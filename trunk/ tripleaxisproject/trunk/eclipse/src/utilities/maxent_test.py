@@ -399,8 +399,8 @@ if __name__=="__main__":
 #h2 = lambda x: (x[-2]-1.5)**4
 #p.h = [h1, h2]
     h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
-    p.h=[pos_sum,neg_sum,chisq]
-    #p.h=[pos_sum,neg_sum]
+    #p.h=[pos_sum,neg_sum,chisq]
+    p.h=[pos_sum,neg_sum]
     p.args.h=h_args
     p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list)
     #p.args.f=h_args
