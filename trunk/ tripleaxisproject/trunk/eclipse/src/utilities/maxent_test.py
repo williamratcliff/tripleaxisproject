@@ -3,6 +3,7 @@ import numpy as N
 import dct
 import pylab
 from openopt import NLP
+A=1.0
 
 pi=N.pi
 
@@ -52,7 +53,7 @@ def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
     return X,Z,P
 
 
-def pos_sum(p,A=1.0):
+def pos_sum(p):
     M=len(p)/2
     return p[0:M].sum()-A
 
@@ -60,7 +61,7 @@ def pos_sum_grad(p):
     M=len(p)/2
     return N.hstack((N.ones(M),N.zeros(M)))
 
-def neg_sum(p,A=1.0):
+def neg_sum(p):
     M=len(p)/2
     return p[M::].sum()-A
 
@@ -329,13 +330,14 @@ if __name__=="__main__":
     flist=N.ones(len(p0))
     M=len(p)/2
     flist[M::]=-flist[M::]
-    vout=chisq_hessian(p,fqerr,p,coslist,flist)
-    print 'vout', vout
+    #vout=chisq_hessian(p,fqerr,p,coslist,flist)
+    #print 'vout', vout
     
-    
+    print 'pos',pos_sum(p0)
+    print 'neg',neg_sum(p0)
     p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
     # f(x) gradient (optional):
-    p.df = S_hessian
+    #p.df = S_grad
     
     
     # lb<= x <= ub:
@@ -420,8 +422,8 @@ if __name__=="__main__":
     if 0:
         pylab.pcolor(X,Z,P)
         pylab.show()    
-    fsum=fourier_p(h[0],k[0],l[0],P)
-    fsum=N.zeros(h.shape)
+        fsum=fourier_p(h[0],k[0],l[0],P)
+        fsum=N.zeros(h.shape)
     if 0:
         for i in range(len(h)):
             fsum[i]=fourier_p(h[i],k[i],l[i],P)
