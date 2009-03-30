@@ -369,6 +369,7 @@ if __name__=="__main__":
     # f(x) gradient (optional):
     p.df = S_grad
     p.d2f=S_hessian
+#    p.userProvided.d2f=True
     
     
     # lb<= x <= ub:
@@ -403,8 +404,8 @@ if __name__=="__main__":
 #h2 = lambda x: (x[-2]-1.5)**4
 #p.h = [h1, h2]
     h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
-    #p.h=[pos_sum,neg_sum,chisq]
-    p.h=[pos_sum,neg_sum]
+    p.h=[pos_sum,neg_sum,chisq]
+#    p.h=[pos_sum,neg_sum]
     p.args.h=h_args
     p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list)
     #p.args.f=h_args
@@ -423,8 +424,11 @@ if __name__=="__main__":
 # Note that in ALGENCAN gradtol means norm of projected gradient of  the Augmented Lagrangian
 # so it should be something like 1e-3...1e-5
     p.gradtol = 1e-5 # gradient stop criterium (default for NLP is 1e-6)
-
-
+    #print 'maxiter', p.maxiter
+    #print 'maxfun', p.maxfun
+    p.maxiter=100
+    p.maxfun=100
+    
 # see also: help(NLP) -> maxTime, maxCPUTime, ftol and xtol
 # that are connected to / used in lincher and some other solvers
 
@@ -438,8 +442,8 @@ if __name__=="__main__":
 # Python indexing starts from ZERO!!
 
     p.plot = 0
-    p.iprint = 0
-    p.df_iter = 4
+    p.iprint = 10
+    p.df_iter = 50
     p.maxTime = 4000
     print 'solving'
     r = p.solve('algencan')
