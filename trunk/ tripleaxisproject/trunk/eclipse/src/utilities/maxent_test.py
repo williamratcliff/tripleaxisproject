@@ -53,7 +53,7 @@ def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
     return X,Z,P
 
 
-def pos_sum(p):
+def pos_sum(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     M=len(p)/2
     return p[0:M].sum()-A
 
@@ -61,7 +61,7 @@ def pos_sum_grad(p):
     M=len(p)/2
     return N.hstack((N.ones(M),N.zeros(M)))
 
-def neg_sum(p):
+def neg_sum(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     M=len(p)/2
     return p[M::].sum()-A
 
@@ -290,12 +290,12 @@ def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.1,zstep=0.1):
                 tot=tot+cosk[i]*cosk[j]*flist[i]*flist[j]/fqerr[al]**2
                 al=al+1;
             vout[i]=vout[i]+v[j]*tot
-    
+            print 'vout',i,j,vout[i]
     vout=2*vout/M**2
     return vout
 
 def Entropy(p2):
-    return (-p2*N.log(p2)).sum()
+    return (p2*N.log(p2)).sum()
 
 
 def max_wrap(p,coslist,cosmat_list,x,z):
@@ -333,8 +333,8 @@ if __name__=="__main__":
     #vout=chisq_hessian(p,fqerr,p,coslist,flist)
     #print 'vout', vout
     
-    print 'pos',pos_sum(p0)
-    print 'neg',neg_sum(p0)
+#    print 'pos',pos_sum(p0)
+#    print 'neg',neg_sum(p0)
     p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
     # f(x) gradient (optional):
     #p.df = S_grad
@@ -344,7 +344,7 @@ if __name__=="__main__":
     # x4 <= -2.5
     # 3.5 <= x5 <= 4.5
     # all other: lb = -5, ub = +15
-    p.lb =N.zeros(p.n)
+    p.lb =1e-7*N.ones(p.n)
     p.ub = N.ones(p.n)
     #p.ub[4] = -2.5
     #p.lb[5], p.ub[5] = 3.5, 4.5
@@ -371,7 +371,9 @@ if __name__=="__main__":
 #h1 = lambda x: 1e4*(x[-1]-1)**4
 #h2 = lambda x: (x[-2]-1.5)**4
 #p.h = [h1, h2]
-    p.h=[pos_sum,neg_sum]
+    h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
+    p.h=[pos_sum,neg_sum,chisq]
+    p.args.h=h_args
 # dh(x)/dx: non-lin eq constraints gradients (optional):
 #def DH(x):
 #    r = zeros((2, p.n))
@@ -405,7 +407,7 @@ if __name__=="__main__":
     p.iprint = 0
     p.df_iter = 4
     p.maxTime = 4000
-
+    print 'solving'
     r = p.solve('algencan')
     print 'solution:', r.xf
     
