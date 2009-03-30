@@ -4,8 +4,8 @@ import dct
 import pylab
 from openopt import NLP
 A=1.0
-xstep=0.01
-zstep=0.01
+xstep=0.1
+zstep=0.1
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
@@ -207,12 +207,14 @@ def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     gradient[pos]=N.log(A)-N.log(p[0:M])
     gradient[posm]=N.log(A)-N.log(p[M+1:2*M])
     #P_up,P_down=transform_p(p,Mx,Mz,M)    
+    #print 'gradient'
     return -gradient
 
 
 def S_hessian(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     global xstep
     global zstep
+    print 'hessian'
     M=int(len(p)/2)
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -231,6 +233,7 @@ def S_hessian(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     hessian[pos]=-1./p[0:M]
     hessian[posm]=-1/p[M+1:2*M]
     #P_up,P_down=transform_p(p,Mx,Mz,M)    
+    
     return hrows,hcols,hessian
 
 
@@ -365,6 +368,7 @@ if __name__=="__main__":
     #p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
     # f(x) gradient (optional):
     p.df = S_grad
+    p.d2f=S_hessian
     
     
     # lb<= x <= ub:
