@@ -4,8 +4,8 @@ import dct
 import pylab
 from openopt import NLP
 A=1.0
-xstep=0.05
-zstep=0.05
+xstep=0.01
+zstep=0.01
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
@@ -135,7 +135,7 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list):
    
 
 
-def chisq_grad(p,h,k,l,fq,fqerr):
+def chisq_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     global xstep
     global zstep
     M=len(p)/2
@@ -185,7 +185,7 @@ def chisq_grad(p,h,k,l,fq,fqerr):
 
 
 
-def S_grad(p,h,k,l,fq,fqerr):
+def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     global xstep
     global zstep
     global A
@@ -207,10 +207,10 @@ def S_grad(p,h,k,l,fq,fqerr):
     gradient[pos]=N.log(A)-N.log(p[0:M])
     gradient[posm]=N.log(A)-N.log(p[M+1:2*M])
     #P_up,P_down=transform_p(p,Mx,Mz,M)    
-    return hrows,hcols,gradient
+    return -gradient
 
 
-def S_hessian(p,h,k,l,fq,fqerr):
+def S_hessian(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     global xstep
     global zstep
     M=int(len(p)/2)
@@ -310,8 +310,8 @@ def chisq_hessian(p,fqerr,v,coslist,flist):
     vout=2*vout/M**2
     return vout
 
-def Entropy(p2):
-    return (p2*N.log(p2)).sum()
+def Entropy(p2,h,k,l,fq,fqerr,x,z,cosmat_list):
+    return (p2*(N.log(p2/A)-1)).sum()
 
 
 def max_wrap(p,coslist,cosmat_list,x,z):
@@ -364,7 +364,7 @@ if __name__=="__main__":
     p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
     #p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
     # f(x) gradient (optional):
-    #p.df = S_grad
+    p.df = S_grad
     
     
     # lb<= x <= ub:
@@ -402,6 +402,7 @@ if __name__=="__main__":
     p.h=[pos_sum,neg_sum,chisq]
     #p.h=[pos_sum,neg_sum]
     p.args.h=h_args
+    p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list)
     #p.args.f=h_args
 # dh(x)/dx: non-lin eq constraints gradients (optional):
 #def DH(x):
