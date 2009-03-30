@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as N
 import dct
 import pylab
+from openopt import NLP
 
 pi=N.pi
 
@@ -292,6 +293,9 @@ def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.1,zstep=0.1):
     vout=2*vout/M**2
     return vout
 
+def Entropy(p2):
+    return (-p2*N.log(p2)).sum()
+
 
 def max_wrap(p,coslist,cosmat_list,x,z):
     l1,l2,l3=p[0:2]
@@ -299,7 +303,7 @@ def max_wrap(p,coslist,cosmat_list,x,z):
     chisqr=chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1)
     pos=pos_sum(p,A=1.0)
     neg=neg_sum(p,A=1.0)
-    ent=(-p2*N.log(p2)).sum
+    ent=Entropy(p2)
     f=ent+l1*chisqr+l2*pos+l3*neg    
     return f
 
@@ -315,18 +319,95 @@ if __name__=="__main__":
     pu=P.flatten()
     pd=N.zeros(len(pu))
     p=N.concatenate((pu,pd))
-    p=N.ones(100)
+    p0=N.ones(200)
     print 'len pu',len(pu)
     print 'len pd',len(pd)
     print 'len p',len(p)
     x,z=precompute_r()
     coslist,cosmat_list=precompute_cos(h,k,l,x,z)
     print 'coslist',coslist[0]
-    flist=N.ones(len(p))
+    flist=N.ones(len(p0))
     M=len(p)/2
     flist[M::]=-flist[M::]
     vout=chisq_hessian(p,fqerr,p,coslist,flist)
     print 'vout', vout
+    
+    
+    p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
+    # f(x) gradient (optional):
+    p.df = S_hessian
+    
+    
+    # lb<= x <= ub:
+    # x4 <= -2.5
+    # 3.5 <= x5 <= 4.5
+    # all other: lb = -5, ub = +15
+    p.lb =N.zeros(p.n)
+    p.ub = N.ones(p.n)
+    #p.ub[4] = -2.5
+    #p.lb[5], p.ub[5] = 3.5, 4.5
+
+# non-linear inequality constraints c(x) <= 0
+# 2*x0^4 <= 1/32
+# x1^2+x2^2 <= 1/8
+# x25^2 +x25*x35 + x35^2<= 2.5
+
+#p.c = lambda x: [2* x[0] **4-1./32, x[1]**2+x[2]**2 - 1./8, x[25]**2 + x[35]**2 + x[25]*x[35] -2.5]
+# other valid c:
+# p.c = [lambda x: c1(x), lambda x : c2(x), lambda x : c3(x)]
+# p.c = (lambda x: c1(x), lambda x : c2(x), lambda x : c3(x))
+# p.c = lambda x: numpy.array(c1(x), c2(x), c3(x))
+# def c(x):
+#      return c1(x), c2(x), c3(x)
+# p.c = c
+
+
+
+# non-linear equality constraints h(x) = 0
+# 1e6*(x[last]-1)**4 = 0
+# (x[last-1]-1.5)**4 = 0
+#h1 = lambda x: 1e4*(x[-1]-1)**4
+#h2 = lambda x: (x[-2]-1.5)**4
+#p.h = [h1, h2]
+    p.h=[pos_sum,neg_sum]
+# dh(x)/dx: non-lin eq constraints gradients (optional):
+#def DH(x):
+#    r = zeros((2, p.n))
+#    r[0, -1] = 1e4*4 * (x[-1]-1)**3
+#    r[1, -2] = 4 * (x[-2]-1.5)**3
+#    return r
+#p.dh = DH
+#    p.dh=[chisq_grad,pos_sum_grad,]
+    p.contol = 1e-3 # required constraints tolerance, default for NLP is 1e-6
+
+# for ALGENCAN solver gradtol is the only one stop criterium connected to openopt
+# (except maxfun, maxiter)
+# Note that in ALGENCAN gradtol means norm of projected gradient of  the Augmented Lagrangian
+# so it should be something like 1e-3...1e-5
+    p.gradtol = 1e-5 # gradient stop criterium (default for NLP is 1e-6)
+
+
+# see also: help(NLP) -> maxTime, maxCPUTime, ftol and xtol
+# that are connected to / used in lincher and some other solvers
+
+    # optional: check of user-supplied derivatives
+    #p.checkdf()
+    #p.checkdc()
+    #p.checkdh()
+
+# last but not least:
+# please don't forget,
+# Python indexing starts from ZERO!!
+
+    p.plot = 0
+    p.iprint = 0
+    p.df_iter = 4
+    p.maxTime = 4000
+
+    r = p.solve('algencan')
+    print 'solution:', r.xf
+    
+    
     if 0:
         chi=chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1)
         print 'chi',chi
