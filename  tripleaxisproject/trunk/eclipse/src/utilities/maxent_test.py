@@ -70,16 +70,16 @@ def neg_sum_grad(p):
 
 
 
-def fourier_p(h,k,l,P,xstep=0.1,zstep=0.1):
-    x=N.arange(0.0,1.0,xstep)
-    z=N.arange(0.0,1.0,zstep)
+def fourier_p(h,k,l,P,x,z,cosqr):
+    #x=N.arange(0.0,1.0,xstep)
+    #z=N.arange(0.0,1.0,zstep)
     xn=len(x)
     zn=len(z)
-    X,Z=N.meshgrid(x,z)
+    #X,Z=N.meshgrid(x,z)
     fsum=0.0
-    delta=.065;
+    #delta=.065;
     #%delta=.1;
-    delta=.035;
+    #delta=.035;
     #outfile='c:\structfactors_density.dat'
     #fid=fopen([outfile],'w');
     fsum=0.0
@@ -108,7 +108,7 @@ def transform_p(p,Mx,Mz,M):
      
      
 
-def chisq(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
+def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1):
     M=len(p)/2
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -118,8 +118,8 @@ def chisq(p,h,k,l,fq,fqerr,xstep=0.1,zstep=0.1):
     chi=N.zeros(h.shape)
     P_up,P_down=transform_p(p,Mx,Mz,M)
     for i in range(len(h)):
-        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
-        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
+        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up,x,z,cosmat_list[i])
+        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down,x,z,cosmat_list[i])
         fmodel=fsum_up[i]-fsum_down[i]
         chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
         #print h[i],k[i],l[i],fq[i],chi[i]
@@ -242,11 +242,13 @@ def precompute_cos(h,k,l,x,z):
     #fid=fopen([outfile],'w');
     #fsum=0.0
     coslist=[]
+    cosmat_list=[]
     for i in range(len(h)):
         hc=h[i]
         kc=k[i]
         lc=l[i]
-        cosmat=[]#N.zeros((xn,zn))
+        cosmat=[]#
+        cosmat_2d=N.zeros((xn,zn))
         for xia in range(xn):
             for zia in range(zn):
                 xi=x[xia]
@@ -254,9 +256,10 @@ def precompute_cos(h,k,l,x,z):
                 #Aj=fq*N.sinc(2*delta*h)*N.sinc(2*delta*k)*N.sinc(2*delta*l)*pi**3
                 cosqr=N.cos(2*pi*1*(hc*xi+lc*zi))
                 cosmat.append(cosqr)
-                #cosmat[xia,zia]=cosqr
-        coslist.append(N.hstack((cosmat,cosmat)))  
-    return coslist
+                cosmat_2d[xia,zia]=cosqr
+        coslist.append(N.hstack((cosmat,cosmat)))
+        cosmat_list.append(cosmat_2d)  
+    return coslist,cosmat_list
 
 def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.1,zstep=0.1):
     
@@ -290,6 +293,16 @@ def chisq_hessian(p,fqerr,v,coslist,flist,xstep=0.1,zstep=0.1):
     return vout
 
 
+def max_wrap(p,coslist,cosmat_list,x,z):
+    l1,l2,l3=p[0:2]
+    p2=p[3::]
+    chisqr=chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1)
+    pos=pos_sum(p,A=1.0)
+    neg=neg_sum(p,A=1.0)
+    ent=(-p2*N.log(p2)).sum
+    f=ent+l1*chisqr+l2*pos+l3*neg    
+    return f
+
 if __name__=="__main__":
     
     myfilestr=r'c:\structfactors.dat'
@@ -307,7 +320,7 @@ if __name__=="__main__":
     print 'len pd',len(pd)
     print 'len p',len(p)
     x,z=precompute_r()
-    coslist=precompute_cos(h,k,l,x,z)
+    coslist,cosmat_list=precompute_cos(h,k,l,x,z)
     print 'coslist',coslist[0]
     flist=N.ones(len(p))
     M=len(p)/2
@@ -315,7 +328,7 @@ if __name__=="__main__":
     vout=chisq_hessian(p,fqerr,p,coslist,flist)
     print 'vout', vout
     if 0:
-        chi=chisq(p,h,k,l,fq,fqerr)
+        chi=chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1)
         print 'chi',chi
         grad=chisq_grad(p,h,k,l,fq,fqerr)
         print 'gradient',grad
