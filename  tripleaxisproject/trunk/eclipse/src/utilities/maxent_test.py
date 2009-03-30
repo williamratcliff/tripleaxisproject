@@ -361,8 +361,8 @@ if __name__=="__main__":
     
 #    print 'pos',pos_sum(p0)
 #    print 'neg',neg_sum(p0)
-#    p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
-    p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
+    p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
+    #p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
     # f(x) gradient (optional):
     #p.df = S_grad
     
@@ -399,10 +399,10 @@ if __name__=="__main__":
 #h2 = lambda x: (x[-2]-1.5)**4
 #p.h = [h1, h2]
     h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
-    #p.h=[pos_sum,neg_sum,chisq]
-    p.h=[pos_sum,neg_sum]
+    p.h=[pos_sum,neg_sum,chisq]
+    #p.h=[pos_sum,neg_sum]
     p.args.h=h_args
-    p.args.f=h_args
+    #p.args.f=h_args
 # dh(x)/dx: non-lin eq constraints gradients (optional):
 #def DH(x):
 #    r = zeros((2, p.n))
