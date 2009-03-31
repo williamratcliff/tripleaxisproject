@@ -6,8 +6,8 @@ from openopt import NLP
 import scipy.optimize
 from utilities.anneal import anneal
 A=1.0
-xstep=0.01
-zstep=0.01
+xstep=0.05
+zstep=0.05
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
@@ -359,17 +359,60 @@ if __name__=="__main__":
 #    print 'pos',pos_sum(p0)
 #    print 'neg',neg_sum(p0)
 
-    if 1:
+    if 0:
         p0=N.ones(M*2+3)
         p0[0:3]=[.1,.1,.1]
+    if 1:
+        p0=N.ones(M*2)
+    if 1:
         print len(p0)
         lowerm=1e-7*N.ones(len(p0))
-        upperm=N.ones(len(p0))
         #lowerm[0:3]=[-1,-1,-1]
-        
+        upperm=N.ones(len(p0))
+    if 1:
+        p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
+    if 0:
+        p = NLP(max_wrap, p0, maxIter = 1e3, maxFunEvals = 1e5)
+    if 1:
+        p.lb=lowerm
+        p.ub=upperm
+        p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list)
+        p.plot = 0
+        p.iprint = 1
+        p.contol = 1e-2#3 # required constraints tolerance, default for NLP is 1e-6
+    
+    # for ALGENCAN solver gradtol is the only one stop criterium connected to openopt
+    # (except maxfun, maxiter)
+    # Note that in ALGENCAN gradtol means norm of projected gradient of  the Augmented Lagrangian
+    # so it should be something like 1e-3...1e-5
+        p.gradtol = 1e-3#5 # gradient stop criterium (default for NLP is 1e-6)
+        #print 'maxiter', p.maxiter
+        #print 'maxfun', p.maxfun
+        p.maxIter=30
+    #    p.maxfun=100
+  
+        #p.df_iter = 50
+        p.maxTime = 4000
         if 1:
-            fmin_l_bfgs_b(func, x0, fprime = None, args=(h,k,l,fq,fqerr,x,z,cosmat_list), approx_grad = 0, \\
-                          bounds = None, m = 10, factr = 10000000.0, \\
+            h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
+            p.h=[pos_sum,neg_sum,chisq]
+    #    p.h=[pos_sum,neg_sum]
+            p.args.h=h_args
+        print 'solving'
+        if 1:
+            #r=p.solve('scipy_cobyla')
+            #r=p.solve('scipy_lbfgsb')
+            #r = p.solve('algencan')
+            r = p.solve('ralg')
+            print 'done'
+            pout=r.xf
+            
+
+
+        
+        if 0:
+            scipy.optimize.optimize.fmin_l_bfgs_b(max_wrap, p0, fprime = None, args=(h,k,l,fq,fqerr,x,z,cosmat_list), approx_grad = 0, \
+                          bounds = None, m = 10, factr = 10000000.0, \
                           pgtol = 1.0000000000000001e-05, epsilon = 1e-08, iprint = -Const(1), maxfun = 15)
         if 0:
             print 'fmin'
@@ -382,10 +425,11 @@ if __name__=="__main__":
             pout,jmin=anneal(max_wrap,p0,args=(h,k,l,fq,fqerr,x,z,cosmat_list),\
                           schedule=myschedule,lower=lowerm,upper=upperm,\
                           maxeval=100, maxaccept=None,dwell=20,maxiter=20,feps=1e-1,full_output = 0)
-            
-        multipliers=pout[0:3]
-        print 'multipliers',multipliers
-        pout=pout[3::]
+        
+        if 0:    
+            multipliers=pout[0:3]
+            print 'multipliers',multipliers
+            pout=pout[3::]
                 
         
 
