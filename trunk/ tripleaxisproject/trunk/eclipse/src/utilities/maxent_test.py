@@ -3,6 +3,7 @@ import numpy as N
 import dct
 import pylab
 from openopt import NLP
+
 A=1.0
 xstep=0.05
 zstep=0.05
