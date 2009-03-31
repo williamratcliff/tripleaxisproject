@@ -155,8 +155,8 @@ def chisq_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     zn=len(z)
     grad=N.zeros(P_up.shape)
     for i in range(len(h)):
-        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up)
-        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down)
+        fsum_up[i]=fourier_p(h[i],k[i],l[i],P_up,x,z,cosmat_list[i])
+        fsum_down[i]=fourier_p(h[i],k[i],l[i],P_down,x,z,cosmat_list[i])
         fmodel[i]=fsum_up[i]-fsum_down[i]
     for xia in range(xn):
         for zia in range(zn):
