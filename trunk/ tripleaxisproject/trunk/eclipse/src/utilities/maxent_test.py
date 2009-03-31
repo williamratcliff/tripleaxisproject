@@ -4,8 +4,8 @@ import dct
 import pylab
 from openopt import NLP
 A=1.0
-xstep=0.1
-zstep=0.1
+xstep=0.02
+zstep=0.02
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
@@ -367,8 +367,8 @@ if __name__=="__main__":
     p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
     #p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
     # f(x) gradient (optional):
-    p.df = S_grad
-    p.d2f=S_hessian
+#    p.df = S_grad
+#    p.d2f=S_hessian
 #    p.userProvided.d2f=True
     
     
@@ -426,8 +426,8 @@ if __name__=="__main__":
     p.gradtol = 1e-5 # gradient stop criterium (default for NLP is 1e-6)
     #print 'maxiter', p.maxiter
     #print 'maxfun', p.maxfun
-    p.maxiter=100
-    p.maxfun=100
+#    p.maxiter=100
+#    p.maxfun=100
     
 # see also: help(NLP) -> maxTime, maxCPUTime, ftol and xtol
 # that are connected to / used in lincher and some other solvers
@@ -443,7 +443,7 @@ if __name__=="__main__":
 
     p.plot = 0
     p.iprint = 10
-    p.df_iter = 50
+    #p.df_iter = 50
     p.maxTime = 4000
     print 'solving'
     r = p.solve('algencan')
