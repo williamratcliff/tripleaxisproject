@@ -303,13 +303,14 @@ def Entropy(p2,h,k,l,fq,fqerr,x,z,cosmat_list):
 
 
 def max_wrap(p,h,k,l,fq,fqerr,x,z,cosmat_list):
-    l1,l2,l3=p[0:2]
+    #print p[0:2]
+    l1,l2,l3=p[0:3]
     p2=p[3::]
-    chisqr=chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list)
-    pos=pos_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
-    neg=neg_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
+    chisqr=chisq(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
+    posc=pos_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
+    negc=neg_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
     ent=Entropy(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
-    f=ent+l1*chisqr+l2*pos+l3*neg    
+    f=ent+l1*chisqr+l2*posc+l3*negc    
     return f
 
 def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=20.0,maxiter=21):
@@ -321,8 +322,8 @@ def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=20.0,maxiter=2
     return p
 
 if __name__=="__main__":
-    global xstep
-    global zstep
+    #global xstep
+    #global zstep
     myfilestr=r'c:\structfactors.dat'
     bob=N.loadtxt(myfilestr)
     #print bob
@@ -360,15 +361,32 @@ if __name__=="__main__":
 
     if 1:
         p0=N.ones(M*2+3)
+        p0[0:3]=[.1,.1,.1]
+        print len(p0)
+        lowerm=1e-7*N.ones(len(p0))
+        upperm=N.ones(len(p0))
+        #lowerm[0:3]=[-1,-1,-1]
         
-        lower=1e-7*N.ones(len(p))
-        upper=N.ones(len(p))
-        pout=scipy.optimize.minpack.fsolve(maxwrap,p0,args=(p,h,k,l,fq,fqerr,x,z,cosmat_list))
-        #pout,jmin=anneal(chisq_an,p0,args=(p,h,k,l,fq,fqerr,x,z,cosmat_list),\
-        #              schedule='simple',lower=lowerm,upper=upperm,\
-        #              maxeval=None, maxaccept=None,dwell=500,maxiter=2000)
-        
-        
+        if 1:
+            fmin_l_bfgs_b(func, x0, fprime = None, args=(h,k,l,fq,fqerr,x,z,cosmat_list), approx_grad = 0, \\
+                          bounds = None, m = 10, factr = 10000000.0, \\
+                          pgtol = 1.0000000000000001e-05, epsilon = 1e-08, iprint = -Const(1), maxfun = 15)
+        if 0:
+            print 'fmin'
+            
+            pout=scipy.optimize.optimize.fmin(max_wrap,p0,maxiter = 5, maxfun = 100,disp=1,args=(h,k,l,fq,fqerr,x,z,cosmat_list))
+        if 0:
+            print 'annealing'
+            myschedule='fast'
+            #myschedule='simple'
+            pout,jmin=anneal(max_wrap,p0,args=(h,k,l,fq,fqerr,x,z,cosmat_list),\
+                          schedule=myschedule,lower=lowerm,upper=upperm,\
+                          maxeval=100, maxaccept=None,dwell=20,maxiter=20,feps=1e-1,full_output = 0)
+            
+        multipliers=pout[0:3]
+        print 'multipliers',multipliers
+        pout=pout[3::]
+                
         
 
     if 0:
