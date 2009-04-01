@@ -364,10 +364,10 @@ if __name__=="__main__":
         p0=N.ones(M*2+3)
         p0[0:3]=[.1,.1,.1]
     if 1:
-        p0=N.ones(M*2)
+        p0=N.ones(M*2)/(2*M)
     if 1:
         print len(p0)
-        lowerm=1e-7*N.ones(len(p0))
+        lowerm=1e-4*N.ones(len(p0))
         #lowerm[0:3]=[-1,-1,-1]
         upperm=N.ones(len(p0))
     if 1:
@@ -380,16 +380,16 @@ if __name__=="__main__":
         p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         p.plot = 0
         p.iprint = 1
-        p.contol = 1e-2#3 # required constraints tolerance, default for NLP is 1e-6
+        p.contol = 1e-3#3 # required constraints tolerance, default for NLP is 1e-6
     
     # for ALGENCAN solver gradtol is the only one stop criterium connected to openopt
     # (except maxfun, maxiter)
     # Note that in ALGENCAN gradtol means norm of projected gradient of  the Augmented Lagrangian
     # so it should be something like 1e-3...1e-5
-        p.gradtol = 1e-3#5 # gradient stop criterium (default for NLP is 1e-6)
+        p.gradtol = 1e-4#5 # gradient stop criterium (default for NLP is 1e-6)
         #print 'maxiter', p.maxiter
         #print 'maxfun', p.maxfun
-        p.maxIter=30
+        p.maxIter=40
     #    p.maxfun=100
   
         #p.df_iter = 50
