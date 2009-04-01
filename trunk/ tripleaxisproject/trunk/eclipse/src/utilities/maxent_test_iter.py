@@ -133,8 +133,7 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
         fmodel=fsum_up[i]-fsum_down[i]
         chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
         #print h[i],k[i],l[i],fq[i],chi[i]
-    #return chi.sum()
-    return (chi.sum()-(M-len(fq)-2))
+    return (chi.sum()-(M/4-len(fq)-2))
    
 
 
@@ -314,7 +313,7 @@ def max_wrap(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     f=ent+l1*chisqr+l2*posc+l3*negc    
     return f
 
-def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=20.0,maxiter=91):
+def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=10.0,maxiter=51):
     for i in range(maxiter):
         dchisqr=chisq_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         p=p*N.exp(-lam*dchisqr)
@@ -394,7 +393,7 @@ if __name__=="__main__":
         p.gradtol = 1e-5#5 # gradient stop criterium (default for NLP is 1e-6)
         #print 'maxiter', p.maxiter
         #print 'maxfun', p.maxfun
-        p.maxIter=20
+        p.maxIter=50
     #    p.maxfun=100
   
         #p.df_iter = 50
@@ -426,11 +425,13 @@ if __name__=="__main__":
             print 'checking'
             p.checkdf()
              #p.checkdc()
-            print 'check constraints'
+            print 'check equality constraints'
             p.checkdh()
+            print 'checking inequality'
+            p.checkdc()
             sys.exit()
         print 'solving'
-        if 1:    
+        if 0:    
             #r=p.solve('scipy_cobyla')
             #r=p.solve('scipy_lbfgsb')
             r = p.solve('algencan')
@@ -463,7 +464,7 @@ if __name__=="__main__":
                 
         
 
-    if 0:
+    if 1:
         pout=silly_iter(p0,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
     if 0:
         p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
