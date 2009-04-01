@@ -7,8 +7,8 @@ from openopt import NLP
 import scipy.optimize
 from utilities.anneal import anneal
 A=1.0
-xstep=0.02
-zstep=0.02
+xstep=0.01
+zstep=0.01
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
