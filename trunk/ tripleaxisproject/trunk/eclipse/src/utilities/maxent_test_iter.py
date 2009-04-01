@@ -7,8 +7,8 @@ from openopt import NLP
 import scipy.optimize
 from utilities.anneal import anneal
 A=1.0
-xstep=0.01/2
-zstep=0.01/2
+xstep=0.01
+zstep=0.01
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
@@ -364,16 +364,16 @@ if __name__=="__main__":
         p0=N.ones(M*2+3)
         p0[0:3]=[.1,.1,.1]
     if 1:
-        p0=N.ones(M*2)/(2*M)
+        p0=N.ones(M*2)/(M)
     if 1:
         print len(p0)
         lowerm=1e-4*N.ones(len(p0))
         #lowerm[0:3]=[-1,-1,-1]
         upperm=N.ones(len(p0))
-    if 0:
+    if 1:
         p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
 
-    if 1:
+    if 0:
         p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
         
         
@@ -401,21 +401,24 @@ if __name__=="__main__":
         p.maxTime = 4000
         h_args=(h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         
-        if 1:
+        if 0:
+            #p.h=[pos_sum,neg_sum]
             p.h=[pos_sum,neg_sum]
-            #p.h=chisq
+            p.c=[chisq]
     #    p.h=[pos_sum,neg_sum]
             p.args.h=h_args
+            p.args.c=h_args
             p.dh=[pos_sum_grad,neg_sum_grad]
             p.df=chisq_grad
-        if 0:
+        if 1:
             
-            p.h=[pos_sum,neg_sum,chisq]
-            #p.h=chisq
-    #    p.h=[pos_sum,neg_sum]
+            #p.h=[pos_sum,neg_sum,chisq]
+            p.c=[chisq]
+            p.h=[pos_sum,neg_sum]
             p.args.h=h_args
-            p.dh=[pos_sum_grad,neg_sum_grad,chisq_grad]
-            #p.dh=chisq_grad
+            p.args.c=h_args
+            p.dh=[pos_sum_grad,neg_sum_grad]
+            p.dc=chisq_grad
             #p.dh=[pos_sum_grad,neg_sum_grad,neg_sum_grad]
             p.df = S_grad
             
@@ -503,9 +506,11 @@ if __name__=="__main__":
     #h2 = lambda x: (x[-2]-1.5)**4
     #p.h = [h1, h2]
         h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
-        p.h=[pos_sum,neg_sum,chisq]
-    #    p.h=[pos_sum,neg_sum]
+        #p.h=[pos_sum,neg_sum,chisq]
+        p.h=[pos_sum,neg_sum]
+        p.c=[chisq]
         p.args.h=h_args
+        p.args.c=h_args
         p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list)
         #p.args.f=h_args
     # dh(x)/dx: non-lin eq constraints gradients (optional):
