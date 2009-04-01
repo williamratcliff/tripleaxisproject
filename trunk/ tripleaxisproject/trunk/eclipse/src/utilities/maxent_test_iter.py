@@ -134,7 +134,7 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
         chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
         #print h[i],k[i],l[i],fq[i],chi[i]
     
-    return chi.sum()-2*M
+    return chi.sum()-(2*M-len(fq))
    
 
 
@@ -314,7 +314,7 @@ def max_wrap(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     f=ent+l1*chisqr+l2*posc+l3*negc    
     return f
 
-def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=20.0,maxiter=21):
+def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=20.0,maxiter=91):
     for i in range(maxiter):
         dchisqr=chisq_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         p=p*N.exp(-lam*dchisqr)
@@ -421,7 +421,6 @@ if __name__=="__main__":
             print 'done'
             pout=r.xf
             
-
 
         
         if 0:
@@ -537,6 +536,7 @@ if __name__=="__main__":
         pout=r.xf
     
     print 'solution:', pout
+    print 'chiq', chisq(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
     print len(pout)
     
     P_up,P_down=transform_p(pout,Mx,Mz,M)
