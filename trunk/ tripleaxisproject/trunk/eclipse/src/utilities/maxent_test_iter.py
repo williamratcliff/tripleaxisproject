@@ -134,7 +134,7 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
         chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
         #print h[i],k[i],l[i],fq[i],chi[i]
     
-    return chi.sum()-(2*M-len(fq))
+    return chi.sum()-(M-len(fq)-2)
    
 
 
@@ -537,7 +537,7 @@ if __name__=="__main__":
     
     print 'solution:', pout
     print 'chiq', chisq(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
-    print len(pout)
+    print 'elements',len(pout)
     
     P_up,P_down=transform_p(pout,Mx,Mz,M)
     P=P_up-P_down
