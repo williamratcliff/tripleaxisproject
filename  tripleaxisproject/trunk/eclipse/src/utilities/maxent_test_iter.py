@@ -134,7 +134,7 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
         chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
         #print h[i],k[i],l[i],fq[i],chi[i]
     
-    return chi.sum()-(M/2-len(fq)-2)
+    return (chi.sum()-(M/4-len(fq)-2))
    
 
 
