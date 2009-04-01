@@ -134,7 +134,7 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
         chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
         #print h[i],k[i],l[i],fq[i],chi[i]
     
-    return chi.sum()-(M-len(fq)-2)
+    return chi.sum()-(M/2-len(fq)-2)
    
 
 
@@ -389,7 +389,7 @@ if __name__=="__main__":
         p.gradtol = 1e-3#5 # gradient stop criterium (default for NLP is 1e-6)
         #print 'maxiter', p.maxiter
         #print 'maxfun', p.maxfun
-        p.maxIter=30
+        p.maxIter=40
     #    p.maxfun=100
   
         #p.df_iter = 50
@@ -413,7 +413,7 @@ if __name__=="__main__":
             p.checkdh()
             sys.exit()
         print 'solving'
-        if 0:    
+        if 1:    
             #r=p.solve('scipy_cobyla')
             #r=p.solve('scipy_lbfgsb')
             r = p.solve('algencan')
@@ -446,7 +446,7 @@ if __name__=="__main__":
                 
         
 
-    if 1:
+    if 0:
         pout=silly_iter(p0,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
     if 0:
         p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
@@ -557,6 +557,7 @@ if __name__=="__main__":
         print 'S_hessian',s_hess
     if 1:
         pylab.pcolor(X,Z,P)
+        pylab.colorbar()
         pylab.show()
     if 0:    
         fsum=fourier_p(h[0],k[0],l[0],P)
