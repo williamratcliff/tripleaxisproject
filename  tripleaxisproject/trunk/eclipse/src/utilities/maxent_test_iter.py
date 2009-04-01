@@ -389,7 +389,7 @@ if __name__=="__main__":
         p.gradtol = 1e-3#5 # gradient stop criterium (default for NLP is 1e-6)
         #print 'maxiter', p.maxiter
         #print 'maxfun', p.maxfun
-        p.maxIter=40
+        p.maxIter=30
     #    p.maxfun=100
   
         #p.df_iter = 50
@@ -537,6 +537,8 @@ if __name__=="__main__":
     
     print 'solution:', pout
     print 'chiq', chisq(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
+    print 'pos_sum',pos_sum(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist), 
+    print 'neg_sum', neg_sum(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
     print 'elements',len(pout)
     
     P_up,P_down=transform_p(pout,Mx,Mz,M)
