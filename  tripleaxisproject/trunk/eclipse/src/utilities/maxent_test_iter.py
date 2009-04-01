@@ -133,8 +133,8 @@ def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
         fmodel=fsum_up[i]-fsum_down[i]
         chi[i]=(fmodel-fq[i])**2/fqerr[i]**2
         #print h[i],k[i],l[i],fq[i],chi[i]
-    return chi.sum()
-    #return (chi.sum()-(M/4-len(fq)-2))
+    #return chi.sum()
+    return (chi.sum()-(M-len(fq)-2))
    
 
 
@@ -394,7 +394,7 @@ if __name__=="__main__":
         p.gradtol = 1e-5#5 # gradient stop criterium (default for NLP is 1e-6)
         #print 'maxiter', p.maxiter
         #print 'maxfun', p.maxfun
-        p.maxIter=50
+        p.maxIter=20
     #    p.maxfun=100
   
         #p.df_iter = 50
