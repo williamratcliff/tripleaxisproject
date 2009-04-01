@@ -1,13 +1,14 @@
 from __future__ import division
 import numpy as N
+import sys
 import dct
 import pylab
 from openopt import NLP
 import scipy.optimize
 from utilities.anneal import anneal
 A=1.0
-xstep=0.05
-zstep=0.05
+xstep=0.02
+zstep=0.02
 pi=N.pi
 
 def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
@@ -56,19 +57,19 @@ def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
     return X,Z,P
 
 
-def pos_sum(p,h,k,l,fq,fqerr,x,z,cosmat_list):
+def pos_sum(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     M=len(p)/2
     return p[0:M].sum()-A
 
-def pos_sum_grad(p):
+def pos_sum_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     M=len(p)/2
     return N.hstack((N.ones(M),N.zeros(M)))
 
-def neg_sum(p,h,k,l,fq,fqerr,x,z,cosmat_list):
+def neg_sum(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     M=len(p)/2
     return p[M::].sum()-A
 
-def neg_sum_grad(p):
+def neg_sum_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     M=len(p)/2
     return N.hstack((N.zeros(M),N.ones(M)))
  
@@ -115,7 +116,7 @@ def transform_p(p,Mx,Mz,M):
      
      
 
-def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list):
+def chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     global xstep
     global zstep
     M=len(p)/2
@@ -164,13 +165,13 @@ def chisq_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     for i in range(2*M):
         for j in range(len(h)):
             grad[i]=grad[i]+flist[i]*coslist[j][i]*(fmodel[j]-fq[j])/fqerr[j]**2    
-    grad=-2/M*grad
+    grad=4/M*grad
     return grad
 
 
 
 
-def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list):
+def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     global xstep
     global zstep
     global A
@@ -298,18 +299,18 @@ def chisq_hessian(p,fqerr,v,coslist,flist):
     vout=2*vout/M**2
     return vout
 
-def Entropy(p2,h,k,l,fq,fqerr,x,z,cosmat_list):
+def Entropy(p2,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     return (p2*(N.log(p2/A)-1)).sum()
 
 
-def max_wrap(p,h,k,l,fq,fqerr,x,z,cosmat_list):
+def max_wrap(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     #print p[0:2]
     l1,l2,l3=p[0:3]
     p2=p[3::]
-    chisqr=chisq(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
-    posc=pos_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
-    negc=neg_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
-    ent=Entropy(p2,h,k,l,fq,fqerr,x,z,cosmat_list)
+    chisqr=chisq(p2,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
+    posc=pos_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
+    negc=neg_sum(p2,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
+    ent=Entropy(p2,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
     f=ent+l1*chisqr+l2*posc+l3*negc    
     return f
 
@@ -376,7 +377,7 @@ if __name__=="__main__":
     if 1:
         p.lb=lowerm
         p.ub=upperm
-        p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list)
+        p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         p.plot = 0
         p.iprint = 1
         p.contol = 1e-2#3 # required constraints tolerance, default for NLP is 1e-6
@@ -394,16 +395,29 @@ if __name__=="__main__":
         #p.df_iter = 50
         p.maxTime = 4000
         if 1:
-            h_args=(h,k,l,fq,fqerr,x,z,cosmat_list)
+            h_args=(h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
             p.h=[pos_sum,neg_sum,chisq]
+            #p.h=chisq
     #    p.h=[pos_sum,neg_sum]
             p.args.h=h_args
+            p.dh=[pos_sum_grad,neg_sum_grad,chisq_grad]
+            #p.dh=chisq_grad
+            #p.dh=[pos_sum_grad,neg_sum_grad,neg_sum_grad]
+            p.df = S_grad
+            
+        if 0:
+            print 'checking'
+            p.checkdf()
+             #p.checkdc()
+            print 'check constraints'
+            p.checkdh()
+            sys.exit()
         print 'solving'
-        if 1:
+        if 0:    
             #r=p.solve('scipy_cobyla')
             #r=p.solve('scipy_lbfgsb')
-            #r = p.solve('algencan')
-            r = p.solve('ralg')
+            r = p.solve('algencan')
+            #r = p.solve('ralg')
             print 'done'
             pout=r.xf
             
@@ -411,18 +425,18 @@ if __name__=="__main__":
 
         
         if 0:
-            scipy.optimize.optimize.fmin_l_bfgs_b(max_wrap, p0, fprime = None, args=(h,k,l,fq,fqerr,x,z,cosmat_list), approx_grad = 0, \
+            scipy.optimize.optimize.fmin_l_bfgs_b(max_wrap, p0, fprime = None, args=h_args, approx_grad = 0, \
                           bounds = None, m = 10, factr = 10000000.0, \
                           pgtol = 1.0000000000000001e-05, epsilon = 1e-08, iprint = -Const(1), maxfun = 15)
         if 0:
             print 'fmin'
             
-            pout=scipy.optimize.optimize.fmin(max_wrap,p0,maxiter = 5, maxfun = 100,disp=1,args=(h,k,l,fq,fqerr,x,z,cosmat_list))
+            pout=scipy.optimize.optimize.fmin(max_wrap,p0,maxiter = 5, maxfun = 100,disp=1,args=h_args)
         if 0:
             print 'annealing'
             myschedule='fast'
             #myschedule='simple'
-            pout,jmin=anneal(max_wrap,p0,args=(h,k,l,fq,fqerr,x,z,cosmat_list),\
+            pout,jmin=anneal(max_wrap,p0,args=h_args,\
                           schedule=myschedule,lower=lowerm,upper=upperm,\
                           maxeval=100, maxaccept=None,dwell=20,maxiter=20,feps=1e-1,full_output = 0)
         
@@ -433,7 +447,7 @@ if __name__=="__main__":
                 
         
 
-    if 0:
+    if 1:
         pout=silly_iter(p0,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
     if 0:
         p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
@@ -498,7 +512,7 @@ if __name__=="__main__":
         p.gradtol = 1e-3#5 # gradient stop criterium (default for NLP is 1e-6)
         #print 'maxiter', p.maxiter
         #print 'maxfun', p.maxfun
-        p.maxiter=10
+        p.maxIter=10
     #    p.maxfun=100
         
     # see also: help(NLP) -> maxTime, maxCPUTime, ftol and xtol
