@@ -1,7 +1,25 @@
 import readncnr3 as readncnr
 import numpy as N
+import scriptutil as SU
+import re
+import simple_combine
 
 
+
+def readfiles(flist):
+    mydatareader=readncnr.datareader()
+    H=[]#N.array([])
+    I=[]#N.array([])
+    Ierr=[]#N.array([])
+    monlist=[]
+    count=0
+    myfirstdata=mydatareader.readbuffer(flist[0])
+    mon0=mydata.metadata['count_info']['monitor']
+    print 'mon0',mon0
+    
+    for currfile in flist:
+        #print currfile
+        mydata=mydatareader.readbuffer(currfile)
 
 
 if __name__=='__main__':
@@ -28,6 +46,15 @@ if __name__=='__main__':
     print mydata.metadata['motor4']['step']
     print mydata.metadata['count_info']['monitor']
     print mydata.metadata['energy_info']
-    print mydata.metadata['q_center']
+    print mydata.metadata['q_center']['h_center']
+    print mydata.metadata['q_center']['k_center']
+    print mydata.metadata['q_center']['l_center']
+    myfilebase='magsc'
+    myend='bt9'
+    mydirectory=r'c:\ce2rhin8\mar10_2009'
+    myfilebaseglob=myfilebase+'*.'+myend
+    print myfilebaseglob
+    flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
+    SU.printr(flist)
     
     
