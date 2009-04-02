@@ -18,7 +18,7 @@ def readfiles(flist):
     print 'mon0',mon0
     
     for currfile in flist:
-        #print currfile
+        print currfile
         mydata=mydatareader.readbuffer(currfile)
 
 
