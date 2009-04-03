@@ -49,6 +49,10 @@ if __name__=='__main__':
     print mydata.metadata['q_center']['h_center']
     print mydata.metadata['q_center']['k_center']
     print mydata.metadata['q_center']['l_center']
+    print mydata.metadata['file_info']['filebase']
+    print mydata.metadata['file_info']['filename']
+    print mydata.metadata['file_info']['fileseq_number']
+    
     myfilebase='magsc'
     myend='bt9'
     mydirectory=r'c:\ce2rhin8\mar10_2009'
