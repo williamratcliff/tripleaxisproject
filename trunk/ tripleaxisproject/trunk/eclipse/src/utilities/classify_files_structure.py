@@ -5,6 +5,19 @@ import re
 import simple_combine
 
 
+def check_q(q1,q2,tol=1e-6):
+    heq=False
+    keq=False
+    leq=False
+    if N.abs(q2['h_center']-q1['h_center'])< tol:
+        heq=True
+    if N.abs(q2['k_center']-q1['k_center'])< tol:
+        keq=True
+    if N.abs(q2['l_center']-q1['l_center'])< tol:
+        leq=True
+    return (heq and keq and leq)
+   
+    
 
 def readfiles(flist):
     mydatareader=readncnr.datareader()
@@ -20,6 +33,8 @@ def readfiles(flist):
     for currfile in flist:
         print currfile
         mydata=mydatareader.readbuffer(currfile)
+        if mydata.metadata['file_info']['scantype']=='b':
+            print 'b'
 
 
 if __name__=='__main__':
@@ -57,7 +72,7 @@ if __name__=='__main__':
     myend='bt9'
     mydirectory=r'c:\ce2rhin8\mar10_2009'
     myfilebaseglob=myfilebase+'*.'+myend
-    print myfilebaseglob
+    #print myfilebaseglob
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     SU.printr(flist)
     
