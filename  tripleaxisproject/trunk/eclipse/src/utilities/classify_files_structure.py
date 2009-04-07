@@ -5,6 +5,19 @@ import re
 import simple_combine
 
 
+class scan(object):
+    def __init__(self,data):
+        self.data=data
+        self.scantype=
+
+class leaf(object):
+    def __init__(self,q,a3=[],th2th=[],qscans=[],other=[],data=None):
+        self.q=q
+        self.a3=a3
+        self.th2th=[]
+        self.other=[]
+        return
+
 def check_q(q1,q2,tol=1e-6):
     heq=False
     keq=False
@@ -19,7 +32,7 @@ def check_q(q1,q2,tol=1e-6):
    
     
 
-def readfiles(flist):
+def readfiles(flist,tol=1e-4):
     mydatareader=readncnr.datareader()
     H=[]#N.array([])
     I=[]#N.array([])
@@ -27,15 +40,22 @@ def readfiles(flist):
     monlist=[]
     count=0
     myfirstdata=mydatareader.readbuffer(flist[0])
-    mon0=mydata.metadata['count_info']['monitor']
+    mon0=myfirstdata.metadata['count_info']['monitor']
     print 'mon0',mon0
     
     for currfile in flist:
-        print currfile
+        #print currfile
         mydata=mydatareader.readbuffer(currfile)
         if mydata.metadata['file_info']['scantype']=='b':
             print 'b'
+            if N.abs(mydata.metadata['motor4']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
+                print currfile, 'a3 scan'
+            elif N.abs(mydata.metadata['motor4']['step']-2*mydata.metadata['motor3']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
+                print currfile, 'th-2th scan'
+            else:
+                print curffile, 'strange scan'
 
+    return
 
 if __name__=='__main__':
     myfilestr=r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9'
@@ -74,6 +94,8 @@ if __name__=='__main__':
     myfilebaseglob=myfilebase+'*.'+myend
     #print myfilebaseglob
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
-    SU.printr(flist)
+    #SU.printr(flist)
+    print mydata.data.keys()
+    readfiles(flist)
     
     
