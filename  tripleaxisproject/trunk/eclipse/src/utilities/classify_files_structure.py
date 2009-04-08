@@ -5,18 +5,40 @@ import re
 import simple_combine
 
 
-class scan(object):
-    def __init__(self,data):
-        self.data=data
-        self.scantype=
 
-class leaf(object):
-    def __init__(self,q,a3=[],th2th=[],qscans=[],other=[],data=None):
+
+#class scan(object):
+#    def __init__(self,data):
+#        self.data=data
+#        self.scantype=
+
+class qnode(object):
+    def __init__(self,q,th=[],th2th=[],qscans=[],other=[],data=None):
         self.q=q
-        self.a3=a3
-        self.th2th=[]
-        self.other=[]
+        self.th=th
+        self.th2th=th2th
+        self.other=other
+        self.qscans=qscans
+        if data!=None:
+            self.place_data(data)
         return
+    
+    def place_data(self,mydata):
+        if mydata.metadata['file_info']['scantype']=='b':
+            print 'b'
+            if N.abs(mydata.metadata['motor4']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
+                print currfile, 'a3 scan'
+                self.th.append(mydata)
+            elif N.abs(mydata.metadata['motor4']['step']-2*mydata.metadata['motor3']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
+                print currfile, 'th-2th scan'
+                self.th2th.append(mydata)
+            else:
+                print currfile, 'strange scan'
+                self.other.append(mydata)
+                
+class qtree(object):
+    def __init__(self,qlist=[]):
+        self.qlist=qlist       
 
 def check_q(q1,q2,tol=1e-6):
     heq=False
