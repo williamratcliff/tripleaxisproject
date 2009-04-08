@@ -37,6 +37,7 @@ class Qnode(object):
             if N.abs(mydata.metadata['motor4']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
                 #print currfile, 'a3 scan'
                 self.th.append(mydata)
+                #print 'self.th',self.th
             elif N.abs(mydata.metadata['motor4']['step']-2*mydata.metadata['motor3']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
                 #print currfile, 'th-2th scan'
                 self.th2th.append(mydata)
@@ -69,13 +70,15 @@ class Qtree(object):
             #print 'qlist len',len(self.qlist)
             #print 'before qlist q',self.qlist[0].q
             inlist=False
-            for qnode in qlist:
+            for qnode in self.qlist:
                 q=qnode.q
                 #print 'qcenter',qcenter
                 #print 'q',q
                 if check_q(q,qcenter):
-                    #print 'in list'
+                    #print qcenter,'in list'
                     qnode.place_data(mydata)
+                    #print 'placed'
+                    #print qnode.th
                     inlist=True 
             if inlist==False:
                 #print 'NOT in list'
@@ -122,7 +125,7 @@ def readfiles(flist,tol=1e-4):
         #print 'q in loop', qtree.qlist[0].q
         
     for qnode in qtree.qlist:
-        print qnode.q['h_center'],qnode.q['k_center'],qnode.q['l_center']
+        print qnode.q['h_center'],qnode.q['k_center'],qnode.q['l_center'],len(qnode.th),qnode.th
     
     #print qtree.qlist
     return qtree
