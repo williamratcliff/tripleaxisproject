@@ -12,7 +12,7 @@ import simple_combine
 #        self.data=data
 #        self.scantype=
 
-class qnode(object):
+class Qnode(object):
     def __init__(self,q,th=[],th2th=[],qscans=[],other=[],data=None):
         self.q=q
         self.th=th
@@ -36,9 +36,19 @@ class qnode(object):
                 print currfile, 'strange scan'
                 self.other.append(mydata)
                 
-class qtree(object):
+class Qtree(object):
     def __init__(self,qlist=[]):
-        self.qlist=qlist       
+        self.qlist=qlist 
+    def addnode(self,mydata):
+        qcenter=mydata.metadata['q_center']['h_center']
+        for qnode in qlist:
+            q=qnode.q
+            if check_q(q,qcenter):
+                qnode.place_data(mydata)
+            else:
+                newnode=Qnode(q,mydata)
+                
+              
 
 def check_q(q1,q2,tol=1e-6):
     heq=False
@@ -64,20 +74,15 @@ def readfiles(flist,tol=1e-4):
     myfirstdata=mydatareader.readbuffer(flist[0])
     mon0=myfirstdata.metadata['count_info']['monitor']
     print 'mon0',mon0
+    qtree=Qtree()
     
     for currfile in flist:
         #print currfile
         mydata=mydatareader.readbuffer(currfile)
-        if mydata.metadata['file_info']['scantype']=='b':
-            print 'b'
-            if N.abs(mydata.metadata['motor4']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
-                print currfile, 'a3 scan'
-            elif N.abs(mydata.metadata['motor4']['step']-2*mydata.metadata['motor3']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
-                print currfile, 'th-2th scan'
-            else:
-                print curffile, 'strange scan'
-
-    return
+        qtree.addnode(mydata)
+    
+    print qtree.qlist
+    return qtree
 
 if __name__=='__main__':
     myfilestr=r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9'
