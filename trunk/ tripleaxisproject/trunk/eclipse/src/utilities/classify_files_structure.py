@@ -2,8 +2,9 @@ import readncnr3 as readncnr
 import numpy as N
 import scriptutil as SU
 import re
-import simple_combine
+from simple_combine import simple_combine
 import copy
+import pylab
 
 
 
@@ -86,7 +87,50 @@ class Qtree(object):
                 newnode=Qnode(qcenter,data=mydata)
                 self.qlist.append(newnode)
         return
+    
+    def find_node(self,qcenter):
+        
+        i=0
+        index=False
+        for qnode in self.qlist:
+                q=qnode.q
+                #print 'qcenter',qcenter
+                #print 'q',q
+                if check_q(q,qcenter):
+                    index=i
+                    break
+                i=i+1
+        return index
+    
+    def condense_node(self,index):
+        qnode=self.qlist[index]
+        print qnode.q
+        print qnode.th
+        
+        a3=[]
+        counts=[]
+        counts_err=[]
+        monlist=[]
+        for mydata in qnode.th:
+            monlist.append(mydata.metadata['count_info']['monitor'])
+            counts_err.append(N.array(mydata.data['counts_err']))
+            counts.append(N.array(mydata.data['counts']))
+            a3.append(N.array(mydata.data['a3']))
+        a3_out,counts_out,counts_err_out=simple_combine(a3,counts,counts_err,monlist)
+        
+        print a3_out.shape
+        print counts_out.shape
+        print counts_err_out.shape
+        if 1:
+            pylab.errorbar(a3_out,counts_out,counts_err_out,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+            pylab.show()
             
+        qnode.th_condensed={}
+        qnode.th_condensed['a3']=a3_out
+        qnode.th_condensed['counts']=counts_out
+        qnode.th_condensed['counts_err']=counts_err_out
+        
+        return a3_out,counts_out,counts_err_out
               
 
 def check_q(q1,q2,tol=1e-6):
@@ -123,7 +167,7 @@ def readfiles(flist,tol=1e-4):
         #print 'MAIN READ',currfile
         mydata=mydatareader.readbuffer(currfile)
         mydata.data['counts_err']=N.sqrt(mydata.data['counts'])*mon0/mydata.metadata['count_info']['monitor']
-        mydata.data['counts']=mydata.data['counts']*mon0/mydata.metadata['count_info']['monitor']
+        mydata.data['counts']=N.array(mydata.data['counts'])*mon0/mydata.metadata['count_info']['monitor']
         qtree.addnode(copy.deepcopy(mydata))
         #print 'readloop'
         #print 'q in loop', qtree.qlist[0].q
@@ -164,7 +208,7 @@ if __name__=='__main__':
 #    print mydata.metadata['file_info']['filebase']
 #    print mydata.metadata['file_info']['filename']
 #    print mydata.metadata['file_info']['fileseq_number']
-    #print mydata.data.keys()
+    print mydata.data.keys()
     myfilebase='magsc'
     myend='bt9'
     mydirectory=r'c:\ce2rhin8\mar10_2009'
@@ -174,5 +218,5 @@ if __name__=='__main__':
     #SU.printr(flist)
     
     qtree=readfiles(flist)
-    
+    qtree.condense_node(0)
     
