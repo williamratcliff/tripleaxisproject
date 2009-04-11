@@ -139,10 +139,13 @@ class Qtree(object):
     def fit_node(self,index):
         qnode=self.qlist[index]
         print qnode.q
+        th=qnode.th_condensed['a3']
+        counts=qnode.th_condensed['counts']
+        counts_err=qnode.th_condensed['counts_err']
         print qnode.th_condensed['counts'].std()
         print qnode.th_condensed['counts'].mean()
-        print qnode.th_condensed['counts'].max()
-        print qnode.th_condensed['counts'].min()
+        maxval=qnode.th_condensed['counts'].max()
+        minval=qnode.th_condensed['counts'].min()
         diff=qnode.th_condensed['counts'].max()-qnode.th_condensed['counts'].min()\
         -qnode.th_condensed['counts'].mean()
         sig=qnode.th_condensed['counts'].std()
@@ -150,13 +153,24 @@ class Qtree(object):
         if diff-3*sig>0:
             #the difference between the high and low point and
             #the mean is greater than 3 sigma so we have a signal
-            p0=findpeak(x,y,1)
+            p0=findpeak(th,counts,1)
             print 'p0',p0
+            
+            if 1:
+                width_x=N.linspace(p0[0]-p0[1],p0[0]+p0[1],100)
+                width_y=N.ones(width_x.shape)*(maxval-minval)/2
+                pos_y=N.linspace(minval,maxval,100)
+                pos_x=N.ones(pos_y.shape)*p0[0]
+                
+                pylab.errorbar(th,counts,counts_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+                pylab.plot(width_x,width_y)
+                pylab.plot(pos_x,pos_y)
+                pylab.show()
             
         else:
             #fix center
             #fix width
-            
+            print 'no peak'
         
         return
               
