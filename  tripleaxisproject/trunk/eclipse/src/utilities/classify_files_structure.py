@@ -5,6 +5,7 @@ import re
 from simple_combine import simple_combine
 import copy
 import pylab
+from findpeak3 import findpeak
 
 
 
@@ -105,7 +106,7 @@ class Qtree(object):
     def condense_node(self,index):
         qnode=self.qlist[index]
         print qnode.q
-        print qnode.th
+        #print qnode.th
         
         a3=[]
         counts=[]
@@ -118,19 +119,46 @@ class Qtree(object):
             a3.append(N.array(mydata.data['a3']))
         a3_out,counts_out,counts_err_out=simple_combine(a3,counts,counts_err,monlist)
         
-        print a3_out.shape
-        print counts_out.shape
-        print counts_err_out.shape
-        if 1:
-            pylab.errorbar(a3_out,counts_out,counts_err_out,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
-            pylab.show()
-            
+        #print a3_out.shape
+        #print counts_out.shape
+        #print counts_err_out.shape
         qnode.th_condensed={}
         qnode.th_condensed['a3']=a3_out
         qnode.th_condensed['counts']=counts_out
         qnode.th_condensed['counts_err']=counts_err_out
         
-        return a3_out,counts_out,counts_err_out
+        print qnode.th_condensed['counts'].std()
+        print qnode.th_condensed['counts'].mean()
+        print qnode.th_condensed['counts'].max()
+        print qnode.th_condensed['counts'].min()
+        if 0:
+            pylab.errorbar(a3_out,counts_out,counts_err_out,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+            pylab.show()       
+        return 
+    
+    def fit_node(self,index):
+        qnode=self.qlist[index]
+        print qnode.q
+        print qnode.th_condensed['counts'].std()
+        print qnode.th_condensed['counts'].mean()
+        print qnode.th_condensed['counts'].max()
+        print qnode.th_condensed['counts'].min()
+        diff=qnode.th_condensed['counts'].max()-qnode.th_condensed['counts'].min()\
+        -qnode.th_condensed['counts'].mean()
+        sig=qnode.th_condensed['counts'].std()
+        
+        if diff-3*sig>0:
+            #the difference between the high and low point and
+            #the mean is greater than 3 sigma so we have a signal
+            p0=findpeak(x,y,1)
+            print 'p0',p0
+            
+        else:
+            #fix center
+            #fix width
+            
+        
+        return
               
 
 def check_q(q1,q2,tol=1e-6):
@@ -219,4 +247,6 @@ if __name__=='__main__':
     
     qtree=readfiles(flist)
     qtree.condense_node(0)
-    
+    qtree.condense_node(1)
+    qtree.fit_node(0)
+    qtree.fit_node(1)
