@@ -86,12 +86,16 @@ def findpeaks(qx,qz,q,counts):
 
 if __name__=='__main__':
     myfilebase='SrFeA0'
-    myend='bt9'
     mydirectory=r'C:\srfeas\SrFeAsNi\Ni0p08\2009-03-diffraction'
+    myend='bt9'
     myfilebaseglob=myfilebase+'*.'+myend
-    print range(43,69)
+    file_range=(43,69)
+    
+    mydirectory=r'C:\srfeas\SrFeAsNi\Ni0p08\2009-04-diffraction'
+    file_range=(35,51)
+    #myfilebase='SrFeA0'
     flist=[]
-    for i in range(43,69):
+    for i in range(file_range[0],file_range[1]):
         currfile=os.path.join(mydirectory,myfilebase+str(i)+r"."+myend)
         #print 'currfile',currfile
         flist.append(currfile)
@@ -107,7 +111,7 @@ if __name__=='__main__':
         pylab.show()
     if 1:
         #QX,QZ=N.meshgrid(qx,qz)
-        pylab.contourf(x,y,z,15)#,cmap=pylab.cm.jet)
+        pylab.contourf(x,y,z,35)#,cmap=pylab.cm.jet)
     
         #pylab.pcolor(qx,qz,counts)
         pylab.colorbar()
