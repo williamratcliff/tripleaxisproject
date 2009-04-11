@@ -10,6 +10,7 @@ import copy
 class Qnode(object):
     def __init__(self,q,th=None,th2th=None,qscans=None,other=None,data=None):
         self.q=q
+        self.mon0=1.0
         if th==None:
             self.th=[]
         else:
@@ -116,10 +117,13 @@ def readfiles(flist,tol=1e-4):
     mon0=myfirstdata.metadata['count_info']['monitor']
     print 'mon0',mon0
     qtree=Qtree()
+    Qtree.mon0=mon0
     #flist=flist[0:12]
     for currfile in flist:
         #print 'MAIN READ',currfile
         mydata=mydatareader.readbuffer(currfile)
+        mydata.data['counts_err']=N.sqrt(mydata.data['counts'])*mon0/mydata.metadata['count_info']['monitor']
+        mydata.data['counts']=mydata.data['counts']*mon0/mydata.metadata['count_info']['monitor']
         qtree.addnode(copy.deepcopy(mydata))
         #print 'readloop'
         #print 'q in loop', qtree.qlist[0].q
@@ -169,6 +173,6 @@ if __name__=='__main__':
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     #SU.printr(flist)
     
-    readfiles(flist)
+    qtree=readfiles(flist)
     
     
