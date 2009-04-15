@@ -12,6 +12,7 @@ from findpeak3 import findpeak
 class Qnode(object):
     def __init__(self,q,th=None,th2th=None,qscans=None,other=None,data=None):
         self.q=q
+        self.selected=True
         self.mon0=1.0
         if th==None:
             self.th=[]
