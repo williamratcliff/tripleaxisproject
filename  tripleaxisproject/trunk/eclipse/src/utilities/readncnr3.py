@@ -665,6 +665,15 @@ class datareader:
             mydata=Data(self.metadata,self.columndict)
             #print self.metadata
             #print self.columnlist
+            filename=os.path.split(myfilestr)[-1]
+            self.metadata['file_info']['filename']=filename
+            #print 'filename ', tokenized[1]
+            pattern = re.compile('^(?P<base>[^.]*?)(?P<seq>[0-9]*)(?P<ext>[.].*)?$')
+            match = pattern.match(filename)
+            dict((a,match.group(a)+"") for a in ['base','seq','ext'])
+            #print 'filebase ',match.group('base')
+            self.metadata['file_info']['filebase']=match.group('base')
+            self.metadata['file_info']['fileseq_number']=match.group('seq')
         else:
             #instrument is bt7
             self.readbt7(myfile)
