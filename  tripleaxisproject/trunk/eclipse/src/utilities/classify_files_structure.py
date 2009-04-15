@@ -173,12 +173,20 @@ class Qtree(object):
             area=Imax*(N.sqrt(2*pi)*sigma)
             print 'Imax',Imax
             pin=[area,center,width,0]
-            oparam=scipy.odr.Model(gauss)
-            mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
-            myodr = scipy.odr.ODR(mydatao, oparam, beta0=pin)
-            myoutput=myodr.run()
-            myoutput.pprint()
-            pfit=myoutput.beta
+            
+            
+            
+            if 0:
+                oparam=scipy.odr.Model(gauss)
+                mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
+                myodr = scipy.odr.ODR(mydatao, oparam, beta0=pin)
+                myoutput=myodr.run()
+                myoutput.pprint()
+                pfit=myoutput.beta
+            
+            if 1:
+                
+            
             Icalc=gauss(pfit,th)
             
             if 1:
