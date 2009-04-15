@@ -8,6 +8,10 @@ import pylab
 from findpeak3 import findpeak
 
 
+class data_item(object):
+    def __init__(self,data,selected=True):
+        self.data=data
+        self.selected=selected
 
 class Qnode(object):
     def __init__(self,q,th=None,th2th=None,qscans=None,other=None,data=None):
@@ -40,14 +44,14 @@ class Qnode(object):
             currfile=mydata.metadata['file_info']['filename']
             if N.abs(mydata.metadata['motor4']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
                 #print currfile, 'a3 scan'
-                self.th.append(mydata)
+                self.th.append(data_item(mydata))
                 #print 'self.th',self.th
             elif N.abs(mydata.metadata['motor4']['step']-2*mydata.metadata['motor3']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
                 #print currfile, 'th-2th scan'
-                self.th2th.append(mydata)
+                self.th2th.append(data_item(mydata))
             else:
                 #print currfile, 'strange scan'
-                self.other.append(mydata)
+                self.other.append(data_item(mydata))
         return
                 
 class Qtree(object):
@@ -113,7 +117,8 @@ class Qtree(object):
         counts=[]
         counts_err=[]
         monlist=[]
-        for mydata in qnode.th:
+        for mydataitem in qnode.th:
+            mydata=mydataitem.data
             monlist.append(mydata.metadata['count_info']['monitor'])
             counts_err.append(N.array(mydata.data['counts_err']))
             counts.append(N.array(mydata.data['counts']))
