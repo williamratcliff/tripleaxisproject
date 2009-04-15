@@ -207,6 +207,7 @@ class Qtree(object):
                 pfit=r.xf
                 print 'pfit openopt',pfit
                 print 'r dict', r.__dict__
+                Icalc=gauss(pfit,th)
             
             if 0:
                 oparam=scipy.odr.Model(gauss)
