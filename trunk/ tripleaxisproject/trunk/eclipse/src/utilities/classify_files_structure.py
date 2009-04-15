@@ -6,6 +6,9 @@ from simple_combine import simple_combine
 import copy
 import pylab
 from findpeak3 import findpeak
+from openopt import NLP
+import scipy.optimize
+import scipy.odr
 
 
 class data_item(object):
@@ -161,17 +164,25 @@ class Qtree(object):
             #the mean is greater than 3 sigma so we have a signal
             p0=findpeak(th,counts,1)
             print 'p0',p0
+            #Area center width Bak
+            pin=[maval-minval,p0[0],p0[1],0]
+            oparam=scipy.odr.Model(guass)
+            mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
+            myodr = scipy.odr.ODR(mydatao, oparam, beta0=pin)
+            myoutput=myodr.run()
+            myoutput.pprint()
+            pfit=myoutput.beta
             
-            if 1:
+            if 0:
                 width_x=N.linspace(p0[0]-p0[1],p0[0]+p0[1],100)
                 width_y=N.ones(width_x.shape)*(maxval-minval)/2
                 pos_y=N.linspace(minval,maxval,100)
                 pos_x=N.ones(pos_y.shape)*p0[0]
-                
-                pylab.errorbar(th,counts,counts_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
-                pylab.plot(width_x,width_y)
-                pylab.plot(pos_x,pos_y)
-                pylab.show()
+                if 1:
+                    pylab.errorbar(th,counts,counts_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+                    pylab.plot(width_x,width_y)
+                    pylab.plot(pos_x,pos_y)
+                    pylab.show()
             
         else:
             #fix center
@@ -179,6 +190,18 @@ class Qtree(object):
             print 'no peak'
         
         return
+
+
+def gauss(p,x):
+    #Area center width Bak
+    area=p[0]/N.sqrt(2*pi)/p[2]
+    x0=p[1]
+    width=p[2]
+    background=p[3]
+    y=background+area*N.exp(-(0.5*(x-x0)*(x-x0)/width/width))
+    return y
+
+def chisq(p):
               
 
 def check_q(q1,q2,tol=1e-6):
