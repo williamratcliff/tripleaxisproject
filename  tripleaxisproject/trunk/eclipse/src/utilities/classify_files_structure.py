@@ -185,6 +185,32 @@ class Qtree(object):
                 pfit=myoutput.beta
             
             if 1:
+                p = NLP(max_wrap, p0, maxIter = 1e3, maxFunEvals = 1e5)
+                p.lb=lowerm
+        p.ub=upperm
+        p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
+        p.plot = 0
+        p.iprint = 1
+        p.contol = 1e-5#3 # required constraints tolerance, default for NLP is 1e-6
+    
+    # for ALGENCAN solver gradtol is the only one stop criterium connected to openopt
+    # (except maxfun, maxiter)
+    # Note that in ALGENCAN gradtol means norm of projected gradient of  the Augmented Lagrangian
+    # so it should be something like 1e-3...1e-5
+        p.gradtol = 1e-5#5 # gradient stop criterium (default for NLP is 1e-6)
+        #print 'maxiter', p.maxiter
+        #print 'maxfun', p.maxfun
+        p.maxIter=50
+    #    p.maxfun=100
+  
+        #p.df_iter = 50
+        p.maxTime = 4000
+        #r=p.solve('scipy_cobyla')
+            #r=p.solve('scipy_lbfgsb')
+            r = p.solve('algencan')
+            #r = p.solve('ralg')
+            print 'done'
+            pout=r.xf
                 
             
             Icalc=gauss(pfit,th)
