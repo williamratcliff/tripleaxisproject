@@ -176,44 +176,47 @@ class Qtree(object):
             
             
             
-            if 0:
-                oparam=scipy.odr.Model(gauss)
-                mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
-                myodr = scipy.odr.ODR(mydatao, oparam, beta0=pin)
-                myoutput=myodr.run()
-                myoutput.pprint()
-                pfit=myoutput.beta
+            
             
             if 1:
-                p = NLP(max_wrap, p0, maxIter = 1e3, maxFunEvals = 1e5)
-                p.lb=lowerm
-        p.ub=upperm
-        p.args.f=(h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
-        p.plot = 0
-        p.iprint = 1
-        p.contol = 1e-5#3 # required constraints tolerance, default for NLP is 1e-6
+                p = NLP(chisq, pin, maxIter = 1e3, maxFunEvals = 1e5)
+                #p.lb=lowerm
+                #p.ub=upperm
+                p.args.f=(th,counts,counts_err)
+                p.plot = 0
+                p.iprint = 1
+                p.contol = 1e-5#3 # required constraints tolerance, default for NLP is 1e-6
     
     # for ALGENCAN solver gradtol is the only one stop criterium connected to openopt
     # (except maxfun, maxiter)
     # Note that in ALGENCAN gradtol means norm of projected gradient of  the Augmented Lagrangian
     # so it should be something like 1e-3...1e-5
-        p.gradtol = 1e-5#5 # gradient stop criterium (default for NLP is 1e-6)
+                p.gradtol = 1e-5#5 # gradient stop criterium (default for NLP is 1e-6)
         #print 'maxiter', p.maxiter
         #print 'maxfun', p.maxfun
-        p.maxIter=50
+                p.maxIter=50
     #    p.maxfun=100
   
         #p.df_iter = 50
-        p.maxTime = 4000
+                p.maxTime = 4000
         #r=p.solve('scipy_cobyla')
             #r=p.solve('scipy_lbfgsb')
-            r = p.solve('algencan')
-            #r = p.solve('ralg')
-            print 'done'
-            pout=r.xf
-                
+                #r = p.solve('algencan')
+                r = p.solve('ralg')
+                print 'done'
+                pfit=r.xf
+                print 'pfit openopt',pfit
+                print 'r dict', r.__dict__
             
-            Icalc=gauss(pfit,th)
+            if 0:
+                oparam=scipy.odr.Model(gauss)
+                mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
+                myodr = scipy.odr.ODR(mydatao, oparam, beta0=pfit)
+                myoutput=myodr.run()
+                myoutput.pprint()
+                pfit=myoutput.beta
+            
+                Icalc=gauss(pfit,th)
             
             if 1:
                 width_x=N.linspace(p0[0]-p0[1],p0[0]+p0[1],100)
@@ -246,7 +249,10 @@ def gauss(p,x):
     y=background+area*N.exp(-(0.5*(x-x0)*(x-x0)/sigma/sigma))
     return y
 
-#def chisq(p):
+def chisq(p,a3,I,Ierr):
+    Icalc=gauss(p,a3)
+    chi=((I-Icalc)/Ierr)**2
+    return chi.sum()/(len(I)-len(p))
               
 
 def check_q(q1,q2,tol=1e-6):
