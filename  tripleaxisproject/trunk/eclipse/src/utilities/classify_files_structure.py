@@ -203,6 +203,7 @@ class Qtree(object):
         #r=p.solve('scipy_cobyla')
             #r=p.solve('scipy_lbfgsb')
                 #r = p.solve('algencan')
+                print 'ralg'
                 r = p.solve('ralg')
                 print 'done'
                 pfit=r.xf
@@ -244,7 +245,7 @@ class Qtree(object):
         return
 
 
-def gauss(x,p):
+def gauss(p,x):
     #Area center width Bak
     
     #p=[p0,p1,p2,p3]
@@ -274,6 +275,10 @@ def gauss2(x,p0,p1,p2,p3):
 
 def chisq(p,a3,I,Ierr):
     Icalc=gauss(p,a3)
+    #print I.shape
+    #print Ierr.shape
+    #print a3.shape
+    #print Icalc.shape
     chi=((I-Icalc)/Ierr)**2
     return chi.sum()/(len(I)-len(p))
               
