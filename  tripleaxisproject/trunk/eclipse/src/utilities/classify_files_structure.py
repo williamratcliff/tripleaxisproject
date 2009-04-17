@@ -211,7 +211,7 @@ class Qtree(object):
             
             if 1:
                 print 'curvefit'
-                pfit,popt=curve_fit(gauss, th, counts, p0=pfit, sigma=counts_err)
+                pfit,popt=curve_fit(gauss2, th, counts, p0=pfit, sigma=counts_err)
                 print 'p,popt', pfit,popt
             if 0:
                 oparam=scipy.odr.Model(gauss)
@@ -244,8 +244,25 @@ class Qtree(object):
         return
 
 
-def gauss(p,x):
+def gauss(x,p):
     #Area center width Bak
+    
+    #p=[p0,p1,p2,p3]
+    
+    
+    x0=p[1]
+    width=p[2]
+    sigma=width/2/N.sqrt(2*N.log(2))
+    area=N.abs(p[0])/N.sqrt(2*pi)/sigma
+    background=p[3]
+    y=background+area*N.exp(-(0.5*(x-x0)*(x-x0)/sigma/sigma))
+    return y
+
+def gauss2(x,p0,p1,p2,p3):
+    #Area center width Bak
+    
+    p=[p0,p1,p2,p3]
+    
     
     x0=p[1]
     width=p[2]
