@@ -9,6 +9,7 @@ from findpeak3 import findpeak
 from openopt import NLP
 import scipy.optimize
 import scipy.odr
+from scipy.optimize import curve_fit
 pi=N.pi
 
 
@@ -207,8 +208,11 @@ class Qtree(object):
                 pfit=r.xf
                 print 'pfit openopt',pfit
                 print 'r dict', r.__dict__
-                Icalc=gauss(pfit,th)
             
+            if 1:
+                print 'curvefit'
+                pfit,popt=curve_fit(gauss, th, counts, p0=pfit, sigma=counts_err)
+                print 'p,popt', pfit,popt
             if 0:
                 oparam=scipy.odr.Model(gauss)
                 mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
@@ -217,7 +221,8 @@ class Qtree(object):
                 myoutput.pprint()
                 pfit=myoutput.beta
             
-                Icalc=gauss(pfit,th)
+            Icalc=gauss(pfit,th)
+            
             
             if 1:
                 width_x=N.linspace(p0[0]-p0[1],p0[0]+p0[1],100)
