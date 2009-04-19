@@ -554,6 +554,7 @@ if __name__=="__main__":
         r = p.solve('algencan')
         print 'done'
         pout=r.xf
+        #p.goal='max'
     
     print 'solution:', pout
     print 'chiq', chisq(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
