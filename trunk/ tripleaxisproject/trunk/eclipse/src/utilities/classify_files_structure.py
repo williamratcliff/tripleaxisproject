@@ -11,6 +11,8 @@ import scipy.optimize
 import scipy.odr
 from scipy.optimize import curve_fit
 pi=N.pi
+import sys
+
 
 
 class data_item(object):
