@@ -13,8 +13,6 @@ from scipy.optimize import curve_fit
 pi=N.pi
 import sys
 
-
-
 class data_item(object):
     def __init__(self,data,selected=True):
         self.data=data
@@ -214,6 +212,7 @@ class Qtree(object):
             
             if 1:
                 print 'curvefit'
+                print sys.executable
                 pfit,popt=curve_fit(gauss2, th, counts, p0=pfit, sigma=counts_err)
                 print 'p,popt', pfit,popt
             if 0:
