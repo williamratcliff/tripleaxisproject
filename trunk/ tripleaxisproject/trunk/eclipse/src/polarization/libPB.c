@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <strings.h>
+#include <string.h>
 #include "PB.h"
 
 /*
@@ -2313,7 +2313,7 @@ static int polmonitorCorrect(PBdatapt *d)
 		   &tp, &tm, &tpesq, &tmesq, &pol, &tf) )
       return ierr ;
     t1 = (tp + tm)/2. ;
-    d->lambI /= lamb2 ;
+    d->lambI /= 2 ;
     if( ierr = transfac(i, 1, d, &expcells[c.cells[0][i]],
 		   &tp, &tm, &tpesq, &tmesq, &pol, &tf) )
       return ierr ;
