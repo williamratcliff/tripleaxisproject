@@ -921,6 +921,7 @@ Keywords:
       qmin = minstep * 0  ## Remove minstep for now!!
       qmax = maxstep != 0
       wh = numpy.nonzero(((qmin!=0.) & (qmax!=0.)) & (maxstep < minstep))
+      
       if (len(wh) > 0):
          self.errmsg = 'ERROR: MPMINSTEP is greater than MPMAXSTEP'
          return
