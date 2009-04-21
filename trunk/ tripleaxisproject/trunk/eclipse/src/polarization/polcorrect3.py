@@ -133,6 +133,7 @@ PBflags=cstruct.cstruct(('MonitorCorrect',N.intc),
 
 if sys.platform=='win32':
     mypolcorrect = N.ctypeslib.load_library('polarization2.dll', 'c:\polcorrecter')
+    #mypolcorrect = N.ctypeslib.load_library(r'C:\mytripleaxisproject\trunk\eclipse\src\polarization\polarization2.dll')
 elif sys.platform=='mac':
     mypolcorrect = N.ctypeslib.load_library('libpolarization2.so', '.')
 else:
