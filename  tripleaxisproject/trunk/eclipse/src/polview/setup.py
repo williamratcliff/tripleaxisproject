@@ -19,7 +19,7 @@ class Target:
     def __init__(self, **kw):
         self.__dict__.update(kw)
         # for the versioninfo resources
-        self.version = "0.1"
+        self.version = "0.3"
         self.company_name = "NIST"
         self.copyright = "Public Domain"
         self.name = "PolApp"
@@ -32,9 +32,11 @@ matplotlibdatadir = matplotlib.get_data_path()
 matplotlibdata = findall(matplotlibdatadir)
 matplotlibdata_files = []
 
+
 for f in matplotlibdata:
     dirname = os.path.join('matplotlibdata', f[len(matplotlibdatadir)+1:])
     matplotlibdata_files.append((os.path.split(dirname)[0], [f]))
+
 
 #
 # packages
@@ -85,7 +87,7 @@ setup(
             'typelibs' : [('{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}', 0, 1, 1)],
             },
     },
-    data_files=matplotlibdata_files
+    data_files=matplotlib.get_py2exe_datafiles()#matplotlibdata_files
     
     # Do something like this to add images to the distribution
     #data_files=[ ("prog",["kategorien.xml",])]
