@@ -3,11 +3,13 @@ import sys, shutil,os
 #SharedLibrary('polarization.dll', ['PBcoef.c','PBcorrect.c','polcorrectTest.c'])
 if sys.platform=='win32':
 	print 'building on windows'
-	SharedLibrary('polarization2.dll', ['libPB.c']) #good
+	env = Environment( tools = [ 'mingw'] ) 
+	#env.Program("main.cpp") 
+	env.SharedLibrary('polarization2.dll', ['libPB.c']) #good
 	print 'I built it  Now copying'
 	mydir=os.getcwd()
 	orig=os.path.join(mydir,'polarization2.dll')
-	shutil.copyfile(orig,r'c:\polcorrecter\polarization2.dll')
+	#shutil.copyfile(orig,r'c:\polcorrecter\polarization2.dll')
 	print 'copied'
 elif sys.platform=='mac':
 	print 'I do not know how to build on Macs yet'
