@@ -920,14 +920,24 @@ Keywords:
       minstep = self.parinfo(parinfo, 'mpminstep', default=0., n=npar)
       qmin = minstep * 0  ## Remove minstep for now!!
       qmax = maxstep != 0
+      print 'maxstep',maxstep
+      print 'minstep',minstep
       wh = numpy.nonzero(((qmin!=0.) & (qmax!=0.)) & (maxstep < minstep))
+      print 'qmax',qmax!=0.,numpy.nonzero(((qmin!=0.) & (qmax!=0.)))
+      print 'wh',wh
+      print 'len',len(wh)
       
-      if (len(wh) > 0):
+      print numpy.shape(wh)
+      print wh[0] 
+      if (numpy.shape(wh)[1] > 0):
          self.errmsg = 'ERROR: MPMINSTEP is greater than MPMAXSTEP'
          return
       wh = numpy.nonzero((qmin!=0.) & (qmax!=0.))
-      qminmax = len(wh > 0)
-
+      if numpy.shape(wh)[1]>0:
+         qminmax = len(wh > 0)
+      else:
+         qminmax=0
+      print 'qminmax'
       ## Finish up the free parameters
       ifree = numpy.nonzero(pfixed != 1)
       nfree = len(ifree)
@@ -942,17 +952,25 @@ Keywords:
       ## LIMITED parameters ?
       limited = self.parinfo(parinfo, 'limited', default=[0,0])
       limits = self.parinfo(parinfo, 'limits', default=[0.,0.])
+      print 'xall',xall
+      print 'lower', limits[:,0]
+      print 'upper', limits[:,1]
+      print 'lower limits enabled', limited[:,0]
+      print 'upper limits enabled', limited[:,1]
       if (limited != None) and (limits != None):
          ## Error checking on limits in parinfo
          wh = numpy.nonzero((limited[:,0] & (xall < limits[:,0])) |
                               (limited[:,1] & (xall > limits[:,1])))
-         if (len(wh) > 0):
+         print 'wh parinfo', wh
+         whlen=numpy.shape(wh)[1]
+         if (whlen > 0):
             self.errmsg = 'ERROR: parameters are not within PARINFO limits'
             return
          wh = numpy.nonzero((limited[:,0] & limited[:,1]) &
                               (limits[:,0] >= limits[:,1]) &
                               (pfixed == 0))
-         if (len(wh) > 0):
+         whlen=numpy.shape(wh)[1]
+         if (whlen > 0):
             self.errmsg = 'ERROR: PARINFO parameter limits are not consistent'
             return
 
@@ -963,7 +981,8 @@ Keywords:
          llim  = numpy.take(limits [:,0], ifree)
 
          wh = numpy.nonzero((qulim!=0.) | (qllim!=0.))
-         if (len(wh) > 0): qanylim = 1
+         whlen=numpy.shape(wh)[1]
+         if (whlen > 0): qanylim = 1
          else: qanylim = 0
       else:
          ## Fill in local variables with dummy values
@@ -984,7 +1003,8 @@ Keywords:
          self.errmsg = 'ERROR: DIAG parameter scales are inconsistent'
          if (len(diag) < n): return
          wh = numpy.nonzero(diag <= 0)
-         if (len(wh) > 0): return
+         whlen=numpy.shape(wh)[1]
+         if (whlen > 0): return
          self.errmsg = ''
 
       # Make sure x is a numpy array of type numpy.float64
@@ -1054,9 +1074,9 @@ Keywords:
          if (qanylim):
             catch_msg = 'zeroing derivatives of pegged parameters'
             whlpeg = numpy.nonzero(qllim & (x == llim))
-            nlpeg = len(whlpeg)
+            nlpeg = numpy.shape(whlpeg)[1]#len(whlpeg)
             whupeg = numpy.nonzero(qulim & (x == ulim))
-            nupeg = len(whupeg)
+            nupeg = numpy.shape(whupeg [1])#llen(whupeg)
             ## See if any "pegged" values should keep their derivatives
             if (nlpeg > 0):
                ## Total derivative of sum wrt lower pegged parameters
@@ -1169,12 +1189,14 @@ Keywords:
 
                   dwa1 = abs(wa1) > machep
                   whl = numpy.nonzero(((dwa1!=0.) & qllim) & ((x + wa1) < llim))
-                  if (len(whl) > 0):
+                  whllen=numpy.shape(whl)[1]
+                  if (len(whllen) > 0):
                      t = ((numpy.take(llim, whl) - numpy.take(x, whl)) /
                            numpy.take(wa1, whl))
                      alpha = min(alpha, min(t))
                   whu = numpy.nonzero(((dwa1!=0.) & qulim) & ((x + wa1) > ulim))
-                  if (len(whu) > 0):
+                  whulen=numpy.shape(whu)[1]
+                  if (whulen > 0):
                      t = ((numpy.take(ulim, whu) - numpy.take(x, whu)) /
                            numpy.take(wa1, whu))
                      alpha = min(alpha, min(t))
@@ -1183,7 +1205,8 @@ Keywords:
                if (qminmax):
                   nwa1 = wa1 * alpha
                   whmax = numpy.nonzero((qmax != 0.) & (maxstep > 0))
-                  if (len(whmax) > 0):
+                  whmaxlen=numpy.shape(whmax)[1]
+                  if (whmaxlen > 0):
                      mrat = max(numpy.take(nwa1, whmax) /
                                 numpy.take(maxstep, whmax))
                      if (mrat > 1): alpha = alpha / mrat
@@ -1195,9 +1218,11 @@ Keywords:
                ## Adjust the final output values.  If the step put us exactly
                ## on a boundary, make sure it is exact.
                wh = numpy.nonzero((qulim!=0.) & (wa2 >= ulim*(1-machep)))
-               if (len(wh) > 0): numpy.put(wa2, wh, numpy.take(ulim, wh))
+               whlen=numpy.shape([wh])
+               if (whlen > 0): numpy.put(wa2, wh, numpy.take(ulim, wh))
                wh = numpy.nonzero((qllim!=0.) & (wa2 <= llim*(1+machep)))
-               if (len(wh) > 0): numpy.put(wa2, wh, numpy.take(llim, wh))
+               whlen=numpy.shape([wh])
+               if (whlen > 0): numpy.put(wa2, wh, numpy.take(llim, wh))
             # endelse
             wa3 = diag * wa1
             pnorm = self.enorm(wa3)
@@ -1331,7 +1356,8 @@ Keywords:
             self.perror = numpy.zeros(nn, numpy.float64)
             d = numpy.diagonal(self.covar)
             wh = numpy.nonzero(d >= 0)
-            if len(wh) > 0:
+            whlen=numpy.shape(wh)[1]
+            if whlen > 0:
               numpy.put(self.perror, wh, numpy.sqrt(numpy.take(d, wh)))
       return
 
@@ -1501,25 +1527,34 @@ Keywords:
       if step != None:
          stepi = numpy.take(step, ifree)
          wh = numpy.nonzero(stepi > 0)
-         if (len(wh) > 0): numpy.put(h, wh, numpy.take(stepi, wh))
+         whlen=numpy.shape(wh)[1]
+         if (whlen > 0): numpy.put(h, wh, numpy.take(stepi, wh))
 
       ## if relative step is given, use that
       if (len(dstep) > 0):
          dstepi = numpy.take(dstep, ifree)
          wh = numpy.nonzero(dstepi > 0)
-         if len(wh) > 0: numpy.put(h, wh, abs(numpy.take(dstepi,wh)*numpy.take(x,wh)))
+         whlen=numpy.shape(wh)[1]
+         if whlen > 0: numpy.put(h, wh, abs(numpy.take(dstepi,wh)*numpy.take(x,wh)))
 
       ## In case any of the step values are zero
       wh = numpy.nonzero(h == 0)
-      if len(wh) > 0: numpy.put(h, wh, eps)
+      whlen=numpy.shape(wh)[1]
+      if whlen > 0: numpy.put(h, wh, eps)
 
       ## Reverse the sign of the step if we are up against the parameter
       ## limit, or if the user requested it.
       mask = dside == -1
       if len(ulimited) > 0 and len(ulimit) > 0:
-         mask = mask or (ulimited and (x > ulimit-h))
+         print 'ulimited',ulimited
+         print 'ulimit',ulimit
+         print 'mask',mask
+         print 'x',x
+         print 'h',h
+         mask = numpy.logical_or(mask[ifree] , numpy.logical_and(ulimited ,(x > ulimit-h)))
          wh = numpy.nonzero(mask)
-         if len(wh) > 0: numpy.put(h, wh, -numpy.take(h, wh))
+         whlen=numpy.shape(wh)[1]
+         if whlen > 0: numpy.put(h, wh, -numpy.take(h, wh))
       ## Loop through parameters, computing the derivative for each
       for j in range(n):
          xp = xall.copy()
@@ -1878,7 +1913,8 @@ Keywords:
       ## then obtain a least squares solution
       nsing = n
       wh = numpy.nonzero(sdiag == 0)
-      if (len(wh) > 0):
+      whlen=numpy.shape(wh)[1]
+      if (whlen > 0):
          nsing = wh[0]
          wa[nsing:] = 0
 
@@ -2003,7 +2039,8 @@ Keywords:
       nsing = n
       wa1 = qtb.copy()
       wh = numpy.nonzero(numpy.diagonal(r) == 0)
-      if len(wh) > 0:
+      whlen=numpy.shape(wh)[1]
+      if whlen > 0:
          nsing = wh[0]
          wa1[wh[0]:] = 0
       if nsing > 1:
