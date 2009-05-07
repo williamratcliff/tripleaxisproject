@@ -351,6 +351,7 @@ def readmeshfiles(mydirectory,myfilebase,myend):
     xa,ya,za=prep_data2(Qx,Qy,Counts);
     print 'xa',xa.min(),xa.max()
     print 'qx',Qx.min(),Qx.max()
+    print 
     return xa,ya,za
 
 
