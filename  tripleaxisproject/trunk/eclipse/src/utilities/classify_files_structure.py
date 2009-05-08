@@ -13,6 +13,7 @@ from scipy.optimize import curve_fit
 pi=N.pi
 import sys
 from mpfit import mpfit
+import rescalculator.rescalc as rescalc
 
 class data_item(object):
     def __init__(self,data,selected=True):
@@ -22,8 +23,15 @@ class data_item(object):
 class Qnode(object):
     def __init__(self,q,th=None,th2th=None,qscans=None,other=None,data=None):
         self.q=q
+	self.Q=0.0
         self.selected=True
         self.mon0=1.0
+	self.th_correction=1.0
+	self.tth_correction=1.0
+	self.q_correction=1.0
+	self.th_integrated_intensity=0.0
+	self.tth_integrated_intensity=0.0
+	self.q_integrated_intensity=0.0
         if th==None:
             self.th=[]
         else:
@@ -121,6 +129,107 @@ class Qtree(object):
                     break
                 i=i+1
         return index
+    
+    def correct_data(self,mydata,q):
+	mya=mydata.metadata['lattice']['a']
+	myb=mydata.metadata['lattice']['b']
+	myc=mydata.metadata['lattice']['c']
+	myalpha=mydata.metadata['lattice']['alpha']
+	mybeta=mydata.metadata['lattice']['beta']
+	mygamma=mydata.metadata['lattice']['gamma']
+	a=N.array([mya,mya],dtype='float64') #for now, the code is broken if only one element in the array for indexing
+	b=N.array([myb,myb],dtype='float64')
+	c=N.array([myc,myc],dtype='float64')
+	alpha=N.array([myalpha,myalpha],dtype='float64')
+	beta=N.array([mybeta,mybeta],dtype='float64')
+	gamma=N.array([mygamma,mygamma],dtype='float64')
+	#print mydata.metadata
+	h=mydata.metadata['orient1']['h']
+	k=mydata.metadata['orient1']['k']
+	l=mydata.metadata['orient1']['l']
+	orient1=N.array([[h,k,l],[h,k,l]],dtype='float64')
+	h=mydata.metadata['orient2']['h']
+	k=mydata.metadata['orient2']['k']
+	l=mydata.metadata['orient2']['l']
+	orient2=N.array([[h,k,l],[h,k,l]],dtype='float64')
+	mylattice=rescalc.lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+					     orient1=orient1,orient2=orient2)
+	h=q['h_center'] #perhaps just take this from the file in the future
+	k=q['k_center']
+	l=q['l_center']
+	H=N.array([h,h],dtype='float64');
+	K=N.array([k,k],dtype='float64');
+	L=N.array([l,l],dtype='float64');
+	W=N.array([0.0,0.0],dtype='float64')
+	EXP={}
+	EXP['ana']={}
+	EXP['ana']['tau']='pg(002)'
+	EXP['mono']={}
+	EXP['mono']['tau']='pg(002)';
+	EXP['ana']['mosaic']=25
+	EXP['mono']['mosaic']=25
+	EXP['sample']={}
+	EXP['sample']['mosaic']=25
+	EXP['sample']['vmosaic']=25
+	coll1=mydata.metadata['collimations']['coll1']
+	coll2=mydata.metadata['collimations']['coll2']
+	coll3=mydata.metadata['collimations']['coll3']
+	coll4=mydata.metadata['collimations']['coll4']	
+	EXP['hcol']=N.array([coll1,coll2,coll3,coll4],dtype='float64')
+	EXP['vcol']=N.array([120, 120, 120, 240],dtype='float64')
+	
+	EXP['infix']=-1 #positive for fixed incident energy
+	EXP['efixed']=mydata.metadata['energy_info']['ef']
+	EXP['method']=0
+	setup=[EXP]
+	myrescal=rescalc.rescalculator(mylattice)
+	newinput=rescalc.lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+					      H=H,K=K,L=L,W=W,setup=setup)
+	mylattice=rescalc.lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+					     beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
+					     orient2=newinput['orient2'])
+	myrescal.__init__(mylattice)
+	Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
+	#print 'Q', Q
+	R0,RM=myrescal.ResMat(Q,W,setup)
+	#print 'RM '
+	#print RM.transpose()
+	#print 'R0 ',R0
+	#exit()
+	R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+	#myrescal.ResPlot(H, K, L, W, setup)
+	#print 'RMS'
+	#print RMS.transpose()[0]
+	corrections=myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+	#print corrections
+	return corrections,Q[0]
+    
+    
+    def correct_node(self,index):
+	qnode=self.qlist[index]
+	q=qnode.q
+	#I will assume that all data in a node will have the same instrument configuration
+	#for now, handle th, 2th corrections, otherwise, need to access correctionsp'q_correction']
+	if len(qnode.th)>0:
+	    mydata=qnode.th[0].data
+	    corrections,Q=self.correct_data(mydata,qnode.q)
+	    th_correction=corrections['th_correction'][0]
+	    qnode.th_correction=th_correction.flatten()[0]
+	    qnode.Q=Q
+	    #print 'corrected', qnode.th_correction
+	if len(qnode.th2th)>0:
+	    mydata=qnode.tth[0].data
+	    corrections,Q=self.correct_data(mydata,qnode.q)
+	    tth_correction=corrections['tth_correction'][0]
+	    qnode.tth_correction=tth_correction.flatten()[0]
+	    qnode.Q=Q
+	
+	return
+    
+    def correct_nodes(self):
+	for index in range(len(self.qlist)):
+	    self.correct_node(index)
+	return
     
     def condense_node(self,index):
         qnode=self.qlist[index]
@@ -333,8 +442,8 @@ class Qtree(object):
         pcerror=perror*N.sqrt(m.fnorm / m.dof)#chisqr
         print 'pcerror', pcerror
 	
-	self.qlist[index].integrated_intensity=pfit[0]
-	self.qlist[index].integrated_intensity_err=pcerror[0]    
+	self.qlist[index].th_integrated_intensity=N.abs(pfit[0])
+	self.qlist[index].th_integrated_intensity_err=N.abs(pcerror[0])    
 	Icalc=gauss(pfit,th)
 	print 'perror',perror
 	if 0:
@@ -499,19 +608,26 @@ if __name__=='__main__':
     
     qtree=readfiles(flist)
     qtree.condense_nodes()
+    qtree.correct_nodes()
     qtree.fit_nodes()
     qlist=qtree.qlist
     I=[]
     Ierr=[]
+    Q=[]
+    correction=[]
     for qnode in qlist:
-	print qnode.q['h_center'], qnode.q['k_center'],qnode.q['l_center'],qnode.integrated_intensity, qnode.integrated_intensity_err
-	I.append(qnode.integrated_intensity)
-	Ierr.append(qnode.integrated_intensity_err)
-    
+	print qnode.q['h_center'], qnode.q['k_center'],qnode.q['l_center'],qnode.th_integrated_intensity, qnode.th_integrated_intensity_err,qnode.th_correction
+	correction.append(qnode.th_correction)
+	I.append(qnode.th_integrated_intensity/qnode.th_correction)
+	Ierr.append(qnode.th_integrated_intensity_err/qnode.th_correction)
+	Q.append(qnode.Q)
+    print 'Q',Q
+    print 'Correction',correction
     if 1:
-	pylab.errorbar(range(len(I)),I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
-    
-    pylab.show()
+	pylab.errorbar(Q,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+
+    if 1:
+	pylab.show()
 
     #qtree.condense_node(0)
     #qtree.condense_node(1)
