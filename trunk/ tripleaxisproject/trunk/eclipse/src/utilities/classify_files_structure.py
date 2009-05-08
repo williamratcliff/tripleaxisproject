@@ -167,7 +167,7 @@ class Qtree(object):
         -qnode.th_condensed['counts'].mean()
         sig=qnode.th_condensed['counts'].std()
         
-        if diff-3*sig>0:
+        if diff-4*sig>0:
             #the difference between the high and low point and
             #the mean is greater than 3 sigma so we have a signal
             p0=findpeak(th,counts,1)
@@ -216,7 +216,7 @@ class Qtree(object):
                 print 'pfit openopt',pfit
                 print 'r dict', r.__dict__
             
-            if 1:
+            if 0:
                 print 'curvefit'
                 print sys.executable
                 pfit,popt=curve_fit(gauss2, th, counts, p0=pfit, sigma=counts_err)
@@ -233,8 +233,29 @@ class Qtree(object):
                 myoutput=myodr.run()
                 myoutput.pprint()
                 pfit=myoutput.beta
-            
-            Icalc=gauss(pfit,th)
+	    if 1: 
+		print 'mpfit'
+		p0=pfit
+		parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
+		parinfo=[]
+		for i in range(len(p0)):
+		    parinfo.append(copy.deepcopy(parbase))
+		for i in range(len(p0)): 
+		    parinfo[i]['value']=p0[i]
+		fa = {'x':th, 'y':counts, 'err':counts_err}
+		#parinfo[1]['fixed']=1
+		#parinfo[2]['fixed']=1
+		m = mpfit(myfunct_res, p0, parinfo=parinfo,functkw=fa)
+		if (m.status <= 0): 
+		    print 'error message = ', m.errmsg
+		params=m.params
+		pfit=params
+		perror=m.perror
+		#chisqr=(myfunct_res(m.params, x=th, y=counts, err=counts_err)[1]**2).sum()
+		chisqr=chisq(pfit,th,counts,counts_err)
+		dof=m.dof
+		#Icalc=gauss(pfit,th)
+		print 'mpfit chisqr', chisqr
             
             
             if 0:
@@ -274,7 +295,8 @@ class Qtree(object):
             params=m.params
 	    pfit=params
             perror=m.perror
-            chisqr=(myfunct_res(m.params, x=th, y=counts, err=counts_err)[1]**2).sum()
+            #chisqr=(myfunct_res(m.params, x=th, y=counts, err=counts_err)[1]**2).sum()
+	    chisqr=chisq(pfit,th,counts,counts_err)
             dof=m.dof
 	    Icalc=gauss(pfit,th)
             print 'perror',perror
@@ -299,8 +321,8 @@ class Qtree(object):
 	#	   pcerror = mpfit.perror * sqrt(mpfit.fnorm / dof)
 	
 	print 'params', pfit
-	print 'chisqr', chisqr
-        pcerror=perror*N.sqrt(chisqr/dof)
+	print 'chisqr', chisqr  #note that chisqr already is scaled by dof
+        pcerror=perror*N.sqrt(m.fnorm / m.dof)#chisqr
         print 'pcerror', pcerror
 	
 	self.qlist[index].integrated_intensity=pfit[0]
@@ -310,6 +332,7 @@ class Qtree(object):
 
     def fit_nodes(self):
 	for index in range(len(self.qlist)):
+	    
 	    self.fit_node(index)
 	return
 
@@ -347,7 +370,11 @@ def chisq(p,a3,I,Ierr):
     #print Ierr.shape
     #print a3.shape
     #print Icalc.shape
-    chi=((I-Icalc)/Ierr)**2
+    Ierr_temp=copy.deepcopy(Ierr)
+    zero_loc=N.where(Ierr==0)[0]
+    if len(zero_loc)!=0:
+	Ierr_temp[zero_loc]=1.0
+    chi=((I-Icalc)/Ierr_temp)**2    
     return chi.sum()/(len(I)-len(p))
 
 
@@ -360,7 +387,11 @@ def myfunct_res(p, fjac=None, x=None, y=None, err=None):
     # Non-negative status value means MPFIT should continue, negative means
     # stop the calculation.
     status = 0
-    return [status, (y-model)/err]
+    Ierr_temp=copy.deepcopy(err)
+    zero_loc=N.where(err==0)[0]
+    if len(zero_loc)!=0:
+	Ierr_temp[zero_loc]=1.0
+    return [status, (y-model)/Ierr_temp]
 
 
 
@@ -452,8 +483,16 @@ if __name__=='__main__':
     qtree.condense_nodes()
     qtree.fit_nodes()
     qlist=qtree.qlist
+    I=[]
+    Ierr=[]
     for qnode in qlist:
-	print qnode.q, qnode.integrated_intensity, qnode.integrated_intensity_err
+	print qnode.q['h_center'], qnode.q['k_center'],qnode.q['l_center'],qnode.integrated_intensity, qnode.integrated_intensity_err
+	I.append(qnode.integrated_intensity)
+	Ierr.append(qnode.integrated_intensity_err)
+    
+    pylab.errorbar(range(len(I)),I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+    pylab.show()
+
     #qtree.condense_node(0)
     #qtree.condense_node(1)
     #qtree.fit_node(0)
