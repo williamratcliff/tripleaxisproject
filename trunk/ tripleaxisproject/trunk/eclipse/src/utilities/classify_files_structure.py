@@ -12,6 +12,7 @@ import scipy.odr
 from scipy.optimize import curve_fit
 pi=N.pi
 import sys
+from mpfit import mpfit
 
 class data_item(object):
     def __init__(self,data,selected=True):
@@ -147,6 +148,11 @@ class Qtree(object):
             pylab.show()       
         return 
     
+    def condense_nodes(self):
+	for index in range(len(self.qlist)):
+	    self.condense_node(index)
+	return
+    
     def fit_node(self,index):
         qnode=self.qlist[index]
         print qnode.q
@@ -215,6 +221,11 @@ class Qtree(object):
                 print sys.executable
                 pfit,popt=curve_fit(gauss2, th, counts, p0=pfit, sigma=counts_err)
                 print 'p,popt', pfit,popt
+                perror=N.sqrt(N.diag(popt))
+                print 'perror',perror
+                chisqr=chisq(pfit,th,counts,counts_err)
+                dof=len(th)-len(pfit)
+                print 'chisq',chisqr
             if 0:
                 oparam=scipy.odr.Model(gauss)
                 mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
@@ -226,7 +237,7 @@ class Qtree(object):
             Icalc=gauss(pfit,th)
             
             
-            if 1:
+            if 0:
                 width_x=N.linspace(p0[0]-p0[1],p0[0]+p0[1],100)
                 width_y=N.ones(width_x.shape)*(maxval-minval)/2
                 pos_y=N.linspace(minval,maxval,100)
@@ -242,9 +253,65 @@ class Qtree(object):
             #fix center
             #fix width
             print 'no peak'
+            #Area center width Bak
+            area=0
+            center=th[len(th)/2]
+            width=(th.max()-th.min())/5.0  #rather arbitrary, but we don't know if it's the first....
+            Bak=qnode.th_condensed['counts'].mean()
+            p0=N.array([area,center,width,Bak],dtype='float64')  #initial conditions
+            parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
+            parinfo=[]
+            for i in range(len(p0)):
+                parinfo.append(copy.deepcopy(parbase))
+            for i in range(len(p0)): 
+                parinfo[i]['value']=p0[i]
+            fa = {'x':th, 'y':counts, 'err':counts_err}
+            parinfo[1]['fixed']=1
+            parinfo[2]['fixed']=1
+            m = mpfit(myfunct_res, p0, parinfo=parinfo,functkw=fa)
+            if (m.status <= 0): 
+                print 'error message = ', m.errmsg
+            params=m.params
+	    pfit=params
+            perror=m.perror
+            chisqr=(myfunct_res(m.params, x=th, y=counts, err=counts_err)[1]**2).sum()
+            dof=m.dof
+	    Icalc=gauss(pfit,th)
+            print 'perror',perror
+	    if 0:
+		pylab.errorbar(th,counts,counts_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+		pylab.plot(th,Icalc)
+		pylab.show()
         
+        print 'final answer'
+        print 'perror', 'perror'
+        #If the fit is unweighted (i.e. no errors were given, or the weights
+	#	were uniformly set to unity), then .perror will probably not represent
+	#the true parameter uncertainties.
+
+	#	*If* you can assume that the true reduced chi-squared value is unity --
+	#	meaning that the fit is implicitly assumed to be of good quality --
+	#	then the estimated parameter uncertainties can be computed by scaling
+	#	.perror by the measured chi-squared value.
+
+	#	   dof = len(x) - len(mpfit.params) # deg of freedom
+	#	   # scaled uncertainties
+	#	   pcerror = mpfit.perror * sqrt(mpfit.fnorm / dof)
+	
+	print 'params', pfit
+	print 'chisqr', chisqr
+        pcerror=perror*N.sqrt(chisqr/dof)
+        print 'pcerror', pcerror
+	
+	self.qlist[index].integrated_intensity=pfit[0]
+	self.qlist[index].integrated_intensity_err=pcerror[0]    
+            
         return
 
+    def fit_nodes(self):
+	for index in range(len(self.qlist)):
+	    self.fit_node(index)
+	return
 
 def gauss(p,x):
     #Area center width Bak
@@ -282,7 +349,20 @@ def chisq(p,a3,I,Ierr):
     #print Icalc.shape
     chi=((I-Icalc)/Ierr)**2
     return chi.sum()/(len(I)-len(p))
-              
+
+
+def myfunct_res(p, fjac=None, x=None, y=None, err=None):
+    # Parameter values are passed in "p"
+    # If fjac==None then partial derivatives should not be
+    # computed.  It will always be None if MPFIT is called with default
+    # flag.
+    model = gauss(p, x)
+    # Non-negative status value means MPFIT should continue, negative means
+    # stop the calculation.
+    status = 0
+    return [status, (y-model)/err]
+
+
 
 def check_q(q1,q2,tol=1e-6):
     heq=False
@@ -369,7 +449,13 @@ if __name__=='__main__':
     #SU.printr(flist)
     
     qtree=readfiles(flist)
-    qtree.condense_node(0)
-    qtree.condense_node(1)
-    qtree.fit_node(0)
-    qtree.fit_node(1)
+    qtree.condense_nodes()
+    qtree.fit_nodes()
+    qlist=qtree.qlist
+    for qnode in qlist:
+	print qnode.q, qnode.integrated_intensity, qnode.integrated_intensity_err
+    #qtree.condense_node(0)
+    #qtree.condense_node(1)
+    #qtree.fit_node(0)
+    #qtree.fit_node(1)
+    #qtree.fit_node(2)
