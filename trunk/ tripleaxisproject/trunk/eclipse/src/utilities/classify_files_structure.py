@@ -61,11 +61,12 @@ class Qnode(object):
         return
                 
 class Qtree(object):
-    def __init__(self,qlist=None):
+    def __init__(self,qlist=None,mon0=1.0):
         if qlist==None:
             self.qlist=[]
         else:
             self.qlist=qlist
+	self.mon0=mon0
         return
     def addnode(self,mydata):
         mydata=copy.deepcopy(mydata)
@@ -74,6 +75,7 @@ class Qtree(object):
         if len(qlist)==0:
             #print '0 case'
             newnode=Qnode(qcenter,data=mydata)
+	    self.mon0=mydata.metadata['count_info']['monitor']
             self.qlist.append(newnode)
             #print '0000000000000'
             #print 'qlist len',len(self.qlist)
@@ -90,6 +92,12 @@ class Qtree(object):
                 #print 'q',q
                 if check_q(q,qcenter):
                     #print qcenter,'in list'
+		    mon=mydata.metadata['count_info']['monitor']
+		    counts_new=mydata.data['counts']*self.mon0/mon
+		    counts_new_err=N.sqrt(mydata.data['counts'])*self.mon0/mon
+		    mydata.data['counts']=counts_new
+		    mydata.data['counts_err']=counts_new_err
+		    mydata.metadata['count_info']['monitor']=self.mon0
                     qnode.place_data(mydata)
                     #print 'placed'
                     #print qnode.th
@@ -167,7 +175,7 @@ class Qtree(object):
         -qnode.th_condensed['counts'].mean()
         sig=qnode.th_condensed['counts'].std()
         
-        if diff-4*sig>0:
+        if diff-2*sig>0:
             #the difference between the high and low point and
             #the mean is greater than 3 sigma so we have a signal
             p0=findpeak(th,counts,1)
@@ -255,7 +263,7 @@ class Qtree(object):
 		chisqr=chisq(pfit,th,counts,counts_err)
 		dof=m.dof
 		#Icalc=gauss(pfit,th)
-		print 'mpfit chisqr', chisqr
+		#print 'mpfit chisqr', chisqr
             
             
             if 0:
@@ -299,7 +307,7 @@ class Qtree(object):
 	    chisqr=chisq(pfit,th,counts,counts_err)
             dof=m.dof
 	    Icalc=gauss(pfit,th)
-            print 'perror',perror
+            #print 'perror',perror
 	    if 0:
 		pylab.errorbar(th,counts,counts_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
 		pylab.plot(th,Icalc)
@@ -327,6 +335,15 @@ class Qtree(object):
 	
 	self.qlist[index].integrated_intensity=pfit[0]
 	self.qlist[index].integrated_intensity_err=pcerror[0]    
+	Icalc=gauss(pfit,th)
+	print 'perror',perror
+	if 0:
+	    pylab.figure()
+	    pylab.errorbar(th,counts,counts_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+	    pylab.plot(th,Icalc)
+	    qstr=str(qnode.q['h_center'])+','+str(qnode.q['k_center'])+','+str(qnode.q['l_center'])
+	    pylab.title(qstr)
+	    #pylab.show()
             
         return
 
@@ -346,7 +363,7 @@ def gauss(p,x):
     width=p[2]
     sigma=width/2/N.sqrt(2*N.log(2))
     area=N.abs(p[0])/N.sqrt(2*pi)/sigma
-    background=p[3]
+    background=N.abs(p[3])
     y=background+area*N.exp(-(0.5*(x-x0)*(x-x0)/sigma/sigma))
     return y
 
@@ -360,7 +377,7 @@ def gauss2(x,p0,p1,p2,p3):
     width=p[2]
     sigma=width/2/N.sqrt(2*N.log(2))
     area=N.abs(p[0])/N.sqrt(2*pi)/sigma
-    background=p[3]
+    background=N.abs(p[3])
     y=background+area*N.exp(-(0.5*(x-x0)*(x-x0)/sigma/sigma))
     return y
 
@@ -430,6 +447,7 @@ def readfiles(flist,tol=1e-4):
         mydata=mydatareader.readbuffer(currfile)
         mydata.data['counts_err']=N.sqrt(mydata.data['counts'])*mon0/mydata.metadata['count_info']['monitor']
         mydata.data['counts']=N.array(mydata.data['counts'])*mon0/mydata.metadata['count_info']['monitor']
+	mydata.metadata['count_info']['monitor']=mon0
         qtree.addnode(copy.deepcopy(mydata))
         #print 'readloop'
         #print 'q in loop', qtree.qlist[0].q
@@ -490,7 +508,9 @@ if __name__=='__main__':
 	I.append(qnode.integrated_intensity)
 	Ierr.append(qnode.integrated_intensity_err)
     
-    pylab.errorbar(range(len(I)),I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+    if 1:
+	pylab.errorbar(range(len(I)),I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+    
     pylab.show()
 
     #qtree.condense_node(0)
