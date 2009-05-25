@@ -39,17 +39,17 @@ def findpeak(x,y,npeaks):
     print 'y',y
     value_sign = 2*(yd > 0) - 1;
     indices = 0;
-    
 
-    
+
+
     # Determine the number of zero crossings
     #%diff_sign = value_sign(2:ny)-value_sign(1:ny-1);
     diff_sign=N.hstack(([0],N.diff(value_sign)))
-    
+
 #    wh_cross = find(((diff_sign==2) | (diff_sign==-2)) & yd2<0);
     wh_cross_table=N.abs(diff_sign)==2 
     yd_table=yd2<0
-    
+
     #print wh_cross_table
     #print yd_table
     index_list=N.array(range(len(wh_cross_table)))
@@ -57,8 +57,8 @@ def findpeak(x,y,npeaks):
     wh_cross=index_list[N.array(wh_cross_table)*N.array(yd_table)]
     print 'wh_cross',wh_cross, 'y[wh_cross]',y[wh_cross]
     n_crossings=len(wh_cross);
-    
-    
+
+
 #    
 #    
 #    
@@ -70,8 +70,8 @@ def findpeak(x,y,npeaks):
 #    
     if n_crossings > 0:
 #    #% Ok, now which ones of these are peaks?
-        
-        
+
+
         #ymax=interp1(ysupport,y,indices);
         ysupport=range(len(y))
         print 'ysupport',ysupport
@@ -92,13 +92,13 @@ def findpeak(x,y,npeaks):
                 best_index =N.hstack((best_index, indices[max_index]));
             ymax[max_index] = ymin;
         indices = best_index;
-        
+
         print 'indices',indices
         xsupport=range(len(x))
         xinterpolater=interpolate.interp1d(xsupport,x,fill_value=0.0,kind='linear',copy=True,bounds_error=False)        
         xpeaks=xinterpolater(indices)
         print 'xpeaks',xpeaks
-        
+
         #xsupport=1:length(x);
         #xpeaks = interp1(xsupport,x,indices);
 #        xpeaks=xpeaks(1:npeaks);
@@ -122,8 +122,8 @@ def findpeak(x,y,npeaks):
                     no_widthr = 1;
                     print 'nowidthr'
                     break;
-                
-                
+
+
             incrementr=incrementr-1  #error on the side of making it too narrow!
             print 'incrementr', incrementr
             print 'elevationr',y[N.floor(indices[i])+incrementr]
@@ -141,17 +141,17 @@ def findpeak(x,y,npeaks):
                 if (N.floor(indices[i])+incrementl< 0):
                     no_widthl = 1;
                     break;
-                
-                
+
+
 #               %goto, no_width_found
-            
+
             incrementl=incrementl+1
             print 'incrementl', incrementl
             print 'elevationl',y[N.floor(indices[i])+incrementl]
             print 'no_widthl',no_widthl
             no_width=N.min([no_widthl,no_widthr]);
             increment=N.min([N.abs(incrementl),incrementr]);
-            
+
             print 'delta',x[N.floor(indices[i])+increment]
             print 'increment', increment
             print 'no_width', no_width
@@ -164,10 +164,10 @@ def findpeak(x,y,npeaks):
             else:
                 width = 2.0*(x[N.floor(indices[i])+increment]-xpeaks[i]);             
             if i == 0:
-              fwhm = width
+                fwhm = width
             else:
-              fwhm = N.hstack(([fwhm],[width]))
-          
+                fwhm = N.hstack(([fwhm],[width]))
+
 #      #     %plot([(xpeaks(i)-fwhm(i)/2) (xpeaks(i)+fwhm(i)/2)],[half_height half_height]); hold on;
 #      end
 #      #%hold off;
@@ -180,7 +180,7 @@ def findpeak(x,y,npeaks):
     print p
 #      return p
     return p
-    
+
 
 
 
@@ -208,7 +208,7 @@ if __name__=="__main__":
     y=matlab_gaussian(x,p)
     p=[1000,3,.1]
     y=y+matlab_gaussian(x,p)
-    if 0:
+    if 1:
         pylab.plot(x,y,'s')
         pylab.show()
         sys.exit()
