@@ -121,13 +121,7 @@ class Person(Base):
         return "<Person('%s' ,'%s')>" % (self.first_name, self.last_name)        
         
         
-def create_tables(engine):
-    metadata=MetaData()
-    instrument_table=Table('instruments',metadata,
-                           Column('instrument_id',Integer, primary_key=True),
-                           Column('instrument_name', String(45))
-                           )
-    metadata.create_all(engine)
+
 
 
         
