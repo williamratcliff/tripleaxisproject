@@ -29,17 +29,21 @@ class Samples(Base):
     __table_args__ = {'mysql_engine':'InnoDB'}
     id=Column(Integer, primary_key=True)
     name=Column(String(250), nullable=False)
-    date_shipped=Column(DateTime)
-    #form=Column(String(50))
-    quantity=Column(String(50))
-    MSDS=Column(Text)
-    hazards=Column(String(250))
-    current_location=Column(Text)
-    sample_type=Column(String(50))
     chemical_formula=Column(String(50))
+    quantity=Column(String(50))
+    sample_type=Column(String(50)) #powder, crystal, liquid, etc.
+    hazards=Column(String(250))  #flamable, toxic, etc
+    MSDS=Column(Text)
+    date_shipped=Column(DateTime)
+    current_location=Column(Text)
+    comments=Column(Text)
     previous_id=Column(Integer)
     
-    comments=Column(Text)
+    photos=relation(Photos,backref=backref('samples'))
+    instruments=relation(Instruments,backref=backref('samples'))
+    experiments=relation(Experiments,backref=backref('samples'))
+  
+    
     def __init__(self,sample_name, chemical_formula, quantity, sample_type, hazards, current_location, 
                  comments=None, MSDS=None, date_shipped=None):
         self.name=sample_name #eventually a barcode
@@ -59,15 +63,17 @@ class Photos(Base):
     name=Column(String, nullable=False)
     sample_id=Column(Integer, ForeignKey('samples.id'))
     sample=relation(Samples,backref=backref('photos'))
-    experiment=relation('Experiments',secondary=photos_experiments, backref='photos')
+    experiment_id=Column(Integer, ForeignKey('experiments.id'))
+    experiment=relation(Experiments,backref=backref('photos'))
+    #experiment=relation('Experiments',secondary=photos_experiments, backref='photos')
     comments=Column(Text)
     def __init__(self,photo):
         self.photo=photo
 
-photos_experiments=Table('photos_experiment',metadata,
-                          Column('photo_id',Integer,ForeignKey('photos.id')),
-                          Column('experiment_id',Integer,ForeignKey('experiments.id'))
-                          )        
+#photos_experiments=Table('photos_experiment',metadata,
+#                          Column('photo_id',Integer,ForeignKey('photos.id')),
+#                          Column('experiment_id',Integer,ForeignKey('experiments.id'))
+#                          )        
 
 
 class Experiments(object):
@@ -81,7 +87,9 @@ class Experiments(object):
     flux=Column(Integer)
     comments=Column(Text)
     sample_id=Column(Integer, ForeignKey('samples.id'))
+    sample=relation(Samples,backref=backref('experiments'))
     instrument_id=Column(Integer, ForeignKey('experiments.id'))
+    instrument=relation(Instruments,backref=backref('experiments'))
     
     
     def __init__(date_on, date_off, flux, instrument_id, sample_id, comments=''):
@@ -90,14 +98,11 @@ class Experiments(object):
         self.flux=flux
         self.instrument_id=instrument_id
         self.sample_id=sample_id
-        
-class PersonExperiment(object):
-    def __init__(person_id, experiment_id):
-        self.person_id=person_id
-        self.experiment_id=experiment_id
-        
 
-
+people_experiments=Table('people_experiments',metadata,
+                          Column('person_id',Integer,ForeignKey('people.id')),
+                          Column('experiment_id',Integer,ForeignKey('experiments.id'))
+                          )        
 
 class Address(object):
     def __init__(self,address1=None,address2=None, country=None, zipcode=None, city=None, state=None):
@@ -123,7 +128,7 @@ class Organization(Base):
     zipcode=Column(Integer)
     country=Column(String, nullable=False)        
 
-    def __init__(self,name,address1,address2,city,state,zipcode,country):
+    def __init__(self,name,address1=None,address2=None,city=None,state=None,zipcode=None,country='USA'):
         """The properties of an organization"""
         self.name=name
         self.address1=address1
@@ -142,7 +147,7 @@ class Name(object):
         self.suffix=suffix
         self.title=title
 
-people_organizations=Table('person_organization',metadata,
+people_organizations=Table('people_organization',metadata,
                           Column('person_id',Integer,ForeignKey('people.id')),
                           Column('organization_id',Integer,ForeignKey('organizations.id'))
                           )
@@ -161,11 +166,11 @@ class Person(Base):
     email=Column(String, nullable=False)
     phone=Column(String, nullable=False)
     role=Column(String, nullable=False)
-    #organization_id=Column(Integer, ForeignKey('organization.id'))
+    ##organization_id=Column(Integer, ForeignKey('organization.id'))
     organization=relation('Organization',secondary=people_organizations, backref='people')
 
     
-    def __init__(self,name,email,organization,phone,role='experimenter'):
+    def __init__(self,name,email=None,organization=None,phone=None,role='experimenter'):
         """Here, The role is either experimenter, or local_contact"""
         self.first_name=name.first_name
         self.middle_initial=name.middle_initial
@@ -187,9 +192,16 @@ class Person(Base):
         
 
 if __name__=='__main__':
-    johns_name=Name('john','smith')
-    johns_address=Address()
-    johns_address.address1='100 Bureau Drive'
-    johns_address.address2='100 Bureau Drive'
+    williams_name=Name('william','ratcliff')
+    NCNR=Organization('NCNR')
+    NCNR.address1='100 Bureau Drive'
+    NCNR.address2='MS 610, Rm E151'
+    NCNR.city='Gaithersburg'
+    NCNR.state='md'
+    NCNR.zipcode=20886
+    william=Person(williams_name)
+    william.email='william.ratcliff@nist.gov'
+    william.phone='301-975-4316'
+    william.role='nist_staff'
+    william.organization=NCNR
     
-    john=Person(johns_name, johns_address,'john@nist.gov')
