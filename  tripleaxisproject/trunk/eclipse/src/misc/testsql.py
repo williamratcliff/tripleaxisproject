@@ -19,6 +19,9 @@ class Instruments(Base):
     __table_args__ = {'mysql_engine':'InnoDB'}
     id=Column(Integer, primary_key=True)
     name=Column(String(50))
+    experiments=relation(Experiments,backref=backref('instruments',
+                                                     cascade='all,delete-orphan'))
+    #no orphan experiments without an instrument
     def __init__(self,name):
         self.name=name
     def __repr__(self):
@@ -39,11 +42,13 @@ class Samples(Base):
     comments=Column(Text)
     previous_id=Column(Integer)
     
-    photos=relation(Photos,backref=backref('samples'))
+    photos=relation(Photos,backref=backref('samples',
+                                           cascade='all,delete-orphan'))
     instruments=relation(Instruments,backref=backref('samples'))
-    experiments=relation(Experiments,backref=backref('samples'))
+    experiments=relation(Experiments,backref=backref('samples',
+                                                     cascade='all,delete-orphan'))
   
-    
+    # no photos, or experiments without a sample
     def __init__(self,sample_name, chemical_formula, quantity, sample_type, hazards, current_location, 
                  comments=None, MSDS=None, date_shipped=None):
         self.name=sample_name #eventually a barcode
@@ -62,9 +67,11 @@ class Photos(Base):
     id=Column(Integer, primary_key=True)
     name=Column(String, nullable=False)
     sample_id=Column(Integer, ForeignKey('samples.id'))
-    sample=relation(Samples,backref=backref('photos'))
+    sample=relation(Samples,backref=backref('photos'))#,
+                                            #cascade='all,delete-orphan'))
     experiment_id=Column(Integer, ForeignKey('experiments.id'))
-    experiment=relation(Experiments,backref=backref('photos'))
+    experiment=relation(Experiments,backref=backref('photos'))#,
+                        #cascade='all,delete-orphan'))
     #experiment=relation('Experiments',secondary=photos_experiments, backref='photos')
     comments=Column(Text)
     def __init__(self,photo):
