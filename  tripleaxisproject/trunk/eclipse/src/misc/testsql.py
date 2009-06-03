@@ -79,7 +79,8 @@ class Photos(Base):
 
 #photos_experiments=Table('photos_experiment',metadata,
 #                          Column('photo_id',Integer,ForeignKey('photos.id')),
-#                          Column('experiment_id',Integer,ForeignKey('experiments.id'))
+#                          Column('experiment_id',Integer,ForeignKey('experiments.id')),
+#        mysql_engine='InnoDB'
 #                          )        
 
 
@@ -108,7 +109,8 @@ class Experiments(object):
 
 people_experiments=Table('people_experiments',metadata,
                           Column('person_id',Integer,ForeignKey('people.id')),
-                          Column('experiment_id',Integer,ForeignKey('experiments.id'))
+                          Column('experiment_id',Integer,ForeignKey('experiments.id')),
+                          mysql_engine='InnoDB'
                           )        
 
 class Address(object):
@@ -156,7 +158,8 @@ class Name(object):
 
 people_organizations=Table('people_organization',metadata,
                           Column('person_id',Integer,ForeignKey('people.id')),
-                          Column('organization_id',Integer,ForeignKey('organizations.id'))
+                          Column('organization_id',Integer,ForeignKey('organizations.id')),
+                          mysql_engine='InnoDB'
                           )
         
 class Person(Base):
