@@ -42,6 +42,7 @@ class Samples(Base):
     comments=Column(Text)
     previous_id=Column(Integer)
     
+    cans=relation(Cans,backref=backref('samples'))
     photos=relation(Photos,backref=backref('samples',
                                            cascade='all,delete-orphan'))
     instruments=relation(Instruments,backref=backref('samples'))
@@ -77,11 +78,17 @@ class Photos(Base):
     def __init__(self,photo):
         self.photo=photo
 
-#photos_experiments=Table('photos_experiment',metadata,
-#                          Column('photo_id',Integer,ForeignKey('photos.id')),
-#                          Column('experiment_id',Integer,ForeignKey('experiments.id')),
-#        mysql_engine='InnoDB'
-#                          )        
+class Cans(Base):
+    __tablename__='cans'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    id=Column(Integer, primary_key=True)
+    type=Column(String(50), nullable=False)
+    number=Column(Integer)
+    size=Column(String(20))
+    sample_id=Column(Integer, ForeignKey('samples.id'))
+    sample=relation(Samples,backref=backref('cans'))#,
+    def __init__(self,can_type):
+        self.type=can_type
 
 
 class Experiments(object):
