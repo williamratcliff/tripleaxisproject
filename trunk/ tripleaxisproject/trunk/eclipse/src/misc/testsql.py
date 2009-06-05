@@ -31,12 +31,14 @@ class Samples(Base):
     __tablename__='samples'
     __table_args__ = {'mysql_engine':'InnoDB'}
     id=Column(Integer, primary_key=True)
-    name=Column(String(250), nullable=False)
+    name=Column(String(250), nullable=False) #barcode
+    chemical_name=Column(String(250), nullable=False)
+    
     chemical_formula=Column(String(50))
     quantity=Column(String(50))
     sample_type=Column(String(50)) #powder, crystal, liquid, etc.
     hazards=Column(String(250))  #flamable, toxic, etc
-    MSDS=Column(Text)
+    MSDS=Column(BLOB) #for PDF
     date_shipped=Column(DateTime)
     current_location=Column(Text)
     comments=Column(Text)
