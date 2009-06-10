@@ -566,5 +566,7 @@ def plot_demo():
 if __name__=='__main__':
     myfilestr=r'C:\Ce2RhIn8\Mar10_2009\nucsc001.bt9'
     demo2(myfilestr)
+    
+    print
     #plot_demo()
     #demo()
