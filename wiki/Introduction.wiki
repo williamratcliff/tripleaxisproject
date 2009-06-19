@@ -1,0 +1,12 @@
+#summary The goal of this project is to work on development of useful codes for the triple axis community
+
+= Introduction =
+
+We have a series of useful libraries here.  For example, in respython, I have translated the popular Reslib package into python.  We also have code for correcting data (at the NCNR at present) taken with HE3 polarizers.  For those interested in spinwaves, please check out the "spinwaves" project on googlecode.   On my TODO list is to finish the data abstraction layer for triple axis instruments and to deal with the reduction pipeline.
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
