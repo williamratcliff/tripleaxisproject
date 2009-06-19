@@ -1,0 +1,15 @@
+#Welcome to the CrysPyML Page!
+
+= Introduction =
+
+The goal of this subproject is to wrap the CrysFML libraries at the ILL using python.  We'd love to have more contributors.  Currently, we are considering:
+
+Babel (Did you know gfortran can export the input files for that package)?
+A GSOC project based on f2py
+ctypes
+subprocessing or pexepect in the worst case
+
+
+= Details =
+
+Please let us know what you suggest!!!
