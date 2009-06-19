@@ -6,6 +6,9 @@ We have a series of useful libraries here.  For example, in respython, I have tr
 
 = Details =
 
+For those of you interested in the [CrysPyML] project (an attempt to bind the CrysFML libraries to python), please discuss on that page.
+
+
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
