@@ -1,22 +1,217 @@
 import numpy as N
+import uncertainty
 
 
 class Component(object):
-        def __init__(self, name=None,units=None, data=None, err=None):
+        def __init__(self, name,values,stderr, units=None):
                 self.name=name
                 self.units=units
-                self.data=data
-                self.err=err
-                
+                #self.values=data
+                #self.err=err
+                self.measurement=uncertainty.Measurement(values,stderr**2)
+
+
 class Motor(Component):
-        def __init__(self,name=None,units='degrees',data=None,err=None):
-                super(Motor,self).__init__(name,units,data,err)
-                
+        """This is the motor class.  A Motor must have a name, for example, 'a1'
+        Furthermore, it is given a set of values and stderr for initialization.
+        units are optional.  Internally, we store a "measurement".  This can be
+        accesed from measurement.x, measurement.dx
+        """"
+        def _getx(self): return self.measurement.x
+        def _setx(self,x): 
+                self.measurement.x=x
+        def _get_variance(self): return self.measurement.variance
+        def _set_variance(self,variance):
+                self.measurement.variance=variance
+        def _getdx(self): return numpy.sqrt(self.variance)
+        def _setdx(self,dx):
+                # Direct operation
+                #    variance = dx**2
+                # Indirect operation to avoid temporaries
+                self.variance[:] = dx
+                self.variance **= 2
+        x=property(_getx,_setx,doc='value')
+        variance=property(_get_variance,_set_variance,doc='variance')
+        dx = property(_getdx,_setdx,doc="standard deviation")
+        
+        #Out of laziness, I am defining properties of x, variance, and dx, but these only effect
+        #the measurement objects attributes.  However, people should do operations on the motor object
+        #NOT on these components, otherwise errors will not propagate correctly!!!
+        
+        def __init__(self,name,values=None,err=None,units='degrees'):
+                self.name=name
+                self.units=units
+                self.measurement=uncertainty.Measurement(values, stderr**2)
+        # Numpy array slicing operations
+        def __len__(self):
+                return len(self.x)
+        def __getitem__(self,key):
+                return Measurement(self.x[key],self.variance[key])
+        def __setitem__(self,key,value):
+                self.x[key] = value.x
+                self.variance[key] = value.variance
+        def __delitem__(self, key):
+                del self.x[key]
+                del self.variance[key]
+        #def __iter__(self): pass # Not sure we need iter
+
+        # Normal operations: may be of mixed type
+        def __add__(self, other):
+                if isinstance(other,Measurement):
+                        return Measurement(*err1d.add(self.x,self.variance,other.x,other.variance))
+                else:
+                        return Measurement(self.x+other, self.variance+0) # Force copy
+        def __sub__(self, other):
+                if isinstance(other,Measurement):
+                        return Measurement(*err1d.sub(self.x,self.variance,other.x,other.variance))
+                else:
+                        return Measurement(self.x-other, self.variance+0) # Force copy
+        def __mul__(self, other):
+                if isinstance(other,Measurement):
+                        return Measurement(*err1d.mul(self.x,self.variance,other.x,other.variance))
+                else:
+                        return Measurement(self.x*other, self.variance*other**2)
+        def __truediv__(self, other):
+                if isinstance(other,Measurement):
+                        return Measurement(*err1d.div(self.x,self.variance,other.x,other.variance))
+                else:
+                        return Measurement(self.x/other, self.variance/other**2)
+        def __pow__(self, other):
+                if isinstance(other,Measurement):
+                        # Haven't calcuated variance in (a+/-da) ** (b+/-db)
+                        return NotImplemented
+                else:
+                        return Measurement(*err1d.pow(self.x,self.variance,other))
+
+        # Reverse operations
+        def __radd__(self, other):
+                return Measurement(self.x+other, self.variance+0) # Force copy
+        def __rsub__(self, other):
+                return Measurement(other-self.x, self.variance+0)
+        def __rmul__(self, other):
+                return Measurement(self.x*other, self.variance*other**2)
+        def __rtruediv__(self, other):
+                x,variance = err1d.pow(self.x,self.variance,-1)
+                return Measurement(x*other,variance*other**2)
+        def __rpow__(self, other): return NotImplemented
+
+        # In-place operations: may be of mixed type
+        def __iadd__(self, other):
+                if isinstance(other,Measurement):
+                        self.x,self.variance \
+                            = err1d.add_inplace(self.x,self.variance,other.x,other.variance)
+                else:
+                        self.x+=other
+                return self
+        def __isub__(self, other):
+                if isinstance(other,Measurement):
+                        self.x,self.variance \
+                            = err1d.sub_inplace(self.x,self.variance,other.x,other.variance)
+                else:
+                        self.x-=other
+                return self
+        def __imul__(self, other):
+                if isinstance(other,Measurement):
+                        self.x, self.variance \
+                            = err1d.mul_inplace(self.x,self.variance,other.x,other.variance)
+                else:
+                        self.x *= other
+                        self.variance *= other**2
+                return self
+        def __itruediv__(self, other):
+                if isinstance(other,Measurement):
+                        self.x,self.variance \
+                            = err1d.div_inplace(self.x,self.variance,other.x,other.variance)
+                else:
+                        self.x /= other
+                        self.variance /= other**2
+                return self
+        def __ipow__(self, other):
+                if isinstance(other,Measurement):
+                        # Haven't calcuated variance in (a+/-da) ** (b+/-db)
+                        return NotImplemented
+                else:
+                        self.x,self.variance = err1d.pow_inplace(self.x, self.variance, other)
+                return self
+
+        # Use true division instead of integer division
+        def __div__(self, other): return self.__truediv__(other)
+        def __rdiv__(self, other): return self.__rtruediv__(other)
+        def __idiv__(self, other): return self.__itruediv__(other)
+
+
+        # Unary ops
+        def __neg__(self):
+                return Measurement(-self.x,self.variance)
+        def __pos__(self):
+                return self
+        def __abs__(self):
+                return Measurement(numpy.abs(self.x),self.variance)
+
+        def __str__(self):
+                #return str(self.x)+" +/- "+str(numpy.sqrt(self.variance))
+                if numpy.isscalar(self.x):
+                        return format_uncertainty(self.x,numpy.sqrt(self.variance))
+                else:
+                        return [format_uncertainty(v,dv)
+                                for v,dv in zip(self.x,numpy.sqrt(self.variance))]
+        def __repr__(self):
+                return "Measurement(%s,%s)"%(str(self.x),str(self.variance))
+
+        # Not implemented
+        def __floordiv__(self, other): return NotImplemented
+        def __mod__(self, other): return NotImplemented
+        def __divmod__(self, other): return NotImplemented
+        def __mod__(self, other): return NotImplemented
+        def __lshift__(self, other): return NotImplemented
+        def __rshift__(self, other): return NotImplemented
+        def __and__(self, other): return NotImplemented
+        def __xor__(self, other): return NotImplemented
+        def __or__(self, other): return NotImplemented
+
+        def __rfloordiv__(self, other): return NotImplemented
+        def __rmod__(self, other): return NotImplemented
+        def __rdivmod__(self, other): return NotImplemented
+        def __rmod__(self, other): return NotImplemented
+        def __rlshift__(self, other): return NotImplemented
+        def __rrshift__(self, other): return NotImplemented
+        def __rand__(self, other): return NotImplemented
+        def __rxor__(self, other): return NotImplemented
+        def __ror__(self, other): return NotImplemented
+
+        def __ifloordiv__(self, other): return NotImplemented
+        def __imod__(self, other): return NotImplemented
+        def __idivmod__(self, other): return NotImplemented
+        def __imod__(self, other): return NotImplemented
+        def __ilshift__(self, other): return NotImplemented
+        def __irshift__(self, other): return NotImplemented
+        def __iand__(self, other): return NotImplemented
+        def __ixor__(self, other): return NotImplemented
+        def __ior__(self, other): return NotImplemented
+
+        def __invert__(self): return NotImplmented  # For ~x
+        def __complex__(self): return NotImplmented
+        def __int__(self): return NotImplmented
+        def __long__(self): return NotImplmented
+        def __float__(self): return NotImplmented
+        def __oct__(self): return NotImplmented
+        def __hex__(self): return NotImplmented
+        def __index__(self): return NotImplmented
+        def __coerce__(self): return NotImplmented
+
+        def log(self):
+                return Measurement(*err1d.log(self.x,self.variance))
+
+        def exp(self):
+                return Measurement(*err1d.exp(self.x,self.variance))
+
+        def log(val): return self.log()
+        def exp(val): return self.exp()
 
 class Monitor(Component):
-        """A monitor
+        """A monitor"""
         def __init__(self, name='Monitor1',
-                     signaltype=None,
+                     signal_type=None, 
                      vertical_focus=None,
                      horizontal_focus=None,
                      Blades=None,
@@ -24,7 +219,7 @@ class Monitor(Component):
                      mosaic_horizntal=None,
                      dspacing=None  #dspacing of the monochromator
                      )
-                
+
 
 
 
