@@ -352,7 +352,7 @@ class lattice:
           """ For given values of M3,S1,S2 and A2 spectrometer motors (AKA M2,M3,M4 and M6)
         and spectrometer and sample parameters specified in EXP calculates the wave vector
         transfer in the sample (H, K, L), Q=|(H,K,L)|, energy tranfer E, and incident
-        and final neutron energies."""
+        and final neutron energies.  Angles are given in radians"""
           newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alphad,beta=self.betad,\
                              gamma=self.gammad,orient1=self.orient1.T,orient2=self.orient2.T,M2=M2,S1=S1,S2=S2,A2=A2)
           self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
@@ -390,7 +390,7 @@ class lattice:
 
      def SpecGoTo(self,H,K,L,E,EXP):
           """Calculate shaft angles given momentum transfer H, K, L, energy transfer E, and
-          spectrometer and smaple parameters in EXP."""
+          spectrometer and smaple parameters in EXP.  The angles returned are in radians"""
           newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alphad,beta=self.betad,\
                              gamma=self.gammad,orient1=self.orient1.T,orient2=self.orient2.T,H=H,K=K,L=L,E=E)
           self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
