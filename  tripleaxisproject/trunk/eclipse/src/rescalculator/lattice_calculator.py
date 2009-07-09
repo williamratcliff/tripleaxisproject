@@ -1,8 +1,6 @@
 import numpy as N
-import pylab
 import math
 import unittest
-from matplotlib.patches import Ellipse
 eps=1e-3
 pi=N.pi
 
@@ -102,7 +100,12 @@ class Instrument(object):
           return
      def get_tau(self,tau):
           return self.tau_list[tau]
-
+     
+class Orientation(object):
+     def __init__(self, orient1,orient2):
+          self.orient1=orient1
+          self.orient2=orient2
+     
 
 class Lattice(object):
      
@@ -112,8 +115,9 @@ class Lattice(object):
      def _get_alpha(self): return self._alpha
      def _get_beta(self): return self._beta
      def _get_gamma(self): return self._gamma
-     def _get_orient1(self): return self._orient1
-     def _get_orient2(self): return self._orient2
+     #def _get_orient1(self): return self._orient1
+     #def _get_orient2(self): return self._orient2
+     def _get_orientation(self): return self._orientation
      def _set_a(self,x):
           self._a=x
           self.setvals()
@@ -132,12 +136,18 @@ class Lattice(object):
      def _set_gamma(self,x):
           self._gamma=x
           self.setvals()
-     def _set_orient1(self,x):
-          self._orient1=x
+     #def _set_orient1(self,x):
+     #     self._orient1=x
+     #     self.setvals()
+     #def _set_orient2(self,x):
+     #     self._orient2=x
+     #     self.setvals()
+     def _set_orientation(self,x):
+          self._orientation=x
+          self._orient1=x.orient1
+          self._orient2=x.orient2
           self.setvals()
-     def _set_orient2(self,x):
-          self._orient2=x
-          self.setvals()
+     
      
      a=property(_get_a,_set_a)
      b=property(_get_b,_set_b)
@@ -145,8 +155,9 @@ class Lattice(object):
      alpha=property(_get_alpha,_set_alpha)
      beta=property(_get_beta,_set_beta)
      gamma=property(_get_gamma,_set_gamma)
-     orient1=property(_get_orient1,_set_orient1)
-     orient2=property(_get_orient2,_set_orient2)
+     #orient1=property(_get_orient1,_set_orient1)
+     #orient2=property(_get_orient2,_set_orient2)
+     orientation=property(_get_orientation, _set_orientation)
      
      def setvals(self):
           #if self._orient1.shape[0]==1:
@@ -178,6 +189,9 @@ class Lattice(object):
           self.npts=N.size(self.a)
           self._orient1=newinput['orient1']
           self._orient2=newinput['orient2']
+          #self._orientation.orient1=newinput['orient1']
+          #self._orientation.orient2=newinput['orient2']
+          
           #print self.npts
           
           #self._orient1=self._orient1.reshape((self.npts,1))
@@ -201,8 +215,8 @@ class Lattice(object):
                   alpha=None, \
                   beta=None, \
                   gamma=None, \
-                  orient1=None, \
-                  orient2=None):
+                  orientation=None, \
+                  ):
           """a,b,c in Angstroms, alpha,beta, gamma in radians.  All are vectors """
           self._a=a
           self._b=b
@@ -210,8 +224,8 @@ class Lattice(object):
           self._alpha=alpha
           self._beta=beta
           self._gamma=gamma
-          self._orient1=orient1
-          self._orient2=orient2
+          self._orient1=orientation.orient1
+          self._orient2=orientation.orient2
           self.instrument=Instrument()
           self.setvals()
           return
@@ -350,8 +364,8 @@ class Lattice(object):
           return x,y,z
 
      def StandardSystem(self):
-          orient1=self.orient1
-          orient2=self.orient2
+          orient1=self._orient1
+          orient2=self._orient2
           try:
                modx=self.modvec(orient1[0, :], orient1[1, :], orient1[2, :], 'latticestar')
           except IndexError:
@@ -442,10 +456,11 @@ class Lattice(object):
         transfer in the sample (H, K, L), Q=|(H,K,L)|, energy tranfer E, and incident
         and final neutron energies.  Angles are given in radians"""
           newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alpha,beta=self.beta,\
-                             gamma=self.gamma,orient1=self.orient1,orient2=self.orient2,M2=M2,S1=S1,S2=S2,A2=A2)
+                             gamma=self.gamma,orient1=self._orient1,orient2=self._orient2,M2=M2,S1=S1,S2=S2,A2=A2)
+          orientation=Orientation(newinput['orient1'],newinput['orient2'])
           self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
-                        beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
-                        orient2=newinput['orient2'])
+                        beta=newinput['beta'],gamma=newinput['gamma'],orientation=orientation\
+                        )
           M2=newinput['M2']
           S1=newinput['S1']
           S2=newinput['S2']
@@ -480,10 +495,11 @@ class Lattice(object):
           """Calculate shaft angles given momentum transfer H, K, L, energy transfer E, and
           spectrometer and smaple parameters in EXP.  The angles returned are in radians"""
           newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alpha,beta=self.beta,\
-                             gamma=self.gamma,orient1=self.orient1,orient2=self.orient2,H=H,K=K,L=L,E=E)
+                             gamma=self.gamma,orient1=self._orient1,orient2=self._orient2,H=H,K=K,L=L,E=E)
+          orientation=Orientation(newinput['orient1'],newinput['orient2'])
           self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
-                        beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
-                        orient2=newinput['orient2'])
+                        beta=newinput['beta'],gamma=newinput['gamma'],orientation=orientation\
+                        )
           H=newinput['H']
           K=newinput['K']
           L=newinput['L']
@@ -558,8 +574,9 @@ class TestLattice(unittest.TestCase):
           gamma=myradians(N.array([90],'Float64'))
           orient1=N.array([[1,0,0]],'Float64')
           orient2=N.array([[0,1,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
           self.fixture = Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
-                                 orient1=orient1,orient2=orient2)
+                                 orientation=orientation)
 
      def test_astar(self):
           self.assertAlmostEqual(self.fixture.astar[0],1.0,2,'astar Not equal to '+str(1.0))
@@ -600,8 +617,9 @@ class TestLatticeCubic(unittest.TestCase):
           gamma=myradians(N.array([90],'Float64'))
           orient1=N.array([[1,0,0]],'Float64')
           orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
           self.fixture=Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
-                                 orient1=orient1,orient2=orient2)
+                                 orientation=orientation)
           EXP={}
           EXP['ana']={}
           EXP['ana']['tau']='pg(002)'
@@ -623,8 +641,10 @@ class TestLatticeCubic(unittest.TestCase):
      def test_cubic1(self):
           
           #setup lattice
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -655,8 +675,10 @@ class TestLatticeCubic(unittest.TestCase):
      def test_cubic2(self):
           """test different Energy Transfer"""
           #setup lattice
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -686,8 +708,10 @@ class TestLatticeCubic(unittest.TestCase):
      def test_cubic3(self):
           """test different Orientation"""
           #setup lattice
-          self.fixture.orient1=N.array([[1,1,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,1,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -716,8 +740,10 @@ class TestLatticeCubic(unittest.TestCase):
      def test_cubic4(self):
           """Switch order of orientations, compare with test 3"""
           #setup lattice
-          self.fixture.orient1=N.array([[0,0,1]],'Float64')
-          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          orient1=N.array([[0,0,1]],'Float64')
+          orient2=N.array([[1,1,0]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -749,8 +775,10 @@ class TestLatticeCubic(unittest.TestCase):
      def test_cubic5(self):
           """Test another energy, compare with test 4"""
           #setup lattice
-          self.fixture.orient1=N.array([[0,0,1]],'Float64')
-          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          orient1=N.array([[0,0,1]],'Float64')
+          orient2=N.array([[1,1,0]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -780,8 +808,10 @@ class TestLatticeCubic(unittest.TestCase):
      def test_cubic6(self):
           """test different energies, compare with test 3"""
           #setup lattice
-          self.fixture.orient1=N.array([[1,1,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,1,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -813,8 +843,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([6.283],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -848,8 +880,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([6.283],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -882,8 +916,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([6.283],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,1,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,1,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=-1 # Fixed Ei
@@ -915,8 +951,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([6.283],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,1,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,1,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=-1 # Fixed Ei
@@ -948,8 +986,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([6.283],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[0,0,1]],'Float64')
-          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          orient1=N.array([[0,0,1]],'Float64')
+          orient2=N.array([[1,1,0]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=-1 # Fixed Ei
@@ -981,8 +1021,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([6.283],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[0,0,1]],'Float64')
-          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          orient1=N.array([[0,0,1]],'Float64')
+          orient2=N.array([[1,1,0]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=-1 # Fixed Ei
@@ -1015,8 +1057,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,2]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1048,8 +1092,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,2]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1081,8 +1127,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,1,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          orient1=N.array([[1,1,0]],'Float64')
+          orient2=N.array([[0,0,2]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1114,8 +1162,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[1,1,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          orient1=N.array([[1,1,0]],'Float64')
+          orient2=N.array([[0,0,2]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1148,8 +1198,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[0,0,2]],'Float64')
-          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          orient1=N.array([[0,0,2]],'Float64')
+          orient2=N.array([[1,1,0]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1181,8 +1233,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.orient1=N.array([[0,0,2]],'Float64')
-          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          orient1=N.array([[0,0,2]],'Float64')
+          orient2=N.array([[1,1,0]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1216,8 +1270,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
           self.fixture.beta=myradians(N.array([100.0],'Float64'))
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1250,8 +1306,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
           self.fixture.beta=myradians(N.array([100.0],'Float64'))
-          self.fixture.orient1=N.array([[1,0,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1285,8 +1343,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
           self.fixture.beta=myradians(N.array([100.0],'Float64'))
-          self.fixture.orient1=N.array([[1,2,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,2,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1320,8 +1380,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
           self.fixture.beta=myradians(N.array([100.0],'Float64'))
-          self.fixture.orient1=N.array([[1,2,0]],'Float64')
-          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          orient1=N.array([[1,2,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           
           #setup spectrometer
           self.fixture.EXP['infix']=1 # Fixed Ef
@@ -1358,8 +1420,10 @@ if __name__=="__main__":
           gamma=myradians(N.array([100],'Float64'))
           orient1=N.array([[0,1,0]],'Float64')
           orient2=N.array([[1,0,0]],'Float64')
+          orientation=Orientation(orient1,orient2)
+          self.fixture.orientation=orientation
           mylattice=Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
-                            orient1=orient1,orient2=orient2)
+                            orientation=orientation)
           H=N.array([1],'Float64');K=N.array([0],'Float64');L=N.array([0],'Float64');W=N.array([0],'Float64')
           EXP={}
           EXP['ana']={}
