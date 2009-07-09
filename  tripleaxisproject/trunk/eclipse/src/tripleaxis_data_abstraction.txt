@@ -1,0 +1,86 @@
+
+Analyzermodes:  
+1)DiffDet, 
+2)SinglDetFlat, 
+3)SinglDetHFoc,
+4)PSDDiff
+5)PSDFlat ???AnalyzerFlat???
+6)Undefined
+
+
+On Addition
+(We'll call this a "distinct" flag and use in the __cmp__ method)
+
+Distinct data points:
+Signal (for example, Detector vs PSD, etc.)
+Reference:  Monitor/Time (we don't want to combine these)
+FixedE  (example Ef)
+Lattice (assume distinct for now)
+Orient
+Monospacing
+AnaSpacing
+MonoVertiFocus
+MonoHorizFocus
+AnalyzerDetectorMode
+AnalyzerFocusMode
+filtran (IN/OUT) should be distinct
+rc radial collimator For horizontal focusing mode, rc=a6
+sc cosoller collimator  this is on a track and the convention is that the 50minute collimator should have the same
+angle as a6 and the others have a fixed offset within some window.
+premonocoll on a track, should be "50 min", "OUT", "Open"
+
+
+Ignore: (this means that these fields go to None if not identical on addition)
+ICE Version
+ICE Repository Version
+Filename
+Epoch
+ExptId
+ScanType:  Motor/Angle?/VECTOR/etc.
+Date
+InstrumentName
+ExptName
+ExptParticipants
+ExptDetaails
+ExptComment
+Fixed These are fixed devices, for now, let's ignore these....We can try to handle these with a flag?
+Apertures:  aperthori, apertvert
+filrot
+filtilt
+focuscu --radius of curvature for cu monochromator in focusing condition
+focuspg-- radius of curvature for pg monochrmoator in focusing condition
+
+
+
+
+
+
+
+
+Subtraction
+Generally, when subtracting, keep the signal, kill the background
+
+
+
+
+
+
+Interpolation
+timestamp->interpolate
+temperature-> uncertainty is it difference between adjacent points, or intrinsic?
+filters->if not the same, don't interpolate
+collimations, if not the same, don't interpolate
+
+
+PSD
+
+For the values not scanned, (for example if we were doing an angle scan and temperature was a "spectator"),
+then we would simply treat temperature as a "detector" and rebin it as well.
+
+
+Open Questions
+1) What do A,B,C,D polarization states mean?
+2) Does a1=dfm
+3) Values for the offsets in SC, rc, are the values for sc, rc "slowly varying" parameters?
+4) For focuscu, focus pg, what are the numbers
+5) Eventually get rid of h,k,l, hkl, qx, qy,qz dichotomy
