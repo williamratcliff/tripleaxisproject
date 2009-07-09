@@ -90,7 +90,7 @@ def CleanArgs(**args):
      return args
 
 
-class instrument:
+class Instrument(object):
      def __init__(self):
           self.tau_list={'pg(002)':1.87325, \
                          'pg(004)':3.74650, \
@@ -104,33 +104,116 @@ class instrument:
           return self.tau_list[tau]
 
 
-class lattice:
-     def __init__(self, a=N.array([2*N.pi, 2*N.pi], 'd'), \
-                  b=N.array([2*N.pi, 2*N.pi], 'd'), \
-                  c=N.array([2*N.pi, 2*N.pi], 'd'), \
-                  alpha=N.array([90, 90], 'd'), \
-                  beta=N.array([90, 90], 'd'), \
-                  gamma=N.array([90, 90], 'd'), \
-                  orient1=N.array([[1, 0, 0], [1, 0, 0]], 'd'), \
-                  orient2=N.array([[0, 1, 0], [0, 1, 0]], 'd')):
-          newinput=CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2)
-          self.a=newinput['a']
-          self.b=newinput['b']
-          self.c=newinput['c']
-          self.alphad=newinput['alpha']
-          self.betad=newinput['beta']
-          self.gammad=newinput['gamma']
-          self.alpha=myradians(newinput['alpha'])
-          self.beta=myradians(newinput['beta'])
-          self.gamma=myradians(newinput['gamma'])
+class Lattice(object):
+     
+     def _get_a(self): return self._a
+     def _get_b(self): return self._b
+     def _get_c(self): return self._c
+     def _get_alpha(self): return self._alpha
+     def _get_beta(self): return self._beta
+     def _get_gamma(self): return self._gamma
+     def _get_orient1(self): return self._orient1
+     def _get_orient2(self): return self._orient2
+     def _set_a(self,x):
+          self._a=x
+          self.setvals()
+     def _set_b(self,x):
+          self._b=x
+          self.setvals()
+     def _set_c(self,x):
+          self._c=x
+          self.setvals()
+     def _set_alpha(self,x):
+          self._alpha=x
+          self.setvals()
+     def _set_beta(self,x):
+          self._beta=x
+          self.setvals()
+     def _set_gamma(self,x):
+          self._gamma=x
+          self.setvals()
+     def _set_orient1(self,x):
+          self._orient1=x
+          self.setvals()
+     def _set_orient2(self,x):
+          self._orient2=x
+          self.setvals()
+     
+     a=property(_get_a,_set_a)
+     b=property(_get_b,_set_b)
+     c=property(_get_c,_set_c)
+     alpha=property(_get_alpha,_set_alpha)
+     beta=property(_get_beta,_set_beta)
+     gamma=property(_get_gamma,_set_gamma)
+     orient1=property(_get_orient1,_set_orient1)
+     orient2=property(_get_orient2,_set_orient2)
+     
+     def setvals(self):
+          #if self._orient1.shape[0]==1:
+          #     self.orient1=self.orient1.transpose()
+          #if self._orient2.shape[0]==1:
+          #     self.orient2=self.orient2.transpose()
+
+          
+          newinput=CleanArgs(a=self._a,
+                             b=self._b,
+                             c=self._c,
+                             alpha=self._alpha,
+                             beta=self._beta,
+                             gamma=self._gamma,
+                             orient1=self._orient1,
+                             orient2=self._orient2)
+          self._a=newinput['a']
+          self._b=newinput['b']
+          self._c=newinput['c']
+          self._alpha=newinput['alpha']
+          self._beta=newinput['beta']
+          self._gamma=newinput['gamma']
+          self.alphad=mydegrees(newinput['alpha'])
+          self.betad=mydegrees(newinput['beta'])
+          self.gammad=mydegrees(newinput['gamma'])
           self.star()
           self.gtensor('lattice')
           self.gtensor('latticestar')
-          self.npts=N.size(a)
-          self.orient1=newinput['orient1'].transpose()
-          self.orient2=newinput['orient2'].transpose()
+          self.npts=N.size(self.a)
+          self._orient1=newinput['orient1']
+          self._orient2=newinput['orient2']
+          #print self.npts
+          
+          #self._orient1=self._orient1.reshape((self.npts,1))
+          #self._orient2=self._orient2.reshape((self.npts,1))
+         
+          #if newinput['orient1'].shape[0]==1:
+          #     self.orient1=newinput['orient1'].transpose()
+          #else:
+          #     self.orient1=newinput['orient1']
+          #if newinput['orient2'].shape[0]==1:
+          #     self.orient2=newinput['orient2'].transpose()
+          #else:
+          #     self.orient2=newinput['orient2']
+
+               
           self.StandardSystem()
-          self.instrument=instrument()
+          
+     def __init__(self, a=None, \
+                  b=None, \
+                  c=None, \
+                  alpha=None, \
+                  beta=None, \
+                  gamma=None, \
+                  orient1=None, \
+                  orient2=None):
+          """a,b,c in Angstroms, alpha,beta, gamma in radians.  All are vectors """
+          self._a=a
+          self._b=b
+          self._c=c
+          self._alpha=alpha
+          self._beta=beta
+          self._gamma=gamma
+          self._orient1=orient1
+          self._orient2=orient2
+          self.instrument=Instrument()
+          self.setvals()
           return
 
 
@@ -203,7 +286,7 @@ class lattice:
 
      def gtensor(self, lattice):
           "calculates the metric tensor of a lattice"
-          g=N.zeros((3, 3, N.size(self.a)), 'd')
+          g=N.zeros((3, 3, N.size(self.a)), 'Float64')
           #print 'shape ', g.shape
           if lattice=='lattice':
                a=self.a
@@ -269,7 +352,12 @@ class lattice:
      def StandardSystem(self):
           orient1=self.orient1
           orient2=self.orient2
-          modx=self.modvec(orient1[0, :], orient1[1, :], orient1[2, :], 'latticestar')
+          try:
+               modx=self.modvec(orient1[0, :], orient1[1, :], orient1[2, :], 'latticestar')
+          except IndexError:
+               orient1=orient1.transpose()
+               orient2=orient2.transpose()
+               modx=self.modvec(orient1[0, :], orient1[1, :], orient1[2, :], 'latticestar')
           x=N.copy(orient1)
           x[0, :]=x[0, :]/modx; # First unit basis vector
           x[1, :]=x[1, :]/modx;
@@ -353,8 +441,8 @@ class lattice:
         and spectrometer and sample parameters specified in EXP calculates the wave vector
         transfer in the sample (H, K, L), Q=|(H,K,L)|, energy tranfer E, and incident
         and final neutron energies.  Angles are given in radians"""
-          newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alphad,beta=self.betad,\
-                             gamma=self.gammad,orient1=self.orient1.T,orient2=self.orient2.T,M2=M2,S1=S1,S2=S2,A2=A2)
+          newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alpha,beta=self.beta,\
+                             gamma=self.gamma,orient1=self.orient1,orient2=self.orient2,M2=M2,S1=S1,S2=S2,A2=A2)
           self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
                         beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
                         orient2=newinput['orient2'])
@@ -363,8 +451,8 @@ class lattice:
           S2=newinput['S2']
           A2=newinput['A2']
           npts=len(EXP)
-          taum=N.empty(npts,'d')
-          taua=N.empty(npts,'d')
+          taum=N.empty(npts,'Float64')
+          taua=N.empty(npts,'Float64')
           for ind in range(npts):
                taum[ind]=self.instrument.get_tau(EXP[ind]['mono']['tau'])
           for ind in range(npts):
@@ -391,8 +479,8 @@ class lattice:
      def SpecGoTo(self,H,K,L,E,EXP):
           """Calculate shaft angles given momentum transfer H, K, L, energy transfer E, and
           spectrometer and smaple parameters in EXP.  The angles returned are in radians"""
-          newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alphad,beta=self.betad,\
-                             gamma=self.gammad,orient1=self.orient1.T,orient2=self.orient2.T,H=H,K=K,L=L,E=E)
+          newinput=CleanArgs(a=self.a,b=self.b,c=self.c,alpha=self.alpha,beta=self.beta,\
+                             gamma=self.gamma,orient1=self.orient1,orient2=self.orient2,H=H,K=K,L=L,E=E)
           self.__init__(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
                         beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
                         orient2=newinput['orient2'])
@@ -462,15 +550,15 @@ class lattice:
 class TestLattice(unittest.TestCase):
 
      def setUp(self):
-          a=N.array([2*pi],'d')
-          b=N.array([2*pi],'d')
-          c=N.array([2*pi],'d')
-          alpha=N.array([90],'d')
-          beta=N.array([90],'d')
-          gamma=N.array([90],'d')
-          orient1=N.array([[1,0,0]],'d')
-          orient2=N.array([[0,1,1]],'d')
-          self.fixture = lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+          a=N.array([2*pi],'Float64')
+          b=N.array([2*pi],'Float64')
+          c=N.array([2*pi],'Float64')
+          alpha=myradians(N.array([90],'Float64'))
+          beta=myradians(N.array([90],'Float64'))
+          gamma=myradians(N.array([90],'Float64'))
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,1,1]],'Float64')
+          self.fixture = Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                  orient1=orient1,orient2=orient2)
 
      def test_astar(self):
@@ -501,36 +589,19 @@ class TestLattice(unittest.TestCase):
           self.assertAlmostEqual(self.fixture.x[0],1.0 ,2,'Standard System x Not equal to '+str(1.0 ))
 
 
+class TestLatticeCubic(unittest.TestCase):
 
-
-#    def test_zeroes(self):
-#        self.assertEqual(0 + 0, 0)
-#        self.assertEqual(5 + 0, 5)
-#        self.assertEqual(0 + 13.2, 13.2)
-#
-#    def test_positive(self):
-#        self.assertEqual(123 + 456, 579)
-#        self.assertEqual(1.2e20 + 3.4e20, 3.5e20)
-#
-#    def test_mixed(self):
-#        self.assertEqual(-19 + 20, 1)
-#        self.assertEqual(999 + -1, 998)
-#        self.assertEqual(-300.1 + -400.2, -700.3)
-#
-
-if __name__=="__main__":
-     if 1:
-          a=N.array([2*pi,2*pi],'d')
-          b=N.array([8],'d')
-          c=N.array([11],'d')
-          alpha=N.array([87],'d')
-          beta=N.array([52],'d')
-          gamma=N.array([100],'d')
-          orient1=N.array([[0,1,0]],'d')
-          orient2=N.array([[1,0,0]],'d')
-          mylattice=lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
-                            orient1=orient1,orient2=orient2)
-          H=N.array([1],'d');K=N.array([0],'d');L=N.array([0],'d');W=N.array([0],'d')
+     def setUp(self):
+          a=N.array([6.283],'Float64')
+          b=N.array([6.283],'Float64')
+          c=N.array([6.283],'Float64')
+          alpha=myradians(N.array([90],'Float64'))
+          beta=myradians(N.array([90],'Float64'))
+          gamma=myradians(N.array([90],'Float64'))
+          orient1=N.array([[1,0,0]],'Float64')
+          orient2=N.array([[0,0,1]],'Float64')
+          self.fixture=Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                                 orient1=orient1,orient2=orient2)
           EXP={}
           EXP['ana']={}
           EXP['ana']['tau']='pg(002)'
@@ -541,8 +612,767 @@ if __name__=="__main__":
           EXP['sample']={}
           EXP['sample']['mosaic']=10
           EXP['sample']['vmosaic']=10
-          EXP['hcol']=N.array([40, 10, 20, 80],'d')
-          EXP['vcol']=N.array([120, 120, 120, 120],'d')
+          EXP['hcol']=N.array([40, 10, 20, 80],'Float64')
+          EXP['vcol']=N.array([120, 120, 120, 120],'Float64')
+          EXP['infix']=-1 #positive for fixed incident energy
+          EXP['efixed']=14.7
+          EXP['method']=0
+          setup=[EXP]
+          self.fixture.EXP=EXP
+
+     def test_cubic1(self):
+          
+          #setup lattice
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([74.169]))
+          A2=myradians(N.array([74.169]))
+          S1=myradians(N.array([97.958]))
+          S2=myradians(N.array([89.131]))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2999,4, 'H Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          #self.assertAlmostEqual(Q[0],2.1799,4, 'Q Not equal to '+ str(2.1799))
+          self.assertAlmostEqual(Ei[0],4.9995,4,'Ei Not equal to '+str(4.9995))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))
+
+          
+     def test_cubic2(self):
+          """test different Energy Transfer"""
+          #setup lattice
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([52.420]))
+          A2=myradians(N.array([74.169]))
+          S1=myradians(N.array([101.076]))
+          S2=myradians(N.array([70.881]))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2999,4, 'H Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],4.3195,4, 'E Not equal to '+ str(4.3195))
+          #self.assertAlmostEqual(Q[0],2.1799,4, 'Q Not equal to '+ str(2.1799))
+          self.assertAlmostEqual(Ei[0],9.3190,4,'Ei Not equal to '+str(9.3190))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))          
+          
+     def test_cubic3(self):
+          """test different Orientation"""
+          #setup lattice
+          self.fixture.orient1=N.array([[1,1,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([74.169]))
+          A2=myradians(N.array([74.169]))
+          S1=myradians(N.array([98.375]))
+          S2=myradians(N.array([109.575]))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2999,4, 'H Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(K[0],1.2999,4, 'K Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.9995,4,'Ei Not equal to '+str(4.9995))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))          
+          
+     def test_cubic4(self):
+          """Switch order of orientations, compare with test 3"""
+          #setup lattice
+          self.fixture.orient1=N.array([[0,0,1]],'Float64')
+          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([74.169]))
+          A2=myradians(N.array([74.169]))
+          S1=myradians(N.array([101.200]))  #Note that this angle has changed
+          #This is a consequence of the fact that ICP defines the first orientation vector 
+          #to be at half of the detector two theta angle.  The second orientation vector is always
+          #at higher a3
+          S2=myradians(N.array([109.575]))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2999,4, 'H Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(K[0],1.2999,4, 'K Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.9995,4,'Ei Not equal to '+str(4.9995))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))          
+
+     def test_cubic5(self):
+          """Test another energy, compare with test 4"""
+          #setup lattice
+          self.fixture.orient1=N.array([[0,0,1]],'Float64')
+          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([48.661]))
+          A2=myradians(N.array([74.169]))
+          S1=myradians(N.array([99.257]))  
+          S2=myradians(N.array([80.722]))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2999,4, 'H Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(K[0],1.2999,4, 'K Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],5.7097,4, 'E Not equal to '+ str(5.7097))
+          self.assertAlmostEqual(Ei[0],10.7092,4,'Ei Not equal to '+str(10.7092))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))    
+          
+          
+     def test_cubic6(self):
+          """test different energies, compare with test 3"""
+          #setup lattice
+          self.fixture.orient1=N.array([[1,1,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([48.661],'Float64'))
+          A2=myradians(N.array([74.169],'Float64'))
+          S1=myradians(N.array([96.433],'Float64'))
+          S2=myradians(N.array([80.722],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2999,4, 'H Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(K[0],1.2999,4, 'K Not equal to '+ str(1.2999))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],5.7097,4, 'E Not equal to '+ str(5.7097))
+          self.assertAlmostEqual(Ei[0],10.7092,4,'Ei Not equal to '+str(10.7092))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))   
+          
+     def test_tetragonal1(self):
+          """test the tetragonal cell"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([6.283],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([74.169],'Float64'))
+          A2=myradians(N.array([74.169],'Float64'))
+          S1=myradians(N.array([76.720],'Float64'))
+          S2=myradians(N.array([110.480],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],2.3749,4, 'H Not equal to '+ str(2.3749))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.9995,4,'Ei Not equal to '+str(4.9995))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))   
+          
+
+          
+     def test_tetragonal2(self):
+          """test the tetragonal cell, change E transfer"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([6.283],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=5.0
+          
+          #test the angles
+          M2=myradians(N.array([49.633],'Float64'))
+          A2=myradians(N.array([74.169],'Float64'))
+          S1=myradians(N.array([74.345],'Float64'))
+          S2=myradians(N.array([82.717],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],2.3749,4, 'H Not equal to '+ str(2.3749))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],1.7499,4, 'L Not equal to '+ str(1.7499))
+          self.assertAlmostEqual(E[0],5.3197,4, 'E Not equal to '+ str(5.3197))
+          self.assertAlmostEqual(Ei[0],10.3192,4,'Ei Not equal to '+str(10.3192))
+          self.assertAlmostEqual(Ef[0],4.9995,4,'Ef Not equal to '+str(4.9995))   
+
+
+     def test_tetragonal3(self):
+          """test the tetragonal cell, change Ei, orientation vectors"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([6.283],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,1,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=-1 # Fixed Ei
+          self.fixture.EXP['efixed']=3.7
+          
+          #test the angles
+          M2=myradians(N.array([89.008],'Float64'))
+          A2=myradians(N.array([89.008],'Float64'))
+          S1=myradians(N.array([100.569],'Float64'))
+          S2=myradians(N.array([148.389],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.6289,4, 'H Not equal to '+ str(1.6289))
+          self.assertAlmostEqual(K[0],1.6289,4, 'K Not equal to '+ str(1.6289))
+          self.assertAlmostEqual(L[0],2.1389,4, 'L Not equal to '+ str(2.1389))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],3.6997,4,'Ei Not equal to '+str(3.6997))
+          self.assertAlmostEqual(Ef[0],3.6997,4,'Ef Not equal to '+str(3.6997))   
+
+     def test_tetragonal4(self):
+          """test the tetragonal cell, change Energy transfer, compare with tetragonal3"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([6.283],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,1,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=-1 # Fixed Ei
+          self.fixture.EXP['efixed']=3.7
+          
+          #test the angles
+          M2=myradians(N.array([89.008],'Float64'))
+          A2=myradians(N.array([98.663],'Float64'))
+          S1=myradians(N.array([91.561],'Float64'))
+          S2=myradians(N.array([117.979],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.3329,4, 'H Not equal to '+ str(1.3329))
+          self.assertAlmostEqual(K[0],1.3329,4, 'K Not equal to '+ str(1.3329))
+          self.assertAlmostEqual(L[0],2.1389,4, 'L Not equal to '+ str(2.1389))
+          self.assertAlmostEqual(E[0],0.5400,4, 'E Not equal to '+ str(0.5400))
+          self.assertAlmostEqual(Ei[0],3.6997,4,'Ei Not equal to '+str(3.6997))
+          self.assertAlmostEqual(Ef[0],3.1597,4,'Ef Not equal to '+str(3.1597))   
+
+     def test_tetragonal5(self):
+          """test the tetragonal cell, swap orientation vectors"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([6.283],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[0,0,1]],'Float64')
+          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=-1 # Fixed Ei
+          self.fixture.EXP['efixed']=3.7
+          
+          #test the angles
+          M2=myradians(N.array([89.008],'Float64'))
+          A2=myradians(N.array([98.663],'Float64'))
+          S1=myradians(N.array([119.133],'Float64'))  #recall how icp chooses the a3 angle based on first orientation vector
+          S2=myradians(N.array([117.979],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.3329,4, 'H Not equal to '+ str(1.3329))
+          self.assertAlmostEqual(K[0],1.3329,4, 'K Not equal to '+ str(1.3329))
+          self.assertAlmostEqual(L[0],2.1389,4, 'L Not equal to '+ str(2.1389))
+          self.assertAlmostEqual(E[0],0.5400,4, 'E Not equal to '+ str(0.5400))
+          self.assertAlmostEqual(Ei[0],3.6997,4,'Ei Not equal to '+str(3.6997))
+          self.assertAlmostEqual(Ef[0],3.1597,4,'Ef Not equal to '+str(3.1597))   
+
+     def test_tetragonal6(self):
+          """test the tetragonal cell, swap orientation vectors compared with tetragonal 4"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([6.283],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[0,0,1]],'Float64')
+          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=-1 # Fixed Ei
+          self.fixture.EXP['efixed']=3.7
+          
+          #test the angles
+          M2=myradians(N.array([89.008],'Float64'))
+          A2=myradians(N.array([89.008],'Float64'))
+          S1=myradians(N.array([137.820],'Float64'))  #recall how icp chooses the a3 angle based on first orientation vector
+          S2=myradians(N.array([148.389],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.6289,4, 'H Not equal to '+ str(1.6289))
+          self.assertAlmostEqual(K[0],1.6289,4, 'K Not equal to '+ str(1.6289))
+          self.assertAlmostEqual(L[0],2.1389,4, 'L Not equal to '+ str(2.1389))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],3.6997,4,'Ei Not equal to '+str(3.6997))
+          self.assertAlmostEqual(Ef[0],3.6997,4,'Ef Not equal to '+str(3.6997))   
+
+
+     def test_orthorhombic1(self):
+          """test the orthorhombic cell"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([78.930],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([89.644],'Float64'))  
+          S2=myradians(N.array([86.470],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.3919,4, 'H Not equal to '+ str(1.3919))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],2.7379,4, 'L Not equal to '+ str(2.7379))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.4996,4,'Ei Not equal to '+str(4.4996))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))   
+   
+     def test_orthorhombic2(self):
+          """test the orthorhombic cell, change E transfer"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([46.305],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([98.405],'Float64'))  
+          S2=myradians(N.array([57.515],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.3919,4, 'H Not equal to '+ str(1.3919))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],2.7379,4, 'L Not equal to '+ str(2.7379))
+          self.assertAlmostEqual(E[0],7.2594,4, 'E Not equal to '+ str(7.2594))
+          self.assertAlmostEqual(Ei[0],11.7590,4,'Ei Not equal to '+str(11.7590))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))   
+          
+     def test_orthorhombic3(self):
+          """test the orthorhombic cell, change orientation vectors, compare with ortho2"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,1,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([78.930],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([91.228],'Float64'))  
+          S2=myradians(N.array([105.102],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2339,4, 'H Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(K[0],1.2339,4, 'K Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(L[0],2.7379,4, 'L Not equal to '+ str(2.7379))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.4996,4,'Ei Not equal to '+str(4.4966))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))   
+
+     def test_orthorhombic4(self):
+          """test the orthorhombic cell, change E, compare with ortho3"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[1,1,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,2]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([47.030],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([92.030],'Float64'))  
+          S2=myradians(N.array([71.391],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2339,4, 'H Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(K[0],1.2339,4, 'K Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(L[0],2.7379,4, 'L Not equal to '+ str(2.7379))
+          self.assertAlmostEqual(E[0],6.9194,4, 'E Not equal to '+ str(6.9194))
+          self.assertAlmostEqual(Ei[0],11.4190,4,'Ei Not equal to '+str(11.4190))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))
+
+          
+     def test_orthorhombic5(self):
+          """test the orthorhombic cell, swap orientation vectors, compare with ortho4"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[0,0,2]],'Float64')
+          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([47.030],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([104.676],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=myradians(N.array([71.391],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2339,4, 'H Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(K[0],1.2339,4, 'K Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(L[0],2.7379,4, 'L Not equal to '+ str(2.7379))
+          self.assertAlmostEqual(E[0],6.9194,4, 'E Not equal to '+ str(6.9194))
+          self.assertAlmostEqual(Ei[0],11.4190,4,'Ei Not equal to '+str(11.4190))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))
+
+     def test_orthorhombic6(self):
+          """test the orthorhombic cell, swap orient vectors, compare with ortho3"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.orient1=N.array([[0,0,2]],'Float64')
+          self.fixture.orient2=N.array([[1,1,0]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([78.930],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([103.874],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=myradians(N.array([105.102],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.2339,4, 'H Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(K[0],1.2339,4, 'K Not equal to '+ str(1.2339))
+          self.assertAlmostEqual(L[0],2.7379,4, 'L Not equal to '+ str(2.7379))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.4996,4,'Ei Not equal to '+str(4.4996))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))     
+          
+          
+     def test_monoclinic1(self):
+          """test monoclinic 1"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([78.930],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([108.743],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=myradians(N.array([130.130],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.5829,4, 'H Not equal to '+ str(1.5829))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],3.4558,4, 'L Not equal to '+ str(3.4558))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.4996,4,'Ei Not equal to '+str(4.4996))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))
+ 
+     def test_monoclinic2(self):
+          """test monoclinic 2, change E"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.orient1=N.array([[1,0,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([74.186],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([106.473],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=myradians(N.array([123.991],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],1.5829,4, 'H Not equal to '+ str(1.5829))
+          self.assertAlmostEqual(K[0],0.0000,4, 'K Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(L[0],3.4558,4, 'L Not equal to '+ str(3.4558))
+          self.assertAlmostEqual(E[0],0.4979,4, 'E Not equal to '+ str(0.4979))
+          self.assertAlmostEqual(Ei[0],4.9976,4,'Ei Not equal to '+str(4.9976))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))
+
+          
+     def test_monoclinic3(self):
+          """test monoclinic 2, change orient vectors"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.orient1=N.array([[1,2,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([78.930],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([70.753],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=myradians(N.array([91.256],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],0.7650,4, 'H Not equal to '+ str(0.7650))
+          self.assertAlmostEqual(K[0],1.5299,4, 'K Not equal to '+ str(1.5299))
+          self.assertAlmostEqual(L[0],1.6539,4, 'L Not equal to '+ str(1.6539))
+          self.assertAlmostEqual(E[0],0.0000,4, 'E Not equal to '+ str(0.0000))
+          self.assertAlmostEqual(Ei[0],4.4996,4,'Ei Not equal to '+str(4.49996))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))
+
+
+     def test_monoclinic4(self):
+          """test monoclinic 2, change E"""
+          #setup lattice
+          self.fixture.a=N.array([6.283],'Float64')
+          self.fixture.b=N.array([5.7568],'Float64')
+          self.fixture.c=N.array([11.765],'Float64')
+          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.orient1=N.array([[1,2,0]],'Float64')
+          self.fixture.orient2=N.array([[0,0,1]],'Float64')
+          
+          #setup spectrometer
+          self.fixture.EXP['infix']=1 # Fixed Ef
+          self.fixture.EXP['efixed']=4.5
+          
+          #test the angles
+          M2=myradians(N.array([56.239],'Float64'))
+          A2=myradians(N.array([78.930],'Float64'))
+          S1=myradians(N.array([73.059],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=myradians(N.array([73.305],'Float64'))
+          H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
+          print 'H ',H
+          print 'K ',K
+          print 'L ',L
+          print 'E ',E
+          print 'Q ',Q
+          print 'Ei ',Ei
+          print 'Ef ',Ef
+          self.assertAlmostEqual(H[0],0.7650,4, 'H Not equal to '+ str(0.7650))
+          self.assertAlmostEqual(K[0],1.5299,4, 'K Not equal to '+ str(1.5299))
+          self.assertAlmostEqual(L[0],1.6539,4, 'L Not equal to '+ str(1.6539))
+          self.assertAlmostEqual(E[0],3.6838,4, 'E Not equal to '+ str(3.6838))
+          self.assertAlmostEqual(Ei[0],8.1834,4,'Ei Not equal to '+str(8.1834))
+          self.assertAlmostEqual(Ef[0],4.4996,4,'Ef Not equal to '+str(4.4996))
+
+          
+if __name__=="__main__":
+     if 0:
+          a=N.array([2*pi,2*pi],'Float64')
+          b=N.array([8],'Float64')
+          c=N.array([11],'Float64')
+          alpha=myradians(N.array([87],'Float64'))
+          beta=myradians(N.array([52],'Float64'))
+          gamma=myradians(N.array([100],'Float64'))
+          orient1=N.array([[0,1,0]],'Float64')
+          orient2=N.array([[1,0,0]],'Float64')
+          mylattice=Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                            orient1=orient1,orient2=orient2)
+          H=N.array([1],'Float64');K=N.array([0],'Float64');L=N.array([0],'Float64');W=N.array([0],'Float64')
+          EXP={}
+          EXP['ana']={}
+          EXP['ana']['tau']='pg(002)'
+          EXP['mono']={}
+          EXP['mono']['tau']='pg(002)';
+          EXP['ana']['mosaic']=30
+          EXP['mono']['mosaic']=30
+          EXP['sample']={}
+          EXP['sample']['mosaic']=10
+          EXP['sample']['vmosaic']=10
+          EXP['hcol']=N.array([40, 10, 20, 80],'Float64')
+          EXP['vcol']=N.array([120, 120, 120, 120],'Float64')
           EXP['infix']=-1 #positive for fixed incident energy
           EXP['efixed']=14.7
           EXP['method']=0
@@ -566,5 +1396,5 @@ if __name__=="__main__":
           print 'A1 ',mydegrees(A1)
           print 'S1 ',mydegrees(S1)
           print 'S2 ',mydegrees(S2)
-
-#    unittest.main()
+     if 1:
+          unittest.main()
