@@ -3,12 +3,13 @@ import uncertainty
 eps=1e-8
 
 class Component(object):
-        def __init__(self, name,values,stderr, units=None):
+        def __init__(self, name,values,err, units=None,aliases=None):
                 self.name=name
+                self.aliases=aliases
                 self.units=units
                 #self.values=data
                 #self.err=err
-                self.measurement=uncertainty.Measurement(values,stderr**2)
+                self.measurement=uncertainty.Measurement(values,err**2)
 
 
 class Motor(Component):
@@ -38,10 +39,18 @@ class Motor(Component):
         #the measurement objects attributes.  However, people should do operations on the motor object
         #NOT on these components, otherwise errors will not propagate correctly!!!
         
-        def __init__(self,name,values=None,err=None,units='degrees',isdistinct=True, window=eps):
+        def __init__(self,name,values=None,err=None,units='degrees',isdistinct=True, window=eps,aliases=None,friends=None,spectator=False):
                 self.name=name
                 self.units=units
-                self.measurement=uncertainty.Measurement(values, stderr**2)
+                self.measurement=uncertainty.Measurement(values, err**2)
+                self.aliases=aliases
+                self.isdistinct=isdistinct
+                self.spectator=spectator
+                #The spectator flag says if I was moving or not during a scan.
+                self.window=window
+                self.friends=friends  
+                #If I am updated, then my friends might need to be updated, for example, hkl->
+                
         # Numpy array slicing operations
         def __len__(self):
                 return len(self.x)
@@ -208,15 +217,14 @@ class Motor(Component):
         def log(val): return self.log()
         def exp(val): return self.exp()
 
+
+
+
 class Mosaic(object):
         def __init__(horizontal, vertical=None):
                 self.horizontal=horizontal
                 self.vertical=vertical
 
-
-        
-        
-        
 class Monochromator(Component):
         """A monochromator"""
         def __init__(self, name='Monochromator', 
@@ -224,11 +232,12 @@ class Monochromator(Component):
                      horizontal_focus=None,
                      blades=None,
                      mosaic=None,
+                     aliases=None,
                      dspacing=None  #dspacing of the monochromator
                      ):
                 self.name=name
                 self.vertical_focus=vertical_focus
-                self.horizontal_focus=
+                self.horizontal_focus=horizontal_focus
                 sellf.blades=blades
                 self.mosaic=mosaic
         
@@ -243,30 +252,47 @@ class Analyzer(Component):
                      ):
                 self.name=name
                 self.blades=blades
+                self.mosaic=mosaic
 
 
-class Primary_Motor(object):
+
+class Primary_Motors(object):
         def __init__():
-                pass
+                self.a1=Motor('a1',values=None,err=None,units='degrees',isdistinct=True)
+                self.a2=Motor('a2',values=None,err=None,units='degrees',isdistinct=True)
+                self.a3=Motor('a3',values=None,err=None,units='degrees',isdistinct=True)
+                self.a4=Motor('a4',values=None,err=None,units='degrees',isdistinct=True)
+                self.a5=Motor('a5',values=None,err=None,units='degrees',isdistinct=True)
+                self.a6=Motor('a6',values=None,err=None,units='degrees',isdistinct=True)
+                self.sample_elevator=Motor('sample_elevation',values=None,err=None,units='degrees',isdistinct=False)
+                self.sample_elevator=Motor('a6',values=None,err=None,units='degrees',isdistinct=False)
+                self.dfm_rotation=Motor('dfm_rotation',values=None,err=None,units='degrees',isdistinct=True)
+                self.analyzer_rotation=Motor('analyzer_rotation',values=None,err=None,units='degrees',isdistinct=True)
+                self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isdistinct=True)
+                self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isdistinct=True)
+                
         
 
         
+
+
+
+
+
+class 
+
 a1=Motor('a1',values=None,err=None,units='degrees',isdistinct=True)
 a2=Motor('a2',values=None,err=None,units='degrees',isdistinct=True)
 a3=Motor('a3',values=None,err=None,units='degrees',isdistinct=True)
 a4=Motor('a4',values=None,err=None,units='degrees',isdistinct=True)
 a5=Motor('a5',values=None,err=None,units='degrees',isdistinct=True)
 a6=Motor('a6',values=None,err=None,units='degrees',isdistinct=True)
+sample_elevator=Motor('sample_elevation',values=None,err=None,units='degrees',isdistinct=False)
+sample_elevator=Motor('a6',values=None,err=None,units='degrees',isdistinct=False)
 dfm_rotation=Motor('dfm_rotation',values=None,err=None,units='degrees',isdistinct=True)
 analyzer_rotation=Motor('analyzer_rotation',values=None,err=None,units='degrees',isdistinct=True)
 aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isdistinct=True)
 aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isdistinct=True)
-
-
-
-class 
-
-
 
 def data_abstraction_layer(self):
         self.metadata={}
