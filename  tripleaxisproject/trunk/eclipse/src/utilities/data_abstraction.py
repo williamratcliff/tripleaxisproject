@@ -1,6 +1,6 @@
 import numpy as N
 import uncertainty
-
+eps=1e-8
 
 class Component(object):
         def __init__(self, name,values,stderr, units=None):
@@ -38,7 +38,7 @@ class Motor(Component):
         #the measurement objects attributes.  However, people should do operations on the motor object
         #NOT on these components, otherwise errors will not propagate correctly!!!
         
-        def __init__(self,name,values=None,err=None,units='degrees'):
+        def __init__(self,name,values=None,err=None,units='degrees',isdistinct=True, window=eps):
                 self.name=name
                 self.units=units
                 self.measurement=uncertainty.Measurement(values, stderr**2)
@@ -208,19 +208,63 @@ class Motor(Component):
         def log(val): return self.log()
         def exp(val): return self.exp()
 
-class Monitor(Component):
-        """A monitor"""
-        def __init__(self, name='Monitor1',
-                     signal_type=None, 
+class Mosaic(object):
+        def __init__(horizontal, vertical=None):
+                self.horizontal=horizontal
+                self.vertical=vertical
+
+
+        
+        
+        
+class Monochromator(Component):
+        """A monochromator"""
+        def __init__(self, name='Monochromator', 
                      vertical_focus=None,
                      horizontal_focus=None,
-                     Blades=None,
-                     mosaic_vertical=None,
-                     mosaic_horizntal=None,
+                     blades=None,
+                     mosaic=None,
                      dspacing=None  #dspacing of the monochromator
-                     )
+                     ):
+                self.name=name
+                self.vertical_focus=vertical_focus
+                self.horizontal_focus=
+                sellf.blades=blades
+                self.mosaic=mosaic
+        
+class Analyzer(Component):
+        """A monochromator"""
+        def __init__(self, name='Analyzer',
+                     vertical_focus=None,
+                     horizontal_focus=None,
+                     blades=None,
+                     mosaic=None,
+                     dspacing=None  #dspacing of the monochromator
+                     ):
+                self.name=name
+                self.blades=blades
 
 
+class Primary_Motor(object):
+        def __init__():
+                pass
+        
+
+        
+a1=Motor('a1',values=None,err=None,units='degrees',isdistinct=True)
+a2=Motor('a2',values=None,err=None,units='degrees',isdistinct=True)
+a3=Motor('a3',values=None,err=None,units='degrees',isdistinct=True)
+a4=Motor('a4',values=None,err=None,units='degrees',isdistinct=True)
+a5=Motor('a5',values=None,err=None,units='degrees',isdistinct=True)
+a6=Motor('a6',values=None,err=None,units='degrees',isdistinct=True)
+dfm_rotation=Motor('dfm_rotation',values=None,err=None,units='degrees',isdistinct=True)
+analyzer_rotation=Motor('analyzer_rotation',values=None,err=None,units='degrees',isdistinct=True)
+aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isdistinct=True)
+aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isdistinct=True)
+
+
+
+class 
 
 
 
@@ -326,3 +370,9 @@ def data_abstraction_layer(self):
         self.metadata['magnetic_field']={}
         self.metadata['magnetic_field']['hfield']=None#float(tokenized[10])
         return
+
+
+
+
+
+
