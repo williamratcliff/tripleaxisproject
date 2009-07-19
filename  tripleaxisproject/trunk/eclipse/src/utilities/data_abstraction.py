@@ -2,22 +2,22 @@ import numpy as N
 import uncertainty
 eps=1e-8
 
+"""
+Current notes:
+My current thoughts are to have one giant table so that we can do sorting
+easily.
+
+
+
+"""
+
 class Component(object):
-        def __init__(self, name,values,err, units=None,aliases=None):
-                self.name=name
-                self.aliases=aliases
-                self.units=units
-                #self.values=data
-                #self.err=err
-                self.measurement=uncertainty.Measurement(values,err**2)
-
-
-class Motor(Component):
-        """This is the motor class.  A Motor must have a name, for example, 'a1'
+        """This is the Component class.  A Component must have a name, for example, 'a1'
         Furthermore, it is given a set of values and stderr for initialization.
         units are optional.  Internally, we store a "measurement".  This can be
         accesed from measurement.x, measurement.dx
         """"
+        
         def _getx(self): return self.measurement.x
         def _setx(self,x): 
                 self.measurement.x=x
@@ -38,19 +38,13 @@ class Motor(Component):
         #Out of laziness, I am defining properties of x, variance, and dx, but these only effect
         #the measurement objects attributes.  However, people should do operations on the motor object
         #NOT on these components, otherwise errors will not propagate correctly!!!
-        
-        def __init__(self,name,values=None,err=None,units='degrees',isdistinct=True, window=eps,aliases=None,friends=None,spectator=False):
+        def __init__(self, name,values,err, units=None,aliases=None):
                 self.name=name
-                self.units=units
-                self.measurement=uncertainty.Measurement(values, err**2)
                 self.aliases=aliases
-                self.isdistinct=isdistinct
-                self.spectator=spectator
-                #The spectator flag says if I was moving or not during a scan.
-                self.window=window
-                self.friends=friends  
-                #If I am updated, then my friends might need to be updated, for example, hkl->
-                
+                self.units=units
+                #self.values=data
+                #self.err=err
+                self.measurement=uncertainty.Measurement(values,err**2)
         # Numpy array slicing operations
         def __len__(self):
                 return len(self.x)
@@ -216,6 +210,32 @@ class Motor(Component):
 
         def log(val): return self.log()
         def exp(val): return self.exp()
+                
+
+class Motor(Component):
+        """This is the motor class.  A Motor must have a name, for example, 'a1'
+        Furthermore, it is given a set of values and stderr for initialization.
+        units are optional.  Internally, we store a "measurement".  This can be
+        accesed from measurement.x, measurement.dx
+        """"
+        
+        
+        def __init__(self,name,values=None,err=None,units='degrees',isDistinct=True, 
+                     window=eps,aliases=None,friends=None,spectator=False
+                     isInterpolatable=False):
+                self.name=name
+                self.units=units
+                self.measurement=uncertainty.Measurement(values, err**2)
+                self.aliases=aliases
+                self.isDistinct=isDistinct
+                self.isInterpolatable=isInterpolatable
+                self.spectator=spectator
+                #The spectator flag says if I was moving or not during a scan.
+                self.window=window #The window in which values are to be deemed equal, it assumes that the isDistinct flag is set 
+                self.friends=friends  
+                #If I am updated, then my friends might need to be updated, for example, hkl->
+                
+
 
 
 
@@ -240,9 +260,30 @@ class Monochromator(Component):
                 self.horizontal_focus=horizontal_focus
                 sellf.blades=blades
                 self.mosaic=mosaic
-        
+                self.focus_cu=Motor('focus_cu',values=None,err=None,units='degrees',isDistinct=True,
+                                    isInterpolatable=True)
+                self.focus_pg=Motor('focus_pg',values=None,err=None,units='degrees',isDistinct=True,
+                                    isInterpolatable=True)
+
+class Filters(Component):
+        """Filters"""
+        def __init__():
+                self.filter_rotation=Motor('filter_rotation',values=None,err=None,units='degrees',isDistinct=False,
+                                           isInterpolatable=False)
+                self.filter_tilt=Motor('filter_tilt',values=None,err=None,units='degrees',isDistinct=False,
+                                           isInterpolatable=False)
+                self.filter_translation=Motor('filter_translation',values=None,err=None,units='none',isDistinct=True,
+                                           isInterpolatable=False)
+                #filter translation has values of "IN" and "OUT" 
+
+class Apertures(Component):
+        self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isDistinct=False,
+                                           isInterpolatable=False)
+        self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isDistinct=False,
+                                           isInterpolatable=False)
+
 class Analyzer(Component):
-        """A monochromator"""
+        """An analyzer"""
         def __init__(self, name='Analyzer',
                      vertical_focus=None,
                      horizontal_focus=None,
@@ -253,33 +294,79 @@ class Analyzer(Component):
                 self.name=name
                 self.blades=blades
                 self.mosaic=mosaic
+                
 
 
 
 class Primary_Motors(object):
         def __init__():
-                self.a1=Motor('a1',values=None,err=None,units='degrees',isdistinct=True)
-                self.a2=Motor('a2',values=None,err=None,units='degrees',isdistinct=True)
-                self.a3=Motor('a3',values=None,err=None,units='degrees',isdistinct=True)
-                self.a4=Motor('a4',values=None,err=None,units='degrees',isdistinct=True)
-                self.a5=Motor('a5',values=None,err=None,units='degrees',isdistinct=True)
-                self.a6=Motor('a6',values=None,err=None,units='degrees',isdistinct=True)
-                self.sample_elevator=Motor('sample_elevation',values=None,err=None,units='degrees',isdistinct=False)
-                self.sample_elevator=Motor('a6',values=None,err=None,units='degrees',isdistinct=False)
-                self.dfm_rotation=Motor('dfm_rotation',values=None,err=None,units='degrees',isdistinct=True)
-                self.analyzer_rotation=Motor('analyzer_rotation',values=None,err=None,units='degrees',isdistinct=True)
-                self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isdistinct=True)
-                self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isdistinct=True)
+                self.a1=Motor('a1',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
+                self.a2=Motor('a2',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
+                self.a3=Motor('a3',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
+                self.a4=Motor('a4',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
+                self.a5=Motor('a5',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
+                self.a6=Motor('a6',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
+                self.sample_elevator=Motor('sample_elevation',values=None,err=None,units='degrees',isDistinct=False
+                                           , isInterpolatable=True)
+                self.sample_elevator=Motor('a6',values=None,err=None,units='degrees',isDistinct=False
+                                           , isInterpolatable=True)
+                self.dfm_rotation=Motor('dfm_rotation',values=None,err=None,units='degrees',isDistinct=True
+                                        , isInterpolatable=True)
+                self.analyzer_rotation=Motor('analyzer_rotation',values=None,err=None,units='degrees',isDistinct=True
+                                             , isInterpolatable=True)
+                self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isDistinct=True
+                                               , isInterpolatable=True)
+                self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isDistinct=True
+                                             , isInterpolatable=True)
                 
         
-
+class Physical_Motors(object):
+        def __init__():
+                self.h=Motor('h',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                self.k=Motor('k',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                self.l=Motor('l',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                self.e=Motor('e',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                self.qx=Motor('qx',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                self.qy=Motor('qy',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                self.qz=Motor('qz',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                self.hkl=Motor('hkl',values=None,err=None,units='rlu',isDistinct=True,
+                             isInterpolatable=True)
+                
+class Collimators(object):
+        """Our collimators:  
+        post_analyzer_collimator:user_defined
+        post_monochromator_collimator:user_defined
+        pre_analyzer_collimator:user_defined
+        pre_monochromator_collimator:measured
+        For the radial and soller collimators, these are angles on the track.  Others
+        self.radial_collimator:  For horizontal focusing mode, rc=a6
+        self.soller_collimator:  When in flat mode, the 50 minute collimator=a6, 
+        others have a fixed offset relative to this one.  Within some window, these
+        are likely to remain constant.  Thus, from the angle on the track, we could probably
+        determine what the likely collimation status is.  This may be a candidate for a 
+        "slowly varying" property.  For now, we will treat these as nonDistict
         
+        """"
+        def __init__():
+                self.post_analyzer_collimator=Motor('post_analyzer_collimator',values=None,err=None,units='minutes',isDistinct=False)
+                self.post_monochromator_collimator=Motor('post_monochromator_collimator',values=None,err=None,units='minutes',isDistinct=False)
+                self.pre_analyzer_collimator=Motor('pre_analyzer_collimator',values=None,err=None,units='minutes',isDistinct=False)
+                self.pre_monochromator_collimator=Motor('post_monochromator_collimator',values=None,err=None,units='minutes',isDistinct=True)
+                self.radial_collimator=Motor('radial_collimator',values=None,err=None,units='degrees',isDistinct=True, window=2.0)
+                self.soller_collimator=Motor('soller_collimator',values=None,err=None,units='degrees',isDistinct=False, window=2.0)
+                
 
 
 
 
 
-class 
 
 a1=Motor('a1',values=None,err=None,units='degrees',isdistinct=True)
 a2=Motor('a2',values=None,err=None,units='degrees',isdistinct=True)
