@@ -16,8 +16,8 @@ class Component(object):
         Furthermore, it is given a set of values and stderr for initialization.
         units are optional.  Internally, we store a "measurement".  This can be
         accesed from measurement.x, measurement.dx
-        """"
-        
+        """
+
         def _getx(self): return self.measurement.x
         def _setx(self,x): 
                 self.measurement.x=x
@@ -34,7 +34,7 @@ class Component(object):
         x=property(_getx,_setx,doc='value')
         variance=property(_get_variance,_set_variance,doc='variance')
         dx = property(_getdx,_setdx,doc="standard deviation")
-        
+
         #Out of laziness, I am defining properties of x, variance, and dx, but these only effect
         #the measurement objects attributes.  However, people should do operations on the motor object
         #NOT on these components, otherwise errors will not propagate correctly!!!
@@ -210,16 +210,16 @@ class Component(object):
 
         def log(val): return self.log()
         def exp(val): return self.exp()
-                
+
 
 class Motor(Component):
         """This is the motor class.  A Motor must have a name, for example, 'a1'
         Furthermore, it is given a set of values and stderr for initialization.
         units are optional.  Internally, we store a "measurement".  This can be
         accesed from measurement.x, measurement.dx
-        """"
-        
-        
+        """
+
+
         def __init__(self,name,values=None,err=None,units='degrees',isDistinct=True, 
                      window=eps,aliases=None,friends=None,spectator=False
                      isInterpolatable=False):
@@ -234,18 +234,40 @@ class Motor(Component):
                 self.window=window #The window in which values are to be deemed equal, it assumes that the isDistinct flag is set 
                 self.friends=friends  
                 #If I am updated, then my friends might need to be updated, for example, hkl->
-                
 
+
+class SampleEnvironment(Component):
+        """This is the motor class.  A Motor must have a name, for example, 'a1'
+        Furthermore, it is given a set of values and stderr for initialization.
+        units are optional.  Internally, we store a "measurement".  This can be
+        accesed from measurement.x, measurement.dx
+        """
+
+
+        def __init__(self,name,values=None,err=None,units='degrees',isDistinct=True, 
+                     window=eps,aliases=None,friends=None,spectator=False
+                     isInterpolatable=False):
+                self.name=name
+                self.units=units
+                self.measurement=uncertainty.Measurement(values, err**2)
+                self.aliases=aliases
+                self.isDistinct=isDistinct
+                self.isInterpolatable=isInterpolatable
+                self.spectator=spectator
+                #The spectator flag says if I was moving or not during a scan.
+                self.window=window #The window in which values are to be deemed equal, it assumes that the isDistinct flag is set 
+                self.friends=friends  
+                #If I am updated, then my friends might need to be updated, for example, hkl->
 
 
 
 
 class Mosaic(object):
-        def __init__(horizontal, vertical=None):
+        def __init__(self,horizontal, vertical=None):
                 self.horizontal=horizontal
                 self.vertical=vertical
 
-class Monochromator(Component):
+class Monochromator(object):
         """A monochromator"""
         def __init__(self, name='Monochromator', 
                      vertical_focus=None,
@@ -265,24 +287,48 @@ class Monochromator(Component):
                 self.focus_pg=Motor('focus_pg',values=None,err=None,units='degrees',isDistinct=True,
                                     isInterpolatable=True)
 
-class Filters(Component):
+class Filters(object):
         """Filters"""
-        def __init__():
+        def __init__(self):
                 self.filter_rotation=Motor('filter_rotation',values=None,err=None,units='degrees',isDistinct=False,
                                            isInterpolatable=False)
                 self.filter_tilt=Motor('filter_tilt',values=None,err=None,units='degrees',isDistinct=False,
-                                           isInterpolatable=False)
+                                       isInterpolatable=False)
                 self.filter_translation=Motor('filter_translation',values=None,err=None,units='none',isDistinct=True,
-                                           isInterpolatable=False)
+                                              isInterpolatable=False)
                 #filter translation has values of "IN" and "OUT" 
 
-class Apertures(Component):
-        self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isDistinct=False,
-                                           isInterpolatable=False)
-        self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isDistinct=False,
-                                           isInterpolatable=False)
+class Apertures(object):
+        def __init__(self):
+                self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isDistinct=False,
+                                               isInterpolatable=False)
+                self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isDistinct=False,
+                                             isInterpolatable=False)
 
-class Analyzer(Component):
+class Time(object):
+        def __init__(self):
+                self.duration=Motor('duration',values=None,err=None,units='seconds',isDistinct=True,
+                                                       isInterpolatable=True)
+                self.timestamp=Motor('timestamp',values=None,err=None,units='seconds',isDistinct=False,
+                                                       isInterpolatable=True)
+                #We should decide if we ignore timestamps, for now let's do so....
+
+class Temperature(object):                
+        def __init__(self):
+                self.temperature=SampleEnvironment('temperature',values=None,err=None,units='K',isDistinct=True,
+                                               isInterpolatable=True)
+                self.temperature_control_reading=SampleEnvironment('temperature_control_reading',values=None,err=None,units='K',isDistinct=False,
+                                               isInterpolatable=True)
+                self.temperature_heater_power=SampleEnvironment('temperature_heater_power',values=None,err=None,units='percentage',isDistinct=False,
+                                               isInterpolatable=True) #usuallly a percentage for most controllers...
+                self.temperature_setpoint=SampleEnvironment('temperature_setpoint',values=None,err=None,units='K',isDistinct=False,
+                                               isInterpolatable=True)
+                
+
+        
+                
+                
+class Analyzer(object):
         """An analyzer"""
         def __init__(self, name='Analyzer',
                      vertical_focus=None,
@@ -294,12 +340,12 @@ class Analyzer(Component):
                 self.name=name
                 self.blades=blades
                 self.mosaic=mosaic
-                
+
 
 
 
 class Primary_Motors(object):
-        def __init__():
+        def __init__(self):
                 self.a1=Motor('a1',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
                 self.a2=Motor('a2',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
                 self.a3=Motor('a3',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
@@ -318,10 +364,10 @@ class Primary_Motors(object):
                                                , isInterpolatable=True)
                 self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isDistinct=True
                                              , isInterpolatable=True)
-                
-        
+
+
 class Physical_Motors(object):
-        def __init__():
+        def __init__(self):
                 self.h=Motor('h',values=None,err=None,units='rlu',isDistinct=True,
                              isInterpolatable=True)
                 self.k=Motor('k',values=None,err=None,units='rlu',isDistinct=True,
@@ -331,14 +377,14 @@ class Physical_Motors(object):
                 self.e=Motor('e',values=None,err=None,units='rlu',isDistinct=True,
                              isInterpolatable=True)
                 self.qx=Motor('qx',values=None,err=None,units='rlu',isDistinct=True,
-                             isInterpolatable=True)
+                              isInterpolatable=True)
                 self.qy=Motor('qy',values=None,err=None,units='rlu',isDistinct=True,
-                             isInterpolatable=True)
+                              isInterpolatable=True)
                 self.qz=Motor('qz',values=None,err=None,units='rlu',isDistinct=True,
-                             isInterpolatable=True)
+                              isInterpolatable=True)
                 self.hkl=Motor('hkl',values=None,err=None,units='rlu',isDistinct=True,
-                             isInterpolatable=True)
-                
+                               isInterpolatable=True)
+
 class Collimators(object):
         """Our collimators:  
         post_analyzer_collimator:user_defined
@@ -352,19 +398,22 @@ class Collimators(object):
         are likely to remain constant.  Thus, from the angle on the track, we could probably
         determine what the likely collimation status is.  This may be a candidate for a 
         "slowly varying" property.  For now, we will treat these as nonDistict
-        
-        """"
-        def __init__():
+
+        """
+        def __init__(self):
                 self.post_analyzer_collimator=Motor('post_analyzer_collimator',values=None,err=None,units='minutes',isDistinct=False)
                 self.post_monochromator_collimator=Motor('post_monochromator_collimator',values=None,err=None,units='minutes',isDistinct=False)
                 self.pre_analyzer_collimator=Motor('pre_analyzer_collimator',values=None,err=None,units='minutes',isDistinct=False)
                 self.pre_monochromator_collimator=Motor('post_monochromator_collimator',values=None,err=None,units='minutes',isDistinct=True)
                 self.radial_collimator=Motor('radial_collimator',values=None,err=None,units='degrees',isDistinct=True, window=2.0)
                 self.soller_collimator=Motor('soller_collimator',values=None,err=None,units='degrees',isDistinct=False, window=2.0)
-                
 
 
 
+class TripleAxis(object):
+        def __init__(self):
+                self.monochromator=Monochromator()
+                self.analyzer=Analyzer()
 
 
 
