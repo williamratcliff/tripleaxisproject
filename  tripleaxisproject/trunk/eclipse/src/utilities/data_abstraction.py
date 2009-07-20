@@ -36,30 +36,41 @@ class Sample(object):
                 self.lattice=Lattice()
                 self.mosaic=Mosaic()
                 self.orientation=Orientation()
+
+class Meta_tag(object):
+        def __init__(self,name,isDistinct=False):
+                self.name=name
+                self.value=value
+                self.isDistinct=isDistinct
+                
                 
 class MetaData(object):
         def __init__(self):
-                self.comment=comment
-                self.filename=filename
-                self.instrument_name=instrument_name
-                self.epoch=epoch
-                self.experiment_name=experiment_name
-                self.experiment_comment=experiment_comment
-                self.experiment_id=experiment_id
-                self.experiment_participants=self.experiment_participants
-                self.experiment_details=experiment_details
-                self.date=date
-                self.ice_version=ice_version
-                self.ice_repository_info=self.ice_repository_info
-                self.scan_type=scan_type #EX MOTOR, VECTOR, etc.
-                self.scanned_variables=scanned_variables #What the user wanted to scan
-                self.fixed_motor=self.fixed_motors #which motors are fixed
-                self.fixed_energy=fixed_energy
-                self.fixed_eief=self.fixed_eief #either ei or ef
-                self.counting_standard=counting_standard # this is either monitor or time
-                self.desired_detector=desired_detector #detector, sd, psddet, etc.
+                self.comment=Meta_tag('comment',comment)
+                self.filename=Meta_tag('filename',filename)
+                self.instrument_name=Meta_tag('instrument_name',instrument_name)
+                self.epoch=Meta_tag('epoch',epoch)
+                self.experiment_name=Meta_tag('experiment_name',experiment_name)
+                self.experiment_id=Meta_tag('experiment_id',experiment_id)
+                self.experiment_participants=Meta_tag('experiment_participants',self.experiment_participants)
+                self.date=Meta_tag('date',date)
                 
-
+                self.scan_type=Meta_tag('scan_type',scan_type) #EX MOTOR, VECTOR, etc.
+                self.scanned_variables=Meta_tag('scanned_variables',scanned_variables,isDistinct=True) #What the user wanted to scan
+                self.fixed_motor=Meta_tag('fixed_motors',fixed_motors) #which motors are fixed
+                self.fixed_energy=Meta_tag('fixed_energy',fixed_energy,isDistinct=True)
+                self.fixed_eief=Meta_tag('fixed_eief',fixed_eief,isDistinct=True) #either ei or ef
+                self.counting_standard=Meta_tag('counting_standard',counting_standard,isDistinct=True) # this is either monitor or time
+                self.desired_detector=Meta_tag('desired_detector',desired_detector,isDistinct=True) #detector, sd, psddet, etc.
+                
+class IceMetaData(MetaData):
+        def __init__(self):
+                super(self).__init__()
+                self.ice_version=Meta_tag('ice_version',ice_version)
+                self.ice_repository_info=Meta_tag('ice_repository_info',ice_reposititory_info)
+                self.experiment_details=Meta_tag('experiment_details',experimental_details)
+                self.experiment_comment=Meta_tag('experiment_comment',experiment_comment)
+                
 
 class Component(object):
         """This is the Component class.  A Component must have a name, for example, 'a1'
@@ -420,7 +431,7 @@ class Analyzer(object):
                 self.name=name
                 self.blades=blades
                 self.mosaic=mosaic
-                self.detector_mode=detector_mode
+                self.detector_mode=detector_mode #DiffDet, SinglDetFlat,SinglDetHFoc,PSDDiff,PSDFlat,Undefined
                 self.focus_mode=focus_mode
                 
                 
