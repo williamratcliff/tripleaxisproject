@@ -7,9 +7,59 @@ Current notes:
 My current thoughts are to have one giant table so that we can do sorting
 easily.
 
-
+For some motors such as filter_translation, flipper_state, collimator, they have values such as 
+"ON/OFF", "A,B,C", "50Min", etc.  we either need to mark these as unplottable, or rather, have a "mapper" which takes these values
+to something plottable
 
 """
+
+
+
+
+
+class Lattice(object):
+        def __init__(self,a,b,c,alpha,beta,gamma):
+                self.a=a
+                self.b=b
+                self=c=c
+                self.alpha=alpha #stored in radians
+                self=beta=beta
+                self.gamma=gamma
+
+class Orientation(object):
+        def __init__(self,orient1,orient2):
+                self.orient1=orient1
+                self.orient2=orient2
+
+class Sample(object):
+        def __init__(self):
+                self.lattice=Lattice()
+                self.mosaic=Mosaic()
+                self.orientation=Orientation()
+                
+class MetaData(object):
+        def __init__(self):
+                self.comment=comment
+                self.filename=filename
+                self.instrument_name=instrument_name
+                self.epoch=epoch
+                self.experiment_name=experiment_name
+                self.experiment_comment=experiment_comment
+                self.experiment_id=experiment_id
+                self.experiment_participants=self.experiment_participants
+                self.experiment_details=experiment_details
+                self.date=date
+                self.ice_version=ice_version
+                self.ice_repository_info=self.ice_repository_info
+                self.scan_type=scan_type #EX MOTOR, VECTOR, etc.
+                self.scanned_variables=scanned_variables #What the user wanted to scan
+                self.fixed_motor=self.fixed_motors #which motors are fixed
+                self.fixed_energy=fixed_energy
+                self.fixed_eief=self.fixed_eief #either ei or ef
+                self.counting_standard=counting_standard # this is either monitor or time
+                self.desired_detector=desired_detector #detector, sd, psddet, etc.
+                
+
 
 class Component(object):
         """This is the Component class.  A Component must have a name, for example, 'a1'
@@ -221,7 +271,7 @@ class Motor(Component):
 
 
         def __init__(self,name,values=None,err=None,units='degrees',isDistinct=True, 
-                     window=eps,aliases=None,friends=None,spectator=False
+                     window=eps,aliases=None,friends=None,spectator=False,
                      isInterpolatable=False):
                 self.name=name
                 self.units=units
@@ -233,11 +283,11 @@ class Motor(Component):
                 #The spectator flag says if I was moving or not during a scan.
                 self.window=window #The window in which values are to be deemed equal, it assumes that the isDistinct flag is set 
                 self.friends=friends  
-                #If I am updated, then my friends might need to be updated, for example, hkl->
+                #If I am updated, then my friends might need to be updated, for example, hkl-> a3,a4, etc.
 
 
 class SampleEnvironment(Component):
-        """This is the motor class.  A Motor must have a name, for example, 'a1'
+        """This is the SampleEnvironment class.  SampleEnvironment must have a name, for example, 'Temperature'
         Furthermore, it is given a set of values and stderr for initialization.
         units are optional.  Internally, we store a "measurement".  This can be
         accesed from measurement.x, measurement.dx
@@ -245,7 +295,7 @@ class SampleEnvironment(Component):
 
 
         def __init__(self,name,values=None,err=None,units='degrees',isDistinct=True, 
-                     window=eps,aliases=None,friends=None,spectator=False
+                     window=eps,aliases=None,friends=None,spectator=False,
                      isInterpolatable=False):
                 self.name=name
                 self.units=units
@@ -257,11 +307,41 @@ class SampleEnvironment(Component):
                 #The spectator flag says if I was moving or not during a scan.
                 self.window=window #The window in which values are to be deemed equal, it assumes that the isDistinct flag is set 
                 self.friends=friends  
-                #If I am updated, then my friends might need to be updated, for example, hkl->
+                #If I am updated, then my friends might need to be updated, for example, hkl-> a3,a4, etc.
 
 
+class Detector(Component):
+        """This is the detector class.  A detector must have a name, for example, 'psd'
+        Furthermore, it is given a set of values and stderr for initialization.
+        units are optional.  Internally, we store a "measurement".  This can be
+        accesed from measurement.x, measurement.dx
+        """
 
 
+        def __init__(self,name,dimension=None,values=None,err=None,units='counts', 
+                     aliases=None,friends=None, isInterpolatable=True):
+                self.name=name
+                self.units=units
+                self.measurement=uncertainty.Measurement(values, err**2)
+                self.aliases=aliases
+                self.isDistinct=isDistinct
+                self.isInterpolatable=isInterpolatable
+                self.friends=friends  
+                #If I am updated, then my friends might need to be updated
+                self.dimension=dimension
+                #Internally, I imagine that we should internally store the detector a multidimensional array.
+                # Each point is an array that is nxm pixels and then we have k points.  So, for a 2D psd for example,
+                # we would have kpoints x (n x m) array where n and m define the dimensions of the 2D psd
+        
+        def correct_efficiencies(self,efficiencies):
+                """This function will correct the detector for efficiencies, in place"""
+                pass
+        def correct_offfsets(self, offsets):
+                """This function will transform from a central a4, to the actual a4 """
+                pass
+
+
+                          
 class Mosaic(object):
         def __init__(self,horizontal, vertical=None):
                 self.horizontal=horizontal
@@ -280,7 +360,7 @@ class Monochromator(object):
                 self.name=name
                 self.vertical_focus=vertical_focus
                 self.horizontal_focus=horizontal_focus
-                sellf.blades=blades
+                sellf.blades=blades #this is an array of the monochromator blades
                 self.mosaic=mosaic
                 self.focus_cu=Motor('focus_cu',values=None,err=None,units='degrees',isDistinct=True,
                                     isInterpolatable=True)
@@ -294,7 +374,7 @@ class Filters(object):
                                            isInterpolatable=False)
                 self.filter_tilt=Motor('filter_tilt',values=None,err=None,units='degrees',isDistinct=False,
                                        isInterpolatable=False)
-                self.filter_translation=Motor('filter_translation',values=None,err=None,units='none',isDistinct=True,
+                self.filter_translation=Motor('filter_translation',values=None,err=None,units='',isDistinct=True,
                                               isInterpolatable=False)
                 #filter translation has values of "IN" and "OUT" 
 
@@ -340,30 +420,45 @@ class Analyzer(object):
                 self.name=name
                 self.blades=blades
                 self.mosaic=mosaic
+                self.detector_mode=detector_mode
+                self.focus_mode=focus_mode
+                
+                
 
 
 
 
 class Primary_Motors(object):
         def __init__(self):
+                """These are a1, which defines the focusing convention and is equal to "dfm" in files
+                a5 also defines the focusing condition.  Instead, use analyzer_rotation and dfm_rotation
+                when present to do calculations.
+                
+                """
                 self.a1=Motor('a1',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
                 self.a2=Motor('a2',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
                 self.a3=Motor('a3',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
                 self.a4=Motor('a4',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
                 self.a5=Motor('a5',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
                 self.a6=Motor('a6',values=None,err=None,units='degrees',isDistinct=True, isInterpolatable=True)
-                self.sample_elevator=Motor('sample_elevation',values=None,err=None,units='degrees',isDistinct=False
+                self.sample_elevator=Motor('sample_elevator',values=None,err=None,units='degrees',isDistinct=False
                                            , isInterpolatable=True)
-                self.sample_elevator=Motor('a6',values=None,err=None,units='degrees',isDistinct=False
+                self.sample_upper_tilt=Motor('sample_upper_tilt',values=None,err=None,units='degrees',isDistinct=False
+                                           , isInterpolatable=True) #note, needs to be changed in UB Mode
+                self.sample_lower_tilt=Motor('sample_lower_tilt',values=None,err=None,units='degrees',isDistinct=False
+                                           , isInterpolatable=True) #note, needs to be changed in UB Mode
+                self.sample_upper_translation=Motor('sample_upper_translation',values=None,err=None,units='degrees',isDistinct=False
                                            , isInterpolatable=True)
+                self.sample_lower_translation=Motor('sample_lower_translation',values=None,err=None,units='degrees',isDistinct=False
+                                           , isInterpolatable=True) #note, needs to be changed in UB Mode
                 self.dfm_rotation=Motor('dfm_rotation',values=None,err=None,units='degrees',isDistinct=True
                                         , isInterpolatable=True)
                 self.analyzer_rotation=Motor('analyzer_rotation',values=None,err=None,units='degrees',isDistinct=True
                                              , isInterpolatable=True)
-                self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isDistinct=True
-                                               , isInterpolatable=True)
-                self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isDistinct=True
-                                             , isInterpolatable=True)
+                #self.aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isDistinct=True
+                #                               , isInterpolatable=True)
+                #self.aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isDistinct=True
+                #                             , isInterpolatable=True)
 
 
 class Physical_Motors(object):
@@ -374,7 +469,7 @@ class Physical_Motors(object):
                              isInterpolatable=True)
                 self.l=Motor('l',values=None,err=None,units='rlu',isDistinct=True,
                              isInterpolatable=True)
-                self.e=Motor('e',values=None,err=None,units='rlu',isDistinct=True,
+                self.e=Motor('e',values=None,err=None,units='meV',isDistinct=True,
                              isInterpolatable=True)
                 self.qx=Motor('qx',values=None,err=None,units='rlu',isDistinct=True,
                               isInterpolatable=True)
@@ -383,7 +478,7 @@ class Physical_Motors(object):
                 self.qz=Motor('qz',values=None,err=None,units='rlu',isDistinct=True,
                               isInterpolatable=True)
                 self.hkl=Motor('hkl',values=None,err=None,units='rlu',isDistinct=True,
-                               isInterpolatable=True)
+                               isInterpolatable=True) #is this a tuple???
 
 class Collimators(object):
         """Our collimators:  
@@ -408,7 +503,18 @@ class Collimators(object):
                 self.radial_collimator=Motor('radial_collimator',values=None,err=None,units='degrees',isDistinct=True, window=2.0)
                 self.soller_collimator=Motor('soller_collimator',values=None,err=None,units='degrees',isDistinct=False, window=2.0)
 
-
+class PolarizedBeam(object):
+        def __init__(self):
+                self.ei_flip=Motor('ei_flip',values=None,err=None,units='amps',isDistinct=False) #used to determine if the flipper is on
+                self.ef_flip=Motor('ef_flip',values=None,err=None,units='amps',isDistinct=False)
+                self.ef_guide=Motor('ef_guide',values=None,err=None,units='amps',isDistinct=False) #guide field
+                self.ei_guide=Motor('ei_guide',values=None,err=None,units='amps',isDistinct=False)
+                self.ei_cancel=Motor('ei_cancel',values=None,err=None,units='amps',isDistinct=False)
+                self.ef_cancel=Motor('ei_flip',values=None,err=None,units='amps',isDistinct=False)
+                self.hsample=Motor('ei_flip',values=None,err=None,units='amps',isDistinct=False) #horizontal current
+                self.vsample=Motor('ei_flip',values=None,err=None,units='amps',isDistinct=False) #vertical current
+                self.sample_guide_field_rotatation=Motor('sample_guide_field_rotation',values=None,err=None,units='degrees',isDistinct=False)
+                self.flipper_state=Motor('flipper_state',values=None,err=None,units='',isDistinct=False) #short hand, can be A,B,C, etc.
 
 class TripleAxis(object):
         def __init__(self):
