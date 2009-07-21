@@ -11,7 +11,7 @@ read(filename) - reads header information and data
 """
 
 import numpy as N
-import datetime,sys,os,re
+import datetime,sys,os,re,time
 
 # Try using precompiled matrix loader
 try:
@@ -179,6 +179,7 @@ class ICP(object):
         print 'tokens', tokens
         self.filename=tokens[0]
         self.timestamp = datetime.datetime(2000,1,1)
+        #could have just used time.strptime
         self.date=self.timestamp.strptime(tokens[1],'%b %d %Y %H:%M')
         self.scantype = tokens[2]
         self.prefactor = float(tokens[4]) #fixed order
