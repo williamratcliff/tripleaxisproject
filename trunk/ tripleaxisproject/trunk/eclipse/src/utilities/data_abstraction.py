@@ -1,5 +1,6 @@
 import numpy as N
 import uncertainty
+import readice
 eps=1e-8
 
 """
@@ -320,6 +321,7 @@ class SampleEnvironment(Component):
                 self.friends=friends  
                 #If I am updated, then my friends might need to be updated, for example, hkl-> a3,a4, etc.
 
+                
 
 class Detector(Component):
         """This is the detector class.  A detector must have a name, for example, 'psd'
@@ -350,6 +352,8 @@ class Detector(Component):
         def correct_offfsets(self, offsets):
                 """This function will transform from a central a4, to the actual a4 """
                 pass
+
+
 
 
                           
@@ -527,25 +531,68 @@ class PolarizedBeam(object):
                 self.sample_guide_field_rotatation=Motor('sample_guide_field_rotation',values=None,err=None,units='degrees',isDistinct=False)
                 self.flipper_state=Motor('flipper_state',values=None,err=None,units='',isDistinct=False) #short hand, can be A,B,C, etc.
 
+
+class DetectorSet(object):
+        """This defines a group of detectors"""
+        def __init__(self):
+                pass
+        def __iter__(self):
+                for key,value in self.__dict__:
+                        return value
+        def next(self):
+                for key, value in self.__dict__:
+                        yield value
+
+
 class TripleAxis(object):
         def __init__(self):
                 self.monochromator=Monochromator()
                 self.analyzer=Analyzer()
+                self.sample=Sample()
+                self.detectors=DetectorSet()
+                self.filters=Filters()
+                self.polarized_beam=PolarizedBeam()
+                self.collimators=Collimators()
+                self.primary_motors=Primary_Motors()
+                self.physical_motors=Physical_Motors()
+                self.time=Time()
+                self.sample_environment=SampleEnvironment()
+                self.meta_data=IceMetaData()
+                self.apertures=Apertures()
+        def translate(self,dataset):
+                self.translate_monochromator(dataset)
+        
+        def translate_monochromator(self,dataset):
+                self.monochromator.focus_cu=dataset.mono
+                
+                
+                
+                
+                data
+                ['apertvert', 'focuspg', 'preanacoll', 'efflip', 'tdc10', 'monitor', 
+                 'smplutilt', 'aperthori', 'smplltilt', 'eiguide', 'smplelev', 'focuscu', 'smplutrn', 'timestamp',
+                 'analyzerblade12', 'filtilt', 'filtran', 'eiflip', 'qy', 'h', 'qz', 'l', 'qx', 'analyzerblade03', 'diffdet', 
+                 'filrot', 'efcancel', 'monoblade10', 'rc', 'temperatureheaterpower', 'ddc1', 'ddc0', 'ddc2', 'sdc0', 'sdc1', 
+                 'sdc2', 'monoblade02', 'monoblade03', 'monoblade01', 'monoblade06', 'monoblade07', 'monoblade04', 'monoblade05', 'monoblade08', 
+                 'monoblade09', 'monitor2', 'analyzerblade01', 'hsample', 'k', 'bksltwdth', 'hkl', 'temperaturesetpoint', 'monotrans', 'premonocoll', 
+                 'bkslthght', 'dfm', 'psdet', 'tdc06', 'tdc07', 'tdc04', 'tdc05', 'tdc02', 'tdc03', 'tdc00', 'tdc01', 'tdc08', 'tdc09', 'smplltrn',
+                 'smplgfrot', 'temp', 'efguide', 'flip', 'analyzerblade09', 'analyzerblade08', 'dfmrot', 'analyzerblade02', 'singledet', 
+                 'analyzerblade07', 'analyzerblade06', 'analyzerblade05', 'analyzerblade04', 'monoelev', 'eicancel', 
+                 'temperaturesensor2', 'temperaturesensor3', 'temperaturesensor1', 'analyzerblade10', 'analyzerblade11', 'detector', 
+                 'analyzerblade13', 'temperaturecontrolreading', 'vsample', 'a1', 'postanacoll', 'a3', 'a2', 'a5', 'a4', 'a6', 
+                 'analyzerrotation', 'e', 'time', 'sc', 'postmonocoll']
+
+
+                metadata
+                ['comment', 'analyzerdetectordevicesofinterest', 'orientation', 'scan', 'ef', 'analyzerpsdgroup', 
+                 'analyzerddgroup', 'exptparticipants', 'filename', 'exptcomment', 'ncolumns', 'lattice', 'exptdetails', 
+                 'fixed_devices', 'scan_description', 'ice', 'efixed', 'instrument', 'epoch', 'columns', 'temperature_units', 
+                 'filebase', 'count_type', 'monohorizfocus', 'analyzerdoordetectorgroup', 'analyzersdgroup', 'detectordims', 
+                 'ranges', 'user', 'exptname', 'varying', 'analyzerfocusmode', 'monovertifocus', 'detectorefficiencies', 
+                 'analyzerdetectormode', 'signal', 'analyzer_dspacing', 'monochromator_dspacing', 'experiment_id', 'npoints', 'fileseq_number']
 
 
 
-a1=Motor('a1',values=None,err=None,units='degrees',isdistinct=True)
-a2=Motor('a2',values=None,err=None,units='degrees',isdistinct=True)
-a3=Motor('a3',values=None,err=None,units='degrees',isdistinct=True)
-a4=Motor('a4',values=None,err=None,units='degrees',isdistinct=True)
-a5=Motor('a5',values=None,err=None,units='degrees',isdistinct=True)
-a6=Motor('a6',values=None,err=None,units='degrees',isdistinct=True)
-sample_elevator=Motor('sample_elevation',values=None,err=None,units='degrees',isdistinct=False)
-sample_elevator=Motor('a6',values=None,err=None,units='degrees',isdistinct=False)
-dfm_rotation=Motor('dfm_rotation',values=None,err=None,units='degrees',isdistinct=True)
-analyzer_rotation=Motor('analyzer_rotation',values=None,err=None,units='degrees',isdistinct=True)
-aperture_horizontal=Motor('aperture_horizontal',values=None,err=None,units='degrees',isdistinct=True)
-aperture_vertical=Motor('aperture_vertical',values=None,err=None,units='degrees',isdistinct=True)
 
 def data_abstraction_layer(self):
         self.metadata={}
@@ -652,6 +699,13 @@ def data_abstraction_layer(self):
 
 
 
-
+if __name__=="__main__":
+        myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
+        mydatareader=readice.datareader()
+        mydata=mydatareader.readbuffer(myfilestr)
+        print mydata.metadata.varying
+        bt7=TripleAxis()
+        bt7.translate(mydata)
+        
 
 
