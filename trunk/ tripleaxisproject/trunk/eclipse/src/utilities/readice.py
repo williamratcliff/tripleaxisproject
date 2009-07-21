@@ -324,7 +324,12 @@ class datareader(object):
                                 myFlag=False
                 return
 
-
+        def numpyize(self):
+                for field in self.data.__dict__.keys():
+                        if type(self.data[field][0])==type(float):
+                                self.data[field]=N.array(self.data[field],'Float64')
+                        else:
+                                self.data[field]=N.array(self.data[field])
 
         def readbuffer(self,myfilestr,lines=N.Inf):
                 self.myfilestr=myfilestr
@@ -340,7 +345,7 @@ class datareader(object):
                                 self.header=[]
                         mydata=DataSet(self.data,self.metadata,self.header)
                         #repair ice files with missing file names
-                        if mydata.metadata.filename==None:
+                        if hasattr(self.metadata,'filename')==False:
                                 filename=os.path.split(myfilestr)[-1]
                                 self.metadata['file_info']['filename']=filename
                                 #print 'filename ', tokenized[1]
@@ -350,6 +355,8 @@ class datareader(object):
                                 #print 'filebase ',match.group('base')
                                 self.metadata.filebase=match.group('base')
                                 self.metadata.fileseq_number=match.group('seq')
+                        self.numpyize()
+                        mydata=DataSet(self.data,self.metadata,self.header)
 
                 return mydata
 
