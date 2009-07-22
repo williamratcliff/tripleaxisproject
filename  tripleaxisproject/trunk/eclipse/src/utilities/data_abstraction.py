@@ -1,6 +1,7 @@
 import numpy as N
 import uncertainty
 import readice
+import copy
 eps=1e-8
 
 """
@@ -636,7 +637,7 @@ class TripleAxis(object):
         def translate_analyzer(self,dataset):
                 self.analyzer.dspacing=dataset.metadata.analyzer_dspacing
                 self.analyzer.focus_mode=dataset.metadata.analyzerfocusmode
-                analyzer_blades=Blades(title='analyzer',nblades=10)
+                analyzer_blades=Blades(title='analyzer',nblades=13)
                 analyzer_blades[0]=dataset.data.analyzerblade01
                 analyzer_blades[1]=dataset.data.analyzerblade02
                 analyzer_blades[2]=dataset.data.analyzerblade03
@@ -729,9 +730,7 @@ class TripleAxis(object):
                 self.slits.back_slit_width =dataset.data.bksltwdth
                 self.slits.back_slit_height =dataset.data.bkslthght
                 
-        def translate_detectors(self,dataset):
-                self.detectors.primary_detector=dataset.data.detector
-                self.detectors.detector_mode=dataset.metadata.analyzerdetectormode
+        
                 
                 
         def translate_sample(self,dataset):
@@ -767,32 +766,59 @@ class TripleAxis(object):
                 self.meta_data.scan_description=dataset.metadata.scan_description
                 self.meta_data.desired_npoints=dataset.metadata.npoints
                 
+        def translate_detectors(self,dataset):
+                self.detectors.primary_detector=dataset.data.detector
+                self.detectors.detector_mode=dataset.metadata.analyzerdetectormode
+                #later, I should do something clever to determine how many detectors are in the file,
+                #or better yet, lobby to have the information in the ice file
+                #but for now, let's just get something that works
                 
- 
+                
+                        
+                if hasattr(dataset.metadata,'analyzersdgroup'):
+                        self.set_detector(dataset,'single_detector','analyzersdgroup')
+                        self.detectors.single_detector.summed_counts=dataset.data.singledet
+                        
+                if hasattr(dataset.metadata,'analyzerdoordetectorgroup'):
+                        self.set_detector(dataset,'door_detector','analyzerdoordetectorgroup')
+                        self.detectors.single_detector.summed_counts=dataset.data.singledet
+                        
+                if hasattr(dataset.metadata,'analyzerddgroup'):
+                        self.set_detector(dataset,'diffraction_detector','analyzerddgroup')
+                        self.detectors.single_detector.summed_counts=dataset.data.diffdet
+                        
+                if hasattr(dataset.metadata,'analyzerpsdgroup'):
+                        self.set_detector(dataset,'position_sensitive_detector','analyzerpsdgroup')
+                        self.detectors.single_detector.summed_counts=dataset.data.psdet
+                        
+                
+                        
+                        
+                def set_detector(self,dataset,detector_name,data_name):                        
+                        analyzergroup=getattr(data.metadata,data_name)
+                        setattr(self.detectors,detector_name,Detector(detector_name))
+                        setattr(self.detectors,detector_name,'dimension=',[len(dataset.metadata.analyzersdgroup),1])
+                        Nx=getattr(self.detectors,detector_name,dimension[0])
+                        Ny=getattr(self.detectors,detector_name,dimension[1])
+                        npts=len(getattr(dataset.data,dataset.metadata.analyzersdgroup[0]))
+                        data=N.empty((npts,Nx,Ny),'Float64')
+                        #put all the data in data array which is npts x Nx x Ny, in this case, Ny=1 since our detectors are 1D
+                        for nx in range(Nx):
+                                curr_detector=getattr(dataset.metadata,data_name)[nx]
+                                data[:,nx,1]=getattr(dataset.data,curr_detector)
+                                
+                        setattr(getattr(self.detectors,detector_name),'x',N.copy.deepcopy(data))
+                        setattr(getattr(self.detectors,detector_name),'variance',N.copy.deepcopy(data))
                 
                
 
                 
                 
                 
-                ['tdc10',
-                 , 'diffdet', 
-                 , 'ddc1', 'ddc0', 'ddc2', 'sdc0', 'sdc1', 
-                 'sdc2', , '', 
-                 , 'psdet', 'tdc06', 'tdc07', 'tdc04', 'tdc05', 'tdc02', 
-                 'tdc03', 'tdc00', 'tdc01', 'tdc08', 'tdc09', '',
-                  'singledet',
-                 ]
+               
+                
+                
 
-                
-                
-                metadata
-                ['analyzerdetectordevicesofinterest',  
-                 'analyzerpsdgroup', 
-                 'analyzerddgroup', 
-                 'analyzerdoordetectorgroup', 
-                 'analyzersdgroup',  
-                 ]
 
  
 
