@@ -748,7 +748,7 @@ class TripleAxis(object):
                 self.meta_data.fixed_energy=dataset.metadata.ef
                 self.meta_data.experiment_comment=dataset.metadata.exptcomment
                 self.meta_data.comment=dataset.metadata.comment
-                self.meta_data.date=dataset.metadata.
+                #self.meta_data.date=dataset.metadata.
                 self.meta_data.experiment_id=dataset.metadata.experiment_id
                 self.meta_data.fixed_devices=dataset.metadata.fixed_devices
                 self.meta_data.scanned_variables=dataset.metadata.varying
