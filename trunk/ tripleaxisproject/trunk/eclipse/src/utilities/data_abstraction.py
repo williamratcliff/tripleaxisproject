@@ -55,7 +55,8 @@ class MetaData(object):
                 self.experiment_id=Meta_tag('experiment_id',experiment_id)
                 self.experiment_participants=Meta_tag('experiment_participants',self.experiment_participants)
                 self.date=Meta_tag('date',date)
-                
+                self.filebase=Meta_tag('filebase',filebase)
+                self.fileseq_number=Meta_tag('fileseq_number',filebase)
                 self.scan_type=Meta_tag('scan_type',scan_type) #EX MOTOR, VECTOR, etc.
                 self.scanned_variables=Meta_tag('scanned_variables',scanned_variables,isDistinct=True) #What the user wanted to scan
                 self.fixed_motor=Meta_tag('fixed_motors',fixed_motors) #which motors are fixed
@@ -71,7 +72,12 @@ class IceMetaData(MetaData):
                 self.ice_repository_info=Meta_tag('ice_repository_info',ice_reposititory_info)
                 self.experiment_details=Meta_tag('experiment_details',experimental_details)
                 self.experiment_comment=Meta_tag('experiment_comment',experiment_comment)
-                
+                self.desired_npoints=Meta_tag('npoints',npoints)
+                self.user=Meta_tag('user',user)
+                self.ranges=Meta_tag('ranges',ranges)
+                self.scan_description=Meta_tag('scan_description',scan_description)
+
+
 
 class Component(object):
         """This is the Component class.  A Component must have a name, for example, 'a1'
@@ -349,11 +355,17 @@ class Detector(Component):
         def correct_efficiencies(self,efficiencies):
                 """This function will correct the detector for efficiencies, in place"""
                 pass
-        def correct_offfsets(self, offsets):
+        def correct_offsets(self, offsets):
                 """This function will transform from a central a4, to the actual a4 """
                 pass
 
-
+class DetectorSet(object):
+        def __init__(self):
+                self.name=name
+        def __getitem__(self, key): return self.__dict__[key]
+        def __setitem__(self, key, item): self.__dict__[key] = item
+ 
+                
 
 
                           
@@ -367,19 +379,24 @@ class Monochromator(object):
         def __init__(self, name='Monochromator', 
                      vertical_focus=None,
                      horizontal_focus=None,
+                     monochromator_translation=None,
                      blades=None,
                      mosaic=None,
-                     aliases=None,
                      dspacing=None  #dspacing of the monochromator
                      ):
                 self.name=name
                 self.vertical_focus=vertical_focus
                 self.horizontal_focus=horizontal_focus
-                sellf.blades=blades #this is an array of the monochromator blades
+                self.blades=blades #this is an array of the monochromator blades
                 self.mosaic=mosaic
+                self.dspacing=dspacing
                 self.focus_cu=Motor('focus_cu',values=None,err=None,units='degrees',isDistinct=True,
                                     isInterpolatable=True)
                 self.focus_pg=Motor('focus_pg',values=None,err=None,units='degrees',isDistinct=True,
+                                    isInterpolatable=True)
+                self.translation=Motor('translation',values=None,err=None,units='degrees',isDistinct=False,
+                                    isInterpolatable=True)
+                self.elevation=Motor('elevation',values=None,err=None,units='degrees',isDistinct=False,
                                     isInterpolatable=True)
 
 class Filters(object):
@@ -407,6 +424,10 @@ class Time(object):
                 self.timestamp=Motor('timestamp',values=None,err=None,units='seconds',isDistinct=False,
                                                        isInterpolatable=True)
                 #We should decide if we ignore timestamps, for now let's do so....
+                self.monitor=Motor('monitor',values=None,err=None,units='neutrons',isDistinct=False,
+                                                       isInterpolatable=True)
+                self.monitor2=Motor('monitor2',values=None,err=None,units='neutrons',isDistinct=False,
+                                                       isInterpolatable=True)
 
 class Temperature(object):                
         def __init__(self):
@@ -437,6 +458,7 @@ class Analyzer(object):
                 self.mosaic=mosaic
                 self.detector_mode=detector_mode #DiffDet, SinglDetFlat,SinglDetHFoc,PSDDiff,PSDFlat,Undefined
                 self.focus_mode=focus_mode
+                self.dspacing=dspacing
                 
                 
 
@@ -518,6 +540,15 @@ class Collimators(object):
                 self.radial_collimator=Motor('radial_collimator',values=None,err=None,units='degrees',isDistinct=True, window=2.0)
                 self.soller_collimator=Motor('soller_collimator',values=None,err=None,units='degrees',isDistinct=False, window=2.0)
 
+                
+class Blades(object):
+        def __init__(self,title='',nblades=7):
+                self.blades=[]
+                for i in range(nblades):
+                        self.blades.append(Motor(title+'_blade_'+str(i),values=None,err=None,units='degrees',isDistinct=False))
+
+                
+                
 class PolarizedBeam(object):
         def __init__(self):
                 self.ei_flip=Motor('ei_flip',values=None,err=None,units='amps',isDistinct=False) #used to determine if the flipper is on
@@ -532,10 +563,20 @@ class PolarizedBeam(object):
                 self.flipper_state=Motor('flipper_state',values=None,err=None,units='',isDistinct=False) #short hand, can be A,B,C, etc.
 
 
+class Slits(object):
+        self.back_slit_height=Motor('back_slit_height',values=None,err=None,units='degrees',isDistinct=False
+                                           , isInterpolatable=True) 
+        self.back_slit_width=Motor('back_slit_width',values=None,err=None,units='degrees',isDistinct=False
+                                           , isInterpolatable=True) 
+                
+
 class DetectorSet(object):
         """This defines a group of detectors"""
         def __init__(self):
-                pass
+                self.primary_detector=Detector('primary_detector',dimension=None,values=None,err=None,units='counts', 
+                     aliases=None,friends=None, isInterpolatable=True)
+                self.detector_mode=None
+                        
         def __iter__(self):
                 for key,value in self.__dict__:
                         return value
@@ -551,6 +592,7 @@ class TripleAxis(object):
                 self.sample=Sample()
                 self.detectors=DetectorSet()
                 self.filters=Filters()
+                self.slits=Slits()
                 self.polarized_beam=PolarizedBeam()
                 self.collimators=Collimators()
                 self.primary_motors=Primary_Motors()
@@ -559,143 +601,202 @@ class TripleAxis(object):
                 self.sample_environment=SampleEnvironment()
                 self.meta_data=IceMetaData()
                 self.apertures=Apertures()
+                self.temperature=Temperature()
+                
+                self.analyzer_blades=Blades(title='analyzer',nblades=8)
+                
+                
+                
         def translate(self,dataset):
                 self.translate_monochromator(dataset)
         
         def translate_monochromator(self,dataset):
-                self.monochromator.focus_cu=dataset.mono
+                self.monochromator.focus_cu=dataset.focuscu
+                self.monochromator.focus_pg=dataset.focuspg
+                self.monochromator.horizontal_focus=dataset.metadata.monohorizfocus
+                self.monochromator.vertical_focus=dataset.metadata.monovertifocus
+                self.monochromator.translation=dataset.data.monotrans
+                self.monochromator.elevation=dataset.data.monoelev
+                self.monochromator.dspacing=dataset.metadata.monochromator_dspacing
+                monochromator_blades=Blades(title='monochromator',nblades=10)
+                monochromator_blades[0]=dataset.data.monoblade01
+                monochromator_blades[1]=dataset.data.monoblade02
+                monochromator_blades[2]=dataset.data.monoblade03
+                monochromator_blades[3]=dataset.data.monoblade04
+                monochromator_blades[4]=dataset.data.monoblade05
+                monochromator_blades[5]=dataset.data.monoblade06
+                monochromator_blades[6]=dataset.data.monoblade07
+                monochromator_blades[7]=dataset.data.monoblade08
+                monochromator_blades[8]=dataset.data.monoblade09
+                monochromator_blades[9]=dataset.data.monoblade10
+                self.monochromator.blades=monochromator_blades
+               
                 
                 
+        def translate_analyzer(self,dataset):
+                self.analyzer.dspacing=dataset.metadata.analyzer_dspacing
+                self.analyzer.focus_mode=dataset.metadata.analyzerfocusmode
+                analyzer_blades=Blades(title='analyzer',nblades=10)
+                analyzer_blades[0]=dataset.data.analyzerblade01
+                analyzer_blades[1]=dataset.data.analyzerblade02
+                analyzer_blades[2]=dataset.data.analyzerblade03
+                analyzer_blades[3]=dataset.data.analyzerblade04
+                analyzer_blades[4]=dataset.data.analyzerblade05
+                analyzer_blades[5]=dataset.data.analyzerblade06
+                analyzer_blades[6]=dataset.data.analyzerblade07
+                analyzer_blades[7]=dataset.data.analyzerblade08
+                analyzer_blades[8]=dataset.data.analyzerblade09
+                analyzer_blades[9]=dataset.data.analyzerblade10
+                analyzer_blades[10]=dataset.data.analyzerblade11
+                analyzer_blades[11]=dataset.data.analyzerblade12
+                analyzer_blades[12]=dataset.data.analyzerblade13
+                self.analyzer.blades=analyzer_blades
                 
-                
-                data
-                ['apertvert', 'focuspg', 'preanacoll', 'efflip', 'tdc10', 'monitor', 
-                 'smplutilt', 'aperthori', 'smplltilt', 'eiguide', 'smplelev', 'focuscu', 'smplutrn', 'timestamp',
-                 'analyzerblade12', 'filtilt', 'filtran', 'eiflip', 'qy', 'h', 'qz', 'l', 'qx', 'analyzerblade03', 'diffdet', 
-                 'filrot', 'efcancel', 'monoblade10', 'rc', 'temperatureheaterpower', 'ddc1', 'ddc0', 'ddc2', 'sdc0', 'sdc1', 
-                 'sdc2', 'monoblade02', 'monoblade03', 'monoblade01', 'monoblade06', 'monoblade07', 'monoblade04', 'monoblade05', 'monoblade08', 
-                 'monoblade09', 'monitor2', 'analyzerblade01', 'hsample', 'k', 'bksltwdth', 'hkl', 'temperaturesetpoint', 'monotrans', 'premonocoll', 
-                 'bkslthght', 'dfm', 'psdet', 'tdc06', 'tdc07', 'tdc04', 'tdc05', 'tdc02', 'tdc03', 'tdc00', 'tdc01', 'tdc08', 'tdc09', 'smplltrn',
-                 'smplgfrot', 'temp', 'efguide', 'flip', 'analyzerblade09', 'analyzerblade08', 'dfmrot', 'analyzerblade02', 'singledet', 
-                 'analyzerblade07', 'analyzerblade06', 'analyzerblade05', 'analyzerblade04', 'monoelev', 'eicancel', 
-                 'temperaturesensor2', 'temperaturesensor3', 'temperaturesensor1', 'analyzerblade10', 'analyzerblade11', 'detector', 
-                 'analyzerblade13', 'temperaturecontrolreading', 'vsample', 'a1', 'postanacoll', 'a3', 'a2', 'a5', 'a4', 'a6', 
-                 'analyzerrotation', 'e', 'time', 'sc', 'postmonocoll']
 
+              
+        def translate_collimator(self,dataset):
+                self.collimators.pre_analyzer_collimator=dataset.preanacoll
+                self.collimators.post_analyzer_collimator=datset.postanacoll
+                self.collimators.post_monochromator_collimator =dataset.postmonocoll
+                self.collimators.pre_monochromator_collimator=dataset.data.premonocoll
+                self.collimators.radial_collimator=dataset.data.rc
+                self.collimators.soller_collimator=dataset.data.sc
+                
+        def translate_apertures(self,dataset):
+                self.apertures.aperture_horizontal=dataset.aperthori
+                self.apertures.aperture_vertical=dataset.apertvert
+                
+        def translate_polarized_beam(self,dataset):
+                self.polarized_beam.ei_flip=dataset.eiflip
+                self.polarized_beam.ef_flip=dataset.efflip
+                self.polarized_beam.ei_guide=dataset.eiguide
+                self.polarized_beam.ef_cancel=dataset.efcancel
+                self.polarized_beam.sample_guide_field_rotatation=dataset.smplgfrot
+                self.polarized_beam.flipper_state=dataset.flip
+                self.polarized_beam.hsample=dataset.hsample
+                self.polarized_beam.vsample=dataset.vsample
+                self.polarized_beam.ef_guide=dataset.efguide
+                self.polarized_beam.ei_cancel=dataset.data.eicancel
+         
+        def translate_primary_motors(self,dataset):
+                self.primary_motors.sample_upper_tilt=dataset.smplutilt
+                self.primary_motors.sample_lower_tilt=dataset.smplltilt
+                self.primary_motors.sample_elevator=dataset.smplelev
+                self.primary_motors.sample_upper_translation=dataset.smplutrn
+                self.primary_motors.sample_lower_translation=dataset.smplltrn
+                self.primary_motors.a1=dataset.a1
+                self.primary_motors.a2=dataset.a2
+                self.primary_motors.a3=dataset.a3
+                self.primary_motors.a4=dataset.a4
+                self.primary_motors.a5=dataset.a5
+                self.primary_motors.a6=dataset.a6
+                self.primary_motors.dfm=dataset.dfm
+                self.primary_motors.analyzer_rotation=dataset.analyzerrotation
+                self.primary_motors.dfm_rotation=dataset.dfmrot
+                
+                
+        def translate_physical_motors(self,dataset):
+                self.physical_motors.h=dataset.h
+                self.physical_motors.k=dataset.k
+                self.physical_motors.l=dataset.l
+                self.physical_motors.hkl=dataset.hkl
+                self.physical_motors.qx=dataset.qx
+                self.physical_motors.qy=dataset.qy
+                self.physical_motors.qz=dataset.qz
+                self.physical_motors.e=dataset.e
+                
+        def translate_filters(self,dataset):
+                self.filters.filter_tilt=dataset.filtilt
+                self.filters.filter_translation=dataset.filtran
+                self.filters.filter_rotation=dataset.filrot
 
+        def translate_timestamp(self,dataset):
+                self.time.timestamp=dataset.timestamp
+                self.time.duration=dataset.data.time
+                
+
+        def translate_temperature(self,dataset):
+                self.temperature.temperature=dataset.temp
+                self.temperature.temperature.units=dataset.metadata.temperature_units
+                self.temperature.temperaturesensor1=dataset.temperaturesensor1
+                self.temperature.temperaturesensor2=dataset.temperaturesensor2
+                self.temperature.temperaturesensor3=dataset.temperaturesensor3
+                self.temperature.temperature_heater_power=dataset.temperatureheaterpower
+                self.temperature.temperature_control_reading =dataset.temperaturecontrolreading
+                self.temperature.temperature_setpoint =dataset.temperaturesetpoint
+        
+        def translate_slits(self,dataset):
+                self.slits.back_slit_width =dataset.data.bksltwdth
+                self.slits.back_slit_height =dataset.data.bkslthght
+                
+        def translate_detectors(self,dataset):
+                self.detectors.primary_detector=dataset.data.detector
+                self.detectors.detector_mode=dataset.metadata.analyzerdetectormode
+                
+                
+        def translate_sample(self,dataset):
+                self.sample.orientation =dataset.metadata.orientation
+                self.sample.mosaic=dataset.metadata.
+                self.sample.lattice=dataset.metadata.lattice
+                
+                
+                
+        def translate_metadata(self,dataset):
+                self.meta_data.epoch=dataset.metadata.epoch
+                self.meta_data.counting_standard=dataset.metadata.count_type
+                self.meta_data.filename=dataset.metadata.filename
+                self.meta_data.fixed_eief=dataset.metadata.efixed
+                self.meta_data.fixed_energy=dataset.metadata.ef
+                self.meta_data.experiment_comment=dataset.metadata.exptcomment
+                self.meta_data.comment=dataset.metadata.comment
+                self.meta_data.date=dataset.metadata.
+                self.meta_data.experiment_id=dataset.metadata.experiment_id
+                self.meta_data.fixed_devices=dataset.metadata.fixed_devices
+                self.meta_data.scanned_variables=dataset.metadata.varying
+                self.meta_data.ice_version=dataset.metadata.ice
+                self.meta_data.ice_repository_info=dataset.metadata.
+                self.meta_data.instrument_name=dataset.metadata.instrument
+                self.meta_data.filebase =dataset.metadata.filebase
+                self.meta_data.fileseq_number=dataset.metadata.fileseq_number
+                self.meta_data.experiment_name=dataset.metadata.exptname
+                self.meta_data.experiment_participants=dataset.metadata.exptparticipants
+                self.meta_data.experiment_details=dataset.metadata.exptdetails
+                self.meta_data.desired_detector=dataset.metadata.signal
+                self.meta_data.ranges=dataset.metadata.ranges
+                self.meta_data.user=dataset.metadata.user
+                self.meta_data.scan_description=dataset.metadata.scan_description
+                self.meta_data.desired_npoints=dataset.metadata.npoints
+                
+                
+ 
+                
+               
+
+                
+                
+                
+                ['tdc10',
+                 , 'diffdet', 
+                 , 'ddc1', 'ddc0', 'ddc2', 'sdc0', 'sdc1', 
+                 'sdc2', , '', 
+                 , 'psdet', 'tdc06', 'tdc07', 'tdc04', 'tdc05', 'tdc02', 
+                 'tdc03', 'tdc00', 'tdc01', 'tdc08', 'tdc09', '',
+                  'singledet',
+                 ]
+
+                
+                
                 metadata
-                ['comment', 'analyzerdetectordevicesofinterest', 'orientation', 'scan', 'ef', 'analyzerpsdgroup', 
-                 'analyzerddgroup', 'exptparticipants', 'filename', 'exptcomment', 'ncolumns', 'lattice', 'exptdetails', 
-                 'fixed_devices', 'scan_description', 'ice', 'efixed', 'instrument', 'epoch', 'columns', 'temperature_units', 
-                 'filebase', 'count_type', 'monohorizfocus', 'analyzerdoordetectorgroup', 'analyzersdgroup', 'detectordims', 
-                 'ranges', 'user', 'exptname', 'varying', 'analyzerfocusmode', 'monovertifocus', 'detectorefficiencies', 
-                 'analyzerdetectormode', 'signal', 'analyzer_dspacing', 'monochromator_dspacing', 'experiment_id', 'npoints', 'fileseq_number']
+                ['analyzerdetectordevicesofinterest',  
+                 'analyzerpsdgroup', 
+                 'analyzerddgroup', 
+                 'analyzerdoordetectorgroup', 
+                 'analyzersdgroup',  
+                 ]
+
+ 
 
 
-
-
-def data_abstraction_layer(self):
-        self.metadata={}
-        self.additional_metadata={}
-        self.metadata['count_info']={}
-        self.metadata['count_info']['monitor_base']=None #float(tokenized[6])
-        self.metadata['count_info']['monitor_prefactor']=None#float(tokenized[7])
-        self.metadata['count_info']['monitor']=None#self.metadata['count_info']['monitor_base']*self.metadata['count_info']['monitor_prefactor']
-        self.metadata['count_info']['count_type']=None  #can be 'monitor', 'time' #tokenized[8].strip("'").lower()
-        self.metadata['count_info']['signal']=None  #for example, 'detector'
-        self.metadata['count_info']['varying']=None
-        self.metadata['count_info']['ranges']=None
-        self.metadata['count_info']['analyzerdetectormode']=None
-        self.metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]=None
-        self.metadata['count_info']['AnalyzerDDGroup'.lower()]=None
-        self.metadata['count_info']['AnalyzerPSDGroup'.lower()]=None
-        self.metadata['count_info']['AnalyzerSDGroup'.lower()]=None
-        self.metadata['count_info']['AnalyzerDoorDetectorGroup'.lower()]=None
-        self.metadata['count_info']['analyzerfocusmode']=None
-        self.metadata['count_info']['monovertifocus']=None
-        self.metadata['count_info']['monohorizfocus']=None
-
-
-        self.metadata['file_info']={}
-        self.metadata['file_info']['filename']=None#tokenized[0].strip("'")
-        self.metadata['file_info']['filebase']=None#self.metadata['file_info']['filename'][0:5]
-        self.metadata['file_info']['fileseq_number']=None
-        self.metadata['file_info']['scantype']=None#tokenized[5].strip("'").lower()
-        self.metadata['file_info']['instrument']=None#self.metadata['file_info']['filename'].split('.')[1].lower()
-        self.metadata['file_info']['comment']=None #myfile.readline().rstrip()
-        self.metadata['file_info']['scan_description']=None
-        self.metadata['file_info']['experiment_id']=None
-        self.metadata['file_info']['fixed_devices']=None
-
-        self.metadata['timestamp']={}
-        self.metadata['timestamp']['month']=None#int, for icp data it is translated using the months dict
-        self.metadata['timestamp']['day']=None#int
-        self.metadata['timestamp']['year']=None#int
-        self.metadata['timestamp']['time']=None#str
-        self.metadata['timestamp']['epoch']=None#float
-
-        self.metadata['collimations']={}
-        self.metadata['collimations']['coll1']=None#float(tokenized[0])
-        self.metadata['collimations']['coll2']=None#float(tokenized[1])
-        self.metadata['collimations']['coll3']=None#float(tokenized[2])
-        self.metadata['collimations']['coll4']=None#float(tokenized[3])
-
-        self.metadata['mosaic']={}
-        self.metadata['mosaic']['mosaic_monochromator']=None#float(tokenized[4])
-        self.metadata['mosaic']['mosaic_sample']=None#float(tokenized[5])
-        self.metadata['mosaic']['mosaic_analyzer']=None#float(tokenized[6])
-
-        self.metadata['dspacing']={}
-        self.metadata['dspacing']['monochromator_dspacing']=None#float(tokenized[3])
-        self.metadata['dspacing']['analyzer_dspacing']=None#float(tokenized[4])
-
-
-        self.metadata['energy_info']={}
-        self.metadata['energy_info']['wavelength']=None#float(tokenized[7])
-        self.metadata['energy_info']['ef']=None#float(tokenized[2])
-        self.metadata['energy_info']['efixed']=None#Should be 'ei,ef'#tokenized[4]
-
-
-        self.metadata['orient1']={}
-        self.metadata['orient1']['h']=None#float(tokenized[7])
-        self.metadata['orient1']['k']=None#float(tokenized[8])
-        self.metadata['orient1']['l']=None#float(tokenized[9])
-        #ignore "angle" field
-        self.metadata['orient2']={}
-        self.metadata['orient2']['h']=None#float(tokenized[11])
-        self.metadata['orient2']['k']=None#float(tokenized[12])
-        self.metadata['orient2']['l']=None#float(tokenized[13])
-
-        self.metadata['lattice']={}
-        self.metadata['lattice']['a']=None#float(tokenized[0])
-        self.metadata['lattice']['b']=None#float(tokenized[1])
-        self.metadata['lattice']['c']=None#float(tokenized[2])
-        self.metadata['lattice']['alpha']=None#float(tokenized[3])
-        self.metadata['lattice']['beta']=None#float(tokenized[4])
-        self.metadata['lattice']['gamma']=None#float(tokenized[5])
-
-        self.metadata['q_center']={}
-        self.metadata['q_center']['e_center']=None#float(tokenized[0])
-        self.metadata['q_center']['h_center']=None#(tokenized[0])
-        self.metadata['q_center']['k_center']=None#(tokenized[1])
-        self.metadata['q_center']['l_center']=None#(tokenized[2])
-
-
-        self.metadata['q_step']={}
-        self.metadata['q_step']['delta_h']=None#float(tokenized[3])
-        self.metadata['q_step']['delta_k']=None#float(tokenized[4])
-        self.metadata['q_step']['delta_l']=None#float(tokenized[5])
-        self.metadata['q_step']['delta_e']=None#float(tokenized[1])
-
-
-        self.metadata['temperature_info']={}
-        self.metadata['temperature_info']['Tstart']=None#float(tokenized[5])
-        self.metadata['temperature_info']['Tstep']=None#float(tokenized[6])
-        self.metadata['temperature_info']['units']=None#float(tokenized[6])
-
-        self.metadata['magnetic_field']={}
-        self.metadata['magnetic_field']['hfield']=None#float(tokenized[10])
-        return
 
 
 
