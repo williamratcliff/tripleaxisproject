@@ -11,7 +11,7 @@ pi=N.pi
 from numpy.random import randn
 
 
-def findpeak(x,y,npeaks):
+def findpeak(x,y,npeaks,order=4,kernel=11):
     """This is a program that finds the positions and FWHMs in a set of
     data specified by x and y.  The user supplies the number of peaks and
     the program returns an array p, where the first entries are the positions of
@@ -38,8 +38,8 @@ def findpeak(x,y,npeaks):
 #end
     step=abs(x[0]-x[1]) #assume that x is monotonic and uniform step sizes
     #print 'step',step
-    yd=savitzky_golay(y,kernel=11,order=4,deriv=1)/step
-    yd2=savitzky_golay(y,kernel=11,order=4,deriv=2)/step**2
+    yd=savitzky_golay(y,kernel=kernel,order=order,deriv=1)/step
+    yd2=savitzky_golay(y,kernel=kernel,order=order,deriv=2)/step**2
     n_crossings=0;
     ny = len(yd);
     #print 'y',y
@@ -205,7 +205,32 @@ def findwidths(x,y,npeaks,xpeaks,indices):
 
 
 
+def calc_DW(y,kernel=11,order=4):
+    """Calculated the DW statistic for y, y must have more than 1 point"""
+    ysmd=savitzky_golay(y,kernel=kernel,order=order,deriv=0)
+    n=len(y)
+    DW=0
+    for i in range(1,n):
+        DW=((y[i]-ysmd[i])-(y[i-1]-ysmd[i-1]))**2+DW
+    DW=DW*n/(n-1)    
+    DW=DW/((y-ysmd)**2).sum()
+    return DW
 
+def optimize_DW(y,order=4):
+    DW=[]
+    #need to check that there are at least order+2 points and check range is valid
+    if order%2==0:
+        minkern=1
+    else:
+        minkern=0
+    kernel_range=range(order+2+minkern,len(y)/11,2)
+    print kernel_range
+    for kernel in kernel_range:
+        print 'kernel',kernel
+        DW.append(calc_DW(y,kernel=kernel,order=order))
+        
+    return kernel_range,DW
+        
 
 
 
@@ -238,21 +263,24 @@ if __name__=="__main__":
     #fig=pylab.Figure()
     #canvas = FigureCanvas(fig)
     #axes = fig.add_subplot(111)
+    
+    #kern,DW=optimize_DW(y)
+    #pylab.plot(kern,DW,'s')
+    #pylab.show()
+    
+    
     if 1:
         pylab.plot(x,y,'s')
         #pylab.axvline(x=0)
         #pylab.show()
         #sys.exit()
-    results=findpeak(x,y,3)
+    results=findpeak(x,y,3,kernel=31)
     print 'res',results['xpeaks']
     npeaks=3
-
-    for i in range(npeaks):
-        pylab.axvline(x=results['xpeaks'][i])
-    #pylab.show()
     fwhm=findwidths(x,y,npeaks,results['xpeaks'],results['indices'])
     print fwhm
     for i in range(npeaks):
+        pylab.axvline(x=results['xpeaks'][i])
         xcen=results['xpeaks'][i]
         half_height=y[results['indices'][i]]/2
         pylab.plot([(xcen-fwhm[i]/2),(xcen+fwhm[i]/2)],[half_height,half_height])
