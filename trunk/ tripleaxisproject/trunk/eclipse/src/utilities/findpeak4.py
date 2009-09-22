@@ -216,14 +216,21 @@ def calc_DW(y,kernel=11,order=4):
     DW=DW/((y-ysmd)**2).sum()
     return DW
 
+def make_odd(x):
+    if x%2==0:
+        return x-1
+    else:
+        return x
+
 def optimize_DW(y,order=4):
     DW=[]
     #need to check that there are at least order+2 points and check range is valid
-    if order%2==0:
-        minkern=1
+    if len(y)%2==0:
+        minkerny=1
     else:
-        minkern=0
-    kernel_range=range(order+2+minkern,len(y)/11,2)
+        minkerny=0
+    odd_len=make_odd(len(y))    
+    kernel_range=range(order+2,min(len(y)/11,odd_len),2)
     print kernel_range
     for kernel in kernel_range:
         print 'kernel',kernel
