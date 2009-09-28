@@ -152,8 +152,8 @@ class Qtree(object):
         k=mydata.metadata['orient2']['k']
         l=mydata.metadata['orient2']['l']
         orient2=N.array([[h,k,l],[h,k,l]],dtype='float64')
-        mylattice=rescalc.lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
-                                                     orient1=orient1,orient2=orient2)
+        orientation=rescalc.lattice_calculator.Orientation(orient1,orient2)
+        mylattice=rescalc.lattice_calculator.Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orientation=orientation)
         h=q['h_center'] #perhaps just take this from the file in the future
         k=q['k_center']
         l=q['l_center']
@@ -185,9 +185,9 @@ class Qtree(object):
         myrescal=rescalc.rescalculator(mylattice)
         newinput=rescalc.lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
                                                       H=H,K=K,L=L,W=W,setup=setup)
-        mylattice=rescalc.lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
-                                                     beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
-                                                     orient2=newinput['orient2'])
+        neworientation=rescalc.lattice_calculator.Orientation(newinput['orient1'],newinput['orient2'])
+        mylattice=rescalc.lattice_calculator.Lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],
+                                                     beta=newinput['beta'],gamma=newinput['gamma'],orientation=neworientation)
         myrescal.__init__(mylattice)
         Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
         #print 'Q', Q
