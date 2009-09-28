@@ -213,8 +213,9 @@ def calc_DW(y,kernel=11,order=4):
     ysmd=savitzky_golay(y,kernel=kernel,order=order,deriv=0)
     n=len(y)
     DW=0
-    for i in range(1,n):
-        DW=((y[i]-ysmd[i])-(y[i-1]-ysmd[i-1]))**2+DW
+    #for i in range(1,n):
+    #    DW=((y[i]-ysmd[i])-(y[i-1]-ysmd[i-1]))**2+DW
+    DW=((N.diff(y)-N.diff(ysmd))**2).sum()
     DW=DW*n/(n-1)    
     DW=DW/((y-ysmd)**2).sum()
     return DW
@@ -228,12 +229,12 @@ def make_odd(x):
 def optimize_DW(y,order=4):
     DW=[]
     #need to check that there are at least order+2 points and check range is valid
-    if len(y)%2==0:
-        minkerny=1
+    if order%2==0:
+        minkern=1
     else:
-        minkerny=0
+        minkern=0
     odd_len=make_odd(len(y))    
-    kernel_range=range(order+2,min(len(y)/11,odd_len),2)
+    kernel_range=range(order+2+minkern,min(len(y)/11,odd_len),2)
     print kernel_range
     for kernel in kernel_range:
         print 'kernel',kernel
@@ -313,10 +314,18 @@ if __name__=="__main__":
     #canvas = FigureCanvas(fig)
     #axes = fig.add_subplot(111)
     
-    if 0:
+    if 1:
         kern,DW=optimize_DW(y) #choose the right window size
-        pylab.plot(kern,DW,'s')
+        DW=N.array(DW)
+        pylab.plot(kern,N.abs(DW-2),'s')
+        DW_min=min(N.abs(DW-2))
+        ind=N.where(N.abs(DW-2)==DW_min)[0]
+        print 'ind',ind
+        print 'DW_min',DW[ind]
+        kernel=kern[ind]
+        print 'kernel',kernel
         pylab.show()
+        sys.exit()
     
     
     
