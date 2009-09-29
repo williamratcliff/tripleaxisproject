@@ -134,9 +134,9 @@ class Qtree(object):
         mya=mydata.metadata['lattice']['a']
         myb=mydata.metadata['lattice']['b']
         myc=mydata.metadata['lattice']['c']
-        myalpha=mydata.metadata['lattice']['alpha']
-        mybeta=mydata.metadata['lattice']['beta']
-        mygamma=mydata.metadata['lattice']['gamma']
+        myalpha=N.radians(mydata.metadata['lattice']['alpha'])
+        mybeta=N.radians(mydata.metadata['lattice']['beta'])
+        mygamma=N.radians(mydata.metadata['lattice']['gamma'])
         a=N.array([mya,mya],dtype='float64') #for now, the code is broken if only one element in the array for indexing
         b=N.array([myb,myb],dtype='float64')
         c=N.array([myc,myc],dtype='float64')
