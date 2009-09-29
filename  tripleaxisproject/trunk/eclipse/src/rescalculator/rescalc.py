@@ -199,7 +199,7 @@ class rescalculator:
                method=0;
                if 'method' in EXP[ind]:
                     method=EXP[ind]['method']
-               myinstrument=lattice_calculator.instrument()
+               myinstrument=lattice_calculator.Instrument()
                taum=myinstrument.get_tau(mono['tau'])
                taua=myinstrument.get_tau(ana['tau'])
 
@@ -1106,8 +1106,8 @@ class rescalculator:
           #========================================================================================================
           #find reciprocal-space directions of X and Y axes
 
-          o1=self.lattice_calculator.orient1 #EXP['orient1']
-          o2=self.lattice_calculator.orient2 #EXP['orient2']
+          o1=self.lattice_calculator.orientation.orient1.T #EXP['orient1']
+          o2=self.lattice_calculator.orientation.orient2.T #EXP['orient2']
 #        print 'o2shape ',o2.shape
 #        print 'yshape ',self.lattice_calculator.y.shape
           pr=self.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
@@ -1345,14 +1345,15 @@ if __name__=="__main__":
           a=N.array([6., 6.],'d')
           b=N.array([7., 7.],'d')
           c=N.array([8.,8],'d')
-          alpha=N.array([90,90],'d')
-          beta=N.array([90,90],'d')
-          gamma=N.array([90,90],'d')
+          alpha=N.array([pi/2,pi/2],'d')
+          beta=N.array([pi/2,pi/2],'d')
+          gamma=N.array([pi/2,pi/2],'d')
      #       orient1=N.array([[0,1,1]],'d')
           orient1=N.array([[1,0,0],[1,0,0]],'d')
           orient2=N.array([[0,0,1],[0,0,1]],'d')
-          mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
-                                               orient1=orient1,orient2=orient2)
+          orientation=lattice_calculator.Orientation(orient1,orient2)
+          mylattice=lattice_calculator.Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                                               orientation=orientation)
           H=N.array([1.5,1.5],'d');K=N.array([0,0.0],'d');L=N.array([5.0,5.0],'d');W=N.array([0,0],'d')
           EXP={}
           EXP['ana']={}
@@ -1373,9 +1374,9 @@ if __name__=="__main__":
           myrescal=rescalculator(mylattice)
           newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
                                                 H=H,K=K,L=L,W=W,setup=setup)
-          mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
-                                               beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
-                                               orient2=newinput['orient2'])
+          neworientation=lattice_calculator.Orientation(newinput['orient1'],newinput['orient2'])
+          mylattice=lattice_calculator.Lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+                                               beta=newinput['beta'],gamma=newinput['gamma'],orientation=neworientation)
           myrescal.__init__(mylattice)
           Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
           print 'Q', Q
