@@ -189,6 +189,7 @@ class Lattice(object):
           self.npts=N.size(self.a)
           self._orient1=newinput['orient1']
           self._orient2=newinput['orient2']
+          self._orientation=Orientation(newinput['orient1'],newinput['orient2'])
           #self._orientation.orient1=newinput['orient1']
           #self._orientation.orient2=newinput['orient2']
           
