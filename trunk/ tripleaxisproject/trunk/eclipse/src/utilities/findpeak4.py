@@ -244,9 +244,11 @@ def optimize_DW(y,order=4):
         
 
 def calc_prob(npeaks,amax,covariance,chimin,rangex):
-    prob=scipy.factorial(npeaks)*(4*pi)**npeaks
-    prob=prob*N.sqrt(N.linalg.det(covariance/2))*N.exp(-chimin/2)/amax**npeaks/rangex**npeaks
+    prob=N.log(scipy.factorial(npeaks))+npeaks*N.log(4*pi)-npeaks*N.log(N.abs(amax)*N.abs(rangex))
+    prob=prob+0.5*N.log(N.linalg.det(covariance/2))-chimin/2
     return prob
+
+#def calc_prob(
 
 
 def fp_gaussian(x,area,center,fwhm):
@@ -284,7 +286,8 @@ def gen_function(p,x):
 def cost_func(p,x,y,err):
     ycalc=gen_function(p,x)
     dof=len(y)-len(p)
-    return (y-ycalc)/err/N.sqrt(dof)
+    fake_dof=len(y)
+    return (y-ycalc)/err#/N.sqrt(fake_dof)
 
 def myfunctlin(p, fjac=None, x=None, y=None, err=None):
     # Parameter values are passed in "p"
@@ -306,15 +309,21 @@ if __name__=="__main__":
     y=y+matlab_gaussian(x,p)
     p=[1000,1.2,.1]
     y=y+matlab_gaussian(x,p)
-    yerr=N.sqrt(y)+1
+    yerr=N.sqrt(y)+2
     y += randn(len(y)) * yerr
+    y=N.abs(y)
+    
+    if 0:
+        pylab.plot(x,y,'s')
+        pylab.show()
+        sys.exit()
     #yerr=N.sqrt(y)+1
     #fig=Figure()
     #fig=pylab.Figure()
     #canvas = FigureCanvas(fig)
     #axes = fig.add_subplot(111)
     
-    if 1:
+    if 0:
         kern,DW=optimize_DW(y) #choose the right window size
         DW=N.array(DW)
         pylab.plot(kern,N.abs(DW-2),'s')
@@ -330,11 +339,12 @@ if __name__=="__main__":
     
     
 
-    
-    npeaks=2   
+    kernel=31
+    npeaks=2 
     nlist=[]
     plist=[]
-    for npeaks in range(1,10): 
+    #if 1:
+    for npeaks in range(1,6): 
         print 'npeaks',npeaks
         results=findpeak(x,y,npeaks,kernel=31)
         fwhm=findwidths(x,y,npeaks,results['xpeaks'],results['indices'])
@@ -352,10 +362,11 @@ if __name__=="__main__":
         print 'p0',p0
         ycalc=gen_function(p0,x)
         if 1:
-            results= scipy.optimize.leastsq(cost_func, p0, args=(x,y,yerr),full_output=1)
-            p1=results[0]
-            covariance=results[1]
+            fresults= scipy.optimize.leastsq(cost_func, p0, args=(x,y,yerr),full_output=1)
+            p1=fresults[0]
+            covariance=fresults[1]
             print 'p1',p1
+            
             
     
         if 0:
@@ -373,20 +384,36 @@ if __name__=="__main__":
             covariance=m.covar
          
         if 1:
-            area=max(N.abs(p1[-3::]))
-            sigma=p1[-6:-3]/2.354
+            #area=max(N.abs(p1[-3::]))
+            #area=N.array((N.abs(p1[-3::])))
+            area=N.array(N.abs(p1[2+2*npeaks::]))
+            fwhm=N.array(N.abs(p1[2+npeaks:2+2*npeaks]))
+            sigma=fwhm/2.354
             amax=max(area/N.sqrt(2*pi*sigma**2))
-            
+            #amax=max(y)/N.sqrt(2*pi*sigma**2)
+            dof=len(y)-len(p1)
+            fake_dof=len(y)
             chimin=(cost_func(p1,x,y,yerr)**2).sum()
+            chimin=chimin#/fake_dof
+            
             rangex=max(x)-min(x)
-            prob=calc_prob(npeaks,amax,covariance,chimin,rangex)
-            print 'prob',prob
+            #prob=calc_prob(npeaks,amax,covariance,chimin,rangex)
+            #print 'det_covariance',N.linalg.det(covariance)
+            
+            prob=len(y)*N.log(chimin/len(y)) +len(p1)*N.log(len(y))
+            print 'prob',prob,'chimin',chimin,'amax',amax
             nlist.append(npeaks)
             plist.append(prob)
             #sys.exit()
-    
-    pylab.semilogy(nlist,plist,'s')    
-    pylab.show()
+            
+    print 'nmin', nlist[N.where(N.array(plist)==min(plist))[0]]
+    if 0:
+        pylab.semilogy(nlist,plist,'s')
+        
+    if 1:
+        pylab.plot(nlist,plist,'s') 
+    if 1:
+        pylab.show()
     if 0:
         pylab.plot(x,y,'s')
         pylab.axis([0,2,0,1.4e4])
