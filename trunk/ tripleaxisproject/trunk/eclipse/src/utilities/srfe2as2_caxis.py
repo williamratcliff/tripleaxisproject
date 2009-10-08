@@ -31,7 +31,7 @@ import matplotlib.transforms as transforms
 import matplotlib.artist as artist
 import matplotlib.patches as patches
 from matplotlib.path import Path
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator,MultipleLocator, FormatStrFormatter
 
 class Ring(patches.Patch):
     """
@@ -643,7 +643,7 @@ if __name__=='__main__':
         
         #mycbar.set_clim(vmin=160, vmax=500)
         #pylab.text(.1,.8,'(a)',fontsize=20,transform=ax.transAxes)
-        pylab.xlim((43.5,46.5))
+        pylab.xlim((43.55,46.5))
         pylab.ylim((195,250))
         #pylab.show()
         #sys.exit()
@@ -660,7 +660,7 @@ if __name__=='__main__':
         pylab.text(.6,.7,'T=250 K',fontsize=10,transform=ax2.transAxes)
         pylab.xlabel(r'$2\theta$',fontsize=10)
         pylab.ylabel('Intensity (arb. units)', fontsize=10)
-        pylab.xlim((43.5,46.5))
+        pylab.xlim((43.55,46.5))
         #print 'T',T[0],T[-1]
         pylab.show()
         
