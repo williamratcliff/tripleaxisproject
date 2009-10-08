@@ -623,10 +623,13 @@ if __name__=='__main__':
         levs = locator()
         levs=N.linspace(zmin,zmax,10)
         #levs=N.concatenate((levs,[3000]))
-        pylab.subplot(1,2,1)
+        ax=pylab.subplot(1,2,1)
         #mycontour=pylab.pcolor(N.array(tth).flatten(),N.array(T).flatten(),N.array(counts).flatten())
         #mycontour=pylab.contourf(x,y,z,levs)#,
         mycontour=pylab.pcolormesh(x,y,z)
+        pylab.xlabel(r'$2\theta$')
+        pylab.ylabel('T (K) ')
+        pylab.axhline(y=220,color='white',linewidth=3.2)
         #levs.set_bounds(zmin, zmax)
         #mycontour=pylab.contourf(x,y,z,35,extent=(17,19.6,y.min(),y.max()))#,cmap=pylab.cm.jet)
         #pylab.axis('equal')
@@ -636,32 +639,32 @@ if __name__=='__main__':
         #mycbar=pylab.colorbar()
         
         #mycbar.set_clim(vmin=160, vmax=500)
-        
-        #pylab.xlim((17,19.6))
-        #pylab.ylim((0,110))
-        pylab.show()
-        sys.exit()
+        pylab.text(.1,.9,'(a)',fontsize=20,transform=ax.transAxes)
+        pylab.xlim((43.5,46.5))
+        pylab.ylim((195,250))
+        #pylab.show()
+        #sys.exit()
     
 
-    if 0:
-        myfilebase='dordp0'
-        mydirectory=r'C:\CaFe4As\Bt9\CaFe4As3\May11_2009'
+    if 1:
+        mydirectory=r'C:\srfeas\Feb27_2009'
+        myfilebase='split0'
         myend='bt9'
         myfilebaseglob=myfilebase+'*.'+myend
         filerange1=range(1,5)
         filerange1.append(7)
         filerange1.append(8)
         filerange1.append(9)
-        filerange2=range(10,32)
+        filerange2=range(45,52)
         #mydirectory=r'C:\srfeas\SrFeAsNi\Ni0p08\2009-04-diffraction'
         #file_range=(35,51)
         #myfilebase='SrFeA0'
         flist=[]
         
-        for i in filerange1:
-            currfile=os.path.join(mydirectory,myfilebase+str(0)+str(i)+r"."+myend)
-            print 'currfile',currfile
-            flist.append(currfile)
+        #for i in filerange1:
+        #    currfile=os.path.join(mydirectory,myfilebase+str(0)+str(i)+r"."+myend)
+        #    print 'currfile',currfile
+        #    flist.append(currfile)
         for i in filerange2:
             currfile=os.path.join(mydirectory,myfilebase+str(i)+r"."+myend)
             print 'currfile',currfile
@@ -691,7 +694,10 @@ if __name__=='__main__':
         #levs=N.concatenate((levs,[3000]))
         ax2=pylab.subplot(1,2,2)
         #print 'hi'
-        mycontour=pylab.contourf(x,y,z,levs)#,
+        #mycontour=pylab.contourf(x,y,z,levs)#,
+        mycontour=ax2.pcolormesh(x,y,z)
+        pylab.xlabel(r'$2\theta$')
+        #pylab.ylabel('T (K) ')
         #levs.set_bounds(zmin, zmax)
         #mycontour=pylab.contourf(x,y,z,35,extent=(17,19.6,y.min(),y.max()))#,cmap=pylab.cm.jet)
         #pylab.axis('equal')
@@ -701,8 +707,9 @@ if __name__=='__main__':
         mycbar=pylab.colorbar()
         
         #mycbar.set_clim(vmin=160, vmax=500)
-        pylab.xlim((17,19.6))
-        pylab.ylim((0,110))
+        ax2.text(.1,.9,'(b)',fontsize=20,transform=ax2.transAxes)
+        pylab.xlim((43.5,46.5))
+        pylab.ylim((195,250))
         ax2.yaxis.set_major_formatter(pylab.NullFormatter())
         ax2.yaxis.set_major_locator(pylab.NullLocator())
         pylab.show()
