@@ -18,6 +18,8 @@ from openopt import NLP
 import scipy.optimize
 import scipy.odr
 import scipy.sandbox.delaunay as D
+from mpl_toolkits.axes_grid.inset_locator import inset_axes
+
 
 
 
@@ -29,7 +31,7 @@ import matplotlib.transforms as transforms
 import matplotlib.artist as artist
 import matplotlib.patches as patches
 from matplotlib.path import Path
-
+from matplotlib.ticker import MaxNLocator
 
 class Ring(patches.Patch):
     """
@@ -623,13 +625,14 @@ if __name__=='__main__':
         levs = locator()
         levs=N.linspace(zmin,zmax,10)
         #levs=N.concatenate((levs,[3000]))
-        ax=pylab.subplot(1,2,1)
+        ax=pylab.subplot(1,1,1)
         #mycontour=pylab.pcolor(N.array(tth).flatten(),N.array(T).flatten(),N.array(counts).flatten())
         #mycontour=pylab.contourf(x,y,z,levs)#,
         mycontour=pylab.pcolormesh(x,y,z)
         pylab.xlabel(r'$2\theta$')
         pylab.ylabel('T (K) ')
         pylab.axhline(y=220,color='white',linewidth=3.2)
+        mycbar=pylab.colorbar()
         #levs.set_bounds(zmin, zmax)
         #mycontour=pylab.contourf(x,y,z,35,extent=(17,19.6,y.min(),y.max()))#,cmap=pylab.cm.jet)
         #pylab.axis('equal')
@@ -639,14 +642,31 @@ if __name__=='__main__':
         #mycbar=pylab.colorbar()
         
         #mycbar.set_clim(vmin=160, vmax=500)
-        pylab.text(.1,.9,'(a)',fontsize=20,transform=ax.transAxes)
+        #pylab.text(.1,.8,'(a)',fontsize=20,transform=ax.transAxes)
         pylab.xlim((43.5,46.5))
         pylab.ylim((195,250))
         #pylab.show()
         #sys.exit()
     
-
     if 1:
+        #ax2=pylab.subplot(2,1,2)
+        ax2 = inset_axes(ax,
+                        width="30%", # width = 30% of parent_bbox
+                        height="30%", # height : 1 inch
+                        loc=1)
+        ax2.errorbar(tth[0],counts[0],yerr=counts_err[0],fmt='s',color='red')
+        ax2.xaxis.set_major_locator(MaxNLocator(4))
+        #ax2.plot(tth[-1],counts[-1],'o',color='blue')
+        pylab.text(.6,.7,'T=250 K',fontsize=10,transform=ax2.transAxes)
+        pylab.xlabel(r'$2\theta$',fontsize=10)
+        pylab.ylabel('Intensity (arb. units)', fontsize=10)
+        pylab.xlim((43.5,46.5))
+        #print 'T',T[0],T[-1]
+        pylab.show()
+        
+        
+
+    if 0:
         mydirectory=r'C:\srfeas\Feb27_2009'
         myfilebase='split0'
         myend='bt9'
@@ -696,6 +716,7 @@ if __name__=='__main__':
         #print 'hi'
         #mycontour=pylab.contourf(x,y,z,levs)#,
         mycontour=ax2.pcolormesh(x,y,z)
+        pylab.axhline(y=220,color='white',linewidth=3.2)
         pylab.xlabel(r'$2\theta$')
         #pylab.ylabel('T (K) ')
         #levs.set_bounds(zmin, zmax)
