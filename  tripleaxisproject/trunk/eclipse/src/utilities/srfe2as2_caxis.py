@@ -17,6 +17,7 @@ from findpeak3 import findpeak
 from openopt import NLP
 import scipy.optimize
 import scipy.odr
+import scipy.sandbox.delaunay as D
 
 
 
@@ -154,6 +155,9 @@ def readfiles(flist,mon0=None):
         #b=mydata.metadata['lattice']['b']
         #c=mydata.metadata['lattice']['c']
         mon=mydata.metadata['count_info']['monitor']
+        wl=2.35916
+        #c=2*wl/N.sin(N.deg2rad(N.array(tth))/2)
+        #tth.append(2*wl/N.sin(N.deg2rad(N.array(mydata.data['a4'])/2)))
         tth.append(N.array(mydata.data['a4']))
         Counts.append(N.array(mydata.data['counts'])*mon0/mon)
         Counts_err.append(N.sqrt(N.array(mydata.data['counts']))*mon0/mon)
@@ -487,6 +491,80 @@ def myfunct_res(p, fjac=None, x=None, y=None, err=None):
 
 
 
+def prep_data2(xt,yt,zorigt,interpolate_on=True):
+#    Data=pylab.load(r'c:\resolution_stuff\1p4K.iexy')
+    #Data=pylab.load(filename)
+    #xt=Data[:,2]
+    #yt=Data[:,3]
+    #zorigt=Data[:,0]
+    xt=N.array(xt).flatten()
+    yt=N.array(yt).flatten()
+    zorigt=N.array(zorigt).flatten()
+    
+    x=xt[:,zorigt>0.0]
+    y=yt[:,zorigt>0.0]
+    z=zorigt[:,zorigt>0.0]
+#    zorig=ma.array(zorigt)
+    print 'reached'
+    threshold=0.0;
+#    print zorigt < threshold
+#    print N.isnan(zorigt)
+#    z = ma.masked_where(zorigt < threshold , zorigt)
+    print 'where masked ', z.shape
+#should be commented out--just for testing
+##    x = pylab.randn(Nu)/aspect
+##    y = pylab.randn(Nu)
+##    z = pylab.rand(Nu)
+##    print x.shape
+##    print y.shape
+    # Grid
+    print x.min()
+    print x.max()
+    print y.min()
+    print y.max()
+    print x.shape
+    xmesh_step=0.02
+    ymesh_step=0.5
+    xi,yi=N.mgrid[x.min():x.max():xmesh_step,y.min():y.max():ymesh_step]
+    #blah
+    # triangulate data
+    tri = D.Triangulation(N.copy(x),N.copy(y))
+    print 'before interpolator'
+    # interpolate data
+    interp = tri.nn_interpolator(z)
+    print 'interpolator reached'
+    zi = interp(xi,yi)
+    # or, all in one line
+    #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
+#    return x,y,z
+    if interpolate_on==False:
+        #print "off"
+        #print xi.shape
+        #print N.reshape(x,(15,31))
+        xi=N.reshape(x,(15,31))
+        yi=N.reshape(y,(15,31))
+        zi=N.reshape(z,(15,31))
+        #print zi2-zi
+        #blah
+        print "interpolation off"
+    return xi,yi,zi    
+
+def prep_data3(xt,yt,zt):
+#    Data=pylab.load(r'c:\resolution_stuff\1p4K.iexy')
+    #Data=pylab.load(filename)
+    #xt=Data[:,2]
+    #yt=Data[:,3]
+    #zorigt=Data[:,0]
+    xt=N.array(xt).flatten()
+    yt=N.array(yt).flatten()
+    zt=N.array(zt).flatten()
+    xi = N.linspace(xt.min(),xt.max(),2*len(xt)/45)
+    yi = N.linspace(yt.min(),yt.max(),2*len(yt)/45)
+    print 'gridding'
+    zi = griddata(xt,yt,zt,xi,yi)
+    print 'gridded'
+    return xi,yi,zi
+
 
 if __name__=='__main__':
     
@@ -494,13 +572,16 @@ if __name__=='__main__':
     if 1:
         myfilebase='ordp10'
         mydirectory=r'C:\CaFe4As\Bt9\CaFe4As3\May11_2009'
+        mydirectory=r'C:\srfeas\Feb27_2009'
+        myfilebase='split0'
         myend='bt9'
         myfilebaseglob=myfilebase+'*.'+myend
         filerange1=range(1,10)
         #filerange1.append(7)
         #filerange1.append(8)
         #filerange1.append(9)
-        filerange2=range(10,55)
+        filerange2=range(10,46)
+        filerange3=range(45,52)
         #mydirectory=r'C:\srfeas\SrFeAsNi\Ni0p08\2009-04-diffraction'
         #file_range=(35,51)
         #myfilebase='SrFeA0'
@@ -519,11 +600,14 @@ if __name__=='__main__':
         #flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
         #SU.printr(flist)
         tth,T,counts,counts_err,mon0=readfiles(flist)
+        #wl=2.35916
+        #c=2*wl/N.sin(N.deg2rad(N.array(tth))/2)
         
         #p,perror,pcerror,chisq=fitpeak(tth[0],counts[0],counts_err[0])
         #print 'p',p,perror,pcerror, chisq
         #sys.exit()
         new_tth,new_T,new_counts=regrid2(tth,T,counts)
+        #new_tth,new_T,new_counts=prep_data3(tth,T,counts)
         #x,y,z=grid(new_tth,new_T,new_counts)
         x=N.array(new_tth)
         y=N.array(new_T)
@@ -532,15 +616,17 @@ if __name__=='__main__':
         #QX,QZ=N.meshgrid(qx,qz)
         cmap=pylab.cm.jet
         #import matplotlib.ticker as ticker
-        zmin, zmax = 160, 500
+        zmin, zmax = z.min(), z.max()
         locator = ticker.MaxNLocator(10) # if you want no more than 10 contours
         locator.create_dummy_axis()
         locator.set_bounds(zmin, zmax)
         levs = locator()
-        #levs=N.linspace(zmin,zmax,10)
+        levs=N.linspace(zmin,zmax,10)
         #levs=N.concatenate((levs,[3000]))
         pylab.subplot(1,2,1)
-        mycontour=pylab.contourf(x,y,z,levs)#,
+        #mycontour=pylab.pcolor(N.array(tth).flatten(),N.array(T).flatten(),N.array(counts).flatten())
+        #mycontour=pylab.contourf(x,y,z,levs)#,
+        mycontour=pylab.pcolormesh(x,y,z)
         #levs.set_bounds(zmin, zmax)
         #mycontour=pylab.contourf(x,y,z,35,extent=(17,19.6,y.min(),y.max()))#,cmap=pylab.cm.jet)
         #pylab.axis('equal')
@@ -550,13 +636,14 @@ if __name__=='__main__':
         #mycbar=pylab.colorbar()
         
         #mycbar.set_clim(vmin=160, vmax=500)
-        pylab.xlim((17,19.6))
-        pylab.ylim((0,110))
-        #pylab.show()
-        #sys.exit()
+        
+        #pylab.xlim((17,19.6))
+        #pylab.ylim((0,110))
+        pylab.show()
+        sys.exit()
     
 
-    if 1:
+    if 0:
         myfilebase='dordp0'
         mydirectory=r'C:\CaFe4As\Bt9\CaFe4As3\May11_2009'
         myend='bt9'
