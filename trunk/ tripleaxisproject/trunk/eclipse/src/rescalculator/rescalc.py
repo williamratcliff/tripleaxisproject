@@ -7,7 +7,7 @@ from matplotlib.patches import Ellipse
 from matplotlib.ticker import NullFormatter, MultipleLocator
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
-import copy
+import copy,sys
 
 
 import lattice_calculator
@@ -608,8 +608,8 @@ class rescalculator:
           #========================================================================================================
           #find reciprocal-space directions of X and Y axes
 
-          o1=self.lattice_calculator.orient1#[:,0] #EXP['orient1']
-          o2=self.lattice_calculator.orient2#[:,0] #EXP['orient2']
+          o1=self.lattice_calculator.orientation.orient1.T#[:,0] #EXP['orient1']
+          o2=self.lattice_calculator.orientation.orient2.T#[:,0] #EXP['orient2']
           pr=self.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],self.lattice_calculator.y[0,:],self.lattice_calculator.y[1,:],self.lattice_calculator.y[2,:],'latticestar')
           o2[0]=self.lattice_calculator.y[0,:]*pr
           o2[1]=self.lattice_calculator.y[1,:]*pr
@@ -948,7 +948,8 @@ class rescalculator:
                #ax.set_zorder(1)
 
 
-          pylab.show()
+          #pylab.show()
+          pylab.savefig("resout.png")
 
 
           #self.PlotEllipse(proj,qx,qw,Style1);
@@ -1295,7 +1296,40 @@ class TestLattice(unittest.TestCase):
 #        self.assertEqual(-300.1 + -400.2, -700.3)
 #
 
+
+def get_tokenized_line(myfile,returnline=['']):
+     lineStr=myfile.readline()
+     returnline[0]=lineStr.rstrip()
+     strippedLine=lineStr.lower().rstrip()
+     tokenized=strippedLine.split()
+
+     return tokenized
+
 if __name__=="__main__":
+     
+     if 1:
+          try:
+               infile=sys.argv[1]
+               myFlag=True
+               returnline=['']
+               i=0
+               while myFlag:
+                    tokenized=get_tokenized_line(myfile,returnline=returnline)
+                    if tokenized[0].startswith('#'):
+                         continue
+                    else:
+                         if i==0:
+                              a=N.array([float(toks[0])])
+                              b=N.array([float(toks[0])])
+                              c=N.array([float(toks[0])])
+                              alpha=N.array([float(toks[0])])
+                              beta=N.array([float(toks[0])])
+                              gamma=N.array([float(toks[0])])
+
+               sys.exit()
+          except:
+               sys.exit()
+          
      if 0:
           a=N.array([2*pi],'d')
           b=N.array([2*pi],'d')
@@ -1386,9 +1420,10 @@ if __name__=="__main__":
           print 'R0 ',R0
           #exit()
           R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
-          #myrescal.ResPlot(H, K, L, W, setup)
+          myrescal.ResPlot(H, K, L, W, setup)
           print 'RMS'
           print RMS.transpose()[0]
           print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
           print myrescal.CalcWidths(H,K,L,W,setup)
           print 'setup length ',len(setup)
+          

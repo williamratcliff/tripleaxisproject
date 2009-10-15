@@ -1,17 +1,34 @@
+#a b c alpha_degrees beta_degrees gamma_degrees
 6.28 6.28 6.28 90 90 90
+#hcoll1 hcoll2 hcoll3 hcoll4
 40 47 40 80
+#vcoll1 vcoll2 vcoll3 vcoll4
 120 120 120 120
+#monochromator mosaic
 30
+#analyzer mosaic
 30
+#sample horizontal mosaic
 30
+#sample vertical mosaic
 30
+#fixed energy
 14.7
+#positive for fixed incident energy
 1
+#monochromator tau 
 pg(002)
+#analyzer tau:pg(002),pg(004),ge(111),ge(220),ge(311),be(002),pg(110), 2axis
 pg(002)
+#orientation vector 1
 1 0 0
+#orientation vector 2
 0 1 0
-1 1 
+#h
+1 1
+#k 
 0 0
+#l
 0 0
+#omega (energy transfer)
 0 0
