@@ -1308,26 +1308,100 @@ def get_tokenized_line(myfile,returnline=['']):
 if __name__=="__main__":
      
      if 1:
-          try:
+          if 1:
+               print 'trying'
                infile=sys.argv[1]
+               #infile=r'rescalc_in.txt'
+               myfile=open(infile,'r')
                myFlag=True
                returnline=['']
                i=0
+               EXP={}
+               EXP['ana']={}
+               EXP['mono']={}
+               EXP['sample']={}
+               EXP['method']=0
                while myFlag:
-                    tokenized=get_tokenized_line(myfile,returnline=returnline)
-                    if tokenized[0].startswith('#'):
+                    toks=get_tokenized_line(myfile,returnline=returnline)
+                    print 'toks',toks
+                    if toks==[]:
+                         break
+                    if toks[0].startswith('#'):
                          continue
                     else:
                          if i==0:
                               a=N.array([float(toks[0])])
-                              b=N.array([float(toks[0])])
-                              c=N.array([float(toks[0])])
-                              alpha=N.array([float(toks[0])])
-                              beta=N.array([float(toks[0])])
-                              gamma=N.array([float(toks[0])])
-
+                              b=N.array([float(toks[1])])
+                              c=N.array([float(toks[2])])
+                              alpha=N.array([float(toks[3])])
+                              beta=N.array([float(toks[4])])
+                              gamma=N.array([float(toks[5])])
+                         elif i==1:
+                              EXP['hcol']=N.array([float(toks[0]),
+                                                   float(toks[1]),
+                                                   float(toks[2]),
+                                                   float(toks[3])],'d')
+                         elif i==2:
+                              EXP['vcol']=N.array([float(toks[0]),
+                                                   float(toks[1]),
+                                                   float(toks[2]),
+                                                   float(toks[3])],'d')
+                         elif i==3:
+                              EXP['mono']['mosaic']=float(toks[0])
+                         elif i==4:
+                              EXP['ana']['mosaic']=float(toks[0])
+                         elif i==5:
+                              EXP['sample']['mosaic']=float(toks[0])
+                         elif i==6:
+                              EXP['sample']['vmosaic']=float(toks[0])
+                         elif i==7:
+                              EXP['efixed']=float(toks[0])
+                         elif i==8:
+                              EXP['infix']=int(toks[0]) #positive for fixed incident energy
+                         elif i==9:
+                              EXP['mono']['tau']=str(toks[0])
+                         elif i==10:
+                              EXP['ana']['tau']=str(toks[0])
+                         elif i==11:
+                              orient1=N.array([toks],'d')
+                         elif i==12:
+                              orient2=N.array([toks],'d')
+                         elif i==13:
+                              H=N.array(toks,'d')
+                         elif i==14:    
+                              K=N.array(toks,'d')
+                         elif i==15:     
+                              L=N.array(toks,'d')
+                         elif i==16:     
+                              W=N.array(toks,'d')             
+                         i=i+1
+               orientation=lattice_calculator.Orientation(orient1,orient2)
+               mylattice=lattice_calculator.Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                                               orientation=orientation)
+               setup=[EXP]
+               myrescal=rescalculator(mylattice)
+               newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+                                                     H=H,K=K,L=L,W=W,setup=setup)
+               neworientation=lattice_calculator.Orientation(newinput['orient1'],newinput['orient2'])
+               mylattice=lattice_calculator.Lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+                                                    beta=newinput['beta'],gamma=newinput['gamma'],orientation=neworientation)
+               myrescal.__init__(mylattice)
+               Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
+               print 'Q', Q
+               R0,RM=myrescal.ResMat(Q,W,setup)
+               print 'RM '
+               print RM.transpose()
+               print 'R0 ',R0
+               #exit()
+               R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+               myrescal.ResPlot(H, K, L, W, setup)
+               print 'RMS'
+               print RMS.transpose()[0]
+               print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+               print myrescal.CalcWidths(H,K,L,W,setup)
+               print 'setup length ',len(setup)
                sys.exit()
-          except:
+          if 0:
                sys.exit()
           
      if 0:
