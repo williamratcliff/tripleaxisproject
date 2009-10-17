@@ -1296,8 +1296,8 @@ if __name__=="__main__":
      if 1:
           if 1:
                print 'trying'
-               #infile=sys.argv[1]
-               infile=r'rescalc_in.txt'
+               infile=sys.argv[1]
+               #infile=r'rescalc_in.txt'
                myfile=open(infile,'r')
                myFlag=True
                returnline=['']
