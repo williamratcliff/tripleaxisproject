@@ -25,10 +25,10 @@ pg(002)
 #orientation vector 2
 0 1 0
 #h
-1 1
+1 1 1
 #k 
-0 0
+0 0 0
 #l
-0 0
+0 0 0
 #omega (energy transfer)
-0 0
+0 0 0

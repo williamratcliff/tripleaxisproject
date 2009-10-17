@@ -4,26 +4,6 @@ import unittest
 eps=1e-3
 pi=N.pi
 
-def autovectorized(f):
-     """Function decorator to do vectorization only as necessary.
-     vectorized functions fail for scalar inputs."""
-     def wrapper(input):
-          if N.isscalar(input)==False:
-               return N.vectorize(f)(input)
-          return f(input)
-     return wrapper
-
-
-
-@autovectorized
-def myradians(x):
-     return math.radians(x)
-
-@autovectorized
-def mydegrees(x):
-     return math.degrees(x)
-#vecradians = N.vectorize(myradians, otypes=[double])
-
 def sign(x):
      if x>0:
           ret=1
@@ -181,9 +161,9 @@ class Lattice(object):
           self._alpha=newinput['alpha']
           self._beta=newinput['beta']
           self._gamma=newinput['gamma']
-          self.alphad=mydegrees(newinput['alpha'])
-          self.betad=mydegrees(newinput['beta'])
-          self.gammad=mydegrees(newinput['gamma'])
+          self.alphad=N.degrees(newinput['alpha'])
+          self.betad=N.degrees(newinput['beta'])
+          self.gammad=N.degrees(newinput['gamma'])
           self.star()
           self.gtensor('lattice')
           self.gtensor('latticestar')
@@ -366,8 +346,8 @@ class Lattice(object):
           return x,y,z
 
      def StandardSystem(self):
-          orient1=self._orient1
-          orient2=self._orient2
+          orient1=self._orient1.T
+          orient2=self._orient2.T
           try:
                modx=self.modvec(orient1[0, :], orient1[1, :], orient1[2, :], 'latticestar')
           except IndexError:
@@ -571,9 +551,9 @@ class TestLattice(unittest.TestCase):
           a=N.array([2*pi],'Float64')
           b=N.array([2*pi],'Float64')
           c=N.array([2*pi],'Float64')
-          alpha=myradians(N.array([90],'Float64'))
-          beta=myradians(N.array([90],'Float64'))
-          gamma=myradians(N.array([90],'Float64'))
+          alpha=N.radians(N.array([90],'Float64'))
+          beta=N.radians(N.array([90],'Float64'))
+          gamma=N.radians(N.array([90],'Float64'))
           orient1=N.array([[1,0,0]],'Float64')
           orient2=N.array([[0,1,1]],'Float64')
           orientation=Orientation(orient1,orient2)
@@ -614,9 +594,9 @@ class TestLatticeCubic(unittest.TestCase):
           a=N.array([6.283],'Float64')
           b=N.array([6.283],'Float64')
           c=N.array([6.283],'Float64')
-          alpha=myradians(N.array([90],'Float64'))
-          beta=myradians(N.array([90],'Float64'))
-          gamma=myradians(N.array([90],'Float64'))
+          alpha=N.radians(N.array([90],'Float64'))
+          beta=N.radians(N.array([90],'Float64'))
+          gamma=N.radians(N.array([90],'Float64'))
           orient1=N.array([[1,0,0]],'Float64')
           orient2=N.array([[0,0,1]],'Float64')
           orientation=Orientation(orient1,orient2)
@@ -653,10 +633,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([74.169]))
-          A2=myradians(N.array([74.169]))
-          S1=myradians(N.array([97.958]))
-          S2=myradians(N.array([89.131]))
+          M2=N.radians(N.array([74.169]))
+          A2=N.radians(N.array([74.169]))
+          S1=N.radians(N.array([97.958]))
+          S2=N.radians(N.array([89.131]))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -687,10 +667,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([52.420]))
-          A2=myradians(N.array([74.169]))
-          S1=myradians(N.array([101.076]))
-          S2=myradians(N.array([70.881]))
+          M2=N.radians(N.array([52.420]))
+          A2=N.radians(N.array([74.169]))
+          S1=N.radians(N.array([101.076]))
+          S2=N.radians(N.array([70.881]))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -720,10 +700,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([74.169]))
-          A2=myradians(N.array([74.169]))
-          S1=myradians(N.array([98.375]))
-          S2=myradians(N.array([109.575]))
+          M2=N.radians(N.array([74.169]))
+          A2=N.radians(N.array([74.169]))
+          S1=N.radians(N.array([98.375]))
+          S2=N.radians(N.array([109.575]))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -752,13 +732,13 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([74.169]))
-          A2=myradians(N.array([74.169]))
-          S1=myradians(N.array([101.200]))  #Note that this angle has changed
+          M2=N.radians(N.array([74.169]))
+          A2=N.radians(N.array([74.169]))
+          S1=N.radians(N.array([101.200]))  #Note that this angle has changed
           #This is a consequence of the fact that ICP defines the first orientation vector 
           #to be at half of the detector two theta angle.  The second orientation vector is always
           #at higher a3
-          S2=myradians(N.array([109.575]))
+          S2=N.radians(N.array([109.575]))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -787,10 +767,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([48.661]))
-          A2=myradians(N.array([74.169]))
-          S1=myradians(N.array([99.257]))  
-          S2=myradians(N.array([80.722]))
+          M2=N.radians(N.array([48.661]))
+          A2=N.radians(N.array([74.169]))
+          S1=N.radians(N.array([99.257]))  
+          S2=N.radians(N.array([80.722]))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -820,10 +800,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([48.661],'Float64'))
-          A2=myradians(N.array([74.169],'Float64'))
-          S1=myradians(N.array([96.433],'Float64'))
-          S2=myradians(N.array([80.722],'Float64'))
+          M2=N.radians(N.array([48.661],'Float64'))
+          A2=N.radians(N.array([74.169],'Float64'))
+          S1=N.radians(N.array([96.433],'Float64'))
+          S2=N.radians(N.array([80.722],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -855,10 +835,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([74.169],'Float64'))
-          A2=myradians(N.array([74.169],'Float64'))
-          S1=myradians(N.array([76.720],'Float64'))
-          S2=myradians(N.array([110.480],'Float64'))
+          M2=N.radians(N.array([74.169],'Float64'))
+          A2=N.radians(N.array([74.169],'Float64'))
+          S1=N.radians(N.array([76.720],'Float64'))
+          S2=N.radians(N.array([110.480],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -892,10 +872,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=5.0
           
           #test the angles
-          M2=myradians(N.array([49.633],'Float64'))
-          A2=myradians(N.array([74.169],'Float64'))
-          S1=myradians(N.array([74.345],'Float64'))
-          S2=myradians(N.array([82.717],'Float64'))
+          M2=N.radians(N.array([49.633],'Float64'))
+          A2=N.radians(N.array([74.169],'Float64'))
+          S1=N.radians(N.array([74.345],'Float64'))
+          S2=N.radians(N.array([82.717],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -928,10 +908,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=3.7
           
           #test the angles
-          M2=myradians(N.array([89.008],'Float64'))
-          A2=myradians(N.array([89.008],'Float64'))
-          S1=myradians(N.array([100.569],'Float64'))
-          S2=myradians(N.array([148.389],'Float64'))
+          M2=N.radians(N.array([89.008],'Float64'))
+          A2=N.radians(N.array([89.008],'Float64'))
+          S1=N.radians(N.array([100.569],'Float64'))
+          S2=N.radians(N.array([148.389],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -963,10 +943,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=3.7
           
           #test the angles
-          M2=myradians(N.array([89.008],'Float64'))
-          A2=myradians(N.array([98.663],'Float64'))
-          S1=myradians(N.array([91.561],'Float64'))
-          S2=myradians(N.array([117.979],'Float64'))
+          M2=N.radians(N.array([89.008],'Float64'))
+          A2=N.radians(N.array([98.663],'Float64'))
+          S1=N.radians(N.array([91.561],'Float64'))
+          S2=N.radians(N.array([117.979],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -998,10 +978,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=3.7
           
           #test the angles
-          M2=myradians(N.array([89.008],'Float64'))
-          A2=myradians(N.array([98.663],'Float64'))
-          S1=myradians(N.array([119.133],'Float64'))  #recall how icp chooses the a3 angle based on first orientation vector
-          S2=myradians(N.array([117.979],'Float64'))
+          M2=N.radians(N.array([89.008],'Float64'))
+          A2=N.radians(N.array([98.663],'Float64'))
+          S1=N.radians(N.array([119.133],'Float64'))  #recall how icp chooses the a3 angle based on first orientation vector
+          S2=N.radians(N.array([117.979],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1033,10 +1013,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=3.7
           
           #test the angles
-          M2=myradians(N.array([89.008],'Float64'))
-          A2=myradians(N.array([89.008],'Float64'))
-          S1=myradians(N.array([137.820],'Float64'))  #recall how icp chooses the a3 angle based on first orientation vector
-          S2=myradians(N.array([148.389],'Float64'))
+          M2=N.radians(N.array([89.008],'Float64'))
+          A2=N.radians(N.array([89.008],'Float64'))
+          S1=N.radians(N.array([137.820],'Float64'))  #recall how icp chooses the a3 angle based on first orientation vector
+          S2=N.radians(N.array([148.389],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1069,10 +1049,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([78.930],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([89.644],'Float64'))  
-          S2=myradians(N.array([86.470],'Float64'))
+          M2=N.radians(N.array([78.930],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([89.644],'Float64'))  
+          S2=N.radians(N.array([86.470],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1104,10 +1084,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([46.305],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([98.405],'Float64'))  
-          S2=myradians(N.array([57.515],'Float64'))
+          M2=N.radians(N.array([46.305],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([98.405],'Float64'))  
+          S2=N.radians(N.array([57.515],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1139,10 +1119,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([78.930],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([91.228],'Float64'))  
-          S2=myradians(N.array([105.102],'Float64'))
+          M2=N.radians(N.array([78.930],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([91.228],'Float64'))  
+          S2=N.radians(N.array([105.102],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1174,10 +1154,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([47.030],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([92.030],'Float64'))  
-          S2=myradians(N.array([71.391],'Float64'))
+          M2=N.radians(N.array([47.030],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([92.030],'Float64'))  
+          S2=N.radians(N.array([71.391],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1210,10 +1190,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([47.030],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([104.676],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
-          S2=myradians(N.array([71.391],'Float64'))
+          M2=N.radians(N.array([47.030],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([104.676],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=N.radians(N.array([71.391],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1245,10 +1225,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([78.930],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([103.874],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
-          S2=myradians(N.array([105.102],'Float64'))
+          M2=N.radians(N.array([78.930],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([103.874],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=N.radians(N.array([105.102],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1271,7 +1251,7 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.beta=N.radians(N.array([100.0],'Float64'))
           orient1=N.array([[1,0,0]],'Float64')
           orient2=N.array([[0,0,1]],'Float64')
           orientation=Orientation(orient1,orient2)
@@ -1282,10 +1262,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([78.930],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([108.743],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
-          S2=myradians(N.array([130.130],'Float64'))
+          M2=N.radians(N.array([78.930],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([108.743],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=N.radians(N.array([130.130],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1307,7 +1287,7 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.beta=N.radians(N.array([100.0],'Float64'))
           orient1=N.array([[1,0,0]],'Float64')
           orient2=N.array([[0,0,1]],'Float64')
           orientation=Orientation(orient1,orient2)
@@ -1318,10 +1298,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([74.186],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([106.473],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
-          S2=myradians(N.array([123.991],'Float64'))
+          M2=N.radians(N.array([74.186],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([106.473],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=N.radians(N.array([123.991],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1344,7 +1324,7 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.beta=N.radians(N.array([100.0],'Float64'))
           orient1=N.array([[1,2,0]],'Float64')
           orient2=N.array([[0,0,1]],'Float64')
           orientation=Orientation(orient1,orient2)
@@ -1355,10 +1335,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([78.930],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([70.753],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
-          S2=myradians(N.array([91.256],'Float64'))
+          M2=N.radians(N.array([78.930],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([70.753],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=N.radians(N.array([91.256],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1381,7 +1361,7 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.a=N.array([6.283],'Float64')
           self.fixture.b=N.array([5.7568],'Float64')
           self.fixture.c=N.array([11.765],'Float64')
-          self.fixture.beta=myradians(N.array([100.0],'Float64'))
+          self.fixture.beta=N.radians(N.array([100.0],'Float64'))
           orient1=N.array([[1,2,0]],'Float64')
           orient2=N.array([[0,0,1]],'Float64')
           orientation=Orientation(orient1,orient2)
@@ -1392,10 +1372,10 @@ class TestLatticeCubic(unittest.TestCase):
           self.fixture.EXP['efixed']=4.5
           
           #test the angles
-          M2=myradians(N.array([56.239],'Float64'))
-          A2=myradians(N.array([78.930],'Float64'))
-          S1=myradians(N.array([73.059],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
-          S2=myradians(N.array([73.305],'Float64'))
+          M2=N.radians(N.array([56.239],'Float64'))
+          A2=N.radians(N.array([78.930],'Float64'))
+          S1=N.radians(N.array([73.059],'Float64'))  #recalll how icp defines a3 in terms of a4 of orient1  
+          S2=N.radians(N.array([73.305],'Float64'))
           H,K,L,E,Q,Ei,Ef=self.fixture.SpecWhere(M2,S1,S2,A2,[self.fixture.EXP])
           print 'H ',H
           print 'K ',K
@@ -1417,9 +1397,9 @@ if __name__=="__main__":
           a=N.array([2*pi,2*pi],'Float64')
           b=N.array([8],'Float64')
           c=N.array([11],'Float64')
-          alpha=myradians(N.array([87],'Float64'))
-          beta=myradians(N.array([52],'Float64'))
-          gamma=myradians(N.array([100],'Float64'))
+          alpha=N.radians(N.array([87],'Float64'))
+          beta=N.radians(N.array([52],'Float64'))
+          gamma=N.radians(N.array([100],'Float64'))
           orient1=N.array([[0,1,0]],'Float64')
           orient2=N.array([[1,0,0]],'Float64')
           orientation=Orientation(orient1,orient2)
@@ -1443,10 +1423,10 @@ if __name__=="__main__":
           EXP['efixed']=14.7
           EXP['method']=0
           setup=[EXP]
-          M2=myradians(N.array([41.177]))
-          A2=myradians(N.array([41.177]))
-          S1=myradians(N.array([66.4363]))
-          S2=myradians(N.array([37.6547]))
+          M2=N.radians(N.array([41.177]))
+          A2=N.radians(N.array([41.177]))
+          S1=N.radians(N.array([66.4363]))
+          S2=N.radians(N.array([37.6547]))
           H,K,L,E,Q,Ei,Ef=mylattice.SpecWhere(M2,S1,S2,A2,setup)
           print 'H ',H
           print 'K ',K
@@ -1456,11 +1436,11 @@ if __name__=="__main__":
           print 'Ei ',Ei
           print 'Ef ',Ef
           M1,M2,S1,S2,A1,A2=mylattice.SpecGoTo(H,K,L,E,setup)
-          print 'M2 ',mydegrees(M2)
-          print 'A2 ',mydegrees(A2)
-          print 'M1 ',mydegrees(M1)
-          print 'A1 ',mydegrees(A1)
-          print 'S1 ',mydegrees(S1)
-          print 'S2 ',mydegrees(S2)
+          print 'M2 ',N.degrees(M2)
+          print 'A2 ',N.degrees(A2)
+          print 'M1 ',N.degrees(M1)
+          print 'A1 ',N.degrees(A1)
+          print 'S1 ',N.degrees(S1)
+          print 'S2 ',N.degrees(S2)
      if 1:
           unittest.main()

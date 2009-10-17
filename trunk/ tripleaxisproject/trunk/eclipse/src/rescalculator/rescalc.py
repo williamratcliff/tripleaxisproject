@@ -1,5 +1,8 @@
 from __future__ import division
+import sys
 import numpy as N
+import matplotlib
+matplotlib.use('Agg')
 import pylab
 import math
 import unittest
@@ -9,27 +12,10 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
 import copy,sys
 
-
 import lattice_calculator
+
 eps=1e-3
 pi=N.pi
-
-def autovectorized(f):
-     """Function decorator to do vectorization only as necessary.
-     vectorized functions fail for scalar inputs."""
-     def wrapper(input):
-          if N.isscalar(input)==False:
-               return N.vectorize(f)(input)
-          return f(input)
-     return wrapper
-
-
-
-@autovectorized
-def myradians(x):
-     return math.radians(x)
-
-#vecradians = N.vectorize(myradians, otypes=[double])
 
 def sign(x):
      if x>0:
@@ -1230,10 +1216,10 @@ class rescalculator:
           Widths['XBWidth']=XBWidth
           Widths['YBWidth']=YBWidth
           Widths['WBWidth']=WBWidth
-          Widths['tthwidth_proj']=lattice_calculator.mydegrees(tthwidth_proj)
-          Widths['tthwidth_sec']=lattice_calculator.mydegrees(tthwidth_sec)
-          Widths['thwidth_proj']=lattice_calculator.mydegrees(thwidth_proj)
-          Widths['thwidth_sec']=lattice_calculator.mydegrees(thwidth_sec)
+          Widths['tthwidth_proj']=N.degrees(tthwidth_proj)
+          Widths['tthwidth_sec']=N.degrees(tthwidth_sec)
+          Widths['thwidth_proj']=N.degrees(thwidth_proj)
+          Widths['thwidth_sec']=N.degrees(thwidth_sec)
           return Widths
 
 
@@ -1310,8 +1296,8 @@ if __name__=="__main__":
      if 1:
           if 1:
                print 'trying'
-               infile=sys.argv[1]
-               #infile=r'rescalc_in.txt'
+               #infile=sys.argv[1]
+               infile=r'rescalc_in.txt'
                myfile=open(infile,'r')
                myFlag=True
                returnline=['']
@@ -1323,7 +1309,7 @@ if __name__=="__main__":
                EXP['method']=0
                while myFlag:
                     toks=get_tokenized_line(myfile,returnline=returnline)
-                    print 'toks',toks
+                    #print 'toks',toks
                     if toks==[]:
                          break
                     if toks[0].startswith('#'):
@@ -1357,7 +1343,7 @@ if __name__=="__main__":
                          elif i==7:
                               EXP['efixed']=float(toks[0])
                          elif i==8:
-                              EXP['infix']=int(toks[0]) #positive for fixed incident energy
+                              EXP['infix']=1 if toks[0]=='Ei' else -1
                          elif i==9:
                               EXP['mono']['tau']=str(toks[0])
                          elif i==10:
@@ -1393,11 +1379,17 @@ if __name__=="__main__":
                print RM.transpose()
                print 'R0 ',R0
                #exit()
-               R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+               print "shapes"
+               print H.shape
+               print K.shape
+               print L.shape
+               print W.shape
+               R0,RMS=myrescal.ResMatS(H.T,K.T,L.T,W.T,setup)
                myrescal.ResPlot(H, K, L, W, setup)
                print 'RMS'
                print RMS.transpose()[0]
-               print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+               #print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+               print myrescal.calc_correction(H,K,L,W,setup)
                print myrescal.CalcWidths(H,K,L,W,setup)
                print 'setup length ',len(setup)
                sys.exit()
@@ -1497,7 +1489,8 @@ if __name__=="__main__":
           myrescal.ResPlot(H, K, L, W, setup)
           print 'RMS'
           print RMS.transpose()[0]
-          print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+          #print myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+          print myrescal.calc_correction(H,K,L,W,setup)
           print myrescal.CalcWidths(H,K,L,W,setup)
           print 'setup length ',len(setup)
           
