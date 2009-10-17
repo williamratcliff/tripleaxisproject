@@ -610,9 +610,9 @@ class rescalculator:
 
           if N.abs(o1[0,center])<1e-5:
                o1[0,center]=0.0
-          if N.absolute(o2[1,center])<1e-5:
+          if N.absolute(o1[1,center])<1e-5:
                o1[1,center]=0.0
-          if N.absolute(o2[2,center])<1e-5:
+          if N.absolute(o1[2,center])<1e-5:
                o1[2,center]=0.0
 
           #%========================================================================================================
@@ -1384,7 +1384,7 @@ if __name__=="__main__":
                print K.shape
                print L.shape
                print W.shape
-               R0,RMS=myrescal.ResMatS(H.T,K.T,L.T,W.T,setup)
+               R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
                myrescal.ResPlot(H, K, L, W, setup)
                print 'RMS'
                print RMS.transpose()[0]
