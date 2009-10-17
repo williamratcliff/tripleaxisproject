@@ -16,9 +16,9 @@ setup.mono.mosaic=30;
 setup.ana.mosaic=30; 
 setup.sample.mosaic=30;
 setup.sample.vmosaic=30;
-setup.sample.a=2*pi; 
-setup.sample.b=2*pi;
-setup.sample.c=2*pi;
+setup.sample.a=6.28; 
+setup.sample.b=6.28;
+setup.sample.c=6.28;
 setup.sample.gamma=90;
 setup.hcol=[40 47 40 80];
 setup.vcol=[120 120 120 120]; 
@@ -58,7 +58,7 @@ L=0;
 %H=linspace(1,.5,.1)
 %K=linspace(1,1.5,.1);
 %W=linspace(0,4,11);
-W=[0,0];
+W=[0];
 
 %H=[H .8]
 %K=[K 1.2]
@@ -66,9 +66,18 @@ W=[0,0];
 %W=[W; W]
 
 % Plot resolution parameters
-
-
 setup.method=0;
+
+EXP=setup;
+
+[xvec,yvec,zvec,sample,rsample]=StandardSystem(EXP);
+Q=modvec(H,K,L,rsample)
+return
+[R0C,RMC]=ResMat(Q,W,EXP)
+%[R0,RMS]=ResMatS(H,K,L,W,EXP)
+return
+
+
 figure()
 %figure(3); 
 clf;

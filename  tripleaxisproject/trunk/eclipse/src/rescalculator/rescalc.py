@@ -1380,11 +1380,11 @@ if __name__=="__main__":
                print RM.transpose()
                print 'R0 ',R0
                #exit()
-               print "shapes"
-               print H.shape
-               print K.shape
-               print L.shape
-               print W.shape
+               #print "shapes"
+               #print H.shape
+               #print K.shape
+               #print L.shape
+               #print W.shape
                R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
                myrescal.ResPlot(H, K, L, W, setup)
                print 'RMS'
