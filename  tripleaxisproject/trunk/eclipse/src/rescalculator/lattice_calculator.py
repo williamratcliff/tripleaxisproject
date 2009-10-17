@@ -231,10 +231,7 @@ class Lattice(object):
                beta=self.betastar
                gamma=self.gammastar
 
-          s=x1*x2*a**2+y1*y2*b**2+z1*z2*c**2+\
-           (x1*y2+x2*y1)*a*b*N.cos(gamma)+\
-           (x1*z2+x2*z1)*a*c*N.cos(beta)+\
-           (z1*y2+z2*y1)*c*b*N.cos(alpha)
+          s=x1*x2*a**2+y1*y2*b**2+z1*z2*c**2+(x1*y2+x2*y1)*a*b*N.cos(gamma)+(x1*z2+x2*z1)*a*c*N.cos(beta)+(z1*y2+z2*y1)*c*b*N.cos(alpha)
           return s
 
      def star(self):

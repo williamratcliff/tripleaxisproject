@@ -1319,9 +1319,9 @@ if __name__=="__main__":
                               a=N.array([float(toks[0])])
                               b=N.array([float(toks[1])])
                               c=N.array([float(toks[2])])
-                              alpha=N.array([float(toks[3])])
-                              beta=N.array([float(toks[4])])
-                              gamma=N.array([float(toks[5])])
+                              alpha=N.radians(N.array([float(toks[3])]))
+                              beta=N.radians(N.array([float(toks[4])]))
+                              gamma=N.radians(N.array([float(toks[5])]))
                          elif i==1:
                               EXP['hcol']=N.array([float(toks[0]),
                                                    float(toks[1]),
@@ -1374,6 +1374,7 @@ if __name__=="__main__":
                myrescal.__init__(mylattice)
                Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
                print 'Q', Q
+               #sys.exit()
                R0,RM=myrescal.ResMat(Q,W,setup)
                print 'RM '
                print RM.transpose()
