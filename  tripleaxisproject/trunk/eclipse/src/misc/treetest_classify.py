@@ -104,7 +104,9 @@ class TreeModel(QtCore.QAbstractItemModel):
             return QtCore.QVariant()
 
         if index.column()==0 and role==QtCore.Qt.CheckStateRole:
-            return QtCore.QVariant(QtCore.Qt.Checked)
+            item = self.idMap[index.internalId()]
+            return QtCore.QVariant(item.checkState())
+            #return QtCore.QVariant(QtCore.Qt.Checked)
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
 
