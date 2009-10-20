@@ -116,7 +116,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         if not index.isValid():
             return QtCore.Qt.ItemIsEnabled
 
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable| Qt.ItemIsUserCheckable
 
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
@@ -211,7 +211,10 @@ class TreeModel(QtCore.QAbstractItemModel):
             data=['other','']
             self.addnode(data,hklnode,nodetype='other')
             data=[filename,'']
-            self.addnode(data,th,nodetype='leaf',measured_data=mydata)
+            leaf=self.addnode(data,th,nodetype='leaf',measured_data=mydata)
+            thidx=id(th)
+            idx=self.index(0,0,thidx)
+            #leaf.setCheckState(0, Qt.Unchecked) # 0 is the column number
         
         
         
