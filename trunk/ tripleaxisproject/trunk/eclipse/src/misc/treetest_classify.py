@@ -213,8 +213,8 @@ class TreeModel(QtCore.QAbstractItemModel):
             data=[filename,'']
             leaf=self.addnode(data,th,nodetype='leaf',measured_data=mydata)
             thidx=id(th)
-            idx=self.index(0,0,thidx)
-            #leaf.setCheckState(0, Qt.Unchecked) # 0 is the column number
+            idx=self.index(0,0,QtCore.QModelIndex())
+            idx.model().setCheckState(0, Qt.Unchecked) # 0 is the column number
         
         
         
