@@ -103,6 +103,8 @@ class TreeModel(QtCore.QAbstractItemModel):
         if not index.isValid():
             return QtCore.QVariant()
 
+        if role==QtCore.Qt.CheckStateRole:
+            return QtCore.Qt.Checked
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
 
@@ -214,8 +216,8 @@ class TreeModel(QtCore.QAbstractItemModel):
             leaf=self.addnode(data,th,nodetype='leaf',measured_data=mydata)
             thidx=id(th)
             idx=self.index(0,0,QtCore.QModelIndex())
-            idx.model().setCheckState(0, Qt.Unchecked) # 0 is the column number
-        
+            #idx.model().setCheckState(0, Qt.Unchecked) # 0 is the column number
+            #idx.model().setData()
         
         
         number = 0
