@@ -103,8 +103,8 @@ class TreeModel(QtCore.QAbstractItemModel):
         if not index.isValid():
             return QtCore.QVariant()
 
-        if role==QtCore.Qt.CheckStateRole:
-            return QtCore.Qt.Checked
+        if index.column()==0 and role==QtCore.Qt.CheckStateRole:
+            return QtCore.QVariant(QtCore.Qt.Checked)
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
 
@@ -118,7 +118,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         if not index.isValid():
             return QtCore.Qt.ItemIsEnabled
 
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable| Qt.ItemIsUserCheckable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable| QtCore.Qt.ItemIsUserCheckable
 
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
@@ -218,6 +218,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             idx=self.index(0,0,QtCore.QModelIndex())
             #idx.model().setCheckState(0, Qt.Unchecked) # 0 is the column number
             #idx.model().setData()
+            idx.model().setData(idx,QtCore.QVariant(QtCore.Qt.Checked), QtCore.Qt.CheckStateRole) 
         
         
         number = 0
