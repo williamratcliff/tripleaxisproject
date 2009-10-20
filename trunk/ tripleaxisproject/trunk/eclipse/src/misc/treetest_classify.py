@@ -54,6 +54,10 @@ class TreeItem(object):
         self.childItems = []
         self.nodetype=nodetype
         self.measured_data=measured_data
+        self._checkState=QtCore.Qt.Unchecked
+        
+    def checkState(self):
+        return self._checkState
 
     def appendChild(self, item):
         self.childItems.append(item)
