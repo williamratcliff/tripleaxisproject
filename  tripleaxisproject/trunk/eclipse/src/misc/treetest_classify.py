@@ -24,13 +24,36 @@
 import sys
 from PyQt4 import QtCore, QtGui
 from PyQt4.examples.itemviews.simpletreemodel import simpletreemodel_rc
+import utilities.readncnr3 as readncnr
+import numpy as N
+import utilities.scriptutil as SU
+import re
+from utilities.simple_combine import simple_combine
+import copy
+import pylab
+from utilities.findpeak3 import findpeak
+from openopt import NLP
+import scipy.optimize
+import scipy.odr
+from scipy.optimize import curve_fit
+pi=N.pi
+from mpfit import mpfit
+import rescalculator.rescalc as rescalc
 
+
+nodetypes=set(['hkl','th','tth','q','other','leaf'])
+#for hkl nodes, the itemdata is a string representation of hkl
+#for other branches, the itemdata is a string of the branch type
+#for the leaves, itemdata is the filename, measured_data will contain the actual data
+#associated with the measurement
 
 class TreeItem(object):
-    def __init__(self, data, parent=None):
+    def __init__(self, data, parent=None,nodetype='hkl',measured_data=None):
         self.parentItem = parent
         self.itemData = data
         self.childItems = []
+        self.nodetype=nodetype
+        self.measured_data=measured_data
 
     def appendChild(self, item):
         self.childItems.append(item)
@@ -62,9 +85,9 @@ class TreeModel(QtCore.QAbstractItemModel):
         QtCore.QAbstractItemModel.__init__(self, parent)
 
         self.idMap = {}
-
+        self.hklmap=[]
         rootData = []
-        rootData.append(QtCore.QVariant("Title"))
+        rootData.append(QtCore.QVariant("HKL"))
         rootData.append(QtCore.QVariant("Summary"))
         self.rootItem = TreeItem(rootData)
         self.idMap[id(self.rootItem)] = self.rootItem
@@ -146,50 +169,94 @@ class TreeModel(QtCore.QAbstractItemModel):
             return parentItem.childCount()
         except:
             return 0
+        
+    def addnode(self,data,parent,nodetype=None,measured_data=None):
+        node=TreeItem(data, parent,nodetype=nodetype, measured_data=measured_data)
+        self.idMap[id(node)] = node
+        parent.appendChild(node)
+        return node
 
     def setupModelData(self, lines, parent):
         parents = []
         indentations = []
         parents.append(parent)
         indentations.append(0)
-
+        
+        myfilestr=r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9'
+        mydatareader=readncnr.datareader()
+        mydata=mydatareader.readbuffer(myfilestr)
+        filename=mydata.metadata['file_info']['filename']
+        h=str(mydata.metadata['q_center']['h_center'])
+        k=str(mydata.metadata['q_center']['k_center'])
+        l=str(mydata.metadata['q_center']['l_center'])
+        hkl=h+k+l
+        self.hklmap.append(hkl)
+        print 'hkl',hkl
+        #hkl=QtCore.QString(hkl)
+        
+        #nodetypes=set(['hkl','th','tth','q','other','leaf'])
+        
+        hkl_data=[hkl,'']
+        hklnode=self.addnode(hkl_data,parents[-1],nodetype='hkl')
+        # Append a new item to the current parent's list of children.
+        #hklnode = TreeItem(hkl_data, parents[-1])
+        #self.idMap[id(hklnode)] = hklnode
+        #parents[-1].appendChild(hklnode)
+        
+        #add the branches
+        data=['theta','']
+        self.addnode(data,hklnode,nodetype='th')
+        #node=TreeItem(data, hklnode)
+        #self.idMap[id(node)] = node
+        #hklnode.appendChild(node)
+        data=['ttheta','']
+        self.addnode(data,hklnode,nodetype='tth')
+        data=['q','']
+        self.addnode(data,hklnode,nodetype='q')
+        data=['other','']
+        self.addnode(data,hklnode,nodetype='other')
+        data=[filename,'']
+        self.addnode(data,hklnode,nodetype='leaf',measured_data=mydata)
+        
+        
+        
         number = 0
-
-        while number < len(lines):
-            position = 0
-            while position < len(lines[number]):
-                if lines[number][position] != " ":
-                    break
-                position += 1
-
-            lineData = lines[number][position:].trimmed()
-
-            if not lineData.isEmpty():
-                # Read the column data from the rest of the line.
-                columnStrings = lineData.split("\t", QtCore.QString.SkipEmptyParts)
-                columnData = []
-                for column in range(0, len(columnStrings)):
-                    columnData.append(columnStrings[column])
-
-                if position > indentations[-1]:
-                    # The last child of the current parent is now the new parent
-                    # unless the current parent has no children.
-
-                    if parents[-1].childCount() > 0:
-                        parents.append(parents[-1].child(parents[-1].childCount() - 1))
-                        indentations.append(position)
-
-                else:
-                    while position < indentations[-1] and len(parents) > 0:
-                        parents.pop()
-                        indentations.pop()
-
-                # Append a new item to the current parent's list of children.
-                item = TreeItem(columnData, parents[-1])
-                self.idMap[id(item)] = item
-                parents[-1].appendChild(item)
-
-            number += 1
+        if 0:
+            while number < len(lines):
+                position = 0
+                while position < len(lines[number]):
+                    if lines[number][position] != " ":
+                        break
+                    position += 1
+    
+                lineData = lines[number][position:].trimmed()
+    
+                if not lineData.isEmpty():
+                    # Read the column data from the rest of the line.
+                    columnStrings = lineData.split("\t", QtCore.QString.SkipEmptyParts)
+                    columnData = []
+                    for column in range(0, len(columnStrings)):
+                        columnData.append(columnStrings[column])
+    
+                    if position > indentations[-1]:
+                        # The last child of the current parent is now the new parent
+                        # unless the current parent has no children.
+    
+                        if parents[-1].childCount() > 0:
+                            parents.append(parents[-1].child(parents[-1].childCount() - 1))
+                            indentations.append(position)
+    
+                    else:
+                        while position < indentations[-1] and len(parents) > 0:
+                            parents.pop()
+                            indentations.pop()
+    
+                    # Append a new item to the current parent's list of children.
+                    item = TreeItem(columnData, parents[-1])
+                    self.idMap[id(item)] = item
+                    parents[-1].appendChild(item)
+    
+                number += 1
 
 
 if __name__ == "__main__":
