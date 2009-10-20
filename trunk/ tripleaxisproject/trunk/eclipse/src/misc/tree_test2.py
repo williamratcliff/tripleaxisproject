@@ -26,7 +26,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.examples.itemviews.simpletreemodel import simpletreemodel_rc
 
 
-class TreeItem:
+class TreeItem(object):
     def __init__(self, data, parent=None):
         self.parentItem = parent
         self.itemData = data
