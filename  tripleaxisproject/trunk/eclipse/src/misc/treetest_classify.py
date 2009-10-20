@@ -85,7 +85,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         QtCore.QAbstractItemModel.__init__(self, parent)
 
         self.idMap = {}
-        self.hklmap=[]
+        self.hklmap={}
         rootData = []
         rootData.append(QtCore.QVariant("HKL"))
         rootData.append(QtCore.QVariant("Summary"))
@@ -190,33 +190,28 @@ class TreeModel(QtCore.QAbstractItemModel):
         k=str(mydata.metadata['q_center']['k_center'])
         l=str(mydata.metadata['q_center']['l_center'])
         hkl=h+k+l
-        self.hklmap.append(hkl)
+        
         print 'hkl',hkl
         #hkl=QtCore.QString(hkl)
         
         #nodetypes=set(['hkl','th','tth','q','other','leaf'])
         
-        hkl_data=[hkl,'']
-        hklnode=self.addnode(hkl_data,parents[-1],nodetype='hkl')
-        # Append a new item to the current parent's list of children.
-        #hklnode = TreeItem(hkl_data, parents[-1])
-        #self.idMap[id(hklnode)] = hklnode
-        #parents[-1].appendChild(hklnode)
         
-        #add the branches
-        data=['theta','']
-        self.addnode(data,hklnode,nodetype='th')
-        #node=TreeItem(data, hklnode)
-        #self.idMap[id(node)] = node
-        #hklnode.appendChild(node)
-        data=['ttheta','']
-        self.addnode(data,hklnode,nodetype='tth')
-        data=['q','']
-        self.addnode(data,hklnode,nodetype='q')
-        data=['other','']
-        self.addnode(data,hklnode,nodetype='other')
-        data=[filename,'']
-        self.addnode(data,hklnode,nodetype='leaf',measured_data=mydata)
+        if hkl not in self.hklmap.keys():           
+            hkl_data=[hkl,'']
+            hklnode=self.addnode(hkl_data,parents[-1],nodetype='hkl')
+            self.hklmap[hkl]=id(hklnode)
+            #add the branches
+            data=['theta','']
+            th=self.addnode(data,hklnode,nodetype='th')
+            data=['ttheta','']
+            self.addnode(data,hklnode,nodetype='tth')
+            data=['q','']
+            self.addnode(data,hklnode,nodetype='q')
+            data=['other','']
+            self.addnode(data,hklnode,nodetype='other')
+            data=[filename,'']
+            self.addnode(data,th,nodetype='leaf',measured_data=mydata)
         
         
         
