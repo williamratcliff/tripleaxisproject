@@ -214,7 +214,12 @@ class TreeModel(QtCore.QAbstractItemModel):
         if len(self.hklmap.keys())==0:
             node.mon0=mydata.metadata['count_info']['monitor']
         else:
-            
+            mon=mydata.metadata['count_info']['monitor']
+                    counts_new=mydata.data['counts']*self.mon0/mon
+                    counts_new_err=N.sqrt(mydata.data['counts'])*self.mon0/mon
+                    mydata.data['counts']=counts_new
+                    mydata.data['counts_err']=counts_new_err
+                    mydata.metadata['count_info']['monitor']=self.mon
         self.idMap[id(node)] = node
         parent.appendChild(node)
         return node
