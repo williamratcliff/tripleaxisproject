@@ -58,6 +58,8 @@ class TreeItem(object):
 
     def checkState(self):
         return self._checkState
+    def setcheckState(self,checkState):
+        self._checkState=checkState
     
     def toggleCheck(self):
         if self._checkState==QtCore.Qt.Unchecked:
@@ -116,6 +118,7 @@ class TreeModel(QtCore.QAbstractItemModel):
 
         if index.column()==0 and role==QtCore.Qt.CheckStateRole:
             item = self.idMap[index.internalId()]
+            print 'checkstate', item.checkState()
             return QtCore.QVariant(item.checkState())
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
@@ -125,6 +128,18 @@ class TreeModel(QtCore.QAbstractItemModel):
             return QtCore.QVariant(item.data(index.column()))
         except KeyError:
             return QtCore.QVariant()
+        
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        if (role == QtCore.Qt.CheckStateRole and index.column() == 0):
+            #self.checkstates[self.fileInfo(index).absoluteFilePath()] = QtCore.Qt.CheckState() 
+            item = self.idMap[index.internalId()]
+            #item.setcheckState(QtCore.Qt.CheckState()) 
+            item.toggleCheck()
+            print 'setting data',QtCore.Qt.CheckState()
+            self.emit(QtCore.SIGNAL("dataChanged(QtCore.QModelIndex,QModelIndex)"), index, index)
+            return True
+
+        return QtCore.QAbstractItemModel.setData(self, index, value, role)
 
     def flags(self, index):
         if not index.isValid():
