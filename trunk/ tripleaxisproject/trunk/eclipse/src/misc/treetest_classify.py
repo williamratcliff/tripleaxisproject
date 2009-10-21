@@ -55,9 +55,16 @@ class TreeItem(object):
         self.nodetype=nodetype
         self.measured_data=measured_data
         self._checkState=QtCore.Qt.Unchecked
-        
+
     def checkState(self):
         return self._checkState
+    
+    def toggleCheck(self):
+        if self._checkState==QtCore.Qt.Unchecked:
+            self._checkState=QtCore.Qt.Checked
+        elif self._checkState==QtCore.Qt.Checked:
+            self._checkState=QtCore.Qt.Unchecked
+            
 
     def appendChild(self, item):
         self.childItems.append(item)
@@ -110,7 +117,6 @@ class TreeModel(QtCore.QAbstractItemModel):
         if index.column()==0 and role==QtCore.Qt.CheckStateRole:
             item = self.idMap[index.internalId()]
             return QtCore.QVariant(item.checkState())
-            #return QtCore.QVariant(QtCore.Qt.Checked)
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
 
@@ -177,7 +183,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             return parentItem.childCount()
         except:
             return 0
-        
+
     def addnode(self,data,parent,nodetype=None,measured_data=None):
         node=TreeItem(data, parent,nodetype=nodetype, measured_data=measured_data)
         self.idMap[id(node)] = node
@@ -189,7 +195,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         indentations = []
         parents.append(parent)
         indentations.append(0)
-        
+
         myfilestr=r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9'
         mydatareader=readncnr.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
@@ -198,13 +204,13 @@ class TreeModel(QtCore.QAbstractItemModel):
         k=str(mydata.metadata['q_center']['k_center'])
         l=str(mydata.metadata['q_center']['l_center'])
         hkl=h+k+l
-        
+
         print 'hkl',hkl
         #hkl=QtCore.QString(hkl)
-        
+
         #nodetypes=set(['hkl','th','tth','q','other','leaf'])
-        
-        
+
+
         if hkl not in self.hklmap.keys():           
             hkl_data=[hkl,'']
             hklnode=self.addnode(hkl_data,parents[-1],nodetype='hkl')
@@ -222,11 +228,9 @@ class TreeModel(QtCore.QAbstractItemModel):
             leaf=self.addnode(data,th,nodetype='leaf',measured_data=mydata)
             thidx=id(th)
             idx=self.index(0,0,QtCore.QModelIndex())
-            #idx.model().setCheckState(0, Qt.Unchecked) # 0 is the column number
-            #idx.model().setData()
             idx.model().setData(idx,QtCore.QVariant(QtCore.Qt.Checked), QtCore.Qt.CheckStateRole) 
-        
-        
+
+
         number = 0
         if 0:
             while number < len(lines):
@@ -235,47 +239,99 @@ class TreeModel(QtCore.QAbstractItemModel):
                     if lines[number][position] != " ":
                         break
                     position += 1
-    
+
                 lineData = lines[number][position:].trimmed()
-    
+
                 if not lineData.isEmpty():
                     # Read the column data from the rest of the line.
                     columnStrings = lineData.split("\t", QtCore.QString.SkipEmptyParts)
                     columnData = []
                     for column in range(0, len(columnStrings)):
                         columnData.append(columnStrings[column])
-    
+
                     if position > indentations[-1]:
                         # The last child of the current parent is now the new parent
                         # unless the current parent has no children.
-    
+
                         if parents[-1].childCount() > 0:
                             parents.append(parents[-1].child(parents[-1].childCount() - 1))
                             indentations.append(position)
-    
+
                     else:
                         while position < indentations[-1] and len(parents) > 0:
                             parents.pop()
                             indentations.pop()
-    
+
                     # Append a new item to the current parent's list of children.
                     item = TreeItem(columnData, parents[-1])
                     self.idMap[id(item)] = item
                     parents[-1].appendChild(item)
-    
+
                 number += 1
 
+
+class myTreeView(QtGui.QTreeView):
+    def __init__(self, parent=None):
+        super(myTreeView, self).__init__(parent)
+
+        #self.myModel = myModel()
+        #self.setModel(self.myModel)
+        #item=self.currentItem()
+        #item.setCheckState(0, Qt.Unchecked) # 0 is the column number
+        
+        f = QtCore.QFile(":/default.txt")
+        f.open(QtCore.QIODevice.ReadOnly)
+        self.myModel=TreeModel(QtCore.QString(f.readAll()))
+        f.close()
+        self.setModel(self.myModel)
+        self.dragEnabled()
+        self.acceptDrops()
+        self.showDropIndicator()
+        self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.connect(self.model(), QtCore.SIGNAL("dataChanged(QtCore.QModelIndex,QtCore.QModelIndex)"), self.change)
+        self.expandAll()
+        #QtCore.QObject.connect(self.selectionModel(),QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"),
+        # self.itemselected)
+        QtCore.QObject.connect(self.selectionModel(),QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"),
+         self.currentselected)
+        
+
+    def change(self, topLeftIndex, bottomRightIndex):
+        self.update(topLeftIndex)
+        self.expandAll()
+        self.expanded()
+    def expanded(self):
+        for column in range(self.model().columnCount(QModelIndex())):
+            self.resizeColumnToContents(column)               
+    def itemselected(self,selected, deselected):
+        print 'itemselected'
+        print len(selected), "items selected"
+        print len(deselected), "items deselected"
+        print 'indexes', selected[0].indexes()
+        idx=selected[0].indexes()[0]
+        model=selected[0].model()
+        print 'item',model.idMap[idx.internalId()].itemData
+        idx2=selected[0].indexes()[1]
+        print 'item2',model.idMap[idx2.internalId()].itemData
+        #Why are there two???
+    def currentselected(self,selected,deselected):
+        print 'currentselected'
+        print 'selected',selected.model().idMap[selected.internalId()].itemData
+        if not deselected.model()==None:
+            print 'deselected',deselected.model().idMap[deselected.internalId()].itemData
+        
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
 
-    f = QtCore.QFile(":/default.txt")
-    f.open(QtCore.QIODevice.ReadOnly)
-    model = TreeModel(QtCore.QString(f.readAll()))
-    f.close()
+    #f = QtCore.QFile(":/default.txt")
+    #f.open(QtCore.QIODevice.ReadOnly)
+    #model = TreeModel(QtCore.QString(f.readAll()))
+    #f.close()
 
-    view = QtGui.QTreeView()
-    view.setModel(model)
+    #view = QtGui.QTreeView()
+    view=myTreeView()
+    #view.setModel(model)
     view.setWindowTitle("Simple Tree Model")
     view.show()
     sys.exit(app.exec_())
