@@ -55,6 +55,16 @@ class TreeItem(object):
         self.nodetype=nodetype
         self.measured_data=measured_data
         self._checkState=QtCore.Qt.Unchecked
+        self.q=q
+        self.Q=0.0
+        self.mon0=1.0
+        self.th_correction=1.0
+        self.tth_correction=1.0
+        self.q_correction=1.0
+        self.th_integrated_intensity=0.0
+        self.tth_integrated_intensity=0.0
+        self.q_integrated_intensity=0.0
+        
 
     def checkState(self):
         return self._checkState
@@ -94,9 +104,9 @@ class TreeItem(object):
 
 
 class TreeModel(QtCore.QAbstractItemModel):
-    def __init__(self, data, parent=None):
+    def __init__(self, filestrlist, parent=None,mon0=1.0):
         QtCore.QAbstractItemModel.__init__(self, parent)
-
+        self.mon0=mon0
         self.idMap = {}
         self.hklmap={}
         rootData = []
@@ -104,7 +114,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         rootData.append(QtCore.QVariant("Summary"))
         self.rootItem = TreeItem(rootData)
         self.idMap[id(self.rootItem)] = self.rootItem
-        self.setupModelData(data.split("\n"), self.rootItem)
+        self.setupModelData(filestrlist, self.rootItem)
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -201,49 +211,83 @@ class TreeModel(QtCore.QAbstractItemModel):
 
     def addnode(self,data,parent,nodetype=None,measured_data=None):
         node=TreeItem(data, parent,nodetype=nodetype, measured_data=measured_data)
+        if len(self.hklmap.keys())==0:
+            node.mon0=mydata.metadata['count_info']['monitor']
+        else:
+            
         self.idMap[id(node)] = node
         parent.appendChild(node)
         return node
+    
+    
+    
+    def place_data(self,mydata,tol=1e-6):
+        if mydata.metadata['file_info']['scantype']=='b':
+            #print 'b'
+            currfile=mydata.metadata['file_info']['filename']
+            if N.abs(mydata.metadata['motor4']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
+                #print currfile, 'a3 scan'
+                target='th'
+                #self.th.append(data_item(mydata))
+                #print 'self.th',self.th
+            elif N.abs(mydata.metadata['motor4']['step']-2*mydata.metadata['motor3']['step'])<tol and N.abs(mydata.metadata['motor3']['step'])>tol:
+                #print currfile, 'th-2th scan'
+                #self.th2th.append(data_item(mydata))
+                target='tth'
+            else:
+                #print currfile, 'strange scan'
+                #self.other.append(data_item(mydata))
+                target='other'
+        return target
 
-    def setupModelData(self, lines, parent):
+    def setupModelData(self, filestrlist, parent):
         parents = []
         indentations = []
         parents.append(parent)
         indentations.append(0)
 
-        myfilestr=r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9'
-        mydatareader=readncnr.datareader()
-        mydata=mydatareader.readbuffer(myfilestr)
-        filename=mydata.metadata['file_info']['filename']
-        h=str(mydata.metadata['q_center']['h_center'])
-        k=str(mydata.metadata['q_center']['k_center'])
-        l=str(mydata.metadata['q_center']['l_center'])
-        hkl=h+k+l
-
-        print 'hkl',hkl
-        #hkl=QtCore.QString(hkl)
-
-        #nodetypes=set(['hkl','th','tth','q','other','leaf'])
-
-
-        if hkl not in self.hklmap.keys():           
-            hkl_data=[hkl,'']
-            hklnode=self.addnode(hkl_data,parents[-1],nodetype='hkl')
-            self.hklmap[hkl]=id(hklnode)
-            #add the branches
-            data=['theta','']
-            th=self.addnode(data,hklnode,nodetype='th')
-            data=['ttheta','']
-            self.addnode(data,hklnode,nodetype='tth')
-            data=['q','']
-            self.addnode(data,hklnode,nodetype='q')
-            data=['other','']
-            self.addnode(data,hklnode,nodetype='other')
-            data=[filename,'']
-            leaf=self.addnode(data,th,nodetype='leaf',measured_data=mydata)
-            thidx=id(th)
-            idx=self.index(0,0,QtCore.QModelIndex())
-            idx.model().setData(idx,QtCore.QVariant(QtCore.Qt.Checked), QtCore.Qt.CheckStateRole) 
+        #myfilestrlist=[r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9',r'C:\Ce2RhIn8\Mar10_2009\magsc034.bt9']
+        
+        
+        
+        for myfilestr in filestrlist:
+            mydatareader=readncnr.datareader()
+            mydata=mydatareader.readbuffer(myfilestr)
+            filename=mydata.metadata['file_info']['filename']
+            h=str(mydata.metadata['q_center']['h_center'])
+            k=str(mydata.metadata['q_center']['k_center'])
+            l=str(mydata.metadata['q_center']['l_center'])
+            hkl=h+k+l
+    
+            print 'hkl',hkl
+            #hkl=QtCore.QString(hkl)
+    
+            #nodetypes=set(['hkl','th','tth','q','other','leaf'])
+    
+    
+            if hkl not in self.hklmap.keys():           
+                hkl_data=[hkl,'']
+                hklnode=self.addnode(hkl_data,parents[-1],nodetype='hkl')
+                self.hklmap[hkl]=id(hklnode)
+                #add the branches
+                data=['theta','']
+                thnode=self.addnode(data,hklnode,nodetype='th')
+                data=['ttheta','']
+                tthnode=self.addnode(data,hklnode,nodetype='tth')
+                data=['q','']
+                qnode=self.addnode(data,hklnode,nodetype='q')
+                data=['other','']
+                othernode=self.addnode(data,hklnode,nodetype='other')
+                data=[filename,'']
+                targetdict={}
+                targetdict['th']=thnode
+                targetdict['tth']=tthnode
+                targetdict['other']=othernode
+                targetdict['qnode']=qnode
+                targetnode=targetdict[self.place_data(mydata)]
+                leaf=self.addnode(data,targetnode,nodetype='leaf',measured_data=mydata)
+                idx=self.index(0,0,QtCore.QModelIndex())
+                idx.model().setData(idx,QtCore.QVariant(QtCore.Qt.Checked), QtCore.Qt.CheckStateRole) 
 
 
         number = 0
@@ -294,10 +338,12 @@ class myTreeView(QtGui.QTreeView):
         #item=self.currentItem()
         #item.setCheckState(0, Qt.Unchecked) # 0 is the column number
         
-        f = QtCore.QFile(":/default.txt")
-        f.open(QtCore.QIODevice.ReadOnly)
-        self.myModel=TreeModel(QtCore.QString(f.readAll()))
-        f.close()
+        #f = QtCore.QFile(":/default.txt")
+        #f.open(QtCore.QIODevice.ReadOnly)
+        #self.myModel=TreeModel(QtCore.QString(f.readAll()))
+        #f.close()
+        filestrlist=[r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9',r'C:\Ce2RhIn8\Mar10_2009\magsc034.bt9']
+        self.myModel=TreeModel(filestrlist)
         self.setModel(self.myModel)
         self.dragEnabled()
         self.acceptDrops()
