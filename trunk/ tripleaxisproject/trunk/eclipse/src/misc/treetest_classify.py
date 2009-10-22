@@ -41,6 +41,23 @@ from mpfit import mpfit
 import rescalculator.rescalc as rescalc
 
 
+def check_q(q1,q2,tol=1e-6):
+    heq=False
+    keq=False
+    leq=False
+    #print 'q1,q2',q1,q2
+    if N.abs(q2['h_center']-q1['h_center'])< tol:
+        heq=True
+    if N.abs(q2['k_center']-q1['k_center'])< tol:
+        keq=True
+    if N.abs(q2['l_center']-q1['l_center'])< tol:
+        leq=True
+    #print 'heq',heq,'keq',keq,'leq',leq
+
+    return (heq and keq and leq)
+
+
+
 nodetypes=set(['hkl','th','tth','q','other','leaf'])
 #for hkl nodes, the itemdata is a string representation of hkl
 #for other branches, the itemdata is a string of the branch type
@@ -48,7 +65,7 @@ nodetypes=set(['hkl','th','tth','q','other','leaf'])
 #associated with the measurement
 
 class TreeItem(object):
-    def __init__(self, data, parent=None,nodetype='hkl',measured_data=None):
+    def __init__(self, data, parent=None,nodetype='hkl',measured_data=None,q=None):
         self.parentItem = parent
         self.itemData = data
         self.childItems = []
@@ -210,18 +227,21 @@ class TreeModel(QtCore.QAbstractItemModel):
             return 0
 
     def addnode(self,data,parent,nodetype=None,measured_data=None):
-        node=TreeItem(data, parent,nodetype=nodetype, measured_data=measured_data)
-        if (not measured_data==None) and nodetpe=='leaf':
+        node=TreeItem(data, parent,nodetype=nodetype, measured_data=copy.deepcopy(measured_data))
+        if (not measured_data==None) and nodetype=='leaf':
             if len(self.hklmap.keys())==0:
                 self.mon0=mydata.metadata['count_info']['monitor']
             else:
                 mon=node.measured_data.metadata['count_info']['monitor']
+                node.measured_data.data['counts']=N.array(node.measured_data.data['counts'],'Float64')
+                #node.measured_data.data['counts_err']=N.array(node.measured_data.data['counts_err'],'Float64')
                 counts_new=node.measured_data.data['counts']*self.mon0/mon
                 counts_new_err=N.sqrt(node.measured_data.data['counts'])*self.mon0/mon
                 node.measured_data.data['counts']=counts_new
                 node.measured_data.data['counts_err']=counts_new_err
                 node.measured_data.metadata['count_info']['monitor']=self.mon0
-            node.mon0=mon0
+            node.mon0=self.mon0
+            node.q=copy.copy(measured_data.metadata['q_center'])
         self.idMap[id(node)] = node
         parent.appendChild(node)
         return node
@@ -264,7 +284,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             h=str(mydata.metadata['q_center']['h_center'])
             k=str(mydata.metadata['q_center']['k_center'])
             l=str(mydata.metadata['q_center']['l_center'])
-            hkl=h+k+l
+            hkl='('+h+' '+k+' '+l+')'
     
             print 'hkl',hkl
             #hkl=QtCore.QString(hkl)
