@@ -211,15 +211,17 @@ class TreeModel(QtCore.QAbstractItemModel):
 
     def addnode(self,data,parent,nodetype=None,measured_data=None):
         node=TreeItem(data, parent,nodetype=nodetype, measured_data=measured_data)
-        if len(self.hklmap.keys())==0:
-            node.mon0=mydata.metadata['count_info']['monitor']
-        else:
-            mon=mydata.metadata['count_info']['monitor']
-                    counts_new=mydata.data['counts']*self.mon0/mon
-                    counts_new_err=N.sqrt(mydata.data['counts'])*self.mon0/mon
-                    mydata.data['counts']=counts_new
-                    mydata.data['counts_err']=counts_new_err
-                    mydata.metadata['count_info']['monitor']=self.mon
+        if (not measured_data==None) and nodetpe=='leaf':
+            if len(self.hklmap.keys())==0:
+                self.mon0=mydata.metadata['count_info']['monitor']
+            else:
+                mon=node.measured_data.metadata['count_info']['monitor']
+                counts_new=node.measured_data.data['counts']*self.mon0/mon
+                counts_new_err=N.sqrt(node.measured_data.data['counts'])*self.mon0/mon
+                node.measured_data.data['counts']=counts_new
+                node.measured_data.data['counts_err']=counts_new_err
+                node.measured_data.metadata['count_info']['monitor']=self.mon0
+            node.mon0=mon0
         self.idMap[id(node)] = node
         parent.appendChild(node)
         return node
