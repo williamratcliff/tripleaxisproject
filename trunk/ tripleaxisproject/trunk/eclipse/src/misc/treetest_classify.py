@@ -324,8 +324,7 @@ class TreeModel(QtCore.QAbstractItemModel):
 
         return
     
-    def condense_node(self,index):
-        qnode=self.qlist[index]
+    def condense_node(self,qnode):
         print qnode.q
         #print qnode.th
 
@@ -361,18 +360,21 @@ class TreeModel(QtCore.QAbstractItemModel):
     def addnode(self,data,parent,nodetype=None,measured_data=None):
         node=TreeItem(data, parent,nodetype=nodetype, measured_data=copy.deepcopy(measured_data))
         if (not measured_data==None) and nodetype=='leaf':
-            if len(self.hklmap.keys())==0:
-                self.mon0=mydata.metadata['count_info']['monitor']
-            else:
-                mon=node.measured_data.metadata['count_info']['monitor']
-                node.measured_data.data['counts']=N.array(node.measured_data.data['counts'],'Float64')
-                #node.measured_data.data['counts_err']=N.array(node.measured_data.data['counts_err'],'Float64')
-                counts_new=node.measured_data.data['counts']*self.mon0/mon
-                counts_new_err=N.sqrt(node.measured_data.data['counts'])*self.mon0/mon
-                node.measured_data.data['counts']=counts_new
-                node.measured_data.data['counts_err']=counts_new_err
-                node.measured_data.metadata['count_info']['monitor']=self.mon0
+            print 'adding leaf len',len(self.hklmap.keys())
+            if len(self.hklmap.keys())==1:
+                print 'first leaf'
+                self.mon0=measured_data.metadata['count_info']['monitor']
+        
+            mon=node.measured_data.metadata['count_info']['monitor']
+            node.measured_data.data['counts']=N.array(node.measured_data.data['counts'],'Float64')
+            #node.measured_data.data['counts_err']=N.array(node.measured_data.data['counts_err'],'Float64')
+            counts_new=node.measured_data.data['counts']*self.mon0/mon
+            counts_new_err=N.sqrt(node.measured_data.data['counts'])*self.mon0/mon
+            node.measured_data.data['counts']=counts_new
+            node.measured_data.data['counts_err']=counts_new_err
+            node.measured_data.metadata['count_info']['monitor']=self.mon0
             node.mon0=self.mon0
+            print 'mon0 in add self',self.mon0,'node',node.mon0
             node.q=copy.copy(measured_data.metadata['q_center'])
             self.correct_node(node)
         self.idMap[id(node)] = node
@@ -449,7 +451,7 @@ class TreeModel(QtCore.QAbstractItemModel):
                 idx=self.index(0,0,QtCore.QModelIndex())
                 idx.model().setData(idx,QtCore.QVariant(QtCore.Qt.Checked), QtCore.Qt.CheckStateRole) 
 
-
+        
         number = 0
         if 0:
             while number < len(lines):
@@ -511,6 +513,7 @@ class myTreeView(QtGui.QTreeView):
         self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
         self.connect(self.model(), QtCore.SIGNAL("dataChanged(QtCore.QModelIndex,QtCore.QModelIndex)"), self.change)
         self.expandAll()
+        self.resizeColumnToContents(0)
         #QtCore.QObject.connect(self.selectionModel(),QtCore.SIGNAL("selectionChanged(QItemSelection, QItemSelection)"),
         # self.itemselected)
         QtCore.QObject.connect(self.selectionModel(),QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"),
@@ -537,11 +540,37 @@ class myTreeView(QtGui.QTreeView):
         #Why are there two???
     def currentselected(self,selected,deselected):
         print 'currentselected'
+        currselected=selected.model().idMap[selected.internalId()].measured_data
         print 'selected',selected.model().idMap[selected.internalId()].itemData
+        node=selected.model().idMap[selected.internalId()]
+        print 'nodetype',node.nodetype
+        if node.nodetype=='leaf':
+            measured_data=node.measured_data
+            print 'leaf'
+            #scantype=node.parentItem.itemData[0]
+            scantype=node.parentItem.nodetype
+            print 'scantype',scantype
+            if scantype in ['tth','th','q']:
+                plotdict={}
+                print 'valid scantype'
+                plotdict['scantype']=scantype
+                plotdict['data']={}
+                if scantype=='th':
+                    plotdict['data']['x']=node.measured_data.data['a3']
+                    plotdict['xlabel']='th (degrees)'
+                plotdict['data']['y']=node.measured_data.data['counts']
+                plotdict['data']['yerr']=node.measured_data.data['counts_err']
+                plotdict['ylabel']='Counts/%g5.1'%(node.mon0)  #assume counting by neutrons for now    
+                self.emit(QtCore.SIGNAL("clearplot"),'clear')
+                self.emit(QtCore.SIGNAL("plot"),plotdict)
+                print 'emitted signal'
         if not deselected.model()==None:
             print 'deselected',deselected.model().idMap[deselected.internalId()].itemData
         
 
+            
+            
+            
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
 
