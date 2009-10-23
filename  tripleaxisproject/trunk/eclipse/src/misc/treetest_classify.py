@@ -39,6 +39,7 @@ from scipy.optimize import curve_fit
 pi=N.pi
 from mpfit import mpfit
 import rescalculator.rescalc as rescalc
+import pylab
 
 
 def check_q(q1,q2,tol=1e-6):
@@ -145,7 +146,7 @@ class TreeModel(QtCore.QAbstractItemModel):
 
         if index.column()==0 and role==QtCore.Qt.CheckStateRole:
             item = self.idMap[index.internalId()]
-            print 'checkstate', item.checkState()
+            #print 'checkstate', item.checkState()
             return QtCore.QVariant(item.checkState())
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
@@ -225,6 +226,137 @@ class TreeModel(QtCore.QAbstractItemModel):
             return parentItem.childCount()
         except:
             return 0
+        
+    def correct_data(self,mydata,qscan=None):
+        mya=mydata.metadata['lattice']['a']
+        myb=mydata.metadata['lattice']['b']
+        myc=mydata.metadata['lattice']['c']
+        myalpha=N.radians(mydata.metadata['lattice']['alpha'])
+        mybeta=N.radians(mydata.metadata['lattice']['beta'])
+        mygamma=N.radians(mydata.metadata['lattice']['gamma'])
+        a=N.array([mya],dtype='float64') #for now, the code is broken if only one element in the array for indexing
+        b=N.array([myb],dtype='float64')
+        c=N.array([myc],dtype='float64')
+        alpha=N.array([myalpha],dtype='float64')
+        beta=N.array([mybeta],dtype='float64')
+        gamma=N.array([mygamma],dtype='float64')
+        #print mydata.metadata
+        h=mydata.metadata['orient1']['h']
+        k=mydata.metadata['orient1']['k']
+        l=mydata.metadata['orient1']['l']
+        orient1=N.array([[h,k,l]],dtype='float64')
+        h=mydata.metadata['orient2']['h']
+        k=mydata.metadata['orient2']['k']
+        l=mydata.metadata['orient2']['l']
+        orient2=N.array([[h,k,l]],dtype='float64')
+        orientation=rescalc.lattice_calculator.Orientation(orient1,orient2)
+        mylattice=rescalc.lattice_calculator.Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orientation=orientation)
+        #h=q['h_center'] #perhaps just take this from the file in the future
+        #k=q['k_center']
+        #l=q['l_center']
+        h=mydata.metadata['q_center']['h_center']
+        k=mydata.metadata['q_center']['k_center']
+        l=mydata.metadata['q_center']['l_center']
+        H=N.array([h,h],dtype='float64');
+        K=N.array([k,k],dtype='float64');
+        L=N.array([l,l],dtype='float64');
+        W=N.array([0.0,0.0],dtype='float64')
+        EXP={}
+        EXP['ana']={}
+        EXP['ana']['tau']='pg(002)'
+        EXP['mono']={}
+        EXP['mono']['tau']='pg(002)';
+        EXP['ana']['mosaic']=25
+        EXP['mono']['mosaic']=25
+        EXP['sample']={}
+        EXP['sample']['mosaic']=25
+        EXP['sample']['vmosaic']=25
+        coll1=mydata.metadata['collimations']['coll1']
+        coll2=mydata.metadata['collimations']['coll2']
+        coll3=mydata.metadata['collimations']['coll3']
+        coll4=mydata.metadata['collimations']['coll4']	
+        EXP['hcol']=N.array([coll1,coll2,coll3,coll4],dtype='float64')
+        EXP['vcol']=N.array([120, 120, 120, 240],dtype='float64')
+
+        EXP['infix']=-1 #positive for fixed incident energy
+        EXP['efixed']=mydata.metadata['energy_info']['ef']
+        EXP['method']=0
+        setup=[EXP]
+        myrescal=rescalc.rescalculator(mylattice)
+        newinput=rescalc.lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+                                                      H=H,K=K,L=L,W=W,setup=setup)
+        neworientation=rescalc.lattice_calculator.Orientation(newinput['orient1'],newinput['orient2'])
+        mylattice=rescalc.lattice_calculator.Lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],
+                                                     beta=newinput['beta'],gamma=newinput['gamma'],orientation=neworientation)
+        myrescal.__init__(mylattice)
+        Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
+        #print 'Q', Q
+        R0,RM=myrescal.ResMat(Q,W,setup)
+        #print 'RM '
+        #print RM.transpose()
+        #print 'R0 ',R0
+        #exit()
+        R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+        #myrescal.ResPlot(H, K, L, W, setup)
+        #print 'RMS'
+        #print RMS.transpose()[0]
+        #corrections=myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+        corrections=myrescal.calc_correction(H,K,L,W,setup,qscan=qscan)
+        #print corrections
+        return corrections,Q[0]
+        
+    def correct_node(self,qnode,nodetype='leaf'):
+        #qnode=self.qlist[index]
+        #for now, handle th, 2th corrections, otherwise, need to access corrections['q_correction']
+        #we would also have to send in qscan as an array
+        #Also, for now, we will have corrections for every scan, we should change this
+        #to corrections for each h,k,l node
+        if nodetype=='leaf':
+            mydata=qnode.measured_data
+            corrections,Q=self.correct_data(mydata,qscan=None)
+            th_correction=corrections['th_correction'][0]
+            qnode.th_correction=th_correction.flatten()[0]
+            tth_correction=corrections['tth_correction'][0]
+            qnode.tth_correction=tth_correction.flatten()[0]
+            qnode.Q=Q
+            print 'corrected', qnode.th_correction
+
+
+        return
+    
+    def condense_node(self,index):
+        qnode=self.qlist[index]
+        print qnode.q
+        #print qnode.th
+
+        a3=[]
+        counts=[]
+        counts_err=[]
+        monlist=[]
+        for mydataitem in qnode.th:
+            mydata=mydataitem.data
+            monlist.append(mydata.metadata['count_info']['monitor'])
+            counts_err.append(N.array(mydata.data['counts_err']))
+            counts.append(N.array(mydata.data['counts']))
+            a3.append(N.array(mydata.data['a3']))
+        a3_out,counts_out,counts_err_out=simple_combine(a3,counts,counts_err,monlist)
+
+        #print a3_out.shape
+        #print counts_out.shape
+        #print counts_err_out.shape
+        qnode.th_condensed={}
+        qnode.th_condensed['a3']=a3_out
+        qnode.th_condensed['counts']=counts_out
+        qnode.th_condensed['counts_err']=counts_err_out
+
+        print qnode.th_condensed['counts'].std()
+        print qnode.th_condensed['counts'].mean()
+        print qnode.th_condensed['counts'].max()
+        print qnode.th_condensed['counts'].min()
+        if 0:
+            pylab.errorbar(a3_out,counts_out,counts_err_out,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+            pylab.show()       
+        return 
 
     def addnode(self,data,parent,nodetype=None,measured_data=None):
         node=TreeItem(data, parent,nodetype=nodetype, measured_data=copy.deepcopy(measured_data))
@@ -242,6 +374,7 @@ class TreeModel(QtCore.QAbstractItemModel):
                 node.measured_data.metadata['count_info']['monitor']=self.mon0
             node.mon0=self.mon0
             node.q=copy.copy(measured_data.metadata['q_center'])
+            self.correct_node(node)
         self.idMap[id(node)] = node
         parent.appendChild(node)
         return node
