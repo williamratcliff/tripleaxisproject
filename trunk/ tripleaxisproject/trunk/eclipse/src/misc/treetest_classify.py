@@ -324,38 +324,66 @@ class TreeModel(QtCore.QAbstractItemModel):
 
         return
     
-    def condense_node(self,qnode):
-        print qnode.q
+    def condense_node(self,node):
+        """Given a node, condenses all of the children into one node
+        """
+        
+        print 'condensing',node.q
         #print qnode.th
+        
+        #parent=self.parentItem
+        children=node.childItems
 
-        a3=[]
+        x=[]
         counts=[]
         counts_err=[]
         monlist=[]
-        for mydataitem in qnode.th:
-            mydata=mydataitem.data
+        if node.nodetype in ['q','other']:
+            return
+        #We'll deal with these omitted nodetypes later
+        for child in children:
+            mydata=child.measured_data
             monlist.append(mydata.metadata['count_info']['monitor'])
             counts_err.append(N.array(mydata.data['counts_err']))
             counts.append(N.array(mydata.data['counts']))
-            a3.append(N.array(mydata.data['a3']))
-        a3_out,counts_out,counts_err_out=simple_combine(a3,counts,counts_err,monlist)
+            if node.nodetype=='th':
+                x.append(N.array(mydata.data['a3']))
+            if node.nodetype=='tth':
+                x.append(N.array(mydata.data['a4']))
+        x_out,counts_out,counts_err_out=simple_combine(x,counts,counts_err,monlist)
 
         #print a3_out.shape
         #print counts_out.shape
         #print counts_err_out.shape
-        qnode.th_condensed={}
-        qnode.th_condensed['a3']=a3_out
-        qnode.th_condensed['counts']=counts_out
-        qnode.th_condensed['counts_err']=counts_err_out
+        plotdict={}
+        plotdict['scantype']=node.nodetype
+        plotdict['data']={}
+        if node.nodetype=='th':
+            node.th_condensed={}
+            node.th_condensed['a3']=x_out
+            node.th_condensed['counts']=counts_out
+            node.th_condensed['counts_err']=counts_err_out
+            plotdict['xlabel']='th (degrees)'
+            
+            print node.th_condensed['counts'].std()
+            print node.th_condensed['counts'].mean()
+            print node.th_condensed['counts'].max()
+            print node.th_condensed['counts'].min()
+        if node.nodetype=='tth':
+            node.tth_condensed={}
+            node.tth_condensed['a4']=x_out
+            node.tth_condensed['counts']=counts_out
+            node.tth_condensed['counts_err']=counts_err_out             
+            plotdict['xlabel']='tth (degrees)'
+        plotdict['data']['x']=x_out
+        plotdict['data']['y']=counts_out
+        plotdict['data']['yerr']=counts_err_out 
+        plotdict['ylabel']='Counts/%g5.1'%(node.mon0)  #assume counting by neutrons for now    
 
-        print qnode.th_condensed['counts'].std()
-        print qnode.th_condensed['counts'].mean()
-        print qnode.th_condensed['counts'].max()
-        print qnode.th_condensed['counts'].min()
         if 0:
             pylab.errorbar(a3_out,counts_out,counts_err_out,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
             pylab.show()       
-        return 
+        return plotdict
 
     def addnode(self,data,parent,nodetype=None,measured_data=None):
         node=TreeItem(data, parent,nodetype=nodetype, measured_data=copy.deepcopy(measured_data))
@@ -550,7 +578,7 @@ class myTreeView(QtGui.QTreeView):
             #scantype=node.parentItem.itemData[0]
             scantype=node.parentItem.nodetype
             print 'scantype',scantype
-            if scantype in ['tth','th','q']:
+            if scantype in ['tth','th']:
                 plotdict={}
                 print 'valid scantype'
                 plotdict['scantype']=scantype
@@ -558,12 +586,20 @@ class myTreeView(QtGui.QTreeView):
                 if scantype=='th':
                     plotdict['data']['x']=node.measured_data.data['a3']
                     plotdict['xlabel']='th (degrees)'
+                elif scantype=='tth':
+                    plotdict['data']['x']=node.measured_data.data['a4']
+                    plotdict['xlabel']='tth (degrees)'
                 plotdict['data']['y']=node.measured_data.data['counts']
                 plotdict['data']['yerr']=node.measured_data.data['counts_err']
                 plotdict['ylabel']='Counts/%g5.1'%(node.mon0)  #assume counting by neutrons for now    
                 self.emit(QtCore.SIGNAL("clearplot"),'clear')
                 self.emit(QtCore.SIGNAL("plot"),plotdict)
                 print 'emitted signal'
+        elif node.nodetype in ['th','tth']:
+            plotdict=self.myModel.condense_node(node)
+            self.emit(QtCore.SIGNAL("clearplot"),'clear')
+            self.emit(QtCore.SIGNAL("plot"),plotdict)
+                
         if not deselected.model()==None:
             print 'deselected',deselected.model().idMap[deselected.internalId()].itemData
         
