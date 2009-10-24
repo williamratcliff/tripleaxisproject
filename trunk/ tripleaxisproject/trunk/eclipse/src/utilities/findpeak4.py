@@ -300,7 +300,7 @@ def myfunctlin(p, fjac=None, x=None, y=None, err=None):
     return [status, cost_func(p,x,y,err)]
 
 def find_kernel(y):
-    kern,DW=findpeak.optimize_DW(y)
+    kern,DW=optimize_DW(y)
     DW=N.array(DW)
     DW_min=min(N.abs(DW-2))
     ind=N.where(N.abs(DW-2)==DW_min)[0]
