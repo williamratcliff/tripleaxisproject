@@ -67,6 +67,12 @@ class AppForm(QMainWindow):
         ax.clear()
         return
         
+    def on_draw_fit(self):
+        ax=self.axes[0]
+        x=self.fitx
+        y=self.fity
+        ax.plot(x,y)
+        
 
     def on_draw(self):
         """ Redraws the figure
@@ -108,6 +114,7 @@ class AppForm(QMainWindow):
         
         self.tree=treetest_classify.myTreeView()
         self.tree.connect(self.tree,SIGNAL("plot"),self.onPlot)
+        self.tree.connect(self.tree,SIGNAL("fitplot"),self.onFitPlot)
         self.tree.connect(self.tree,SIGNAL("clearplot"),self.onClear)
         self.tree_dock=QDockWidget("integration",self)
         self.tree_dock.setObjectName("Files")
@@ -247,6 +254,11 @@ class AppForm(QMainWindow):
         self.yerr=plotdict['data']['yerr']
         self.ylabel=plotdict['ylabel']
         self.on_draw()
+        
+    def onFitPlot(self,fitdict):
+        self.fitx=fitdict['x']
+        self.fity=fitdict['y']
+        self.on_draw_fit()
     
     def onKeyPress(self,event):
         #if not event.inaxes: return

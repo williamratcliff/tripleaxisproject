@@ -31,11 +31,12 @@ import re
 from utilities.simple_combine import simple_combine
 import copy
 import pylab
-from utilities.findpeak3 import findpeak
+import utilities.findpeak4 as findpeak
 from openopt import NLP
 import scipy.optimize
 import scipy.odr
-from scipy.optimize import curve_fit
+#from scipy.optimize import curve_fit
+import scipy, scipy.optimize
 pi=N.pi
 from mpfit import mpfit
 import rescalculator.rescalc as rescalc
@@ -57,6 +58,11 @@ def check_q(q1,q2,tol=1e-6):
 
     return (heq and keq and leq)
 
+
+
+
+    
+    
 
 
 nodetypes=set(['hkl','th','tth','q','other','leaf'])
@@ -323,6 +329,46 @@ class TreeModel(QtCore.QAbstractItemModel):
 
 
         return
+    
+    def fit_node(self,plotdict):
+        x=plotdict['data']['x']
+        y=plotdict['data']['y']
+        yerr=plotdict['data']['yerr']
+        kernel=findpeak.find_kernel(y)
+        npeaks,nlist,plist=findpeak.find_npeaks(x,y,yerr,kernel,nmax=3)
+        results=findpeak.findpeak(x,y,npeaks,kernel=kernel)
+        fwhm=findpeak.findwidths(x,y,npeaks,results['xpeaks'],results['indices'])
+        sigma=fwhm/2.354
+        p0=[0,0]
+        pb=N.concatenate((results['xpeaks'], fwhm, results['heights']*N.sqrt(2*pi*sigma**2)))
+        pb=N.array(pb).flatten()
+        p0=N.concatenate((p0,pb)).flatten()
+        print 'p0',p0
+        #
+        fresults= scipy.optimize.leastsq(findpeak.cost_func, p0, args=(x,y,yerr),full_output=1)
+        p1=fresults[0]
+        covariance=fresults[1]
+        area=N.array(N.abs(p1[2+2*npeaks::]))
+        fwhm=N.array(N.abs(p1[2+npeaks:2+2*npeaks]))
+        dof=len(y)-len(p1)
+        fake_dof=len(y)
+        chimin=(findpeak.cost_func(p1,x,y,yerr)**2).sum()
+        chimin=chimin/fake_dof
+        
+        
+        ycalc=findpeak.gen_function(p1,x)
+        fitdict={}
+        fitdict['x']=x
+        fitdict['y']=ycalc
+        fitdict['area']=area.sum()
+        fitdict['chi']=chimin
+        print 'area',fitdict['area']
+        #next add the fit results
+        return fitdict
+
+        
+        
+        
     
     def condense_node(self,node):
         """Given a node, condenses all of the children into one node
@@ -597,8 +643,10 @@ class myTreeView(QtGui.QTreeView):
                 print 'emitted signal'
         elif node.nodetype in ['th','tth']:
             plotdict=self.myModel.condense_node(node)
+            fitdict=self.myModel.fit_node(plotdict)
             self.emit(QtCore.SIGNAL("clearplot"),'clear')
             self.emit(QtCore.SIGNAL("plot"),plotdict)
+            self.emit(QtCore.SIGNAL("fitplot"),fitdict)
                 
         if not deselected.model()==None:
             print 'deselected',deselected.model().idMap[deselected.internalId()].itemData
