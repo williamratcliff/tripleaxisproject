@@ -234,7 +234,7 @@ def optimize_DW(y,order=4):
     else:
         minkern=0
     odd_len=make_odd(len(y))    
-    kernel_range=range(order+2+minkern,min(len(y)/11,odd_len),2)
+    kernel_range=range(order+2+minkern,min(len(y)/3,odd_len),2) #The 3 here is arbitrary
     print kernel_range
     for kernel in kernel_range:
         print 'kernel',kernel
@@ -298,55 +298,28 @@ def myfunctlin(p, fjac=None, x=None, y=None, err=None):
     # stop the calculation.
     status = 0
     return [status, cost_func(p,x,y,err)]
-    
 
-if __name__=="__main__":
-    x=N.arange(-3,4,.005)
-    #y=fp_gaussian(x,1,0,.5)
-    p=[500,0.7,.2]
-    y=matlab_gaussian(x,p)
-    p=[1000,1,.4]
-    y=y+matlab_gaussian(x,p)
-    p=[1000,1.2,.1]
-    y=y+matlab_gaussian(x,p)
-    yerr=N.sqrt(y)+2
-    y += randn(len(y)) * yerr
-    y=N.abs(y)
-    
+def find_kernel(y):
+    kern,DW=findpeak.optimize_DW(y)
+    DW=N.array(DW)
+    DW_min=min(N.abs(DW-2))
+    ind=N.where(N.abs(DW-2)==DW_min)[0]
+    print 'ind',ind
+    print 'DW_min',DW[ind]
+    kernel=kern[ind]
     if 0:
-        pylab.plot(x,y,'s')
-        pylab.show()
-        sys.exit()
-    #yerr=N.sqrt(y)+1
-    #fig=Figure()
-    #fig=pylab.Figure()
-    #canvas = FigureCanvas(fig)
-    #axes = fig.add_subplot(111)
-    
-    if 0:
-        kern,DW=optimize_DW(y) #choose the right window size
-        DW=N.array(DW)
         pylab.plot(kern,N.abs(DW-2),'s')
-        DW_min=min(N.abs(DW-2))
-        ind=N.where(N.abs(DW-2)==DW_min)[0]
-        print 'ind',ind
-        print 'DW_min',DW[ind]
-        kernel=kern[ind]
-        print 'kernel',kernel
         pylab.show()
         sys.exit()
-    
-    
-    
+    return kernel
 
-    kernel=31
-    npeaks=2 
+def find_npeaks(x,y,yerr,kernel,nmax=6):
     nlist=[]
     plist=[]
     #if 1:
-    for npeaks in range(1,6): 
+    for npeaks in range(1,nmax): 
         print 'npeaks',npeaks
-        results=findpeak(x,y,npeaks,kernel=31)
+        results=findpeak(x,y,npeaks,kernel=kernel)
         fwhm=findwidths(x,y,npeaks,results['xpeaks'],results['indices'])
         print 'res',results['xpeaks']
         print 'fwhm',fwhm
@@ -405,8 +378,37 @@ if __name__=="__main__":
             nlist.append(npeaks)
             plist.append(prob)
             #sys.exit()
-            
-    print 'nmin', nlist[N.where(N.array(plist)==min(plist))[0]]
+    nmin=nlist[N.where(N.array(plist)==min(plist))[0]]        
+    print 'nmin', nmin
+    return nmin,nlist,plist
+
+if __name__=="__main__":
+    x=N.arange(-3,4,.005)
+    #y=fp_gaussian(x,1,0,.5)
+    p=[500,0.7,.2]
+    y=matlab_gaussian(x,p)
+    p=[1000,1,.4]
+    y=y+matlab_gaussian(x,p)
+    p=[1000,1.2,.1]
+    y=y+matlab_gaussian(x,p)
+    yerr=N.sqrt(y)+2
+    y += randn(len(y)) * yerr
+    y=N.abs(y)
+    
+    if 0:
+        pylab.plot(x,y,'s')
+        pylab.show()
+        sys.exit()
+    #yerr=N.sqrt(y)+1
+    #fig=Figure()
+    #fig=pylab.Figure()
+    #canvas = FigureCanvas(fig)
+    #axes = fig.add_subplot(111)
+    
+
+    kernel=31
+    npeaks=2 
+    nmin,nlist,plist=find_npeaks(x,y,yerr,kernel)
     if 0:
         pylab.semilogy(nlist,plist,'s')
         
