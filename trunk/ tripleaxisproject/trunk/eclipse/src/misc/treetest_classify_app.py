@@ -20,7 +20,7 @@ import ticker
 class AppForm(QMainWindow):
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
-        self.setWindowTitle('Demo: PyQt with matplotlib')
+        self.setWindowTitle('StructFactors')
 
         self.create_menu()
         self.create_main_frame()
