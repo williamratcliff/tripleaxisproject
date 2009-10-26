@@ -116,11 +116,15 @@ class AppForm(QMainWindow):
         self.tree.connect(self.tree,SIGNAL("plot"),self.onPlot)
         self.tree.connect(self.tree,SIGNAL("fitplot"),self.onFitPlot)
         self.tree.connect(self.tree,SIGNAL("clearplot"),self.onClear)
+        self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
+                
         self.tree_dock=QDockWidget("integration",self)
         self.tree_dock.setObjectName("Files")
         self.tree_dock.setAllowedAreas(Qt.LeftDockWidgetArea |Qt.RightDockWidgetArea)
         
         self.tree_dock.setWidget(self.tree)
+        self.connect(self.tree_dock.widget(), SIGNAL("customContextMenuRequested(const QPoint &)"), self.doTreeMenu)
+
         self.addDockWidget(Qt.RightDockWidgetArea,self.tree_dock)
         #self.integration_dock.setFloating(True)
         #self.integration_dock.setFeatures(QDockWidget.DockWidgetClosable|
@@ -195,7 +199,29 @@ class AppForm(QMainWindow):
             #self.autoaxes()
             self.canvas.draw_idle()
             #self.tth_canvas.draw_idle()
+            
+    def doTreeMenu(self, point):
+        treeidx=self.tree.indexAt(point)
+        node=treeidx.model().idMap[treeidx.internalId()]
+        print 'doing tree idx',node.itemData,node.nodetype
+        
+        self.tree_menu = QMenu()#self.menuBar().addMenu("&File")
+        
+        load_file_action = self.create_action("&Load Files",
+            shortcut="Ctrl+L", slot=self.load_files, 
+            tip="Load Files")
+        export_file_action = self.create_action("&Export Results",
+            shortcut="Ctrl+L", slot=self.export_results, 
+            tip="Export the Results")
+        self.add_actions(self.tree_menu, 
+            (load_file_action, None, export_file_action))
+        self.tree_menu.exec_(point)
 
+    def load_files(self):
+        print 'loading'
+        
+    def export_results(self):
+        print 'exporting'
 
     def create_status_bar(self):
         self.status_text = QLabel("This is a demo")
