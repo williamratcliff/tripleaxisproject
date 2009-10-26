@@ -78,13 +78,14 @@ class TreeItem(object):
         self.childItems = []
         self.nodetype=nodetype
         self.measured_data=measured_data
-        self._checkState=QtCore.Qt.Unchecked
+        self._checkState=QtCore.Qt.Checked#QtCore.Qt.Unchecked
         self.q=q
         self.Q=0.0
         self.mon0=1.0
-        self.th_correction=1.0
-        self.tth_correction=1.0
-        self.q_correction=1.0
+        #self.th_correction=1.0
+        #self.tth_correction=1.0
+        #self.q_correction=1.0
+        self.correction={}
         self.th_integrated_intensity=0.0
         self.tth_integrated_intensity=0.0
         self.q_integrated_intensity=0.0
@@ -233,6 +234,71 @@ class TreeModel(QtCore.QAbstractItemModel):
         except:
             return 0
         
+    def export_data(self):
+        hlist=[]
+        klist=[]
+        llist=[]
+        Qlist=[]
+        corrections=[]
+        I=[]
+        Ierr=[]
+        I_corrected=[]
+        Ierr_corrected=[]
+        for hklnode in self.rootItem.childItems:
+            if hklnode.checkState()==QtCore.Qt.Checked:
+                for scannode in hklnode.childItems:
+                    correction={}
+                    Idict={}
+                    Ierrdict={}
+                    Icorrdict={}
+                    Ierrcorrdict={}
+                    
+                    if scannode.nodetype in ['th','tth'] and scannode.checkState()==QtCore.Qt.Checked:
+                        flag=False
+                        if 1:
+                            print 'exporting loop',scannode.nodetype
+                            plotdict=self.condense_node(scannode)
+                            fitdict=self.fit_node(plotdict)
+                            Idict[scannode.nodetype]=fitdict['area']
+                            Ierrdict[scannode.nodetype]=fitdict['area_err']
+                        #except:
+                        #    continue
+                        
+                        for leaf in scannode.childItems:
+                            if leaf.checkState()==QtCore.Qt.Checked:
+                                h=leaf.measured_data.metadata['q_center']['h_center']
+                                k=leaf.measured_data.metadata['q_center']['h_center']
+                                l=leaf.measured_data.metadata['q_center']['h_center']
+                                Q=leaf.Q
+                                flag=True
+                                correction[scannode.nodetype]=leaf.correction[scannode.nodetype]
+                                Icorrdict[scannode.nodetype]=Idict[scannode.nodetype]/correction[scannode.nodetype]
+                                Ierrcorrdict[scannode.nodetype]=Ierrdict[scannode.nodetype]/correction[scannode.nodetype]
+                                break
+                        if flag==True:
+                            I.append(Idict)
+                            Ierr.append(Ierrdict)
+                            hlist.append(h)
+                            klist.append(k)
+                            llist.append(l)
+                            Qlist.append(Q)
+                            corrections.append(correction)
+                            I_corrected.append(Icorrdict)
+                            Ierr_corrected.append(Ierrcorrdict)
+                            
+            result={}
+            result['I']=I
+            result['Ierr']=Ierr
+            result['I_corrected']=I_corrected
+            result['Ierr_corrected']=Ierr_corrected
+            result['h']=hlist
+            result['k']=klist
+            result['l']=llist
+                            
+                                
+                
+                
+        
     def correct_data(self,mydata,qscan=None):
         mya=mydata.metadata['lattice']['a']
         myb=mydata.metadata['lattice']['b']
@@ -321,11 +387,11 @@ class TreeModel(QtCore.QAbstractItemModel):
             mydata=qnode.measured_data
             corrections,Q=self.correct_data(mydata,qscan=None)
             th_correction=corrections['th_correction'][0]
-            qnode.th_correction=th_correction.flatten()[0]
+            qnode.correction['th']=th_correction.flatten()[0]
             tth_correction=corrections['tth_correction'][0]
-            qnode.tth_correction=tth_correction.flatten()[0]
+            qnode.correction['tth']=tth_correction.flatten()[0]
             qnode.Q=Q
-            print 'corrected', qnode.th_correction
+            print 'corrected', qnode.correction['th']
 
 
         return
@@ -362,6 +428,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         fitdict['y']=ycalc
         fitdict['area']=area.sum()
         fitdict['chi']=chimin
+        fitdict['area_err']=1.0
         print 'area',fitdict['area']
         #next add the fit results
         return fitdict
