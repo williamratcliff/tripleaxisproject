@@ -313,6 +313,9 @@ class TreeModel(QtCore.QAbstractItemModel):
         Ierr=result['Ierr']
         I_corrected=result['I_corrected']
         Ierr_corrected=result['Ierr_corrected']
+        for i in range(len(hlist)):
+            f.write('%5.4g %5.4g %5.4g\n',hlist[i],klist[i],llist[i])
+            
         
         
         f.close()
