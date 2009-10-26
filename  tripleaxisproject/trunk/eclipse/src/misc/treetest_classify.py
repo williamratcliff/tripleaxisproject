@@ -256,7 +256,7 @@ class TreeModel(QtCore.QAbstractItemModel):
                     if scannode.nodetype in ['th','tth'] and scannode.checkState()==QtCore.Qt.Checked:
                         flag=False
                         if 1:
-                            print 'exporting loop',scannode.nodetype
+                            print 'exporting loop',scannode.nodetype,scannode.q
                             plotdict=self.condense_node(scannode)
                             fitdict=self.fit_node(plotdict)
                             Idict[scannode.nodetype]=fitdict['area']
@@ -491,7 +491,8 @@ class TreeModel(QtCore.QAbstractItemModel):
         plotdict['data']['x']=x_out
         plotdict['data']['y']=counts_out
         plotdict['data']['yerr']=counts_err_out 
-        plotdict['ylabel']='Counts/%g5.1'%(node.mon0)  #assume counting by neutrons for now    
+        plotdict['ylabel']='Counts/%g5.1'%(node.mon0)  #assume counting by neutrons for now 
+        #self.condensed_dict=plotdict
 
         if 0:
             pylab.errorbar(a3_out,counts_out,counts_err_out,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
