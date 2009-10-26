@@ -202,8 +202,11 @@ class AppForm(QMainWindow):
             
     def doTreeMenu(self, point):
         treeidx=self.tree.indexAt(point)
-        node=treeidx.model().idMap[treeidx.internalId()]
-        print 'doing tree idx',node.itemData,node.nodetype
+        try:
+            node=treeidx.model().idMap[treeidx.internalId()]
+            print 'doing tree idx',node.itemData,node.nodetype
+        except:
+            pass
         
         self.tree_menu = QMenu()#self.menuBar().addMenu("&File")
         
@@ -222,6 +225,8 @@ class AppForm(QMainWindow):
         
     def export_results(self):
         print 'exporting'
+        result=self.tree_dock.widget().model().export_data()
+        print 'export result',result
 
     def create_status_bar(self):
         self.status_text = QLabel("This is a demo")
