@@ -299,6 +299,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         result['h']=hlist
         result['k']=klist
         result['l']=llist
+        result['Q']=Qlist
         result['corrections']=corrections
         return result
                             
@@ -308,13 +309,27 @@ class TreeModel(QtCore.QAbstractItemModel):
         hlist=result['h']
         klist=result['k']
         llist=result['l']
+        Qlist=result['Q']
         corrections=result['corrections']
         I=result['I']
         Ierr=result['Ierr']
         I_corrected=result['I_corrected']
         Ierr_corrected=result['Ierr_corrected']
         for i in range(len(hlist)):
-            f.write('%5.4g %5.4g %5.4g\n',hlist[i],klist[i],llist[i])
+            #h k l scan_type 
+            f.write('%5.4g %5.4g %5.4g '%(hlist[i],klist[i],llist[i]))
+            for scantype in leaftypes:
+                try:
+                    Ic=I[i][scantype]
+                    f.write ('%s %5.4g'%(scantype,Ic))
+                    Ic=Ierr[i][scantype]
+                    f.write (' %5.4g'%(Ic))
+                    Ic=corrections[i][scantype]
+                    f.write (' %5.4g'%(Ic))
+                except:
+                    pass
+            
+            f.write('\n')
             
         
         
