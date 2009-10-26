@@ -226,6 +226,10 @@ class AppForm(QMainWindow):
     def export_results(self):
         print 'exporting'
         result=self.tree_dock.widget().model().export_data()
+        
+        myfilestr='result.txt'
+        self.tree_dock.widget().model().save_data(result,myfilestr)
+        #result=self.tree.model().export_data()
         print 'export result',result
 
     def create_status_bar(self):

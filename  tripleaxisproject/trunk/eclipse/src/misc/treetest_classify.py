@@ -66,6 +66,7 @@ def check_q(q1,q2,tol=1e-6):
 
 
 nodetypes=set(['hkl','th','tth','q','other','leaf'])
+leaftypes=set(['th','tth','q','other'])
 #for hkl nodes, the itemdata is a string representation of hkl
 #for other branches, the itemdata is a string of the branch type
 #for the leaves, itemdata is the filename, measured_data will contain the actual data
@@ -244,6 +245,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         Ierr=[]
         I_corrected=[]
         Ierr_corrected=[]
+        result={}
         for hklnode in self.rootItem.childItems:
             if hklnode.checkState()==QtCore.Qt.Checked:
                 for scannode in hklnode.childItems:
@@ -255,26 +257,29 @@ class TreeModel(QtCore.QAbstractItemModel):
                     
                     if scannode.nodetype in ['th','tth'] and scannode.checkState()==QtCore.Qt.Checked:
                         flag=False
-                        if 1:
+                        try:
                             print 'exporting loop',scannode.nodetype,scannode.q
+                            if len(scannode.childItems)==0:
+                                continue
                             plotdict=self.condense_node(scannode)
                             fitdict=self.fit_node(plotdict)
                             Idict[scannode.nodetype]=fitdict['area']
                             Ierrdict[scannode.nodetype]=fitdict['area_err']
-                        #except:
-                        #    continue
+                            for leaf in scannode.childItems:
+                                if leaf.checkState()==QtCore.Qt.Checked:
+                                    h=leaf.measured_data.metadata['q_center']['h_center']
+                                    k=leaf.measured_data.metadata['q_center']['k_center']
+                                    l=leaf.measured_data.metadata['q_center']['l_center']
+                                    Q=leaf.Q
+                                    flag=True
+                                    correction[scannode.nodetype]=leaf.correction[scannode.nodetype]
+                                    Icorrdict[scannode.nodetype]=Idict[scannode.nodetype]/correction[scannode.nodetype]
+                                    Ierrcorrdict[scannode.nodetype]=Ierrdict[scannode.nodetype]/correction[scannode.nodetype]
+                                    break
+                        except:
+                            continue
                         
-                        for leaf in scannode.childItems:
-                            if leaf.checkState()==QtCore.Qt.Checked:
-                                h=leaf.measured_data.metadata['q_center']['h_center']
-                                k=leaf.measured_data.metadata['q_center']['h_center']
-                                l=leaf.measured_data.metadata['q_center']['h_center']
-                                Q=leaf.Q
-                                flag=True
-                                correction[scannode.nodetype]=leaf.correction[scannode.nodetype]
-                                Icorrdict[scannode.nodetype]=Idict[scannode.nodetype]/correction[scannode.nodetype]
-                                Ierrcorrdict[scannode.nodetype]=Ierrdict[scannode.nodetype]/correction[scannode.nodetype]
-                                break
+                        
                         if flag==True:
                             I.append(Idict)
                             Ierr.append(Ierrdict)
@@ -286,17 +291,31 @@ class TreeModel(QtCore.QAbstractItemModel):
                             I_corrected.append(Icorrdict)
                             Ierr_corrected.append(Ierrcorrdict)
                             
-            result={}
-            result['I']=I
-            result['Ierr']=Ierr
-            result['I_corrected']=I_corrected
-            result['Ierr_corrected']=Ierr_corrected
-            result['h']=hlist
-            result['k']=klist
-            result['l']=llist
+           
+        result['I']=I
+        result['Ierr']=Ierr
+        result['I_corrected']=I_corrected
+        result['Ierr_corrected']=Ierr_corrected
+        result['h']=hlist
+        result['k']=klist
+        result['l']=llist
+        result['corrections']=corrections
+        return result
                             
                                 
-                
+    def write_data(self,result,myfilestr):
+        f=open(myfilestr,'w')
+        hlist=result['h']
+        klist=result['k']
+        llist=result['l']
+        corrections=result['corrections']
+        I=result['I']
+        Ierr=result['Ierr']
+        I_corrected=result['I_corrected']
+        Ierr_corrected=result['Ierr_corrected']
+        
+        
+        f.close()
                 
         
     def correct_data(self,mydata,qscan=None):
