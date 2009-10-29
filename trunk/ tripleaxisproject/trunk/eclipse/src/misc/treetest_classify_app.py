@@ -14,6 +14,7 @@ import matplotlib.colors
 from matplotlib.font_manager import FontProperties
 from matplotlib.colors import Normalize,LogNorm
 import ticker
+import cPickle,gzip
 
 
 
@@ -21,10 +22,12 @@ class AppForm(QMainWindow):
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
         self.setWindowTitle('StructFactors')
-
+        settings = QSettings()
         self.create_menu()
         self.create_main_frame()
         self.create_status_bar()
+        self.restoreState(
+                settings.value("MainWindow/State").toByteArray())
         #self.on_draw()
 
     def save_plot(self):
@@ -111,13 +114,27 @@ class AppForm(QMainWindow):
     def create_main_frame(self):
         self.main_frame = QWidget()
         #self.integration_frame = QWidget()
-        
+        settings = QSettings()
+        self.filename=settings.value("SavedFile").toString()#None
+        self.filestrlist=[r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9',r'C:\Ce2RhIn8\Mar10_2009\magsc034.bt9']
+        #self.dirname=settings.value("Dir").toString()#None
+        self.filestrlist=None
+        self.recentfiles=None
+        self.recentfiles=settings.value("RecentFiles").toStringList()#.toList()#.toStringList()#None
+        #if self.recentfiles:
+        #    self.filestrlist=Qlist2list(self.recentfiles)
+        self.dirty=False
+        self._dirty=False
+        #self.tree=treetest_classify.myTreeView(filestrlist=self.filestrlist)
         self.tree=treetest_classify.myTreeView()
         self.tree.connect(self.tree,SIGNAL("plot"),self.onPlot)
         self.tree.connect(self.tree,SIGNAL("fitplot"),self.onFitPlot)
         self.tree.connect(self.tree,SIGNAL("clearplot"),self.onClear)
         self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
-                
+        #self.tree.reset()
+        #self.tree.expandAll()
+        
+        ##self.tree.expanded()
         self.tree_dock=QDockWidget("integration",self)
         self.tree_dock.setObjectName("Files")
         self.tree_dock.setAllowedAreas(Qt.LeftDockWidgetArea |Qt.RightDockWidgetArea)
@@ -177,10 +194,21 @@ class AppForm(QMainWindow):
         vbox = QVBoxLayout()
         vbox.addWidget(self.canvas)
         vbox.addWidget(self.mpl_toolbar)
+        
+        self.clearall()
       
         self.main_frame.setLayout(vbox)
         self.setCentralWidget(self.main_frame)
         self.tree_dock.setFeatures(QDockWidget.DockWidgetMovable|QDockWidget.DockWidgetFloatable)
+        
+        size = settings.value("MainWindow/Size",
+                              QVariant(QSize(600, 500))).toSize()
+        self.resize(size)
+        position = settings.value("MainWindow/Position",
+                                  QVariant(QPoint(0, 0))).toPoint()
+        self.move(position)
+        #self.restoreState(
+        #        settings.value("MainWindow/State").toByteArray())
 
         #self.setSizeGripEnabled(True)
         
@@ -190,6 +218,23 @@ class AppForm(QMainWindow):
         #self.form.show()
         #self.form.raise_()
         #self.form.activateWindow()
+        
+    def closeEvent(self, event):
+        if self.okToContinue():
+            settings = QSettings()
+            filename = QVariant(QString(self.filename)) \
+                    if self.filename is not None else QVariant()
+            settings.setValue("SavedFile", filename)
+            recentFiles = QVariant(self.recentfiles) \
+                    if self.recentfiles else QVariant()
+            settings.setValue("RecentFiles", recentFiles)
+            settings.setValue("MainWindow/Size", QVariant(self.size()))
+            settings.setValue("MainWindow/Position",
+                    QVariant(self.pos()))
+            settings.setValue("MainWindow/State",
+                    QVariant(self.saveState()))
+        else:
+            event.ignore()
         
     def onButtonPress(self,event):
         # TODO: finish binder so that it allows tagging of fully qualified
@@ -214,23 +259,144 @@ class AppForm(QMainWindow):
             shortcut="Ctrl+L", slot=self.load_files, 
             tip="Load Files")
         export_file_action = self.create_action("&Export Results",
-            shortcut="Ctrl+L", slot=self.export_results, 
+            shortcut="Ctrl+E", slot=self.export_results, 
             tip="Export the Results")
         self.add_actions(self.tree_menu, 
             (load_file_action, None, export_file_action))
         self.tree_menu.exec_(point)
-
+        
     def load_files(self):
-        print 'loading'
+        if not self.okToContinue():
+            return
+        if (self.filestrlist is not None) and len(self.filestrlist)!=0:
+            mydir = os.path.dirname(self.filestrlist[-1]) \
+                    if self.filestrlist[-1] is not None else "."
+        elif (self.recentfiles is not None) and len(self.recentfiles)!=0:
+            mydir = os.path.dirname(str(self.recentfiles[-1]) )
+        else:
+            mydir='.'
+        formats = ["*.bt9","*.ng5"]
+        fnames = QFileDialog.getOpenFileNames(self,
+                            "StructFactor - Choose Files", mydir,
+                            "Data files (%s)" % " ".join(formats))
+        #flist=[]
+        flist=Qlist2list(fnames)
+        #for name in fnames:
+        #    name=str(name)
+        #    flist.append(name)
+        #fnames=flist
+        if fnames:
+            if self.filestrlist:
+                for mystr in flist:
+                    self.filestrlist.append(mystr)
+            else:
+                self.filestrlist=flist
+            if self.recentfiles:
+                self.recentfiles<<fnames
+                if len(self.recentfiles)>5:
+                    self.recentfiles=self.recentfiles[-3::]
+            else:
+                self.recentfiles=fnames
+            print 'loading files',self.filestrlist
+            self.tree.model().setupModelData(self.filestrlist)
+            #self.tree.reset()
+            #self.tree.expandAll()
+            self.clearall()
+            #self.tree.expanded()
+            self.dirty=True
+            self._dirty=True
+            settings = QSettings()
+            recentFiles = QVariant(self.recentfiles) \
+                    if self.recentfiles else QVariant()
+            settings.setValue("RecentFiles", recentFiles)
+            
+
+    def okToContinue(self):
+        if self.dirty or self._dirty:
+            reply = QMessageBox.question(self,
+                            "StructureFactor - Unsaved Changes",
+                            "Save unsaved changes?",
+                            QMessageBox.Yes|QMessageBox.No|
+                            QMessageBox.Cancel)
+            if reply == QMessageBox.Cancel:
+                return False
+            elif reply == QMessageBox.Yes:
+                self.export_results()
+                #self.savePickle()
+                self.dirty=False
+                self._dirty=False
+        return True
+    
+
+        
         
     def export_results(self):
         print 'exporting'
         result=self.tree_dock.widget().model().export_data()
         
-        myfilestr='result.txt'
-        self.tree_dock.widget().model().save_data(result,myfilestr)
-        #result=self.tree.model().export_data()
-        print 'export result',result
+        #myfilestr='result.txt'
+        #extfilter=Qstring("*.txt")
+        #myfilestr=QFileDialog.getSaveFileName("",Qstring("*.txt"), self, "Save File")
+        myfilestr=self.filename if self.filename is not None else "."
+        formats=["*.txt","*.dat"]
+        myfilestr=str(QFileDialog.getSaveFileName(self,"Reduction Save File",myfilestr,
+                                                  "Data Files (%s)"%" ".join(formats)))
+        if myfilestr:
+            if "." not in myfilestr:
+                myfilestr=myfilestr+'.txt'
+            self.tree_dock.widget().model().write_data(result,myfilestr)
+            #result=self.tree.model().export_data()
+            print 'export result',result
+            self.filename=myfilestr
+            self.dirty=False
+            
+            
+    def savePickle(self,savefile=r'c:\tree.sf'):
+        error = None
+        fh = None
+        try:
+            fh = gzip.open(unicode(savefile), "wb")
+            cPickle.dump(self.tree.model(), fh, 2)
+        except (IOError, OSError), e:
+            error = "Failed to save: %s" % e
+        finally:
+            if fh is not None:
+                fh.close()
+            if error is not None:
+                return False, error
+            self._dirty = False
+            return True, "Saved %d node records to %s" % (
+                    len([1,2]),
+                    QFileInfo(savefile).fileName())
+
+    def clearall(self):
+        self.onClear()
+        self.tree.reset()
+        self.tree.expandAll()
+        try:
+            self.tree.expanded()
+        except:
+            pass
+        
+    def loadPickle(self,loadfile=r'c:\tree.sf'):
+        error = None
+        fh = None
+        try:
+            fh = gzip.open(unicode(loadfile), "rb")
+            #self.clear(False)
+            model = cPickle.load(fh)
+            self.tree.myModel=model
+            self.tree.setModel(self.tree.myModel)
+            self.clearall()
+        except (IOError, OSError), e:
+            error = "Failed to load: %s" % e
+        finally:
+            if fh is not None:
+                fh.close()
+            if error is not None:
+                return False, error
+            self._dirty = False
+            return True
 
     def create_status_bar(self):
         self.status_text = QLabel("This is a demo")
@@ -239,14 +405,29 @@ class AppForm(QMainWindow):
     def create_menu(self):        
         self.file_menu = self.menuBar().addMenu("&File")
         
-        load_file_action = self.create_action("&Save plot",
-            shortcut="Ctrl+S", slot=self.save_plot, 
+        file_open_action = self.create_action("&Open...", slot=self.load_files,
+                shortcut=QKeySequence.Open,
+                tip="Open A Data File")
+        
+        file_restore_action = self.create_action("&Restore...", slot=self.loadPickle,
+                shortcut="Ctrl+R",
+                tip="Restore the Last Saved State of the Tree")
+        
+        save_file_action = self.create_action("&Save plot",
+            shortcut=QKeySequence.Save, slot=self.save_plot, 
             tip="Save the plot")
+        
+        save_state_action = self.create_action("&Save State",
+            shortcut="Ctrl+F", slot=self.savePickle, 
+            tip="Save the State of the Tree")
+        
+        
         quit_action = self.create_action("&Quit", slot=self.close, 
             shortcut="Ctrl+Q", tip="Close the application")
         
         self.add_actions(self.file_menu, 
-            (load_file_action, None, quit_action))
+            (file_open_action,None,file_restore_action,None,save_file_action, None, 
+             save_state_action,None,quit_action))
         
         self.help_menu = self.menuBar().addMenu("&Help")
         about_action = self.create_action("&About", 
@@ -424,12 +605,22 @@ class AppForm(QMainWindow):
 
 
 
-
+def Qlist2list(fnames):
+    flist=[]
+    for name in fnames:
+        name=str(name)
+        flist.append(name)
+    fnames=flist
+    return fnames
 
 
 
 def main():
     app = QApplication(sys.argv)
+    app.setOrganizationName("NIST")
+    app.setOrganizationDomain("ncnr.nist.gov")
+    app.setApplicationName("StructureFactor")
+    #app.setWindowIcon(QIcon(":/icon.png"))
     form = AppForm()
     form.show()
     app.exec_()
