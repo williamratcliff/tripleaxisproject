@@ -581,6 +581,8 @@ if __name__=="__main__":
     if 1:
         pylab.pcolor(X,Z,P)
         pylab.colorbar()
+        pylab.xlabel('x')
+        pylab.ylabel('z')
         pylab.show()
     if 0:    
         fsum=fourier_p(h[0],k[0],l[0],P)
