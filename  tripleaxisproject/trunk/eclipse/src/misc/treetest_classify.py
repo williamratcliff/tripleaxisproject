@@ -38,7 +38,8 @@ import scipy.odr
 #from scipy.optimize import curve_fit
 import scipy, scipy.optimize
 pi=N.pi
-from mpfit import mpfit
+from spinwaves.utilities.mpfit.mpfit import mpfit 
+#from utilities.mpfit import mpfit
 import rescalculator.rescalc as rescalc
 import pylab
 
@@ -136,11 +137,13 @@ class TreeModel(QtCore.QAbstractItemModel):
         self.idMap = {}
         self.hklmap={}
         rootData = []
+        self.filestrlist=filestrlist
         rootData.append(QtCore.QVariant("HKL"))
         rootData.append(QtCore.QVariant("Summary"))
         self.rootItem = TreeItem(rootData)
         self.idMap[id(self.rootItem)] = self.rootItem
-        self.setupModelData(filestrlist, self.rootItem)
+        if not (filestrlist==None or filestrlist==[]):
+            self.setupModelData(filestrlist, self.rootItem)
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -254,30 +257,29 @@ class TreeModel(QtCore.QAbstractItemModel):
                     Ierrdict={}
                     Icorrdict={}
                     Ierrcorrdict={}
-                    
+                    flag=False
                     if scannode.nodetype in ['th','tth'] and scannode.checkState()==QtCore.Qt.Checked:
-                        flag=False
+                        #flag=False
                         try:
                             print 'exporting loop',scannode.nodetype,scannode.q
-                            if len(scannode.childItems)==0:
-                                continue
-                            plotdict=self.condense_node(scannode)
-                            fitdict=self.fit_node(plotdict)
-                            Idict[scannode.nodetype]=fitdict['area']
-                            Ierrdict[scannode.nodetype]=fitdict['area_err']
-                            for leaf in scannode.childItems:
-                                if leaf.checkState()==QtCore.Qt.Checked:
-                                    h=leaf.measured_data.metadata['q_center']['h_center']
-                                    k=leaf.measured_data.metadata['q_center']['k_center']
-                                    l=leaf.measured_data.metadata['q_center']['l_center']
-                                    Q=leaf.Q
-                                    flag=True
-                                    correction[scannode.nodetype]=leaf.correction[scannode.nodetype]
-                                    Icorrdict[scannode.nodetype]=Idict[scannode.nodetype]/correction[scannode.nodetype]
-                                    Ierrcorrdict[scannode.nodetype]=Ierrdict[scannode.nodetype]/correction[scannode.nodetype]
-                                    break
+                            if not len(scannode.childItems)==0:
+                                plotdict=self.condense_node(scannode)
+                                fitdict=self.fit_node(plotdict)
+                                Idict[scannode.nodetype]=fitdict['area']
+                                Ierrdict[scannode.nodetype]=fitdict['area_err']
+                                for leaf in scannode.childItems:
+                                    if leaf.checkState()==QtCore.Qt.Checked:
+                                        h=leaf.measured_data.metadata['q_center']['h_center']
+                                        k=leaf.measured_data.metadata['q_center']['k_center']
+                                        l=leaf.measured_data.metadata['q_center']['l_center']
+                                        Q=leaf.Q
+                                        flag=True
+                                        correction[scannode.nodetype]=leaf.correction[scannode.nodetype]
+                                        Icorrdict[scannode.nodetype]=Idict[scannode.nodetype]/correction[scannode.nodetype]
+                                        Ierrcorrdict[scannode.nodetype]=Ierrdict[scannode.nodetype]/correction[scannode.nodetype]
+                                        break
                         except:
-                            continue
+                            pass
                         
                         
                         if flag==True:
@@ -316,7 +318,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         I_corrected=result['I_corrected']
         Ierr_corrected=result['Ierr_corrected']
         for i in range(len(hlist)):
-            #h k l scan_type 
+            #h k l Q scan_type I Ierr correction Icorrected Ierrcorrected ....
             f.write('%5.4g %5.4g %5.4g '%(hlist[i],klist[i],llist[i]))
             for scantype in leaftypes:
                 try:
@@ -325,6 +327,10 @@ class TreeModel(QtCore.QAbstractItemModel):
                     Ic=Ierr[i][scantype]
                     f.write (' %5.4g'%(Ic))
                     Ic=corrections[i][scantype]
+                    f.write (' %5.4g'%(Ic))
+                    Ic=I_corrected[i][scantype]
+                    f.write (' %5.4g'%(Ic))
+                    Ic=Ierr_corrected[i][scantype]
                     f.write (' %5.4g'%(Ic))
                 except:
                     pass
@@ -438,7 +444,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         y=plotdict['data']['y']
         yerr=plotdict['data']['yerr']
         kernel=findpeak.find_kernel(y)
-        npeaks,nlist,plist=findpeak.find_npeaks(x,y,yerr,kernel,nmax=3)
+        npeaks,nlist,plist=findpeak.find_npeaks(x,y,yerr,kernel,nmax=2)
         results=findpeak.findpeak(x,y,npeaks,kernel=kernel)
         fwhm=findpeak.findwidths(x,y,npeaks,results['xpeaks'],results['indices'])
         sigma=fwhm/2.354
@@ -451,12 +457,33 @@ class TreeModel(QtCore.QAbstractItemModel):
         fresults= scipy.optimize.leastsq(findpeak.cost_func, p0, args=(x,y,yerr),full_output=1)
         p1=fresults[0]
         covariance=fresults[1]
-        area=N.array(N.abs(p1[2+2*npeaks::]))
-        fwhm=N.array(N.abs(p1[2+npeaks:2+2*npeaks]))
+
+        parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
+        parinfo=[]
+        for i in range(len(p0)):
+            parinfo.append(copy.deepcopy(parbase))
+        for i in range(len(p0)): 
+            parinfo[i]['value']=p0[i]
+        parinfo[1]['fixed']=1 #fix slope
+        fa = {'x':x, 'y':y, 'err':yerr}
+        m = mpfit(findpeak.myfunctlin, p0, parinfo=parinfo,functkw=fa) 
+        print 'status = ', m.status
+        print 'params = ', m.params
+        p1=m.params
+        covariance=m.covar
+        
         dof=len(y)-len(p1)
         fake_dof=len(y)
         chimin=(findpeak.cost_func(p1,x,y,yerr)**2).sum()
-        chimin=chimin/fake_dof
+        chimin=chimin/dof if dof>0 else chimin/fake_dof
+        covariance=covariance*chimin #assume our model is good
+        
+        
+        
+        area=N.array(N.abs(p1[2+2*npeaks::]))
+        area_sig=covariance.diagonal()[2+2*npeaks::]
+        fwhm=N.array(N.abs(p1[2+npeaks:2+2*npeaks]))
+        
         
         
         ycalc=findpeak.gen_function(p1,x)
@@ -465,7 +492,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         fitdict['y']=ycalc
         fitdict['area']=area.sum()
         fitdict['chi']=chimin
-        fitdict['area_err']=1.0
+        fitdict['area_err']=N.sqrt(area_sig.sum())
         print 'area',fitdict['area']
         #next add the fit results
         return fitdict
@@ -491,6 +518,8 @@ class TreeModel(QtCore.QAbstractItemModel):
         if node.nodetype in ['q','other']:
             return
         #We'll deal with these omitted nodetypes later
+        if children==[]:
+            return None
         for child in children:
             mydata=child.measured_data
             monlist.append(mydata.metadata['count_info']['monitor'])
@@ -581,15 +610,17 @@ class TreeModel(QtCore.QAbstractItemModel):
                 target='other'
         return target
 
-    def setupModelData(self, filestrlist, parent):
+    def setupModelData(self, filestrlist, parent=None):
         parents = []
         indentations = []
-        parents.append(parent)
-        indentations.append(0)
+        #if parent==None:
+        #    parents.append(self.rootItem)
+        #else:
+        #    parents.append(parent)
+            
+        parents.append(self.rootItem)
 
         #myfilestrlist=[r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9',r'C:\Ce2RhIn8\Mar10_2009\magsc034.bt9']
-        
-        
         
         for myfilestr in filestrlist:
             mydatareader=readncnr.datareader()
@@ -627,51 +658,15 @@ class TreeModel(QtCore.QAbstractItemModel):
                 targetdict['qnode']=qnode
                 targetnode=targetdict[self.place_data(mydata)]
                 leaf=self.addnode(data,targetnode,nodetype='leaf',measured_data=mydata)
-                idx=self.index(0,0,QtCore.QModelIndex())
-                idx.model().setData(idx,QtCore.QVariant(QtCore.Qt.Checked), QtCore.Qt.CheckStateRole) 
-
+                #idx=self.index(0,0,QtCore.QModelIndex())
+                #idx.model().setData(idx,QtCore.QVariant(QtCore.Qt.Checked), QtCore.Qt.CheckStateRole) 
+        #self.emit(QtCore.SIGNAL("dataChanged(QtCore.QModelIndex,QtCore.QModelIndex)"))
         
-        number = 0
-        if 0:
-            while number < len(lines):
-                position = 0
-                while position < len(lines[number]):
-                    if lines[number][position] != " ":
-                        break
-                    position += 1
-
-                lineData = lines[number][position:].trimmed()
-
-                if not lineData.isEmpty():
-                    # Read the column data from the rest of the line.
-                    columnStrings = lineData.split("\t", QtCore.QString.SkipEmptyParts)
-                    columnData = []
-                    for column in range(0, len(columnStrings)):
-                        columnData.append(columnStrings[column])
-
-                    if position > indentations[-1]:
-                        # The last child of the current parent is now the new parent
-                        # unless the current parent has no children.
-
-                        if parents[-1].childCount() > 0:
-                            parents.append(parents[-1].child(parents[-1].childCount() - 1))
-                            indentations.append(position)
-
-                    else:
-                        while position < indentations[-1] and len(parents) > 0:
-                            parents.pop()
-                            indentations.pop()
-
-                    # Append a new item to the current parent's list of children.
-                    item = TreeItem(columnData, parents[-1])
-                    self.idMap[id(item)] = item
-                    parents[-1].appendChild(item)
-
-                number += 1
+    
 
 
 class myTreeView(QtGui.QTreeView):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None,filestrlist=None):
         super(myTreeView, self).__init__(parent)
 
         #self.myModel = myModel()
@@ -683,7 +678,7 @@ class myTreeView(QtGui.QTreeView):
         #f.open(QtCore.QIODevice.ReadOnly)
         #self.myModel=TreeModel(QtCore.QString(f.readAll()))
         #f.close()
-        filestrlist=[r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9',r'C:\Ce2RhIn8\Mar10_2009\magsc034.bt9']
+        #filestrlist=[r'C:\Ce2RhIn8\Mar10_2009\magsc035.bt9',r'C:\Ce2RhIn8\Mar10_2009\magsc034.bt9']
         self.myModel=TreeModel(filestrlist)
         self.setModel(self.myModel)
         self.dragEnabled()
@@ -748,10 +743,14 @@ class myTreeView(QtGui.QTreeView):
                 print 'emitted signal'
         elif node.nodetype in ['th','tth']:
             plotdict=self.myModel.condense_node(node)
-            fitdict=self.myModel.fit_node(plotdict)
-            self.emit(QtCore.SIGNAL("clearplot"),'clear')
-            self.emit(QtCore.SIGNAL("plot"),plotdict)
-            self.emit(QtCore.SIGNAL("fitplot"),fitdict)
+            if plotdict is not None:
+                try:
+                    fitdict=self.myModel.fit_node(plotdict)
+                    self.emit(QtCore.SIGNAL("clearplot"),'clear')
+                    self.emit(QtCore.SIGNAL("plot"),plotdict)
+                    self.emit(QtCore.SIGNAL("fitplot"),fitdict)
+                except:
+                    pass
                 
         if not deselected.model()==None:
             print 'deselected',deselected.model().idMap[deselected.internalId()].itemData
