@@ -234,7 +234,7 @@ def optimize_DW(y,order=4):
     else:
         minkern=0
     odd_len=make_odd(len(y))    
-    kernel_range=range(order+2+minkern,min(len(y)/3,odd_len),2) #The 3 here is arbitrary
+    kernel_range=range(order+2+minkern,min(len(y)/1,odd_len),2) #The 3 here is arbitrary and this line needs to be more robust!
     print kernel_range
     for kernel in kernel_range:
         print 'kernel',kernel
