@@ -1,8 +1,8 @@
-import numpy as N
+#import numpy as N
 threshold=1e-6
 
 
-simple_scans_parameter=['title','type','ef', 'ei','efixed','counts','counttype','detectortype','prefac','npts','timeout','holdpoint','holdscan','comment',
+simple_scans_parameter=['title','type','ef', 'ei','fixede','counts','counttype','detectortype','prefac','npts','timeout','holdpoint','holdscan','comment',
                         'filename']
 aliased_scan_parameter=['w_i','w_c','w_f','w_s',
                         'h_i','h_c','h_f','h_s',
@@ -57,7 +57,7 @@ class scanparser:
                     start=float(toks[0])
                     step=float(toks[1])
                     stop=start+(npts-1)*step
-                    prange[field]['step']=N.absolute(step)
+                    prange[field]['step']=abs(step)
                     prange[field]['start']=min(start,stop)
                     prange[field]['stop']=max(start,stop)
                     #prange['type']=toks[-1]
@@ -72,7 +72,7 @@ class scanparser:
                 #print 'center',center
                 start=center-float(step)*(npts-1)/2
                 stop=center+float(step)*(npts-1)/2
-                prange[field]['step']=N.absolute(step)
+                prange[field]['step']=abs(step)
                 prange[field]['start']=min(start,stop)
                 prange[field]['stop']=max(start,stop)
                 #prange['type']=''
@@ -90,7 +90,8 @@ class scanparser:
                     if toks[-1]=='s':
                         #print 'start stop'
                         start=toks[0].split('~')
-                        start=N.array(start).astype('Float64')
+                        start=[float(s) for s in start]
+                        #start=N.array(start).astype('Float64')
                         prange['qx']['start']=start[0]
                         prange['qy']['start']=start[1]
                         prange['qz']['start']=start[2]
@@ -98,7 +99,8 @@ class scanparser:
                         orange['qy']['start']=start[1]
                         orange['qz']['start']=start[2]
                         stop=toks[1].split('~')
-                        stop=N.array(stop).astype('Float64')
+                        stop=[float(s) for s in stop]
+                        #stop=N.array(stop).astype('Float64')
                         prange['qx']['stop']=stop[0]
                         prange['qy']['stop']=stop[1]
                         prange['qz']['stop']=stop[2]
@@ -108,7 +110,9 @@ class scanparser:
                         #orange['type']=toks[-1]
                         #prange['type']=toks[-1]
                         if npts>1:
-                            step=(stop-start)/(npts-1)
+                            step=[]
+                            for i in range(len(stop)):
+                                step.append((stop[i]-start[i])/(npts-1))
                             prange['qx']['step']=step[0]
                             prange['qy']['step']=step[1]
                             prange['qz']['step']=step[2]
@@ -119,10 +123,14 @@ class scanparser:
                     elif toks[-1]=='i':
                         #print 'initial step'
                         start=toks[0].split('~')
-                        start=N.array(start).astype('Float64')
+                        start=[float(s) for s in start]
+                        #start=N.array(start).astype('Float64')
                         step=toks[1].split('~')
-                        step=N.array(step).astype('Float64')
-                        stop=start+(npts-1)*step
+                        step=[float(s) for s in step]
+                        #step=N.array(step).astype('Float64')
+                        stop=[]
+                        for i in range(len(step)):
+                            stop.append(start[i]+(npts-1)*step[i])
                         orange['qx']['start']=start[0]
                         orange['qy']['start']=start[1]
                         orange['qz']['start']=start[2]
@@ -142,17 +150,22 @@ class scanparser:
                         #orange['type']=toks[-1]
                 else:
                     center=toks[0].split('~')
+                    center=[float(s) for s in center]
                     #print 'center step'
                     #print 'center',center
-                    center=N.array(center).astype('Float64')
+                    #center=N.array(center).astype('Float64')
                     step=toks[1].split('~')
-                    step=N.array(step).astype('Float64')
-                    start=center-(npts-1)/2*step
-                    stop=center+(npts-1)/2*step
+                    step=[float(s) for s in step]
+                    #step=N.array(step).astype('Float64')
+                    start=[]
+                    stop=[]
+                    for i in range(len(center)):
+                        start.append(center[i]-(npts-1)/2*step[i])
+                        stop.append(center[i]+(npts-1)/2*step[i])
                     
-                    prange['qx']['center']=start[0]
-                    prange['qy']['center']=start[1]
-                    prange['qz']['center']=start[2]
+                    prange['qx']['center']=center[0]
+                    prange['qy']['center']=center[1]
+                    prange['qz']['center']=center[2]
                     prange['qx']['step']=step[0]
                     prange['qy']['step']=step[1]
                     prange['qz']['step']=step[2]
@@ -179,15 +192,18 @@ class scanparser:
 
 
     def parse_scan(self):
-        scanstr=self.scanstr
+        scanstr=self.scanstr.lower().strip()
         self.scan_description={}
         scan_description=self.scan_description
         scan_description['scan_string']=scanstr
         scan_description['range_strings']=[]
 
         toks=scanstr.split(':')
+        toks=[str(i) for i in toks]
         try:
-            if toks[0].lower()!='scan':
+            #print toks
+            #print 'toks',toks[0]
+            if toks[0].lower().strip()!='scan':
                 raise BadScanError,'Not a Valid Scan'
             toks=toks[1:]
             for tok in toks:
@@ -196,7 +212,7 @@ class scanparser:
                 if field[0]=='':
                     return self.scan_description # for fpx scans can get a '::Title'  ack!!!!!!
                 else:
-                    key=field[0].lower()
+                    key=str(field[0].lower())
                     value=field[1]
                     if key.lower()=='range':
                         scan_description['range_strings'].append(tok.lower())
@@ -212,6 +228,7 @@ class scanparser:
             return self.scan_description
 
     def get_varying(self):
+        #print 'get varying'
         scan_description=self.scan_description
         scanstr_parsed=self.parse_scan()
         if self.scan_description=={}:
@@ -228,7 +245,7 @@ class scanparser:
                 for key,value in ranges.iteritems():
                     self.ranges[key]=value
                     #print 'key',key,'value',value
-                    if N.absolute(value['step'])>threshold:
+                    if abs(value['step'])>threshold:
                         self.varying.append(key)
                 for key,value in oranges.iteritems():
                     self.oranges[key]=value
@@ -237,9 +254,11 @@ class scanparser:
         
     def add_parameter(self,key,value):
         if key in simple_scans_parameter:
+            #print 'simple_scan_parameter'
             if not (value==None):
                 self.scan_description[key]=value
         elif key in aliased_scan_parameter:
+            #print 'aliased'
             if key in w_alias and not (value==None):
                 rangetype='e'
                 if not (self.oranges.has_key('e')):
@@ -286,13 +305,18 @@ class scanparser:
                     self.oranges['qz']['step']=value
                 if key=='l_c' and not (value==None):
                     self.oranges['qz']['center']=value 
-        else: 
+        elif not key in ['delete']: 
+            #print 'nonaliased range'
             #a nonaliased range
-            if not (self.oranges.has_key(key)) and not (value==None):
-                            self.oranges[key]={}
             keyparts=key.split('_')
             devname=keyparts[0]
+            #print keyparts
+            #if len(keyparts)==2:
             component=keyparts[1]
+            if not (self.oranges.has_key(devname)) and not (value==None):
+                #print 'new_orange',key
+                self.oranges[devname]={}
+            
             if  component=='i' and not (value==None):
                     self.oranges[devname]['start']=value
             if component=='f' and not (value==None):
@@ -376,10 +400,12 @@ class scanparser:
         for key,value in newobj.__dict__.iteritems():
             if key=='scans':
                 pass
-            elif key=='delete':
+            elif key=='delete' and not value==None:
                 self.delete_parameter(key,value)
             else:
+                #print 'adding'
                 self.add_parameter(key,value)
+                #print 'added'
     
     def verify(self):
         """"
@@ -412,31 +438,43 @@ class scanparser:
                     raise BadScanError,'qx,qy,and qz are different types of scans!  Scan is ill defined'
             else:
                 raise BadScanError,'qx,qy,and qz are different types of scans!  Scan is ill defined'
-                
+
+#simple_scans_parameter=['title','type','ef', 'ei','efixed','counts','counttype','detectortype','prefac','npts','timeout','holdpoint','holdscan','comment',
+#                        'filename']        
+            
                     
     def generate_new_description(self):
-        s='Scan:'
+        s='Scan'
         for key,value in self.scan_description.iteritems():
-            if not key in ignore_list:
-                s='%s:%s=%s'%(s,key,str(value))
+            if not key in ignore_list and not value==None:
+                #print 'key',key,value
+                if key in ['npts','fixed','subid']:
+                    s='%s:%s=%d'%(s,key,int(value))
+                elif key in ['holdpoint','counts','prefac','holdscan']:
+                    s='%s:%s=%3.1f'%(s,key,float(value))
+                else:
+                    try:
+                        s='%s:%s=%3.5f'%(s,key,float(value))
+                    except:
+                        s='%s:%s=%s'%(s,key,str(value))                    
         for key,value in self.oranges.iteritems():
             if not key in ['qx','qy','qz']:
-                s='%s:Range=%s='%(s,key)
+                s='%s:Range=%s='%(s,key.upper())
                 if value['type']=='s':
-                    s='%s %3.5g %3.5g s'%(s,float(value['start']), float(value['stop']))
+                    s='%s%4.5f %4.5f s'%(s,float(value['start']), float(value['stop']))
                 if value['type']=='i':
-                    s='%s %3.5g %3.5g i'%(s,float(value['start']), float(value['step']))
+                    s='%s%4.5f %4.5f i'%(s,float(value['start']), float(value['step']))
                 if value['type']=='':
-                    s='%s %3.5g %3.5g'%(s,float(value['center']), float(value['step']))
+                    s='%s%4.5f %4.5f'%(s,float(value['center']), float(value['step']))
         if self.oranges.has_key('qx'):
             if self.oranges['qx']['type']=='s':
-                s='%s:RANGE=Q=%3.5g~%3.5g~%3.5g %3.5g~%3.5g~%3.5g s'%(s,float(self.oranges['qx']['start']),float(self.oranges['qy']['start']),float(self.oranges['qz']['start']),
+                s='%s:RANGE=Q=%3.5f~%3.5f~%3.5f %3.5f~%3.5f~%3.5f s'%(s,float(self.oranges['qx']['start']),float(self.oranges['qy']['start']),float(self.oranges['qz']['start']),
                                                                    float(self.oranges['qx']['stop']),float(self.oranges['qy']['stop']),float(self.oranges['qz']['stop']))
             elif self.oranges['qx']['type']=='i':
-                s='%s:RANGE=Q=%3.5g~%3.5g~%3.5g %3.5g~%3.5g~%3.5g i'%(s,float(self.oranges['qx']['start']),float(self.oranges['qy']['start']),float(self.oranges['qz']['start']),
+                s='%s:RANGE=Q=%3.5f~%3.5f~%3.5f %3.5f~%3.5f~%3.5f i'%(s,float(self.oranges['qx']['start']),float(self.oranges['qy']['start']),float(self.oranges['qz']['start']),
                                                                    float(self.oranges['qx']['step']),float(self.oranges['qy']['step']),float(self.oranges['qz']['step']))   
             elif self.oranges['qx']['type']=='':
-                s='%s:RANGE=Q=%3.5g~%3.5g~%3.5g %3.5g~%3.5g~%3.5g'%(s,float(self.oranges['qx']['center']),float(self.oranges['qy']['center']),float(self.oranges['qz']['center']),
+                s='%s:RANGE=Q=%3.5f~%3.5f~%3.5f %3.5f~%3.5f~%3.5f'%(s,float(self.oranges['qx']['center']),float(self.oranges['qy']['center']),float(self.oranges['qz']['center']),
                                                                    float(self.oranges['qx']['step']),float(self.oranges['qy']['step']),float(self.oranges['qz']['step']))            
         return s
     
@@ -456,10 +494,32 @@ class Parseobj(object):
         #self.delete='h_f k_f l_f h_i k_i l_i'
 
 def driver(original_scan,parseobj):
-    myparser=scanparser(scanstr)
+    
+    #if hasattr(parseob,'ei') and hasattr(parseob,'ef'):
+    if parseobj.ei==True and parseobj.ef==True:
+        raise BadScanError,'Not a Valid Scan.  Cannot fix both ei and ef.'
+    elif parseobj.ei==True:
+        parsobj.fixed=0
+    elif parseobj.ef==True:
+        parsobj.fixed=1
+    delattr(parseobj,'ei')
+    delattr(parseobj,'ef')
+    for key,value in parseobj.__dict__.iteritems():
+        if not value==None:
+            try:
+                parseobj.__dict__[key]=value[0]
+            except:
+                pass
+            #print key,parseobj.__dict__[key]
+    print 'original_scan\n', original_scan
+    myparser=scanparser(original_scan)
+    #print 'instantiated', myparser.__dict__.keys()
+    scanstr_parsed=myparser.parse_scan()
+    #print 'scanstr_parsed',scanstr_parsed
     varying=myparser.get_varying()
-    #print 'varying'
+    #print 'varying',varying
     myparser.scanop(parseobj)
+    #print 'oranges',myparser.oranges
     myparser.verify()
     s=myparser.generate_new_description()
     return s 

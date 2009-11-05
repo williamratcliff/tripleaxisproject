@@ -4,7 +4,8 @@ import functools,inspect
 import argparse
 pi=math.pi
 #import readline
-
+#instrument='localhost'
+#instrument='129.6.121.48'
 import fnmatch, copy
 
 from ice import * 
@@ -28,13 +29,13 @@ from ice.gui.core import IceDialog
 from ice.gui.core import IceEditPanel
 from ice.gui.core import IceWindow
 from ice.swing import *
-
+import scanparser3 as scanparser
 
 import readline
 import sys
 
 c=ClientAPI.getInstance('test','localhost')
-
+#c=ClientAPI.getInstance('test','129.6.121.48')
 
 
 ###For now, I'm including stubs for testing purposes.  These need to be replaced with Java classes which have the actual 
@@ -1061,13 +1062,53 @@ class Devices(object):
 		return isvalid
 	    
 	    
-	def scanop(self, scanlist,parameters, values):
+	def scanop(self, scanlist,myparseobj):
 		"""For the scans in scanlist, sets the parameters to the given set of values"""
-		self.send_command("Scan ListDescr "+self.Title)
-		for scan in scanlist:
-			if self.isScan(scan):
-				for i in range(len(parameters)):
-					print 'In scan ',scan,' setting ',parameter[i], ' to ', value[i]
+		present_scans=self.present_scans
+		matched_scans=copy.deepcopy(self.match(present_scans,scanlist))
+		#print 'present_scans', present_scans
+		#print 'matched_scans', matched_scans
+		for scan in matched_scans:
+			#print 'dry running ',scan
+			getscandescription=GetScanDescription(scan)
+			#print '1'
+			getscandescription.run()
+			#print '2'
+			scan_description=getscandescription.scan_description
+			#print 'scan_description', scan_description
+			#print 'parseobj',myparseobj.__dict__['scanstr']
+			new_scan_description=scanparser.driver(scan_description,myparseobj)
+			
+			print 'new_scan\n',new_scan_description
+			scanName=scan+'_tmp'
+			#print 'listing'
+			scanDesrToListCommand = ScanDescrToListCommand(scanName,new_scan_description)
+			#print 'listed'
+			scanDesrToListCommand.run()
+			scandryrun = ScanDryRunCommand(scanName)
+			scandryrun.run()
+			print 'result',scandryrun.result
+			if str(scandryrun.result).find('unknown scan') >=0:
+				print 'epic fail.  Your scan operation was unsuccessful.  Sorry...'
+				self.deleteScanFromScanList(scanName)
+			else:
+				self.deleteScanFromScanList(scanName)
+				scanDesrToListCommand = ScanDescrToListCommand(scan,new_scan_description)
+				scanDesrToListCommand.run()
+				
+			#print scan,' dry ran'   
+			
+			#scanDesrToListCommand = ScanDescrToListCommand(scan,new_scan_description)
+			#scanDesrToListCommand.run()
+			
+		
+		
+		
+		
+		
+		#self.send_command("Scan ListDescr "+self.Title)
+		#for scan in scanlist:
+		
 		return
 	    
 	def run_asynchronous(commandstr):
@@ -1729,17 +1770,29 @@ class CmdLineApp(Cmd):
 	def do_scanop(self,arg,opts=None):
 		"""
 		This command takes a list of scans and changes a set of parameters in these scans.
-		usage:scanop <scanlist> ,<parameter name> <parameter value>, <parameter name> <parameter value>
-		ex:scanop scan[1-5] tscan*,qx 1.0 qy 1.0
+		For a list of parameters type 'scanop -h'.  Generally, for any moving device you may use it as a scan parameter.
+		There is relatively little error checking on the arguments, so it is possible this will corrupt your scan, so I
+		suggest you save a backup and test it first.  Especially if you plan to use it in a sequence!!!!  The things that I
+		do check for is if your parameter is consistent with the original form of the scan.  So, for example, if you add a new
+		range, it should have all the parameters necessary to define a scan (for example, initial, final, npts.  If you are modifying
+		and existing range, then you should check that your parameters are consistent.  For example, if the original scan defined
+		h_center, h_step, and npts.  Then don't add a h_final parameter.  The resulting scan will be ambiguous.  Use the -delete <prange>
+		delete the offending ranges.  I will first delete them, then attempt to add your new ranges.
+		usage:scanop <scanlist> <-parameter name> <parameter value> <-parameter name> <parameter value>
+		ex:scanop scan[1-5] tscan* -h_i 1.0 h_f 1.0 -prefac 2
+		ex:scanop scanb* -temp_i 200 -a3_i 32.3
+		ex:scanob scanb* -temp_i 200 -delete h_i h_f -npts 3 -h_c 4 to change from and initial step final scan to a center step npts scan
 		"""
 		args=arg.split()
 		devices=Devices()
-		parser = argparse.ArgumentParser(description='Frabble the foo and the bars')		
+		parser = argparse.ArgumentParser(description='Frabble the foo and the bars')	
+		parser.add_argument('scans', nargs='+', help='scans to be modified')
+		parser.add_argument('-delete', nargs='+', help='scan ranges to be deleted')		
 		parser.add_argument('-title', nargs=1, help='title of the scan')
-		parser.add_argument('-type', type=int,choices='01256789',nargs=1, help='title')
+		parser.add_argument('-type',choices='01256789',nargs=1, help='title')
 		parser.add_argument('-ef', action='store_true', help='fixed energy is ef')
 		parser.add_argument('-ei', action='store_true', help='fixed energy is ei')		
-		parser.add_argument('-efixed', type=float, nargs=1, help='value of fixed energy')
+		parser.add_argument('-fixede', type=float, nargs=1, help='value of fixed energy')
 		parser.add_argument('-counts', type=int, nargs=1, help='number of counts for the point')
 		parser.add_argument('-counttype', nargs=1, help='device used to count')
 		parser.add_argument('-detectortype', nargs=1, help='device used to accumulate data.  Used only for xpeek and metadata in file')
@@ -1749,18 +1802,48 @@ class CmdLineApp(Cmd):
 		parser.add_argument('-timeout', type=int,nargs=1, help='time after which the preset counter will be stopped regardless of whether it has reached its preset value')
 		parser.add_argument('-holdpoint', type=int,nargs=1, help='holding time before the preset counter is started at each point of a scan')
 		parser.add_argument('-holdscan',type=int, nargs=1, help='holding time before a preset counter is started for the first point of a scan')
-		parser.add_argument('-ccmment', nargs=1, help='the user can enter a comment here')
+		parser.add_argument('-comment', nargs=1, help='the user can enter a comment here')
 		parser.add_argument('-filename', nargs=1, help='specifies a string to be added at the beginning of the data filename')
-		parser.add_argument('-q', nargs=3, help='h k l')
-		
-		parser.add_argument('-w', nargs=1, help='energy transfer')
-		
+		#parser.add_argument('-q', nargs=3, help='h k l')
+		parser.add_argument('-w_i', nargs=1, help='energy transfer initial')
+		parser.add_argument('-w_c', nargs=1, help='energy transfer center')
+		parser.add_argument('-w_f', nargs=1, help='energy transfer final')
+		parser.add_argument('-w_s', nargs=1, help='energy transfer step')
+		parser.add_argument('-h_i', nargs=1, help='h initial')
+		parser.add_argument('-h_c', nargs=1, help='h center')
+		parser.add_argument('-h_f', nargs=1, help='h final')
+		parser.add_argument('-h_s', nargs=1, help='h step')
+		parser.add_argument('-k_i', nargs=1, help='k initial')
+		parser.add_argument('-k_c', nargs=1, help='k center')
+		parser.add_argument('-k_f', nargs=1, help='k final')
+		parser.add_argument('-k_s', nargs=1, help='k step')
+		parser.add_argument('-l_i', nargs=1, help='l initial')
+		parser.add_argument('-l_c', nargs=1, help='l center')
+		parser.add_argument('-l_f', nargs=1, help='l final')
+		parser.add_argument('-l_s', nargs=1, help='l step')
+		present_devices=devices.present_devices
+		omitted=['h','k','l','hkl','e','qx','q(x)','q(y)','qz','q(z)']
+		for dev in present_devices:
+			if not (dev in omitted):
+				parser.add_argument('-%s_i'%(dev,), nargs=1, help=argparse.SUPPRESS)#, help='%s initial'%(dev,))
+				parser.add_argument('-%s_c'%(dev,), nargs=1, help=argparse.SUPPRESS)#, help='%s center'%(dev,))
+				parser.add_argument('-%s_f'%(dev,), nargs=1, help=argparse.SUPPRESS)#, help='%s final'%(dev,))
+				parser.add_argument('-%s_s'%(dev,), nargs=1, help=argparse.SUPPRESS)#, help='%s step'%(dev,))
+		#print 'parsing'
 		myargs = parser.parse_args(args)
-		q=myargs.q
-		ef=myargs.ef
-		ei=myargs.ei
-		omega=myargs.w
-		efixed=myargs.efixed
+		#print 'parsed'
+		
+		
+		#print 'myargs',myargs.__dict__.keys()
+		#print 'myargs',myargs.__dict__['psdc14_s']
+		#print 'myargs',myargs.psdc14_s
+		devices.scanop(myargs.scans,myargs)
+		
+		#q=myargs.q
+		#ef=myargs.ef
+		#ei=myargs.ei
+		#omega=myargs.w
+		#efixed=myargs.efixed
 		if 0:
 			paramlist=args[1].split()
 			if len(paramlist)%2!=0:
