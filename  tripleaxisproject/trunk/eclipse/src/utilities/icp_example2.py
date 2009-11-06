@@ -144,6 +144,16 @@ class GetErrs(BroadcastMessageListener):
 	def actionPerformed(self,me):
 		data=me.getData()
 		print data
+		if not  str(data).find('Stopped')==-1:
+			print 'exiting'
+			sys.exit()
+		#if not str(data).find('Paused')==-1:
+		#	print 'instrument paused'  #for now exit
+		#	sys.exit()
+		#if not str(data).find('Resuming')==-1:
+		#	print 'instrument Resuming'  #for now exit
+		#	sys.exit()
+			
 	def __del__(self):
 		comm.removeMessageListener(self)
 geterrs=GetErrs()
@@ -434,7 +444,10 @@ class Devices(object):
 	def environmental_devices():
 		doc="list of environment devices currently present on the instrument"
 		def fget(self):
-			self._environmental_devices=['temp','magfield']
+			controller=self.controller
+			#self._environmental_devices=['temp','magfield']
+			#environmental_devices=c.getEnvDevices()
+			self._environmental_devices=[str(device.name).lower() for device in controller.getEnvDevices()]
 			return self._environmental_devices
 
 		return locals()
@@ -457,7 +470,10 @@ class Devices(object):
 	def counting_devices():
 		doc="list of counting devices currently present on the instrument"
 		def fget(self):
-			self._counting_devices=['time','monitor']
+			controller=self.controller
+			#self._counting_devices=['time','monitor']
+			#counting_devices=c.getCounterDevices()
+			self._counting_devices=[str(device.name).lower() for device in controller.getCounterDevices()]
 			return self._counting_devices
 		return locals()
 		#Java updtate
@@ -480,15 +496,17 @@ class Devices(object):
 	def temperature_devices():
 		doc="list of temperature devices currently present on the instrument"
 		def fget(self):
-			self._temperature_devices=[]
+			#self._temperature_devices=[]
 			controller=self.controller
-			devices=self.present_devices
+			#devices=self.present_devices
 		
-			for device in devices:
-				actual_device=controller.getAllDevices(device)
-				if len(actual_device)>1:
-					if type(actual_device[-1]) is InstalledTempDevice:
-						self._temperature_devices.append(device)
+			#for device in devices:
+			#	actual_device=controller.getAllDevices(device)
+			#	if len(actual_device)>1:
+			#		if type(actual_device[-1]) is InstalledTempDevice:
+			#			self._temperature_devices.append(device)
+			#self._temperature_devices=c.getTempDevices()
+			self._temperature_devices=[str(device.name).lower() for device in controller.getTempDevices()]
 			return self._temperature_devices
 		return locals()
 		#Here, the problem is that the type of temp is 'environment'
@@ -503,16 +521,18 @@ class Devices(object):
     
 	@Property
 	def magnetic_field_devices():
-		doc="list of magnetic devices present on the instrument"
+		doc="list of magnetic devices present on the instrument"	
 		def fget(self):
-			self._magnetic_field_devices=[]
 			controller=self.controller
-			devices=self.present_devices
-			for device in devices:
-				actual_device=controller.getAllDevices(device)
-				if len(actual_device)>1:
-					if type(actual_device[-1]) is InstalledMagnetDevice:
-						self._magnetic_field_devices.append(device)
+			#self._magnetic_field_devices=[]
+			#controller=self.controller
+			#devices=self.present_devices
+			#for device in devices:
+			#	actual_device=controller.getAllDevices(device)
+			#	if len(actual_device)>1:
+			#		if type(actual_device[-1]) is InstalledMagnetDevice:
+			#			self._magnetic_field_devices.append(device)
+			self._magnetic_field_devices=[str(device.name).lower() for device in controller.getMagnetDevices()]
 			return self._magnetic_field_devices    
 		return locals()
 	
@@ -1375,7 +1395,7 @@ class CmdLineApp(Cmd):
 			args=['*']
 			devices.pr(args,flag='all')
 		
-	    
+	do_pa=do_p #alias pa to p 
 	def do_psa(self,arg,opts=None):
 		"""This command prints a list of software angles
 		usage:pa <devices>
