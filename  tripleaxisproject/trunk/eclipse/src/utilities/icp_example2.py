@@ -596,13 +596,16 @@ class Devices(object):
 			DeviceFreeCommand(device).run()
 			print "Releasing", device
 		    
-	def move(self,devices,positions):
+	def move(self,devices,positions,moveflag=False):
 		"""Move devices to positions"""
 		present_devices=self.present_devices
 		print 'devices',devices
 		for i in range(len(devices)):
-			print 'Moving',devices[i],'to',positions[i]
-			m=MoveCommand(devices[i],positions[i])
+			if not moveflag:
+				print 'Moving',devices[i],'to',positions[i]
+			else:
+				print 'Moving',devices[i],'by',positions[i]
+			m=MoveCommand(devices[i],positions[i],moveflag)
 			m.run()  
 
 		
@@ -998,6 +1001,7 @@ class Devices(object):
 		#print 'moving',s
 		fpt=SimpleQueuedCommand(s)
 		fpt.run()
+		
 
 	def qscan(self,qi,qf,qstep,monitor):
 		s="qscan %s %s %s %s %s %s %s %s %s %s"%(qi[0],qi[1],qi[2],qf[0],qf[1],qf[2],monitor,qstep[0],qstep[1],qstep[2])
@@ -1067,7 +1071,7 @@ class Devices(object):
 		present_scans=self.present_scans
 		matched_scans=copy.deepcopy(self.match(present_scans,scanlist))
 		#print 'present_scans', present_scans
-		#print 'matched_scans', matched_scans
+		print 'matched_scans', matched_scans
 		for scan in matched_scans:
 			#print 'dry running ',scan
 			getscandescription=GetScanDescription(scan)
@@ -1077,7 +1081,7 @@ class Devices(object):
 			scan_description=getscandescription.scan_description
 			#print 'scan_description', scan_description
 			#print 'parseobj',myparseobj.__dict__['scanstr']
-			new_scan_description=scanparser.driver(scan_description,myparseobj)
+			new_scan_description=scanparser.driver(scan_description,copy.deepcopy(myparseobj))
 			
 			print 'new_scan\n',new_scan_description
 			scanName=scan+'_tmp'
@@ -1259,9 +1263,9 @@ class CmdLineApp(Cmd):
 		pass
 	    
      
-	def parse_move(self,arg,relative=False):
+	def parse_move(self,args,relative=False):
 		"""Parse the move command"""
-		args=arg.split()
+		#args=arg.split()
 		if len(args) <2:
 			self.stdout.write('Sorry, you need to specify both a device and a position you wish to drive to.')
 			self.stdout.write('\n')
@@ -1283,7 +1287,7 @@ class CmdLineApp(Cmd):
 			if myFlag:
 				devices=Devices()
 				if relative:
-					devices.move_relative(device_list,position_list)
+					devices.move(device_list,position_list,moveflag=True)
 				else:
 					devices.move(device_list,position_list)
 			
@@ -1295,16 +1299,23 @@ class CmdLineApp(Cmd):
 		ex:mv temp 30
 		ex:mv a3 4 a4 2.0
 		"""
-		self.parse_move(arg)
+		args=arg.split()
+		#devices=Devices()
+		parser = argparse.ArgumentParser(description='Move devices')
+		parser.add_argument('targets',nargs='*', help='devices and positions')
+		parser.add_argument('-r', action='store_true', help='relative')
+		myargs = parser.parse_args(args)
+		#print 'relative',myargs.r
+		self.parse_move(myargs.targets,relative=myargs.r)
 	    
-	def do_mvr(self,arg,opts=None):
-		""""This command moves a device by the given increment.
-		usage: mv <device> <position>
-		ex:mvr a3 4
-		ex:mvr temp 30
-		ex:mvr a3 4 a4 2.0
-		"""
-		self.parse_move(arg,relative=True)
+#	def do_mvr(self,arg,opts=None):
+#		""""This command moves a device by the given increment.
+#		usage: mv <device> <position>
+#		ex:mvr a3 4
+#		ex:mvr temp 30
+#		ex:mvr a3 4 a4 2.0
+#		"""						
+#		self.parse_move(arg,relative=True)
 	    
 	def do_mvt(self,arg,opts=None):
 		""""This command moves two devices in a theta two theta fashion.
@@ -1688,12 +1699,34 @@ class CmdLineApp(Cmd):
 		devices.scan_peak(device,scanrange,step,duration,tol=1e-4,apflag=False)
 		
 		
+	def do_ice(self,arg,opts=None):
+		"""
+		This command runs an ice command.  It will first try to run it as an immediate command.  If this fails,
+		it will try it as a queued command.  For a queued command, you may see the result twice.
+		usage:ice <command> 
+		ex:ice move a3 4 a5 6 
+		"""
+		args=arg.split()
+		
+		#devices=Devices()
+		try:
+			#print 'immediate'
+			command=SimpleImmediateCommand(arg)
+			command.run()
+			#print 'immediate result',command.result
+			if not str(command.result).find('Command not allowed')==-1:
+				#print 'queued'
+				command=SimpleQueuedCommand(arg)
+				command.run()
+			print command.result
+		except:
+			pass
 		
 	def do_scanq(self,arg,opts=None):
 		"""
 		This command scans q at the current Ei and Ef
 		usage:scanq <monitor> --h <hi> <hstep> <hf> --k <ki> <kstep> <kf> --l <li> <lstep> <lf> 
-		ex:qscan 1 --h 1 .1 2 --k 1 .1 2 
+		ex:scanq 1 --h 1 .1 2 --k 1 .1 2 
 		"""
 		args=arg.split()
 		devices=Devices()
