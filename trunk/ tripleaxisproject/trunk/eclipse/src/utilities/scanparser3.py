@@ -500,9 +500,12 @@ def driver(original_scan,parseobj):
         raise BadScanError,'Not a Valid Scan.  Cannot fix both ei and ef.'
     elif parseobj.ei==True:
         parsobj.fixed=0
+        #print 'ei tested'
     elif parseobj.ef==True:
         parsobj.fixed=1
+        #print 'ef tested'
     delattr(parseobj,'ei')
+    #print 'deleted ei'
     delattr(parseobj,'ef')
     for key,value in parseobj.__dict__.iteritems():
         if not value==None:
