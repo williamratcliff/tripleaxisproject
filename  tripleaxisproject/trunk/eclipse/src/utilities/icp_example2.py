@@ -1,4 +1,4 @@
-from cmd2 import Cmd, make_option, options, Cmd2TestCase
+from cmd3 import Cmd, make_option, options, Cmd2TestCase
 import unittest, optparse, sys,math
 import functools,inspect
 import argparse
@@ -2009,7 +2009,7 @@ class CmdLineApp(Cmd):
 	def do_we(self, arg,opts=None):
 		""""Converts wavelength in Angstroms to energy in meV.
 		    usage:we <wavelength>
-		    example:we 14.7
+		    example:we 2.35916
 		"""     
 		args=arg.split()
 		if len(args)<1:
@@ -2042,7 +2042,7 @@ class CmdLineApp(Cmd):
 			print __doc__
 		else:
 			try:
-				energy=math.fabs(float(args[0]))
+				energy=abs(float(args[0]))
 				wavelength=9.045/math.sqrt(energy)
 				sys.stdout.write('%f\n'%(wavelength,))
 			except ValueError:
@@ -2068,6 +2068,8 @@ class CmdLineApp(Cmd):
 				sys.stdout.write("wavelength and dspacings must be numbers.\n")
 			except ZeroDivisionError:
 				sys.stdout.write('two theta cannot be zero!\n')
+				
+	
 	    
     
     
