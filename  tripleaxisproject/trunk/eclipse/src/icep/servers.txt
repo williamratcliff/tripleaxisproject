@@ -1,0 +1,14 @@
+"Lime", lime.ncnr.nist.gov
+"BT9", bt9.ncnr.nist.gov
+"Local Server", 127.0.0.1
+"Richard's Server", 129.6.122.129
+"BT7", bt7.ncnr.nist.gov
+"Whistle", whistle.ncnr.nist.gov
+"Minuet", minuet.ncnr.nist.gov
+"Ravel", ravel.ncnr.nist.gov
+"Mike's test server bridged", 129.6.122.50
+"Local NAT", 192.168.102.128
+"1ICP TEST VM", 129.6.121.48
+"1myvm", 129.6.121.182
+
+
