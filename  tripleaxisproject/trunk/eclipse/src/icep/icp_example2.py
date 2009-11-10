@@ -19,7 +19,7 @@ from ice.communication import *
 from ice.event import *
 from ice.primitive import *
 from ice.util import *
-from ice.event.communication import BroadcastMessageListener
+from ice.event.communication import BroadcastMessageListener, ResponseMessageListener
 
 
 from java.awt import *
@@ -34,10 +34,12 @@ import scanparser3 as scanparser
 import readline
 import sys
 
-c=ClientAPI.getInstance('test','localhost')
-#c=ClientAPI.getInstance('test','129.6.121.48')
-
-
+#c=ClientAPI.getInstance('test','localhost')
+#c=ClientAPI.getInstance('test','129.6.121.48')  #ice test server
+#c=ClientAPI.getInstance('test','129.6.121.182') #my test server
+#c=ClientAPI.getInstance('test','129.6.120.239') #bach
+c=ClientAPI.getInstance('test','129.6.120.82') #bt7
+#port is 5553
 ###For now, I'm including stubs for testing purposes.  These need to be replaced with Java classes which have the actual 
 ###Actions that I require.  Things are probably safer this way, because there is more isolation between the python code and
 ###the Java Code.
@@ -159,6 +161,23 @@ class GetErrs(BroadcastMessageListener):
 geterrs=GetErrs()
 
 
+#class GetErrs2(ResponseMessageListener):
+#	def __init__(self):
+#		c=Controller.getReference()
+#		comm=c.getCommMgr()
+#		comm.addResponseMessageListener(self)
+#	def actionPerformed(self,me):
+#		data=me.getData()
+#		print 'response'
+#		print data
+#		if not  str(data).find('Stopped')==-1:
+#			print 'exiting'
+#			sys.exit()			
+#	def __del__(self):
+#		comm.removeMessageListener(self)
+#geterrs2=GetErrs2()
+
+
 class Rate(QueuedCommand):
 	def getCommandString(self):
 		s="Rate"
@@ -170,6 +189,12 @@ class Rate(QueuedCommand):
 		cmq=imq.getMessagesForAbsCommandId(cid)
 		f=cmq.remove()
 		print "Rate ",f 
+		f=cmq.remove()
+		print "Rate2 ",f 
+		f=cmq.remove()
+		print "Rate3 ",f 
+		f=cmq.remove()
+		print "Rate4 ",f 
 		self.rate=f
 		#Note, the rate command doesn't seem to actually print the bloody rate!!!
 
@@ -322,7 +347,13 @@ class GetScanDescription(QueuedCommand):
 		self.imq=imq
 		f=cmq.remove()
 	    ##The following is a complete and utter hack and needs to be improved!!!!
-	        self.scan_description=f.split(':Title')[0].split('iceuser:')[1]
+	        #print 'result',f
+		loc=str(f).lower().find('scan')
+		loc2=str(f).lower().find('(command')
+		#print 'res',f[loc:loc2].strip()
+		self.scan_description=f[loc:loc2].strip()
+		#self.scan_description=f.split(':Title')[0].split('bt7:')[1]
+	        #self.scan_description=f.split(':Title')[0].split('iceuser:')[1]
         
 class ScanDryRunCommand(QueuedCommand):
 	def __init__(self,scan):
@@ -338,6 +369,7 @@ class ScanDryRunCommand(QueuedCommand):
 		self.imq=imq
 		f=cmq.remove()
 		self.result=f
+		
 
 def Property(func):
 	return property(**func())
@@ -713,7 +745,7 @@ class Devices(object):
 		present_scans=self.present_scans
 		matched_scans=copy.deepcopy(self.match(present_scans,scanlist))
 		#print 'present_scans', present_scans
-		#print 'matched_scans', matched_scans
+		print 'matched_scans', matched_scans
 		for scan in matched_scans:
 			print 'dry running ',scan
 			getscandescription=GetScanDescription(scan)
@@ -722,7 +754,7 @@ class Devices(object):
 			scanName=scan+'_tmp'
 			#print 'listing'
 			scanDesrToListCommand = ScanDescrToListCommand(scanName,scan_description)
-			print 'listed'
+			#print 'listed'
 			scanDesrToListCommand.run()
 			scandryrun = ScanDryRunCommand(scanName)
 			scandryrun.run()

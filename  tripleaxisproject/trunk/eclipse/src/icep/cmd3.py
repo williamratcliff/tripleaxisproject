@@ -998,11 +998,11 @@ class Cmd(cmd.Cmd):
         while flag:
             try:
                 targetstr,i,mark=sequenceloader.driver(targetname)
-                target=open('tmp','w')
+                target=open(r'tmpicep','w')
                 target.write(targetstr)
                 #target.write(r'\n')
                 target.close()
-                target=open('tmp','r')
+                target=open(r'tmpicep','r')
             except IOError, e:
                 self.perror('Problem accessing script from %s: \n%s' % (targetname, e))
                 return
