@@ -23,7 +23,7 @@ def readfile(filename):
     myfile.close()
     if mark==None:
         mark=0
-        linetoexecute=firstline
+        linetoexecute=''#firstline  #as a courtesy, do nothing for the first line; to be consistent have the user mark the first line
 
     return linetoexecute,mark
 
