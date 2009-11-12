@@ -175,7 +175,7 @@ def calc_struct(p,h,k,l,d,q,alphastar,astar,lattice,hh,kh,lh):
         f2=f2/3
         #print 'f2inal',f2
         flist.append(f2)
-    flist=N.array(flist)*s1*scale
+    flist=N.array(flist)*s1*scale**2
     
     ff=mgnfacFe3psquared(q/4/pi)
     #print 'ff',ff
@@ -184,17 +184,7 @@ def calc_struct(p,h,k,l,d,q,alphastar,astar,lattice,hh,kh,lh):
         
     return flist
 
-def gen_function(p,x):
-    npeaks=(len(p)-2)/3
-    y=p[0]+p[1]*x
-    for i in range(npeaks):
-        #print 'i',i
-        center=p[2+i]
-        fwhm=p[2+npeaks+i]
-        #sigma=fwhm/2.354
-        area=p[2+2*npeaks+i]#
-        y=y+matlab_gaussian(x,[area,center,fwhm])
-    return y
+
 
 def cost_func(p,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,err):
     #ycalc=gen_function(p,x)
@@ -220,19 +210,32 @@ def myfunctlin(p, fjac=None,Hr=None,Kr=None,Lr=None\
 
     
 if __name__=="__main__":
-    p0=N.array([100,N.radians(45)],'Float64')
+    p0=N.array([100,N.radians(0)],'Float64')
     if 0:
         Hpc=N.array([1,1,2,1,.5],'float64')
         Kpc=N.array([1,1,-1,0,.5],'float64')
         Lpc=N.array([1,-2,-1,0,.5],'float64')
     if 1:
         data=N.array([[.5,-1.5,.5,55,5],
-                     [.5,-1.5,-1.5,13,3],
+                     #[.5,-1.5,-1.5,13,3],
                      [.5,1.5,-.5,63,4],
                      [2.50,0.50,1.50,43,1],
                      [0.50,-1.50,-0.50,55,3],
                      [0.50,0.50,1.50,37,4],
-                     [0.50,-1.50,-0.50,57,4]
+                     [0.50,-1.50,-0.50,57,4],
+                     [2.50,-0.50,-0.50,18,3],
+                     [0.50,0.50, 2.50,18,1],
+                     [2.50,-0.50,-0.50,1,1],
+                     [2.50,0.50,1.50,43,1],
+                     [0.50, -1.50,0.50,36+17, 2],
+                     [1.50, -1.50 ,-0.50,31+9,2],
+                     #[0.50, -1.50,  1.50,49, 2],
+                     [0.50,1.50,  0.50,33+9, 1],
+                     [0.5,2.50,1.50,30,1],
+                     [0.50,1.50,-0.50,43+22,4],
+                     #[0.50,-0.50,0.50,29,2],  #th-2th
+                     #[0.50,0.50,-0.50,36,2],   #th-2th
+                     #[0.50,0.50,0.50,29,1]   #th-2th
                      ],'float64')
         Hpc=data[:,0]
         Kpc=data[:,1]
@@ -242,8 +245,8 @@ if __name__=="__main__":
     Hr,Kr,Lr,d,astar,alphastar,lattice,Hh,Kh,Lh=setup(Hpc,Kpc,Lpc)
     q=2*pi/d
     lam=2.35916
-    y=y*2*d/lam
-    yerr=yerr*2*d/lam
+    y=y*(2*d/lam) #these are pure omega scans, so no lorenz factor?
+    yerr=yerr*(2*d/lam)
     if 1:
         print 'data'
         for i in range(len(Hpc)):
@@ -271,6 +274,8 @@ if __name__=="__main__":
     for i in range(len(p0)): 
         parinfo[i]['value']=p0[i]
     parinfo[1]['fixed']=0 #fix slope
+    parinfo[1]['limited']=[1,1]
+    parinfo[1]['limits']=[0,pi]
     fa = {'y':y, 'err':yerr,
           'Hr':Hr
           ,'Kr':Kr
@@ -298,11 +303,11 @@ if __name__=="__main__":
     print 'p1',p1
     covariance=covariance*chimin #assume our model is good       
     scale=N.abs(p1[0])
-    scale_sig=covariance.diagonal()[0]
-    angle=N.degrees(p1[1])%360
-    angle_sig=N.degrees(covariance.diagonal()[1])%360
+    scale_sig=N.sqrt(covariance.diagonal()[0])
+    angle=p1[1]
+    angle_sig=N.sqrt(covariance.diagonal()[1])
     print 'scale',scale,'scale_sig',scale_sig
-    print 'angle',angle,'angle_sig',angle_sig
+    print 'angle',N.degrees(angle),'angle_sig',angle_sig,N.degrees(angle_sig)%360
     
     pylab.errorbar(q,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
     pylab.plot(q,ycalc,marker='s',linestyle='None',mfc='red')       
