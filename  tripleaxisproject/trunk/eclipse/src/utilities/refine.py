@@ -210,29 +210,31 @@ def myfunctlin(p, fjac=None,Hr=None,Kr=None,Lr=None\
 
     
 if __name__=="__main__":
-    p0=N.array([100,N.radians(0)],'Float64')
+    p0=N.array([100,N.radians(30)],'Float64')
     if 0:
         Hpc=N.array([1,1,2,1,.5],'float64')
         Kpc=N.array([1,1,-1,0,.5],'float64')
         Lpc=N.array([1,-2,-1,0,.5],'float64')
     if 1:
-        data=N.array([[.5,-1.5,.5,55,5],
-                     #[.5,-1.5,-1.5,13,3],
-                     [.5,1.5,-.5,63,4],
-                     [2.50,0.50,1.50,43,1],
-                     [0.50,-1.50,-0.50,55,3],
-                     [0.50,0.50,1.50,37,4],
-                     [0.50,-1.50,-0.50,57,4],
-                     [2.50,-0.50,-0.50,18,3],
-                     [0.50,0.50, 2.50,18,1],
-                     [2.50,-0.50,-0.50,1,1],
-                     [2.50,0.50,1.50,43,1],
-                     [0.50, -1.50,0.50,36+17, 2],
-                     [1.50, -1.50 ,-0.50,31+9,2],
-                     #[0.50, -1.50,  1.50,49, 2],
-                     [0.50,1.50,  0.50,33+9, 1],
-                     [0.5,2.50,1.50,30,1],
-                     [0.50,1.50,-0.50,43+22,4],
+        data=N.array([[.5,-.5,1.5,55+6,5],            #192630
+                     [.5,1.5,-.5,43+20,4],             #192638
+                     [0.50,-1.50,-0.50,47+8,4],     #192635
+                     [0.50,0.50,1.50,32+5,4],       #192629
+                     [0.50,-1.50,-0.50,49+8,4],     #192662
+                     [2.50,-0.50,-0.50,16+2,3],     #192661
+                     [0.50,0.50, 2.50,18+1,3],      #192632
+                     #[2.50,-0.50,-0.50,1,3], #why? #192631
+                     [2.50,0.50,1.50,43,3],         #192634
+                     [0.50, -1.50,0.50,36+17, 2],   #192628
+                     [1.50, -1.50 ,-0.50,31+9,2],   #192624
+                     [0.50, -1.50,  1.50,49, 2],    #192626
+                     [0.50,1.50,  0.50,33+9, 3],    #192627
+                     [0.5,2.50,1.50,30,3],          #192633
+                     #[1.50,-1.50,0.50,33+0,2],     #192621 #th-2th
+                     [2.50,0.50,1.50,30+0,1],     #192637
+                     #[0.50,-1.50,-1.50,13+0,1],     #192660 #why
+                     [0.50,1.50,-0.50,43+21,6]     #192636
+                     #[0.50,1.50,1.50,10+5,2]     #192625
                      #[0.50,-0.50,0.50,29,2],  #th-2th
                      #[0.50,0.50,-0.50,36,2],   #th-2th
                      #[0.50,0.50,0.50,29,1]   #th-2th
@@ -245,8 +247,10 @@ if __name__=="__main__":
     Hr,Kr,Lr,d,astar,alphastar,lattice,Hh,Kh,Lh=setup(Hpc,Kpc,Lpc)
     q=2*pi/d
     lam=2.35916
-    y=y*(2*d/lam) #these are pure omega scans, so no lorenz factor?
+    y=y*(2*d/lam) #these are pure omega scans, so no lorenz factor? yes
     yerr=yerr*(2*d/lam)
+    #y[-3:]=y[-3:]/(2*d[-3:]/lam) #these were w-2th scans, so they need the factor
+    #yerr[-3:]=yerr[-3:]/(2*d[-3:]/lam)
     if 1:
         print 'data'
         for i in range(len(Hpc)):
@@ -275,7 +279,7 @@ if __name__=="__main__":
         parinfo[i]['value']=p0[i]
     parinfo[1]['fixed']=0 #fix slope
     parinfo[1]['limited']=[1,1]
-    parinfo[1]['limits']=[0,pi]
+    parinfo[1]['limits']=[0,pi/2]
     fa = {'y':y, 'err':yerr,
           'Hr':Hr
           ,'Kr':Kr
@@ -308,6 +312,11 @@ if __name__=="__main__":
     angle_sig=N.sqrt(covariance.diagonal()[1])
     print 'scale',scale,'scale_sig',scale_sig
     print 'angle',N.degrees(angle),'angle_sig',angle_sig,N.degrees(angle_sig)%360
+    
+    if 1:
+        print 'data'
+        for i in range(len(Hpc)):
+            print Hpc[i],Kpc[i],Lpc[i],q[i],y[i],yerr[i],ycalc[i]
     
     pylab.errorbar(q,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
     pylab.plot(q,ycalc,marker='s',linestyle='None',mfc='red')       
