@@ -19,7 +19,7 @@ from ice.communication import *
 from ice.event import *
 from ice.primitive import *
 from ice.util import *
-from ice.event.communication import BroadcastMessageListener, ResponseMessageListener
+from ice.event.communication import BroadcastMessageListener, ResponseMessageListener, ClientMessageListener
 
 
 from java.awt import *
@@ -34,11 +34,11 @@ import scanparser3 as scanparser
 import readline
 import sys
 
-#c=ClientAPI.getInstance('test','localhost')
+c=ClientAPI.getInstance('test','localhost')
 #c=ClientAPI.getInstance('test','129.6.121.48')  #ice test server
 #c=ClientAPI.getInstance('test','129.6.121.182') #my test server
 #c=ClientAPI.getInstance('test','129.6.120.239') #bach
-c=ClientAPI.getInstance('test','129.6.120.82') #bt7
+#c=ClientAPI.getInstance('test','129.6.120.82') #bt7
 #port is 5553
 ###For now, I'm including stubs for testing purposes.  These need to be replaced with Java classes which have the actual 
 ###Actions that I require.  Things are probably safer this way, because there is more isolation between the python code and
@@ -161,21 +161,21 @@ class GetErrs(BroadcastMessageListener):
 geterrs=GetErrs()
 
 
-#class GetErrs2(ResponseMessageListener):
-#	def __init__(self):
-#		c=Controller.getReference()
-#		comm=c.getCommMgr()
-#		comm.addResponseMessageListener(self)
-#	def actionPerformed(self,me):
-#		data=me.getData()
-#		print 'response'
-#		print data
-#		if not  str(data).find('Stopped')==-1:
-#			print 'exiting'
-#			sys.exit()			
-#	def __del__(self):
-#		comm.removeMessageListener(self)
-#geterrs2=GetErrs2()
+class GetErrs2(ClientMessageListener):
+	def __init__(self):
+		c=Controller.getReference()
+		comm=c.getCommMgr()
+		comm.addClientListener(self)
+	def actionPerformed(self,me):
+		data=me.getData()
+		#print 'client'
+		print data
+		if not  str(data).find('Stopped')==-1:
+			print 'exiting'
+			sys.exit()			
+	def __del__(self):
+		comm.removeMessageListener(self)
+geterrs2=GetErrs2()
 
 
 class Rate(QueuedCommand):
@@ -189,12 +189,12 @@ class Rate(QueuedCommand):
 		cmq=imq.getMessagesForAbsCommandId(cid)
 		f=cmq.remove()
 		print "Rate ",f 
-		f=cmq.remove()
-		print "Rate2 ",f 
-		f=cmq.remove()
-		print "Rate3 ",f 
-		f=cmq.remove()
-		print "Rate4 ",f 
+		#f=cmq.remove()
+		#print "Rate2 ",f 
+		#f=cmq.remove()
+		#print "Rate3 ",f 
+		#f=cmq.remove()
+		#print "Rate4 ",f 
 		self.rate=f
 		#Note, the rate command doesn't seem to actually print the bloody rate!!!
 
