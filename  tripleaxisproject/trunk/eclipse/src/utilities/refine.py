@@ -5,6 +5,7 @@ pi=N.pi
 from spinwaves.utilities.mpfit.mpfit import mpfit
 import sys,os,copy
 import pylab
+from utilities.anneal import anneal
 
 A=5.581
 B=A
@@ -179,7 +180,8 @@ def calc_struct(p,h,k,l,d,q,alphastar,astar,lattice,hh,kh,lh):
     
     ff=mgnfacFe3psquared(q/4/pi)
     #print 'ff',ff
-    flist=flist*ff
+    Bf=.005
+    flist=flist*ff*N.exp(-Bf*q**2/4/pi**2)
         
         
     return flist
@@ -193,6 +195,10 @@ def cost_func(p,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,err):
     fake_dof=len(y)
     #print 'chi',(y-ycalc)/err
     return (y-ycalc)/err#/N.sqrt(fake_dof)
+
+def chisq_an(p,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,err):
+    chisq=cost_func(p,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,err)
+    return (chisq**2).sum()/len(y)
 
 def myfunctlin(p, fjac=None,Hr=None,Kr=None,Lr=None\
                ,d=None,q=None,alphastar=None,astar=None\
@@ -292,6 +298,22 @@ if __name__=="__main__":
           'Hh':Hh,
           'Kh':Kh,
           'Lh':Lh}
+    
+    lowerm=[0,0]
+    upperm=[100,pi/2]
+    p0,jmin=anneal(chisq_an,p0,args=(Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,yerr),\
+                      schedule='simple',lower=lowerm,upper=upperm,\
+                      maxeval=None, maxaccept=None,dwell=500,maxiter=6000,T0=None)
+    dof=len(y)-len(p0)
+    fake_dof=len(y)
+    chimin=(cost_func(p0,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,yerr)**2).sum()
+    chimin=chimin/dof if dof>0 else chimin/fake_dof 
+    print 'p0_anneal',p0[0],N.degrees(p0[1])
+    print 'chi_anneal', chimin
+    
+    
+    
+    
     m = mpfit(myfunctlin, p0, parinfo=parinfo,functkw=fa) 
     print 'status = ', m.status
     print 'params = ', m.params
