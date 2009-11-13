@@ -161,7 +161,7 @@ def calc_struct(p,h,k,l,d,q,alphastar,astar,lattice,hh,kh,lh):
     for i in range(len(h)):
         #print 'i',i
         f=0
-        vec=[h[i],k[i],l[i]]
+        vec=[hh[i],kh[i],lh[i]]
         dotp1=N.dot(vec,Fe1r)*2*pi
         dotp2=N.dot(vec,Fe2r)*2*pi
         sp1=s1-N.dot(s1,vec)*N.array(vec)/q[i]
@@ -170,21 +170,21 @@ def calc_struct(p,h,k,l,d,q,alphastar,astar,lattice,hh,kh,lh):
         f2=N.abs(N.dot(f,N.conjugate(f)))
         #print 'f1',f,f2
         
-        vec=[k[i],l[i],h[i]]
+        vec=[kh[i],hh[i],lh[i]]
         dotp1=N.dot(vec,Fe1r)*2*pi
         dotp2=N.dot(vec,Fe2r)*2*pi
         f=sp1*N.exp(-1.0j*dotp1)+sp2*N.exp(-1.0j*dotp2)    
         f2=f2+N.abs(N.dot(f,N.conjugate(f)))
         #print 'f2',f,f2
         
-        vec=[l[i],h[i],k[i]]
+        vec=[kh[i],-hh[i],lh[i]]
         dotp1=N.dot(vec,Fe1r)*2*pi
         dotp2=N.dot(vec,Fe2r)*2*pi
         f=sp1*N.exp(-1.0j*dotp1)+sp2*N.exp(-1.0j*dotp2)    
         f2=f2+N.abs(N.dot(f,N.conjugate(f)))
         #print 'f3',f,f2
         
-        f2=f2/3
+        #f2=f2/3
         #print 'f2inal',f2
         flist.append(f2)
     flist=N.array(flist)*scale**2
