@@ -464,8 +464,8 @@ if __name__=="__main__":
                 
         
 
-    if 1:
-        pout=silly_iter(p0,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
+    if 0:
+        pout=silly_iter(p0,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)  # This is the small density
     if 0:
         p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
         #p = NLP(chisq, p0, maxIter = 1e3, maxFunEvals = 1e5)
@@ -579,6 +579,10 @@ if __name__=="__main__":
         srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr)
         print 'S_hessian',s_hess
     if 1:
+        N.savetxt(r'c:\maxden.txt',P.flatten())
+        N.save(r'c:\maxdenP.np',P)
+        N.save(r'c:\maxdenX.np',X)
+        N.save(r'c:\maxdenZ.np',Z)
         pylab.pcolor(X,Z,P)
         pylab.colorbar()
         pylab.xlabel('x')
