@@ -169,6 +169,12 @@ class scanparser:
                     prange['qx']['step']=step[0]
                     prange['qy']['step']=step[1]
                     prange['qz']['step']=step[2]
+                    orange['qx']['center']=center[0]
+                    orange['qy']['center']=center[1]
+                    orange['qz']['center']=center[2]
+                    orange['qx']['step']=step[0]
+                    orange['qy']['step']=step[1]
+                    orange['qz']['step']=step[2]
                     
                     
                     
