@@ -12,7 +12,7 @@ def gen_as():
     rz=np.array([[np.cos(c),np.sin(c),0],[-np.sin(c),np.cos(c),0],[0,0,1]],'Float64')
     pos_at=np.array([[0.0000,   0.0000,   1-xas],\
                 [0.0000,   0.0000,   xas],\
-                [0.0000,   0.5000,   .5-xas],
+                [0.0000,   0.5000,   .5-xas],\
                 [0.0000,   0.5000,   .5+xas],\
                 [0.5000,   0.0000,   .5-xas],\
                 [0.5000,   0.0000,   .5+xas],\
@@ -81,11 +81,11 @@ def gen_sr():
 
 @mlab.show
 def test_den():
-    #P = np.random.random((10,10))
+    P = np.random.random((10,10))
     P=np.load(r'c:\maxdenP.np.npy')
-    #myfilestr=r'c:\structfactors_density.dat'
-    #x,y,z=np.loadtxt(myfilestr).T
-    #P=z.reshape((101,101))
+    myfilestr=r'c:\structfactors_density.dat'
+    x,y,z=np.loadtxt(myfilestr).T
+    P=z.reshape((101,101))
     #print P.shape
     fig=mlab.figure()    
     x,y,z=gen_as()   
@@ -100,8 +100,12 @@ def test_den():
     pts_sr=mlab.points3d(x,y,z-.125,color=(0,0,1),colormap='gist_rainbow',figure=fig)
     outline=mlab.outline(figure=fig,extent=[0,1,0,1,-1,0])
     mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
-    src = mlab.pipeline.array2d_source(P)
-    surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.9)
+    print 'shape',P.shape
+    P = P[:,:, np.newaxis]
+    print 'after',P.shape
+    src = mlab.pipeline.scalar_field(P)
+    #src = mlab.pipeline.array2d_source(P)
+    surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.4)
     #surf.transform.GetTransform().RotateX(90)
     print 'done'
 
