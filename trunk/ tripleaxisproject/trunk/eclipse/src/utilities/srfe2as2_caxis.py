@@ -32,6 +32,7 @@ import matplotlib.artist as artist
 import matplotlib.patches as patches
 from matplotlib.path import Path
 from matplotlib.ticker import MaxNLocator,MultipleLocator, FormatStrFormatter
+pylab.rc("axes", linewidth=2.0)
 
 class Ring(patches.Patch):
     """
@@ -629,9 +630,16 @@ if __name__=='__main__':
         #mycontour=pylab.pcolor(N.array(tth).flatten(),N.array(T).flatten(),N.array(counts).flatten())
         #mycontour=pylab.contourf(x,y,z,levs)#,
         mycontour=pylab.pcolormesh(x,y,z)
-        pylab.xlabel(r'$2\theta$')
-        pylab.ylabel('T (K) ')
+        pylab.xlabel(r'$2\theta$',fontsize=18)
+        pylab.ylabel('T (K) ', fontsize=18)
         pylab.axhline(y=220,color='white',linewidth=3.2)
+        
+        fontsize=16
+        ax = pylab.gca()
+        for tick in ax.xaxis.get_major_ticks():
+            tick.label1.set_fontsize(fontsize)
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label1.set_fontsize(fontsize)      
         mycbar=pylab.colorbar()
         #levs.set_bounds(zmin, zmax)
         #mycontour=pylab.contourf(x,y,z,35,extent=(17,19.6,y.min(),y.max()))#,cmap=pylab.cm.jet)
@@ -660,6 +668,8 @@ if __name__=='__main__':
         pylab.text(.6,.7,'T=250 K',fontsize=10,transform=ax2.transAxes)
         pylab.xlabel(r'$2\theta$',fontsize=10)
         pylab.ylabel('Intensity (arb. units)', fontsize=10)
+        
+        
         pylab.xlim((43.55,46.5))
         #print 'T',T[0],T[-1]
         pylab.show()
@@ -717,7 +727,7 @@ if __name__=='__main__':
         #mycontour=pylab.contourf(x,y,z,levs)#,
         mycontour=ax2.pcolormesh(x,y,z)
         pylab.axhline(y=220,color='white',linewidth=3.2)
-        pylab.xlabel(r'$2\theta$')
+        pylab.xlabel(r'$2\theta$',fontsize=14)
         #pylab.ylabel('T (K) ')
         #levs.set_bounds(zmin, zmax)
         #mycontour=pylab.contourf(x,y,z,35,extent=(17,19.6,y.min(),y.max()))#,cmap=pylab.cm.jet)

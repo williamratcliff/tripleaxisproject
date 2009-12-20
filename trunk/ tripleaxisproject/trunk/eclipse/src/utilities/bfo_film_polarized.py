@@ -282,7 +282,7 @@ def film111():
 
 if __name__=="__main__":
     myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
-    if 0:
+    if 1:
         film110()
     if 1:
         film111()
