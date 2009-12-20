@@ -6,6 +6,7 @@ import pylab
 from openopt import NLP
 import scipy.optimize
 from utilities.anneal import anneal
+from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator
 A=1.0
 xstep=0.01
 zstep=0.01
@@ -313,13 +314,49 @@ def max_wrap(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     f=ent+l1*chisqr+l2*posc+l3*negc    
     return f
 
-def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=10.0,maxiter=51):
+def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=10.0,maxiter=31):
     for i in range(maxiter):
         dchisqr=chisq_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         p=p*N.exp(-lam*dchisqr)
         print 'i',i,'dchi',dchisqr
         
     return p
+
+def gen_as():
+    xas=0.36
+    aspos=N.array([[0.0000,   0.0000,1-xas],   
+                   [0.0000,   0.0000,xas],    
+                   [0.0000,   0.5000,.5-xas],    
+                   [0.0000,   0.5000,.5+xas],       
+                   [0.5000,   0.0000,.5-xas],  
+                   [0.5000,   0.0000,.5+xas],    
+                   [0.5000,   0.5000,1-xas],   
+                   [0.5000,   0.5000,xas],
+                   [1.0000,   0.0000,1-xas],   
+                   [1.0000,   0.0000,xas],  
+                   [1.0000,   0.5000,.5-xas],    
+                   [1.0000,   0.5000,.5+xas]
+                   ],'Float64')
+    return aspos
+
+def plot_as(ax,fig):
+    aspos=gen_as()
+    xn=aspos[N.where(aspos[:,1]==0)[0],0]
+    zn=aspos[N.where(aspos[:,1]==0)[0],2]
+    xp=aspos[N.where(aspos[:,1]==0.5)[0],0]
+    zp=aspos[N.where(aspos[:,1]==0.5)[0],2]
+    
+    for x,z in zip(xn,zn):
+        #print x,z
+        x1=N.array([x])
+        y1=N.array([z])
+        ax.plot(x1,y1,'bo',markersize=20,markerfacecolor='blue',markeredgecolor='blue')
+      
+    for x,z in zip(xp,zp):
+        #print x,z
+        x1=N.array([x])
+        y1=N.array([z])
+        ax.plot(x1,y1,'ro',markersize=10,markerfacecolor='red',markeredgecolor='red')
 
 if __name__=="__main__":
     #global xstep
@@ -464,7 +501,7 @@ if __name__=="__main__":
                 
         
 
-    if 0:
+    if 1:
         pout=silly_iter(p0,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)  # This is the small density
     if 0:
         p = NLP(Entropy, p0, maxIter = 1e3, maxFunEvals = 1e5)
@@ -578,15 +615,59 @@ if __name__=="__main__":
         print 'S_grad', s_grad
         srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr)
         print 'S_hessian',s_hess
+        
+    if 1:
+        fig=pylab.figure(figsize=(8,8))
+        
+        
+    if 1:
+        myfilestr=r'c:\structfactors_density.dat'
+        x,y,z=N.loadtxt(myfilestr).T
+        P2=z.reshape((101,101)).T
+        P2=P2/P2.max()
+        ax=fig.add_subplot(1,2,1)
+        pc=ax.pcolor(X,Z,P2)
+        
+        plot_as(ax,fig)
+        ax.set_xlabel('x')
+        ax.set_ylabel('z')
+        ax.set_xlim(0,1)
+        ax.set_ylim(0,1)
+        ax.text(.96,.90,'(a)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
+        ax.set_aspect(1./ax.get_data_ratio())
+        pmin=-1.0; pmax=1.0
+        pc.set_clim(pmin,pmax)
+        cb=pylab.colorbar(pc,orientation='horizontal',ticks=N.arange(pmin,pmax+.5,.5))
+        #cb=pylab.colorbar(pc,orientation='horizontal')
+        #cb.ax.xaxis.set_major_locator(MaxNLocator(4))
+        #pylab.axis('equal')
+        #pylab.axis('scaled')
+        
+        
     if 1:
         N.savetxt(r'c:\maxden.txt',P.flatten())
         N.save(r'c:\maxdenP.np',P)
         N.save(r'c:\maxdenX.np',X)
         N.save(r'c:\maxdenZ.np',Z)
-        pylab.pcolor(X,Z,P)
-        pylab.colorbar()
-        pylab.xlabel('x')
-        pylab.ylabel('z')
+        P=P/P.max()
+        ax=fig.add_subplot(1,2,2)
+        pc=ax.pcolor(X,Z,P.T)
+        #fig.colorbar()
+        
+        plot_as(ax,fig)
+        ax.set_xlabel('x')
+        ax.set_ylabel('z')
+        ax.text(.96,.90,'(b)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
+        ax.set_xlim(0,1)
+        ax.set_ylim(0,1)
+        ax.set_aspect(1./ax.get_data_ratio())
+        pmin=-1.0; pmax=1.0
+        pc.set_clim(pmin,pmax)
+        cb=pylab.colorbar(pc,orientation='horizontal',ticks=N.arange(pmin,pmax+.5,.5))
+        #cb.ax.xaxis.set_major_locator(MaxNLocator(4))
+        #cb.ax.set_aspect(1./cb.ax.get_data_ratio())
+        
+    if 1:
         pylab.show()
     if 0:    
         fsum=fourier_p(h[0],k[0],l[0],P)
