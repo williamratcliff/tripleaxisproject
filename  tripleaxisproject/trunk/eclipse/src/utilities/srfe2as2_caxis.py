@@ -630,9 +630,13 @@ if __name__=='__main__':
         #mycontour=pylab.pcolor(N.array(tth).flatten(),N.array(T).flatten(),N.array(counts).flatten())
         #mycontour=pylab.contourf(x,y,z,levs)#,
         mycontour=pylab.pcolormesh(x,y,z)
+        #cmap = pylab.cm.RdBu_r
+        cmap=pylab.cm.binary
+        #cmap = pylab.cm.PiYG
+        mycontour.set_cmap(cmap)
         pylab.xlabel(r'$2\theta$',fontsize=18)
         pylab.ylabel('T (K) ', fontsize=18)
-        pylab.axhline(y=220,color='white',linewidth=3.2)
+        pylab.axhline(y=220,color='black',linewidth=3.2)
         
         fontsize=16
         ax = pylab.gca()
@@ -672,7 +676,9 @@ if __name__=='__main__':
         
         pylab.xlim((43.55,46.5))
         #print 'T',T[0],T[-1]
+        pylab.savefig(r'c:\srfeas\formfactor_paper\srfe2_fig3.png')
         pylab.show()
+        #pylab.savefig(r'c:\srfeas\formfactor_paper\srfe2_fig3.png')
         
         
 
@@ -726,6 +732,9 @@ if __name__=='__main__':
         #print 'hi'
         #mycontour=pylab.contourf(x,y,z,levs)#,
         mycontour=ax2.pcolormesh(x,y,z)
+        cmap = pylab.cm.RdBu_r
+        #cmap = pylab.cm.PiYG
+        mycontour.set_cmap(cmap)
         pylab.axhline(y=220,color='white',linewidth=3.2)
         pylab.xlabel(r'$2\theta$',fontsize=14)
         #pylab.ylabel('T (K) ')
