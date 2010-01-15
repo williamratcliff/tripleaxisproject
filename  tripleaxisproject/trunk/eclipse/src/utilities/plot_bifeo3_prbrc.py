@@ -26,180 +26,173 @@ pi=N.pi
 
 
 def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
-    """Plot resolution ellipse for a given scan"""
-    center=N.round(H.shape[0]/2)
-    if center<1:
-         center=0
-    if center>H.shape[0]:
-         center=H.shape[0]
-    #EXP=[EXP[center]]
-    Style1=''
-    Style2='--'
-
-    XYAxesPosition=[0.1, 0.6, 0.3, 0.3]
-    XEAxesPosition=[0.1, 0.1, 0.3, 0.3]
-    YEAxesPosition=[0.6, 0.6, 0.3, 0.3]
-    TextAxesPosition=[0.45, 0.0, 0.5, 0.5]
-    GridPoints=101
-
-    [R0,RMS]=myrescal.ResMatS(H,K,L,W,EXP)
-    #[xvec,yvec,zvec,sample,rsample]=self.StandardSystem(EXP);
-    myrescal.lattice_calculator.StandardSystem()
-    #print 'shape ',self.lattice_calculator.x.shape
-    qx=myrescal.lattice_calculator.scalar(myrescal.lattice_calculator.x[0,:],myrescal.lattice_calculator.x[1,:],myrescal.lattice_calculator.x[2,:],H,K,L,'latticestar')
-    qy=myrescal.lattice_calculator.scalar(myrescal.lattice_calculator.y[0,:],myrescal.lattice_calculator.y[1,:],myrescal.lattice_calculator.y[2,:],H,K,L,'latticestar')
-    qw=W;
-
-    print 'qx',qx
-    print 'qy',qy
-    #========================================================================================================
-    #find reciprocal-space directions of X and Y axes
-
-    o1=myrescal.lattice_calculator.orient1#[:,0] #EXP['orient1']
-    o2=myrescal.lattice_calculator.orient2#[:,0] #EXP['orient2']
-    pr=myrescal.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],myrescal.lattice_calculator.y[0,:],myrescal.lattice_calculator.y[1,:],myrescal.lattice_calculator.y[2,:],'latticestar')
-    o2[0]=myrescal.lattice_calculator.y[0,:]*pr
-    o2[1]=myrescal.lattice_calculator.y[1,:]*pr
-    o2[2]=myrescal.lattice_calculator.y[2,:]*pr
-    if N.abs(o2[0,center])<1e-5:
-         o2[0,center]=0.0
-    if N.absolute(o2[1,center])<1e-5:
-         o2[1,center]=0.0
-    if N.absolute(o2[2,center])<1e-5:
-         o2[2,center]=0.0
-
-    if N.abs(o1[0,center])<1e-5:
-         o1[0,center]=0.0
-    if N.absolute(o2[1,center])<1e-5:
-         o1[1,center]=0.0
-    if N.absolute(o2[2,center])<1e-5:
-         o1[2,center]=0.0
-
-    #%========================================================================================================
-    #%determine the plot range
-    XWidth=max(myrescal.fproject(RMS,0))
-    YWidth=max(myrescal.fproject(RMS,1))
-    WWidth=max(myrescal.fproject(RMS,2))
-    XMax=(max(qx)+XWidth*1.5)
-    XMin=(min(qx)-XWidth*1.5)
-    YMax=(max(qy)+YWidth*1.5)
-    YMin=(min(qy)-YWidth*1.5)
-    WMax=(max(qw)+WWidth*1.5)
-    WMin=(min(qw)-WWidth*1.5)
-    #print 'qx ',qx
-    #print 'qy ',qy
-    #print 'XWidth ',XWidth
-    #print 'YWidth ',YWidth
-    #fig=pylab.figure()
-    #%========================================================================================================
-    #% plot XY projection
-
-
-    proj,sec=myrescal.project(RMS,2)
-    (a,b,c)=N.shape(proj)
-    mat=N.copy(proj)
-    #print 'proj ', proj.shape
-    a1=[];b1=[];theta=[];a1_sec=[];b1_sec=[];theta_sec=[];e=[]; e_sec=[]
-    for i in range(c):
-        matm=N.matrix(mat[:,:,i])
-        w,v=N.linalg.eig(matm)
-        vm=N.matrix(v)
-        vmt=vm.T
-        mat_diag=vmt*matm*vm
-        a1.append(1.0/N.sqrt(mat_diag[0,0]))
-        b1.append(1.0/N.sqrt(mat_diag[1,1]))
-        thetar=N.arccos(vm[0,0])
-        theta.append(math.degrees(thetar))
-
-    mat_sec=N.copy(sec)
-    #print 'proj ', proj
-    (a,b,c)=N.shape(sec)
-    print 'reached'
-    for i in range(c):
-        rsample='latticestar'
-        ascale=myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)[0]
-        bscale=myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)[0]
-        print 'ascale',ascale
-        print 'bscale',bscale
-        ascale=1
-        bscale=1
-        matm_sec=N.matrix(mat_sec[:,:,i])
-        w_sec,v_sec=N.linalg.eig(matm_sec)
-        vm_sec=N.matrix(v)
-        vmt_sec=vm_sec.T
-        mat_diag_sec=vmt_sec*matm_sec*vm_sec
-        #print 'a',myrescal.lattice_calculator.a[0]
-        a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0])/ascale)
-        b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1])/bscale)
-        thetar_sec=N.arccos(vm_sec[0,0]/ascale)
-        theta_sec.append(math.degrees(thetar_sec))
-        #x0y0=N.array([H[i],K[i]])
-        x0y0=N.array([qx[i],qy[i]])
-        print 'a1_sec',a1_sec
-        print 'b1_sec',b1_sec
-        print 'theta_sec',math.degrees(thetar_sec)
-        print 'x0y0',x0y0
-        #print i,'qx',qx[i]
-        #print 'qy',qy[i]
-        e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
-        e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
-
+     """Plot resolution ellipse for a given scan"""
+     center=N.round(H.shape[0]/2)
+     if center<1:
+          center=0
+     if center>H.shape[0]:
+          center=H.shape[0]
+     #EXP=[EXP[center]]
+     Style1=''
+     Style2='--'
+     
+     XYAxesPosition=[0.1, 0.6, 0.3, 0.3]
+     XEAxesPosition=[0.1, 0.1, 0.3, 0.3]
+     YEAxesPosition=[0.6, 0.6, 0.3, 0.3]
+     TextAxesPosition=[0.45, 0.0, 0.5, 0.5]
+     GridPoints=101
+     
+     [R0,RMS]=myrescal.ResMatS(H,K,L,W,EXP)
+     #[xvec,yvec,zvec,sample,rsample]=self.StandardSystem(EXP);
+     myrescal.lattice_calculator.StandardSystem()
+     #print 'shape ',self.lattice_calculator.x.shape
+     qx=myrescal.lattice_calculator.scalar(myrescal.lattice_calculator.x[0,:],myrescal.lattice_calculator.x[1,:],myrescal.lattice_calculator.x[2,:],H,K,L,'latticestar')
+     qy=myrescal.lattice_calculator.scalar(myrescal.lattice_calculator.y[0,:],myrescal.lattice_calculator.y[1,:],myrescal.lattice_calculator.y[2,:],H,K,L,'latticestar')
+     qw=W;
+     
+     #========================================================================================================
+     #find reciprocal-space directions of X and Y axes
+     
+     o1=myrescal.lattice_calculator.orientation.orient1.T#[:,0] #EXP['orient1']
+     o2=myrescal.lattice_calculator.orientation.orient2.T#[:,0] #EXP['orient2']
+     pr=myrescal.lattice_calculator.scalar(o2[0,:],o2[1,:],o2[2,:],myrescal.lattice_calculator.y[0,:],myrescal.lattice_calculator.y[1,:],myrescal.lattice_calculator.y[2,:],'latticestar')
+     o2[0]=myrescal.lattice_calculator.y[0,:]*pr
+     o2[1]=myrescal.lattice_calculator.y[1,:]*pr
+     o2[2]=myrescal.lattice_calculator.y[2,:]*pr
+     
+     if N.abs(o2[0,center])<1e-5:
+          o2[0,center]=0.0
+     if N.absolute(o2[1,center])<1e-5:
+          o2[1,center]=0.0
+     if N.absolute(o2[2,center])<1e-5:
+          o2[2,center]=0.0
+     
+     if N.abs(o1[0,center])<1e-5:
+          o1[0,center]=0.0
+     if N.absolute(o1[1,center])<1e-5:
+          o1[1,center]=0.0
+     if N.absolute(o1[2,center])<1e-5:
+          o1[2,center]=0.0
+     
+     #%========================================================================================================
+     #%determine the plot range
+     XWidth=max(myrescal.fproject(RMS,0))
+     YWidth=max(myrescal.fproject(RMS,1))
+     WWidth=max(myrescal.fproject(RMS,2))
+     XMax=(max(qx)+XWidth*1.5)
+     XMin=(min(qx)-XWidth*1.5)
+     YMax=(max(qy)+YWidth*1.5)
+     YMin=(min(qy)-YWidth*1.5)
+     WMax=(max(qw)+WWidth*1.5)
+     WMin=(min(qw)-WWidth*1.5)
+    ##fig=pylab.figure()
+    ##%========================================================================================================
+    ##% plot XY projection
+     proj,sec=myrescal.project(RMS,2)
+     (a,b,c)=N.shape(proj)
+     mat=N.copy(proj)
+     #print 'proj ', proj.shape
+     a1=[];b1=[];theta=[];a1_sec=[];b1_sec=[];theta_sec=[];e=[]; e_sec=[]
+     for i in range(c):
+         matm=N.matrix(mat[:,:,i])
+         w,v=N.linalg.eig(matm)
+         vm=N.matrix(v)
+         vmt=vm.T
+         mat_diag=vmt*matm*vm
+         a1.append(1.0/N.sqrt(mat_diag[0,0]))
+         b1.append(1.0/N.sqrt(mat_diag[1,1]))
+         thetar=N.arccos(vm[0,0])
+         theta.append(math.degrees(thetar))
  
-
-
-
-    rsample='latticestar'
-    oxmax=XMax/myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
-    oxmin=XMin/myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
-    oymax=YMax/myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
-    oymin=YMin/myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+     mat_sec=N.copy(sec)
+     #print 'proj ', proj
+     (a,b,c)=N.shape(sec)
+     print 'reached'
+     for i in range(c):
+         rsample='latticestar'
+         ascale=myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)[0]
+         bscale=myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)[0]
+         print 'ascale',ascale
+         print 'bscale',bscale
+         ascale=1
+         bscale=1
+         matm_sec=N.matrix(mat_sec[:,:,i])
+         w_sec,v_sec=N.linalg.eig(matm_sec)
+         vm_sec=N.matrix(v)
+         vmt_sec=vm_sec.T
+         mat_diag_sec=vmt_sec*matm_sec*vm_sec
+         #print 'a',myrescal.lattice_calculator.a[0]
+         a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0])/ascale)
+         b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1])/bscale)
+         thetar_sec=N.arccos(vm_sec[0,0]/ascale)
+         theta_sec.append(math.degrees(thetar_sec))
+         #x0y0=N.array([H[i],K[i]])
+         x0y0=N.array([qx[i],qy[i]])
+         print 'a1_sec',a1_sec
+         print 'b1_sec',b1_sec
+         print 'theta_sec',math.degrees(thetar_sec)
+         print 'x0y0',x0y0
+         #print i,'qx',qx[i]
+         #print 'qy',qy[i]
+         e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
+         e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
  
-    #make right y-axis
-    #ax2 = fig.add_subplot(2,2,1)
-    #pylab.subplots_adjust(hspace=0.6,wspace=0.3)
-    #ax2.set_ylim(oymin[center], oymax[center])
-    #ax2.yaxis.tick_right()
-    #ax2.yaxis.set_label_position('right')
-    #ax2.xaxis.set_major_formatter(pylab.NullFormatter())
-    #ax2.xaxis.set_major_locator(pylab.NullLocator())
-    #ylabel=r'Q$_y$' +'(units of ['+str(o2[0,center])+' '+str(o2[1,center])+' '+str(o2[2,center])+'])'
-    #ax2.set_ylabel(ylabel)
-    #make top x-axis
-    #if 1:
-        #ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-y top')
-        #ax3.xaxis.tick_top()
-        #ax3.xaxis.set_label_position('top')
-        #ax3.set_xlim(oxmin[center], oxmax[center])
-        #ax3.yaxis.set_major_formatter(NullFormatter())
-        #ax3.yaxis.set_major_locator(pylab.NullLocator())
-        #xlabel=r'Q$_x$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
-        #ax3.set_xlabel(xlabel)
-        #ax3.set_zorder(2)
-
-    #make bottom x-axis, left y-axis
-    if 1:
-        #ax = fig.add_axes(ax2.get_position(), frameon=False,label='x-y')
-        #ax.yaxis.tick_left()
-        #ax.yaxis.set_label_position('left')
-        #ax.xaxis.tick_bottom()
-        #ax.xaxis.set_label_position('bottom')
-        for i in range(c):
-            #ax.add_artist(e[i])
-            e[i].set_clip_box(ax.bbox)
-            e[i].set_alpha(0.5)
-            e[i].set_facecolor('red')
-            ax.add_artist(e_sec[i])
-            e_sec[i].set_clip_box(ax.bbox)
-            e_sec[i].set_alpha(0.7)
-            e_sec[i].set_facecolor('black')
-
-        #ax.set_xlim(XMin, XMax)
-        #ax.set_ylim(YMin, YMax)
-        #xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
-        #ax.set_xlabel(xlabel)
-        #ylabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
-        #ax.set_ylabel(ylabel)
-
+  
+ 
+ 
+ 
+     rsample='latticestar'
+     oxmax=XMax/myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+     oxmin=XMin/myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)
+     oymax=YMax/myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+     oymin=YMin/myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)
+  
+     #make right y-axis
+     #ax2 = fig.add_subplot(2,2,1)
+     #pylab.subplots_adjust(hspace=0.6,wspace=0.3)
+     #ax2.set_ylim(oymin[center], oymax[center])
+     #ax2.yaxis.tick_right()
+     #ax2.yaxis.set_label_position('right')
+     #ax2.xaxis.set_major_formatter(pylab.NullFormatter())
+     #ax2.xaxis.set_major_locator(pylab.NullLocator())
+     #ylabel=r'Q$_y$' +'(units of ['+str(o2[0,center])+' '+str(o2[1,center])+' '+str(o2[2,center])+'])'
+     #ax2.set_ylabel(ylabel)
+     #make top x-axis
+     #if 1:
+         #ax3 = fig.add_axes(ax2.get_position(), frameon=False,label='x-y top')
+         #ax3.xaxis.tick_top()
+         #ax3.xaxis.set_label_position('top')
+         #ax3.set_xlim(oxmin[center], oxmax[center])
+         #ax3.yaxis.set_major_formatter(NullFormatter())
+         #ax3.yaxis.set_major_locator(pylab.NullLocator())
+         #xlabel=r'Q$_x$' +'(units of ['+str(o1[0,center])+' '+str(o1[1,center])+' '+str(o1[2,center])+'])'
+         #ax3.set_xlabel(xlabel)
+         #ax3.set_zorder(2)
+ 
+     #make bottom x-axis, left y-axis
+     if 1:
+         #ax = fig.add_axes(ax2.get_position(), frameon=False,label='x-y')
+         #ax.yaxis.tick_left()
+         #ax.yaxis.set_label_position('left')
+         #ax.xaxis.tick_bottom()
+         #ax.xaxis.set_label_position('bottom')
+         for i in range(c):
+             #ax.add_artist(e[i])
+             e[i].set_clip_box(ax.bbox)
+             e[i].set_alpha(0.5)
+             e[i].set_facecolor('red')
+             ax.add_artist(e_sec[i])
+             e_sec[i].set_clip_box(ax.bbox)
+             e_sec[i].set_alpha(0.7)
+             e_sec[i].set_facecolor('black')
+ 
+         #ax.set_xlim(XMin, XMax)
+         #ax.set_ylim(YMin, YMax)
+         #xlabel=r'Q$_x$ ('+r'$\AA^{-1}$)'
+         #ax.set_xlabel(xlabel)
+         #ylabel=r'Q$_y$ ('+r'$\AA^{-1}$)'
+         #ax.set_ylabel(ylabel)
+ 
 
 
 
@@ -477,8 +470,9 @@ if __name__ == '__main__':
  #       orient1=N.array([[0,1,1]],'d')
         orient1=N.array([[1,0,0]],'d')
         orient2=N.array([[0,1,0]],'d')
-        mylattice=lattice_calculator.lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
-                               orient1=orient1,orient2=orient2)
+        orientation=lattice_calculator.Orientation(orient1,orient2)
+        mylattice=lattice_calculator.Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
+                               orientation=orientation)
         delta=.0045
         hc=.5035
         kc=.5
@@ -521,9 +515,10 @@ if __name__ == '__main__':
         myrescal=rescalculator(mylattice)
         newinput=lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
                             H=H,K=K,L=L,W=W,setup=setup)
-        mylattice=lattice_calculator.lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
-                        beta=newinput['beta'],gamma=newinput['gamma'],orient1=newinput['orient1'],\
-                        orient2=newinput['orient2'])
+        neworientation=lattice_calculator.Orientation(newinput['orient1'],newinput['orient2'])
+        mylattice=lattice_calculator.Lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],\
+                        beta=newinput['beta'],gamma=newinput['gamma'],orientation=neworientation,\
+                        )
         myrescal.__init__(mylattice)
         Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
         R0,RM=myrescal.ResMat(Q,W,setup)
