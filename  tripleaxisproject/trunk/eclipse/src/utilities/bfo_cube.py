@@ -79,33 +79,85 @@ def gen_sr():
     return x,y,z
 
 
+def genvec(vec,fig,color=None):
+    vmag=np.sqrt(vec[0]**2+vec[1]**2+vec[2]**2); vec=vec/vmag
+    u=[vec[0]];v=[vec[1]];w=[vec[2]]
+    mlab.quiver3d([0],[0],[0],u,v,w,line_width=3, scale_factor=1,figure=fig,color=color)
+
 @mlab.show
 def test_den():
     P = np.random.random((10,10))
-    P=np.load(r'c:\maxdenP.np.npy')
-    myfilestr=r'c:\structfactors_density.dat'
-    x,y,z=np.loadtxt(myfilestr).T
-    P=z.reshape((101,101))
+    #P=np.load(r'c:\maxdenP.np.npy')
+    #myfilestr=r'c:\structfactors_density.dat'
+    #x,y,z=np.loadtxt(myfilestr).T
+    #P=z.reshape((101,101))
     #print P.shape
-    fig=mlab.figure()    
+    fig=mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
     x,y,z=gen_as()   
     #view along z-axis
-    pts_as=mlab.points3d(x,y,z-.125,color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+    #pts_as=mlab.points3d(x,y,z-.125,color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.1)
     x,y,z=gen_fe()  
     print 'x',x
     print 'y',y
     print 'z',z
-    pts_fe=mlab.points3d(x,y,z-.125,color=(0,1,0),colormap='gist_rainbow',figure=fig,scale_factor=.02)
+    #pts_fe=mlab.points3d(x,y,z-.125,color=(0,1,0),colormap='gist_rainbow',figure=fig,scale_factor=.02)
     x,y,z=gen_sr()  
-    pts_sr=mlab.points3d(x,y,z-.125,color=(0,0,1),colormap='gist_rainbow',figure=fig)
-    outline=mlab.outline(figure=fig,extent=[0,1,0,1,-1,0])
+    #pts_sr=mlab.points3d(x,y,z-.125,color=(0,0,1),colormap='gist_rainbow',figure=fig)
+    
+   
+    
+    vec=np.array([1,1,-2],'Float64')
+    genvec(vec,fig,color=(1,0,0))   
+    vec=np.array([-2,1,1],'Float64')
+    genvec(vec,fig,color=(1,0,0))   
+    vec=np.array([1,-2,1],'Float64')
+    genvec(vec,fig,color=(1,0,0))  
+    
+    
+    
+    vec=np.array([1,1,1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    vec=np.array([1,1,-1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    vec=np.array([1,-1,1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    vec=np.array([-1,1,1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    
+    vec=np.array([1,-1,-1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    vec=np.array([-1,1,-1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    vec=np.array([-1,-1,1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    vec=np.array([-1,-1,-1],'Float64')
+    genvec(vec,fig, color=(0,0,1))
+    
+    
+    
+    
+    
+    vec=np.array([1,1,0],'Float64')
+    genvec(vec,fig, color=(0,1,0)) 
+    vec=-np.array([1,1,0],'Float64')
+    genvec(vec,fig, color=(0,1,0)) 
+    vec=np.array([1,0,1],'Float64')
+    genvec(vec,fig, color=(0,1,0))
+    vec=-np.array([1,0,1],'Float64')
+    genvec(vec,fig, color=(0,1,0))
+    vec=np.array([0,1,-1],'Float64')
+    genvec(vec,fig, color=(0,1,0)) 
+    vec=-np.array([0,1,-1],'Float64')
+    genvec(vec,fig, color=(0,1,0)) 
+    #outline=mlab.outline(figure=fig)
+    outline=mlab.outline(figure=fig,extent=[-1,1,-1,1,-1,1])
     mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
-    print 'shape',P.shape
-    P = P[:,:, np.newaxis]
-    print 'after',P.shape
-    src = mlab.pipeline.scalar_field(P)
+    #print 'shape',P.shape
+    #P = P[:,:, np.newaxis]
+    #print 'after',P.shape
+    #src = mlab.pipeline.scalar_field(P)
     #src = mlab.pipeline.array2d_source(P)
-    surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.4)
+    #surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.4)
     #surf.transform.GetTransform().RotateX(90)
     print 'done'
 
