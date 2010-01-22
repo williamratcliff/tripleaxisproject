@@ -1,3 +1,4 @@
+
 ## PointRotate.py Version 1.02
 ## Copyright (c) 2006 Bruce Vaughan, BV Detailing & Design, Inc.
 ## All rights reserved.
