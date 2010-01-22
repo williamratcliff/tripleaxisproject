@@ -377,8 +377,10 @@ if __name__=="__main__":
     # x4 <= -2.5
     # 3.5 <= x5 <= 4.5
     # all other: lb = -5, ub = +15
-    p.lb =1e-7*N.ones(p.n)
-    p.ub = N.ones(p.n)
+    #p.lb =1e-7*N.ones(p.n)
+    #p.ub = N.ones(p.n)
+    p.lb =1e-7*N.ones(p0.shape)
+    p.ub = N.ones(p0.shape)
     #p.ub[4] = -2.5
     #p.lb[5], p.ub[5] = 3.5, 4.5
 

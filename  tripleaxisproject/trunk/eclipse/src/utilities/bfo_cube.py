@@ -105,54 +105,73 @@ def test_den():
     #pts_sr=mlab.points3d(x,y,z-.125,color=(0,0,1),colormap='gist_rainbow',figure=fig)
     
    
+    if 0:
+        #112
+        vec=np.array([1,1,-2],'Float64')
+        genvec(vec,fig,color=(1,0,0))   
+        vec=np.array([-2,1,1],'Float64')
+        genvec(vec,fig,color=(1,0,0))   
+        vec=np.array([1,-2,1],'Float64')
+        genvec(vec,fig,color=(1,0,0))  
+        
+        #111
+        vec=np.array([1,1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
     
-    vec=np.array([1,1,-2],'Float64')
-    genvec(vec,fig,color=(1,0,0))   
-    vec=np.array([-2,1,1],'Float64')
-    genvec(vec,fig,color=(1,0,0))   
-    vec=np.array([1,-2,1],'Float64')
-    genvec(vec,fig,color=(1,0,0))  
+    if 0: 
+        #111
+        vec=np.array([1,1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([1,1,-1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([1,-1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([-1,1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+    
+        vec=np.array([1,-1,-1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([-1,1,-1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([-1,-1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([-1,-1,-1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
     
     
-    
-    vec=np.array([1,1,1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
-    vec=np.array([1,1,-1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
-    vec=np.array([1,-1,1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
-    vec=np.array([-1,1,1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
-    
-    vec=np.array([1,-1,-1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
-    vec=np.array([-1,1,-1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
-    vec=np.array([-1,-1,1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
-    vec=np.array([-1,-1,-1],'Float64')
-    genvec(vec,fig, color=(0,0,1))
+    if 1:
+        #scattering plane:
+        vec=np.array([1,1,0],'Float64')
+        genvec(vec,fig, color=(0,1,0)) 
+        vec=np.array([1,1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([1,1,-2],'Float64')
+        genvec(vec,fig,color=(1,0,0))   
+        vec=np.array([0,0,1],'Float64')
+        genvec(vec,fig,color=(0,0,0))   
+        
     
     
-    
-    
-    
-    vec=np.array([1,1,0],'Float64')
-    genvec(vec,fig, color=(0,1,0)) 
-    vec=-np.array([1,1,0],'Float64')
-    genvec(vec,fig, color=(0,1,0)) 
-    vec=np.array([1,0,1],'Float64')
-    genvec(vec,fig, color=(0,1,0))
-    vec=-np.array([1,0,1],'Float64')
-    genvec(vec,fig, color=(0,1,0))
-    vec=np.array([0,1,-1],'Float64')
-    genvec(vec,fig, color=(0,1,0)) 
-    vec=-np.array([0,1,-1],'Float64')
-    genvec(vec,fig, color=(0,1,0)) 
-    #outline=mlab.outline(figure=fig)
+    if 0:
+        #1 1 0
+        vec=np.array([1,1,0],'Float64')
+        genvec(vec,fig, color=(0,1,0)) 
+        vec=-np.array([1,1,0],'Float64')
+        genvec(vec,fig, color=(0,1,0)) 
+        
+        vec=np.array([1,0,1],'Float64')
+        genvec(vec,fig, color=(0,1,0))
+        vec=-np.array([1,0,1],'Float64')
+        genvec(vec,fig, color=(0,1,0))
+        
+        vec=np.array([0,1,-1],'Float64')
+        genvec(vec,fig, color=(0,1,0)) 
+        vec=-np.array([0,1,-1],'Float64')
+        genvec(vec,fig, color=(0,1,0)) 
+        #outline=mlab.outline(figure=fig)
     outline=mlab.outline(figure=fig,extent=[-1,1,-1,1,-1,1])
     mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
-    #print 'shape',P.shape
+        #print 'shape',P.shape
     #P = P[:,:, np.newaxis]
     #print 'after',P.shape
     #src = mlab.pipeline.scalar_field(P)
@@ -160,6 +179,8 @@ def test_den():
     #surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.4)
     #surf.transform.GetTransform().RotateX(90)
     print 'done'
+    if 0:
+        mlab.view(45, 45,focalpoint=(2,2,2))
 
 
 if __name__=='__main__':

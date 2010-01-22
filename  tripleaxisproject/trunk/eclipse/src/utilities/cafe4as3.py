@@ -454,19 +454,7 @@ def gauss(p,x):
     y=y+area2*N.exp(-(0.5*(x-center2)*(x-center2)/sigma2/sigma2))
     return y
 
-def gauss2(x,p0,p1,p2,p3,p4,p5,p6):
-    #Area center width Bak
 
-    p=[p0,p1,p2,p3,p4,p5,p6]
-
-
-    x0=p[1]
-    width=p[2]
-    sigma=width/2/N.sqrt(2*N.log(2))
-    area=N.abs(p[0])/N.sqrt(2*pi)/sigma
-    background=N.abs(p[3])
-    y=background+area*N.exp(-(0.5*(x-x0)*(x-x0)/sigma/sigma))
-    return y
 
 def chisq(p,a3,I,Ierr):
     Icalc=gauss(p,a3)
@@ -531,9 +519,10 @@ if __name__=='__main__':
         #flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
         #SU.printr(flist)
         tth,T,counts,counts_err,mon0=readfiles(flist)
-        p,perror,pcerror,chisq=fitpeak(tth[0],counts[0],counts_err[0])
-        print 'p',p,perror,pcerror, chisq
-        sys.exit()
+        
+        #p,perror,pcerror,chisq=fitpeak(tth[0],counts[0],counts_err[0])
+        #print 'p',p,perror,pcerror, chisq
+        #sys.exit()
         new_tth,new_T,new_counts=regrid2(tth,T,counts)
         #x,y,z=grid(new_tth,new_T,new_counts)
         x=N.array(new_tth)
