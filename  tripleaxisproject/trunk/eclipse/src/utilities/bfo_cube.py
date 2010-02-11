@@ -105,7 +105,7 @@ def test_den():
     #pts_sr=mlab.points3d(x,y,z-.125,color=(0,0,1),colormap='gist_rainbow',figure=fig)
     
    
-    if 0:
+    if 1:
         #112
         vec=np.array([1,1,-2],'Float64')
         genvec(vec,fig,color=(1,0,0))   
@@ -139,7 +139,7 @@ def test_den():
         genvec(vec,fig, color=(0,0,1))
     
     
-    if 1:
+    if 0:
         #scattering plane:
         vec=np.array([1,1,0],'Float64')
         genvec(vec,fig, color=(0,1,0)) 
@@ -150,7 +150,30 @@ def test_den():
         vec=np.array([0,0,1],'Float64')
         genvec(vec,fig,color=(0,0,0))   
         
-    
+
+    if 0:
+        #110 scattering plane:
+        vec=np.array([1,1,0],'Float64')
+        genvec(vec,fig, color=(0,1,0)) 
+        vec=np.array([1,1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([1,1,-2],'Float64')
+        genvec(vec,fig,color=(1,0,0))   
+        vec=np.array([0,0,1],'Float64')
+        genvec(vec,fig,color=(0,0,0)) 
+        
+    if 1:
+        #110 scattering plane variations normal to 111
+        vec=np.array([1,-1,0],'Float64')
+        genvec(vec,fig, color=(0,1,0)) 
+        vec=np.array([1,1,1],'Float64')
+        genvec(vec,fig, color=(0,0,1))
+        vec=np.array([0,1,-1],'Float64')
+        genvec(vec,fig,color=(0,1,0))   
+        vec=np.array([-1,0,1],'Float64')
+        genvec(vec,fig,color=(0,1,0))
+
+        
     
     if 0:
         #1 1 0
