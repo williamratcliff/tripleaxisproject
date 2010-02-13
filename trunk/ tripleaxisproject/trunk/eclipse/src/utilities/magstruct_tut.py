@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import pi,cos, sqrt, sin,exp
-from enthought.mayavi import mlab
+from numpy.linalg import norm
+#from enthought.mayavi import mlab
 
 
 astar=2*pi/5.511;
@@ -38,15 +39,29 @@ def gen_spins(th_in=41):
  s6=-s1
  s7=s1
  s8=s1
+ s=np.vstack((s1,s2,s3,s4,s5,s6,s7,s8))
+ return s
  
 
 @mlab.show
 def draw_struct():
     fig=mlab.figure()    
-    r=gen_fe()   
+    r=gen_fe()
+    s=gen_spins()
     #view along z-axis
-    pts_as=mlab.points3d(r[:,0],r[:0,1],r[:,2],color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.1)
-    outline=mlab.outline(figure=fig,extent=[0,1,0,1,-1,0])
+    x=r[:,0]
+    y=r[:,1]
+    z=r[:,2]
+    u=s[:,0]
+    v=s[:,1]
+    w=s[:,2]
+    
+    #print x.shape
+    #print y.shape
+    #print z.shape
+    pts_as=mlab.points3d(x,y,z,color=(0,0,1),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+    mlab.quiver3d(x, y, z,u,v,w, line_width=3, scale_factor=.3,figure=fig)
+    outline=mlab.outline(figure=fig,extent=[0,1,0,1,0,1])
     mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
     print 'done'
 
