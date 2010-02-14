@@ -10,6 +10,34 @@ astar=2*pi/5.511;
 bstar=2*pi/5.511
 cstar=2*pi/12.136
 
+#def readfiles():
+ #filedir='c:\srfeas\20081212\';
+#filehead='mag35';
+#fileend='.bt9';
+#%scans=[12 16 18 37 39 41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 73];
+
+#fileszero='00';
+
+
+#fileszero2='0';
+#%scans2=10:17;
+#%scans=[scans1 scans2];
+#%scans=scans1;
+#files=[];
+#numfiles=[2,3,5,6,7];
+
+#numfiles=[4:9];
+#for i=1:length(numfiles)
+#file=[filedir filehead fileszero num2str(numfiles(i)) fileend];
+#files=[files;file];
+#end
+
+#numfiles=[10:17];
+#for i=1:length(numfiles)
+#file=[filedir filehead fileszero2 num2str(numfiles(i)) fileend];
+#files=[files;file];
+#end
+
 def magstruct(pfit,Qm,Int,Interr,correction,setup):
  Ifit=calcstructure(pfit,Qm,correction,setup)
  chisq=(Ifit-Int)/Interr;
