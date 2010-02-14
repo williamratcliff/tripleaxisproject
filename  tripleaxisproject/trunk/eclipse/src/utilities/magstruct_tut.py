@@ -1,6 +1,7 @@
 import numpy as np
-from numpy import pi,cos, sqrt, sin,exp
+from numpy import pi,cos, sqrt, sin,exp,conj
 from numpy.linalg import norm
+I=np.complex(0,1)
 import copy
 #from enthought.mayavi import mlab
 
@@ -66,16 +67,25 @@ def gen_spins(th_in=41):
     #mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
     #print 'done'
 
-def calcstructure(pfit,Qs,correction,setup):
+    
+def mgnfacFesquared(x):
+
+#x=s=sin(theta)/lambda=modq/4/pi
+ y=( 0.0706*exp(-35.008*x**2)+0.3589*exp(-15.358*x**2)
+   +0.5819*exp(-5.561*x**2)-0.0114)**2
+ return y
+    
+def calcstructure(pfit,Qs,correction):
  #positions of magnetic atoms in unit cell
  Mn3pt=gen_fe()
  momentsKMn3p=gen_spins()
- n,m=Qs.shape()
+ n,m=Qs.shape
  QA=copy.deepcopy(Qs)
  QA[:,0]=QA[:,0]*astar
  QA[:,1]=QA[:,1]*bstar
  QA[:,2]=QA[:,2]*cstar
- modq=sqrt(QA[:,0].*QA[:,0]+QA[:,1].*QA[:,1]+QA[:,2].*QA[:,2])
+ modq=sqrt(QA[:,0]*QA[:,0]+QA[:,1]*QA[:,1]+QA[:,2]*QA[:,2])
+ Qn=copy.deepcopy(QA)
  Qn[:,0]=QA[:,0]/modq;
  Qn[:,1]=QA[:,1]/modq;
  Qn[:,2]=QA[:,2]/modq;   
@@ -83,21 +93,22 @@ def calcstructure(pfit,Qs,correction,setup):
  magnfacMn3p=sqrt(mgnfacFesquared(modq/4/pi));
  #calculate structure factor
  F1Mn3p=np.zeros((n,3));
- expt=exp(i*2*pi*np.multiply(Qs,Mn3pt.T))
- F1Mn3p=np.multiply(expt,momentsKMn3p)
+ expt=exp(I*2*pi*np.dot(Qs,Mn3pt.T))
+ F1Mn3p=np.dot(expt,momentsKMn3p)
  F1Mn3p[:,0]=F1Mn3p[:,0]*magnfacMn3p;
  F1Mn3p[:,1]=F1Mn3p[:,1]*magnfacMn3p;
  F1Mn3p[:,2]=F1Mn3p[:,2]*magnfacMn3p;
- fmt=np.zeros((n,1))
+ #fmt=np.zeros((n,1))
  F1=F1Mn3p;
  #find fperpendicular from F-F.q*q hat
+ Fperp1=np.zeros(F1.shape,'float64')
  Fperp1[:,0]=F1[:,0]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,0]
  Fperp1[:,1]=F1[:,1]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,1]
  Fperp1[:,2]=F1[:,2]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,2]
- 
+ fm1=np.zeros(F1.shape,'float64')
  fm1=(Fperp1[:,0]*conj(Fperp1[:,0])+Fperp1[:,1]*conj(Fperp1[:,1])+Fperp1[:,2]*conj(Fperp1[:,2]))      
- fmt=fmt+(fm1);
- fm=fmt[0:n]*pfit[0]^2*correction
+ fmt=fm1;
+ fm=fmt[0:n]*pfit[0]**2*correction
  return fm
 
 
@@ -106,9 +117,26 @@ if __name__=="__main__":
  print "main"
  Qs=np.array([[1,0,1],
               [1,0,3]
-              ]
+              ],
               'float64')
-              
- calcstructure(pfit,Qs,correction,setup)
+ Qs=np.array([[  1,     0,     7],
+              [  3,     0,     1],
+              [  3,     0,     3],
+              [  3,     0,     5],
+              [  1,     0,     1],
+              [  1,     0,     3],
+              [  1,     0,     5],
+              [  1,     0,     7],
+              [  1,     0,     9],
+              [  1,     0,    11],
+              [  3,     0,     7],
+              [  3,     0,     9],
+              [  5,     0,     1],
+              [  5,     0,     3]],
+              'float64')
+ pfit=np.array([1.0],'float64')  
+ correction=np.ones(Qs.shape[0])
+ fm=calcstructure(pfit,Qs,correction)
+ print 'fm',fm
  #r=gen_fe()
  #draw_struct()
