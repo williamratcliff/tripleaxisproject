@@ -63,6 +63,7 @@ def readfiles(filestrlist):
  Qlist=[]
  hkllist=[]
  thlist=[]
+ mydatalist=[]
  for myfilestr in filestrlist:
   mydatareader=readncnr.datareader()
   mydata=mydatareader.readbuffer(myfilestr)
@@ -87,7 +88,8 @@ def readfiles(filestrlist):
   hkllist.append(hkl)
   th=np.array(mydata.data['a3'])
   thlist.append(th)
- return Qlist, thlist,Ilist, Ierrlist,hkllist
+  mydatalist.append(mydata)
+ return Qlist, thlist,Ilist, Ierrlist,hkllist,mydatalist
            
 
 
@@ -259,6 +261,89 @@ def fit_peak(plotdict):
   print 'chi',chimin
   return fitdict
 
+
+def correct_data(mydata,qscan=None):
+ mya=mydata.metadata['lattice']['a']
+ myb=mydata.metadata['lattice']['b']
+ myc=mydata.metadata['lattice']['c']
+ myalpha=N.radians(mydata.metadata['lattice']['alpha'])
+ mybeta=N.radians(mydata.metadata['lattice']['beta'])
+ mygamma=N.radians(mydata.metadata['lattice']['gamma'])
+ a=N.array([mya],dtype='float64') #for now, the code is broken if only one element in the array for indexing
+ b=N.array([myb],dtype='float64')
+ c=N.array([myc],dtype='float64')
+ alpha=N.array([myalpha],dtype='float64')
+ beta=N.array([mybeta],dtype='float64')
+ gamma=N.array([mygamma],dtype='float64')
+ #print mydata.metadata
+ h=mydata.metadata['orient1']['h']
+ k=mydata.metadata['orient1']['k']
+ l=mydata.metadata['orient1']['l']
+ orient1=N.array([[h,k,l]],dtype='float64')
+ h=mydata.metadata['orient2']['h']
+ k=mydata.metadata['orient2']['k']
+ l=mydata.metadata['orient2']['l']
+ orient2=N.array([[h,k,l]],dtype='float64')
+ orientation=rescalc.lattice_calculator.Orientation(orient1,orient2)
+ mylattice=rescalc.lattice_calculator.Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orientation=orientation)
+ #h=q['h_center'] #perhaps just take this from the file in the future
+ #k=q['k_center']
+ #l=q['l_center']
+ h=mydata.metadata['q_center']['h_center']
+ k=mydata.metadata['q_center']['k_center']
+ l=mydata.metadata['q_center']['l_center']
+ H=N.array([h,h],dtype='float64');
+ K=N.array([k,k],dtype='float64');
+ L=N.array([l,l],dtype='float64');
+ W=N.array([0.0,0.0],dtype='float64')
+ EXP={}
+ EXP['ana']={}
+ EXP['ana']['tau']='pg(002)'
+ EXP['mono']={}
+ EXP['mono']['tau']='pg(002)';
+ EXP['ana']['mosaic']=60
+ EXP['mono']['mosaic']=60
+ EXP['sample']={}
+ EXP['sample']['mosaic']=30
+ EXP['sample']['vmosaic']=30
+ coll1=mydata.metadata['collimations']['coll1']
+ coll2=mydata.metadata['collimations']['coll2']
+ coll3=mydata.metadata['collimations']['coll3']
+ coll4=mydata.metadata['collimations']['coll4']	
+ 
+ EXP['hcol']=N.array([coll1,coll2,coll3,coll4],dtype='float64')
+ EXP['hcol']=N.array([40, 22.7, 40, 120],dtype='float64')
+ 
+ EXP['vcol']=N.array([120, 120, 120, 240],dtype='float64')
+
+ EXP['infix']=-1 #positive for fixed incident energy
+ EXP['efixed']=mydata.metadata['energy_info']['ef']
+ EXP['method']=0
+ setup=[EXP]
+ myrescal=rescalc.rescalculator(mylattice)
+ newinput=rescalc.lattice_calculator.CleanArgs(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,orient1=orient1,orient2=orient2,\
+                                               H=H,K=K,L=L,W=W,setup=setup)
+ neworientation=rescalc.lattice_calculator.Orientation(newinput['orient1'],newinput['orient2'])
+ mylattice=rescalc.lattice_calculator.Lattice(a=newinput['a'],b=newinput['b'],c=newinput['c'],alpha=newinput['alpha'],
+                                              beta=newinput['beta'],gamma=newinput['gamma'],orientation=neworientation)
+ myrescal.__init__(mylattice)
+ Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
+ #print 'Q', Q
+ R0,RM=myrescal.ResMat(Q,W,setup)
+ #print 'RM '
+ #print RM.transpose()
+ #print 'R0 ',R0
+ #exit()
+ R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
+ #myrescal.ResPlot(H, K, L, W, setup)
+ #print 'RMS'
+ #print RMS.transpose()[0]
+ #corrections=myrescal.calc_correction(H,K,L,W,setup,qscan=[[1,0,1],[1,0,1]])
+ corrections=myrescal.calc_correction(H,K,L,W,setup,qscan=qscan)
+ #print corrections
+ return corrections,Q[0]
+ 
+ 
 if __name__=="__main__":
  print "main"
  if 1:
@@ -268,10 +353,11 @@ if __name__=="__main__":
   filenums=range(4,18-3)
   flist=gen_flist(mydirectory,myfilebase,myend,filenums)
   print flist
-  Qlist, thlist,Ilist, Ierrlist,hkllist=readfiles(flist)
+  Qlist, thlist,Ilist, Ierrlist,hkllist,mydatalist=readfiles(flist)
   print Qlist
   fig=pylab.figure(figsize=(8,8))
-  
+  modqlist=[]
+  corrections=[]
   for i in range(len(Qlist)):
    print hkllist[i]
    plotdict={}
@@ -284,7 +370,13 @@ if __name__=="__main__":
     ax=fig.add_subplot(3,4,i+1)
     ax.errorbar(plotdict['data']['x'],plotdict['data']['y'],plotdict['data']['yerr'],marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
     ax.plot(fitdict['x'],fitdict['y'])
-  pylab.show()   
+   correction,modq=correct_data(mydatalist[i])
+   corrections.append(correction['th_correction'][0])
+   modqlist.append(modq)
+  if 0:
+   pylab.show() 
+  print corrections
+  print modqlist
 
  if 0:
   Qs=np.array([[  1,     0,     7],
