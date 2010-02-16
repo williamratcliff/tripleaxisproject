@@ -2,7 +2,19 @@ import numpy as np
 from numpy import pi,cos, sqrt, sin,exp,conj
 from numpy.linalg import norm
 I=np.complex(0,1)
-import copy
+import copy,sys,os
+import readncnr3 as readncnr
+import numpy as N
+import scriptutil as SU
+import re
+from simple_combine import simple_combine
+import scipy.optimize
+import rescalculator.rescalc as rescalc
+import utilities.findpeak4 as findpeak
+from spinwaves.utilities.mpfit.mpfit import mpfit 
+import pylab
+
+
 #from enthought.mayavi import mlab
 
 
@@ -11,9 +23,8 @@ bstar=2*pi/5.511
 cstar=2*pi/12.136
 
 #def readfiles():
- #filedir='c:\srfeas\20081212\';
-#filehead='mag35';
-#fileend='.bt9';
+ 
+
 #%scans=[12 16 18 37 39 41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 73];
 
 #fileszero='00';
@@ -38,11 +49,47 @@ cstar=2*pi/12.136
 #files=[files;file];
 #end
 
+
+
 def magstruct(pfit,Qm,Int,Interr,correction,setup):
  Ifit=calcstructure(pfit,Qm,correction,setup)
  chisq=(Ifit-Int)/Interr;
  #[th1 phi2 th2]; 
  return chisq
+
+def readfiles(filestrlist):
+ Ilist=[]
+ Ierrlist=[]
+ Qlist=[]
+ hkllist=[]
+ thlist=[]
+ for myfilestr in filestrlist:
+  mydatareader=readncnr.datareader()
+  mydata=mydatareader.readbuffer(myfilestr)
+  filename=mydata.metadata['file_info']['filename']
+  h=mydata.metadata['q_center']['h_center']
+  k=mydata.metadata['q_center']['k_center']
+  l=mydata.metadata['q_center']['l_center']
+  hkl='('+str(h)+' '+str(k)+' '+str(l)+')' 
+  Q=np.array([h,k,l],'float64')
+  print 'hkl',hkl
+  if len(Ilist)==0:
+   mon0=mydata.metadata['count_info']['monitor']
+        
+  mon=mydata.metadata['count_info']['monitor']
+  I_orig=np.array(mydata.data['counts'],'Float64')
+            #node.measured_data.data['counts_err']=N.array(node.measured_data.data['counts_err'],'Float64')
+  I_norm=I_orig*mon0/mon
+  I_norm_err=np.sqrt(I_orig)*mon0/mon
+  Ilist.append(I_norm)
+  Ierrlist.append(I_norm_err)
+  Qlist.append(Q)
+  hkllist.append(hkl)
+  th=np.array(mydata.data['a3'])
+  thlist.append(th)
+ return Qlist, thlist,Ilist, Ierrlist,hkllist
+           
+
 
 def gen_fe():
  #generate atoms in the unit cell
@@ -139,32 +186,126 @@ def calcstructure(pfit,Qs,correction):
  fm=fmt[0:n]*pfit[0]**2*correction
  return fm
 
+def gen_flist(mydirectory,myfilebase,myend,filenums):
+ files=[]
+ for filenum in filenums:
+  if filenum < 10:
+   myfilestr=myfilebase+'00'+str(filenum)+myend
+  elif filenum < 100:
+   myfilestr=myfilebase+'0'+str(filenum)+myend
+  else:
+   myfilestr=myfilebase+str(filenum)+myend
+   
+  myfilestr=os.path.join(mydirectory,myfilestr)
+  files.append(myfilestr)
+ return files
 
+def fit_peak(plotdict):
+  x=plotdict['data']['x']
+  y=plotdict['data']['y']
+  yerr=plotdict['data']['yerr']
+  kernel=findpeak.find_kernel(y)
+  npeaks,nlist,plist=findpeak.find_npeaks(x,y,yerr,kernel,nmax=2)
+  results=findpeak.findpeak(x,y,npeaks,kernel=kernel)
+  fwhm=findpeak.findwidths(x,y,npeaks,results['xpeaks'],results['indices'])
+  sigma=fwhm/2.354
+  p0=[0,0]
+  pb=N.concatenate((results['xpeaks'], fwhm, results['heights']*N.sqrt(2*pi*sigma**2)))
+  pb=N.array(pb).flatten()
+  p0=N.concatenate((p0,pb)).flatten()
+  print 'p0',p0
+  #
+  fresults= scipy.optimize.leastsq(findpeak.cost_func, p0, args=(x,y,yerr),full_output=1)
+  p1=fresults[0]
+  covariance=fresults[1]
+
+  parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
+  parinfo=[]
+  for i in range(len(p0)):
+      parinfo.append(copy.deepcopy(parbase))
+  for i in range(len(p0)): 
+      parinfo[i]['value']=p0[i]
+  parinfo[1]['fixed']=1 #fix slope
+  fa = {'x':x, 'y':y, 'err':yerr}
+  m = mpfit(findpeak.myfunctlin, p0, parinfo=parinfo,functkw=fa) 
+  print 'status = ', m.status
+  print 'params = ', m.params
+  p1=m.params
+  covariance=m.covar
+  
+  dof=len(y)-len(p1)
+  fake_dof=len(y)
+  chimin=(findpeak.cost_func(p1,x,y,yerr)**2).sum()
+  chimin=chimin/dof if dof>0 else chimin/fake_dof
+  covariance=covariance*chimin #assume our model is good
+  
+  
+  
+  area=N.array(N.abs(p1[2+2*npeaks::]))
+  area_sig=covariance.diagonal()[2+2*npeaks::]
+  fwhm=N.array(N.abs(p1[2+npeaks:2+2*npeaks]))
+  
+  
+  
+  ycalc=findpeak.gen_function(p1,x)
+  fitdict={}
+  fitdict['x']=x
+  fitdict['y']=ycalc
+  fitdict['area']=area.sum()
+  fitdict['chi']=chimin
+  fitdict['area_err']=N.sqrt(area_sig.sum())
+  print 'area',fitdict['area']
+  #next add the fit results
+  print 'chi',chimin
+  return fitdict
 
 if __name__=="__main__":
  print "main"
- Qs=np.array([[1,0,1],
-              [1,0,3]
-              ],
-              'float64')
- Qs=np.array([[  1,     0,     7],
-              [  3,     0,     1],
-              [  3,     0,     3],
-              [  3,     0,     5],
-              [  1,     0,     1],
-              [  1,     0,     3],
-              [  1,     0,     5],
-              [  1,     0,     7],
-              [  1,     0,     9],
-              [  1,     0,    11],
-              [  3,     0,     7],
-              [  3,     0,     9],
-              [  5,     0,     1],
-              [  5,     0,     3]],
-              'float64')
- pfit=np.array([1.0],'float64')  
- correction=np.ones(Qs.shape[0])
- fm=calcstructure(pfit,Qs,correction)
- print 'fm',fm
- #r=gen_fe()
- #draw_struct()
+ if 1:
+  mydirectory=r'c:\srfeas\20081212'
+  myfilebase='mag35'
+  myend='.bt9'
+  filenums=range(4,18-3)
+  flist=gen_flist(mydirectory,myfilebase,myend,filenums)
+  print flist
+  Qlist, thlist,Ilist, Ierrlist,hkllist=readfiles(flist)
+  print Qlist
+  fig=pylab.figure(figsize=(8,8))
+  
+  for i in range(len(Qlist)):
+   print hkllist[i]
+   plotdict={}
+   plotdict['data']={}
+   plotdict['data']['x']=thlist[i]
+   plotdict['data']['y']=Ilist[i]
+   plotdict['data']['yerr']=Ierrlist[i]
+   fitdict=fit_peak(plotdict)
+   if 1:
+    ax=fig.add_subplot(3,4,i+1)
+    ax.errorbar(plotdict['data']['x'],plotdict['data']['y'],plotdict['data']['yerr'],marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
+    ax.plot(fitdict['x'],fitdict['y'])
+  pylab.show()   
+
+ if 0:
+  Qs=np.array([[  1,     0,     7],
+               [  3,     0,     1],
+               [  3,     0,     3],
+               [  3,     0,     5],
+               [  1,     0,     1],
+               [  1,     0,     3],
+               [  1,     0,     5],
+               [  1,     0,     7],
+               [  1,     0,     9],
+               [  1,     0,    11],
+               [  3,     0,     7],
+               [  3,     0,     9],
+               [  5,     0,     1],
+               [  5,     0,     3]],
+               'float64')
+  pfit=np.array([1.0],'float64')  
+  correction=np.ones(Qs.shape[0])
+  fm=calcstructure(pfit,Qs,correction)
+  print 'fm',fm
+ if 0:
+  r=gen_fe()
+  #draw_struct()
