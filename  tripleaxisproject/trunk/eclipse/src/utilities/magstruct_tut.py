@@ -155,7 +155,7 @@ def mgnfacFesquared(x):
 def calcstructure(pfit,Qs,correction):
  #positions of magnetic atoms in unit cell
  Mn3pt=gen_fe()
- momentsKMn3p=gen_spins()
+ momentsKMn3p=gen_spins(th_in=pfit[1])
  n,m=Qs.shape
  QA=copy.deepcopy(Qs)
  QA[:,0]=QA[:,0]*astar
@@ -377,6 +377,12 @@ if __name__=="__main__":
    pylab.show() 
   print corrections
   print modqlist
+  pfit=np.array([0.7383 ,  -0.0026],'float64')  
+  #correction=np.ones(Qs.shape[0])
+  corrections=np.array(corrections)
+  Qlist=np.array(Qlist)
+  fm=calcstructure(pfit,Qlist,corrections)
+  print 'fm',fm
 
  if 0:
   Qs=np.array([[  1,     0,     7],
