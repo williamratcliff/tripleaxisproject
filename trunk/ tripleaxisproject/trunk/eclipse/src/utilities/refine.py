@@ -6,10 +6,45 @@ from spinwaves.utilities.mpfit.mpfit import mpfit
 import sys,os,copy
 import pylab
 from utilities.anneal import anneal
-
+from numpy import sqrt
 A=5.581
 B=A
 C=13.8757
+
+
+h1=N.array([[1,0,0],
+            [0,1,0],
+            [0,0,1]
+            ],'Float64')
+h2=N.array([[0,-1,0],
+            [1,0,0],
+            [0,0,1]
+            ],'Float64')
+h3=N.array([[-1,0,0],
+            [0,-1,0],
+            [0,0,1]
+            ],'Float64')
+h4=N.array([[0,1,0],
+            [-1,0,0],
+            [0,0,1]
+            ],'Float64')
+
+
+ah=A; ch=C/2
+
+B1=N.array([[sqrt(2)/3/ah,-4/3/ah/sqrt(2),sqrt(2)/3/ah],
+            [4/3/ah/sqrt(2),-sqrt(2)/3/ah,-sqrt(2)/3/ah],
+            [sqrt(3)/ch,sqrt(3)/ch,sqrt(3)/ch]
+            ],'Float64')
+B2=N.dot(h2,B1)
+B3=N.dot(h3,B1)
+B4=B.dot(h4,B1)
+B1inv=N.linalg.inv(B1)
+M2=N.dot(N.dot(B1inv,h2),B1) #could have done M2=N.dot(B1iv,B2)
+M3=N.dot(N.dot(B1inv,h3),B1)
+M4=N.dot(N.dot(B1inv,h4),B1) 
+#so N.dot(M4,vec) takes vec from individual 4 into frame of individual 1
+#vec is in hexagonal coordinates, so need to convert pc->hex for that individual
 
 
 def calcstar():
@@ -116,6 +151,9 @@ def hex2rhomb(h,k,l):
         
     return N.array(hr),N.array(kr),N.array(lr)
 
+
+
+
 def setup(Hpc,Kpc,Lpc):
     Hh,Kh,Lh=pseudocubic2hex(Hpc,Kpc,Lpc)
     if 0:
@@ -144,6 +182,7 @@ def calc_struct(p,h,k,l,d,q,alphastar,astar,lattice,hh,kh,lh):
     Fe1r=N.array([0.2200,  0.2200,  0.2200],'Float64')
     Fe2r=N.array([0.7200,  0.7200,  0.7200],'Float64')
     scale,phi1=p
+    
     cos2n1=calc_cos2n(phi1,h,k,l,d,alphastar,astar)
     #cos2n2=calc_cos2n(phi2,h,k,l,d,alphastar,astar)
     s1=(1-cos2n1)
