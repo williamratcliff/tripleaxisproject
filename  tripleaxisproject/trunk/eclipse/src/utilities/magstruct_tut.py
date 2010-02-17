@@ -15,7 +15,7 @@ from spinwaves.utilities.mpfit.mpfit import mpfit
 import pylab
 
 
-#from enthought.mayavi import mlab
+from enthought.mayavi import mlab
 
 
 astar=2*pi/5.511;
@@ -51,11 +51,21 @@ cstar=2*pi/12.136
 
 
 
-def magstruct(pfit,Qm,Int,Interr,correction,setup):
- Ifit=calcstructure(pfit,Qm,correction,setup)
+def magstruct(pfit,Qm,Int,Interr,correction):
+ Ifit=calcstructure(pfit,Qm,correction)
  chisq=(Ifit-Int)/Interr;
  #[th1 phi2 th2]; 
  return chisq
+
+def myfunctlin(p, fjac=None, x=None, y=None, err=None,correction=None):
+    # Parameter values are passed in "p"
+    # If fjac==None then partial derivatives should not be
+    # computed.  It will always be None if MPFIT is called with default
+    # flag.
+    # Non-negative status value means MPFIT should continue, negative means
+    # stop the calculation.
+    status = 0
+    return [status, magstruct(p,x,y,err,correction)]
 
 def readfiles(filestrlist):
  Ilist=[]
@@ -122,27 +132,27 @@ def gen_spins(th_in=41):
  return s
  
 
-#@mlab.show
-#def draw_struct():
-    #fig=mlab.figure()    
-    #r=gen_fe()
-    #s=gen_spins()
-    ##view along z-axis
-    #x=r[:,0]
-    #y=r[:,1]
-    #z=r[:,2]
-    #u=s[:,0]
-    #v=s[:,1]
-    #w=s[:,2]
+@mlab.show
+def draw_struct():
+    fig=mlab.figure()    
+    r=gen_fe()
+    s=gen_spins()
+    #view along z-axis
+    x=r[:,0]
+    y=r[:,1]
+    z=r[:,2]
+    u=s[:,0]
+    v=s[:,1]
+    w=s[:,2]
     
-    ##print x.shape
-    ##print y.shape
-    ##print z.shape
-    #pts_as=mlab.points3d(x,y,z,color=(0,0,1),colormap='gist_rainbow',figure=fig,scale_factor=.1)
-    #mlab.quiver3d(x, y, z,u,v,w, line_width=3, scale_factor=.3,figure=fig)
-    #outline=mlab.outline(figure=fig,extent=[0,1,0,1,0,1])
-    #mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
-    #print 'done'
+    #print x.shape
+    #print y.shape
+    #print z.shape
+    pts_as=mlab.points3d(x,y,z,color=(0,0,1),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+    mlab.quiver3d(x, y, z,u,v,w, line_width=3, scale_factor=.3,figure=fig)
+    outline=mlab.outline(figure=fig,extent=[0,1,0,1,0,1])
+    mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
+    print 'done'
 
     
 def mgnfacFesquared(x):
@@ -358,6 +368,8 @@ if __name__=="__main__":
   fig=pylab.figure(figsize=(8,8))
   modqlist=[]
   corrections=[]
+  y=[]
+  yerr=[]
   for i in range(len(Qlist)):
    print hkllist[i]
    plotdict={}
@@ -366,6 +378,8 @@ if __name__=="__main__":
    plotdict['data']['y']=Ilist[i]
    plotdict['data']['yerr']=Ierrlist[i]
    fitdict=fit_peak(plotdict)
+   y.append(fitdict['area'])
+   yerr.append(fitdict['area_err'])
    if 1:
     ax=fig.add_subplot(3,4,i+1)
     ax.errorbar(plotdict['data']['x'],plotdict['data']['y'],plotdict['data']['yerr'],marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
@@ -373,16 +387,44 @@ if __name__=="__main__":
    correction,modq=correct_data(mydatalist[i])
    corrections.append(correction['th_correction'][0])
    modqlist.append(modq)
-  if 0:
+  if 1:
    pylab.show() 
   print corrections
   print modqlist
+  y=np.array(y,'float64')
+  yerr=np.array(yerr,'float64')
   pfit=np.array([0.7383 ,  -0.0026],'float64')  
   #correction=np.ones(Qs.shape[0])
   corrections=np.array(corrections)
   Qlist=np.array(Qlist)
   fm=calcstructure(pfit,Qlist,corrections)
   print 'fm',fm
+  
+  parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
+  parinfo=[]
+  for i in range(len(pfit)):
+      parinfo.append(copy.deepcopy(parbase))
+  for i in range(len(pfit)): 
+      parinfo[i]['value']=pfit[i]
+  fa = {'x':Qlist, 'y':y, 'err':yerr, 'correction':corrections}
+  m = mpfit(myfunctlin, pfit, parinfo=parinfo,functkw=fa) 
+  print 'status = ', m.status
+  print 'params = ', m.params
+  p1=m.params
+  covariance=m.covar
+  print 'p',p1
+  dof=len(y)-len(p1)
+  fake_dof=len(y)
+  #chimin=(findpeak.cost_func(p1,x,y,yerr)**2).sum()
+  #chimin=chimin/dof if dof>0 else chimin/fake_dof
+  #covariance=covariance*chimin #assume our model is good
+  
+  
+  
+  #area=N.array(N.abs(p1[2+2*npeaks::]))
+  #area_sig=covariance.diagonal()[2+2*npeaks::]
+  #fwhm=N.array(N.abs(p1[2+npeaks:2+2*npeaks]))
+  
 
  if 0:
   Qs=np.array([[  1,     0,     7],
@@ -404,6 +446,6 @@ if __name__=="__main__":
   correction=np.ones(Qs.shape[0])
   fm=calcstructure(pfit,Qs,correction)
   print 'fm',fm
- if 0:
+ if 1:
   r=gen_fe()
-  #draw_struct()
+  draw_struct()

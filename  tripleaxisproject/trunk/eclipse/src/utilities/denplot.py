@@ -82,10 +82,10 @@ def gen_sr():
 @mlab.show
 def test_den():
     P = np.random.random((10,10))
-    P=np.load(r'c:\maxdenP.np.npy')
-    myfilestr=r'c:\structfactors_density.dat'
-    x,y,z=np.loadtxt(myfilestr).T
-    P=z.reshape((101,101))
+    #P=np.load(r'c:\maxdenP.np.npy')
+    #myfilestr=r'c:\structfactors_density.dat'
+    #x,y,z=np.loadtxt(myfilestr).T
+    #P=z.reshape((101,101))
     #print P.shape
     fig=mlab.figure()    
     x,y,z=gen_as()   
