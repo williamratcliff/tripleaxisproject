@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Magnetic Structure Tutorial</title>
+</head>
+<body>
+    <!-- Insert your content here -->
+    <p>
+        <h2>Software for visualizing crystal structures</h2>
+        I like to use the following two programs to visualize crystal structures:
+        <ol>
+        <li>
+        <a href=http://homepage.mac.com/fujioizumi/visualization/VENUS.html/>VENUS</a>
+        </li>
+        <li>
+        <a href=http://www.softbug.com/toycrate/>Ball&Sticks</a>
+        </li>
+        </ol>
+        </p>
+    
+    <p>
+        <h2>Rietveld Programs</h2>
+        <h3>GSAS  </h3>
+        <p>
+        GSAS is an excellent program for solving crystal structures.  It also useful
+        for solving simple magnetic structures.  There is an excellent set of
+        instructional materials available at <a href=http://www.aps.anl.gov/Xray_Science_Division/Powder_Diffraction_Crystallography/GSASEXPGUI.html>APS</a> courtesy of
+        Brian Toby.  You can download the program itself <a href=http://www.ncnr.nist.gov/xtal/software/expgui/expgui.html>here</a>.
+        </p>
+        <h3>Fullprof </h3>
+        <p>
+        <a href=http://www.ill.eu/sites/fullprof/>Fullprof</a> is another excellent program for refining crystal and magnetic structures.  While it has a
+        steep learning curve, it offers the ability to refine incommensurate magnetic structures which is lacking in GSAS.
+        </p>
+        
+        Generally if you are interested in solving magnetic structures, I recommend you look at some of the material found
+        <a href=http://www.ncnr.nist.gov/staff/taner/racmagstr/scope.html>here</a>.  Besides GBASIREPS found within Fullprof, I also
+        recommend:
+        <ol>
+            <li><a href=http://www.chem.ucl.ac.uk/people/wills/index.html>Sarah</a> </li>
+            <li><a href=http://www.ftj.agh.edu.pl/~sikora/modyopis.htm> MODY</a> </li>
+        </ol>
+    </p>
+    
+    <p>
+        <h2>Python</h2>
+        <h3>Getting Started</h3>
+        <p>For windows, I would start by downloading the <a href=http://www.pythonxy.com/foreword.php>Python(x,y)</a> distribution
+        of python.  It is large, but includes packages that many of you will find useful
+        for scientific computing.  I will assume that you download the whole distribution and install it as
+        full. (For mac users, <a href=http://www.enthought.com/products/epd.php>EPD</a>) is another option.)
+            
+        </p>
+        <h3><a href=http://code.google.com/p/tripleaxisproject/>Triple Axis Project  (T.A.P.)</a></h3>
+        <p>After you've installed python, I have developed a suite of programs for reducing neutron scattering
+        data.  However, in order to use the source code, you will need to have access to svn.  For windows users,
+        I suggest using <a href=>Tortoise SVN</a>.  After installing it, you will need to reboot your machine.
+        Next, create a c:\tripleaxisproject directory.  Right click on the directory.  You will see an option
+        called <em>Checkout SVN</em>.  Select that and in the resulting dialogue change the URL of the repository
+        to: <em>http:&#47&#47tripleaxisproject.googlecode.com&#47svn&#47trunk&#47</em>
+        
+        </p>
+        
+        <h3><a href=http://code.google.com/p/spinwaves/>Spin Wave Analyzer (SPINAL)</a></h3>
+        <p>My students and I have also developed a set of libraries for analyzing spinwaves.  Please look at
+        the wiki to get started--there are even links to youtube videos!.  You
+        will want to checkout the source from this one in the same manner as above.  However, this
+        time make a directory, c:\spinwaves to hold the project locally.  The URL of the repository is:
+        http://spinwaves.googlecode.com/svn/trunk      
+        </p>
+        <h3>Updating your path</h3>
+        <p>
+        You now need to tell python where these new directories are.  If you've used the
+        defaults, go to c:/python26/lib/site-packages/ and add the following files:       
+        <ol>
+            <li>spinwaves.pth</li>
+            <li>tripleaxisproject.pth</li>
+            <li> </li>
+        </ol>
+        from c:\tripleaxisproject\trunk\eclipse\src    
+        </p>
+        
+        <h3>Magnetic Structure refinement</h3>
+        <p>
+        During the tutorial, I showed you some simple code to solve a magnetic structure.
+        To test that everything works, go to your start menu and select "run" and type "cmd.exe"
+        which will open a command window.  From there:
+        <ol>
+            <li>cd c:\tripleaxisproject\trunk\eclipse\src\utilities</li>
+            <li>python magstruct_tut.py</li>
+            <li>Congrats!  You've successfuly installed everything!</li>
+        </ol>
+        Now, as an exercise, can you plot the results of the fit as compared to the data?
+        </p>
+        
+    </p>
+</body>
+</html>
