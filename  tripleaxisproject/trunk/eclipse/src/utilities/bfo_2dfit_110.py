@@ -6,7 +6,7 @@ import matplotlib.numerix.ma as ma
 from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator
 from scipy.signal.signaltools import convolve2d
 import scriptutil as SU
-import re,sys, os
+import re,sys, os,copy
 import readicp
 from matplotlib.ticker import FormatStrFormatter
 from numpy import sqrt, exp
@@ -161,25 +161,34 @@ def readmeshfiles(mydirectory,myfilebase,myend,eflag='hhl'):
         Counts=N.concatenate((Counts,N.array(mydata.data['Counts'])*mon0/mon))
     if eflag=='hhl':
         xa,ya,za=prep_data2(Qx,Qz,Counts)
+        return xa,ya,za,Qx,Qz,Counts
     elif eflag=='hkk':
         xa,ya,za=prep_data2(Qy,Qx,Counts)
+        return xa,ya,za,Qy,Qz,Counts
     elif eflag=='hkh':
         xa,ya,za=prep_data2(Qx,Qy,Counts)
     return xa,ya,za
 
-def quadform(mat,x):
-    matprod=N.multiply(N.multiply(x,pmat),x)
+def quadform(pmat,x):
+    matprod=N.dot(N.dot(x.T,pmat),x)
     return matprod
     
 
 def calc_struct(p,qx,qy):
     pfirst=p[0:4]
-    x1_center,y1_center,x2_center,y2_center,I1,I2,width1,width2
+    #x1_center,y1_center,x2_center,y2_center,I1,I2,width1,width2
+    x1_center,y1_center,x2_center,y2_center,I1,I2=p[4::]
     pmat=N.reshape(pfirst,(2,2))
     pmat=pmat/N.linalg.det(pmat)
-    matprod1=quadform(pmat,qx-x1_center,qy-y1_center)
-    matprod2=quadform(pmat,qx-x2_center,qy-y2_center)   
-    print matprod
+    deltax1=qx-x1_center
+    deltay1=qy-y1_center
+    delta1=N.array([deltax1,deltay1])
+    deltax2=qx-x2_center
+    deltay2=qy-y2_center
+    delta2=N.array([deltax2,deltay2])
+    matprod1=quadform(pmat,delta1)[0,0]
+    matprod2=quadform(pmat,delta2)[0,0]   
+    #print matprod1
     Icalc=I1*exp(-matprod1)+I2*exp(-matprod2)
     return Icalc
     
@@ -192,10 +201,7 @@ def cost_func(p,qx,qy,I,Ierr):
     #print 'chi',(y-ycalc)/err
     return (I-Icalc)/Ierr#/N.sqrt(fake_dof)
 
-def myfunctlin(p, fjac=None,Hr=None,Kr=None,Lr=None\
-               ,d=None,q=None,alphastar=None,astar=None\
-               ,lattice=None,Hh=None,Kh=None,\
-                Lh=None,y=None,err=None):
+def myfunctlin(p, fjac=None,y=None,err=None,qx=None, qy=None):
     # Parameter values are passed in "p"
     # If fjac==None then partial derivatives should not be
     # computed.  It will always be None if MPFIT is called with default
@@ -213,12 +219,16 @@ if __name__ == '__main__':
     mydirectory=r'C:\BiFeO3film\Jan18_2010'
     #myfilebase='cmesh'
     myend='bt9'
-    xc,yc,zc=readmeshfiles(mydirectory,'meshd',myend,eflag='hkk') #Rm temp
+    xc,yc,zc,X,Y,Z=readmeshfiles(mydirectory,'meshd',myend,eflag='hkk') #Rm temp
     #xf,yf,zf=readmeshfiles(mydirectory,'meshf',myend,eflag='hkk') #0
     #xg,yg,zg=readmeshfiles(mydirectory,'meshg',myend,eflag='hkh') #-1.3
     print 'matplotlib'
 
-    p0=N.array([1,N.radians(60)],'Float64')
+    #p0=N.array([1,N.radians(60)],'Float64')
+    I1=100; I2=100; x1_center=.5; y1_center=.5; x2_center=x1_center+.005; y2_center=y1_center
+    p0=N.array([1,0,0,1,x1_center,y1_center,x2_center,y2_center,I1,I2],'Float64')
+    y=Z
+    yerr=N.sqrt(Z)
     
     
     parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
@@ -232,20 +242,10 @@ if __name__ == '__main__':
         parinfo[1]['limited']=[1,1]
         parinfo[1]['limits']=[0,pi*2]
     fa = {'y':y, 'err':yerr,
-          'Hr':Hr
-          ,'Kr':Kr
-          ,'Lr':Lr
-          ,'d':d
-          ,'q':q
-          ,'alphastar':alphastar,
-          'astar':astar,
-          'lattice':lattice,
-          'Hh':Hh,
-          'Kh':Kh,
-          'Lh':Lh}
+          'qx':X,
+          'qy':Y}
     
-    lowerm=[0,0]
-    upperm=[100,pi/2]
+
     
     print 'linearizing'
     m = mpfit(myfunctlin, p0, parinfo=parinfo,functkw=fa) 
@@ -256,9 +256,9 @@ if __name__ == '__main__':
     
     dof=len(y)-len(p1)
     fake_dof=len(y)
-    chimin=(cost_func(p1,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,yerr)**2).sum()
+    chimin=(cost_func(p1,X,Y,y,yerr)**2).sum()
     chimin=chimin/dof if dof>0 else chimin/fake_dof
-    ycalc=calc_struct(p1,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh)
+    ycalc=calc_struct(p1,X,Y)
     print 'chimin',chimin
     print 'p1',p1
     covariance=covariance*chimin #assume our model is good       
