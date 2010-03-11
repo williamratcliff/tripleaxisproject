@@ -33,18 +33,20 @@ def film110():
     myfilestr=os.path.join(mydirectory,'flipperoffvuline_horizonal78500.bt7')
     qz,I,Ierr,mon0=read_data(myfilestr)
     ax=fig.add_subplot(1,3,1)
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
     
     myfilestr=os.path.join(mydirectory,'flipperonvuline_horizonal78499.bt7')
     qz,I,Ierr,mon=read_data(myfilestr)
     Ierr=Ierr*mon0/mon
     I=I*mon0/mon
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
     #ax.set_title('horizontal')
-    ax.legend(numpoints=1)
+    ax.legend(numpoints=1,loc=2)
     plt.xlabel('L')
     plt.ylabel('Intensity (arb. units)')
     ax.xaxis.set_major_locator(MaxNLocator(4))
+    ax.text(.96,.90,'(a)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+        
     
     #vertical
     ax=fig.add_subplot(1,3,2)
@@ -52,17 +54,19 @@ def film110():
     qz,I,Ierr,mon=read_data(myfilestr)
     Ierr=Ierr*mon0/mon
     I=I*mon0/mon
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
     
     myfilestr=os.path.join(mydirectory,'flipperonvuline_vertical78501.bt7')
     qz,I,Ierr,mon=read_data(myfilestr)
     Ierr=Ierr*mon0/mon
     I=I*mon0/mon
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
     #ax.set_title('vertical')
-    ax.legend(numpoints=1)
+    ax.legend(numpoints=1,loc=2)
     ax.xaxis.set_major_locator(MaxNLocator(4))
     plt.xlabel('L')
+    ax.text(.96,.90,'(b)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+        
     #plt.ylabel('Intensity (arb. units)')
     
     
@@ -129,17 +133,19 @@ def film110():
     qz,I,Ierr,mon=read_fpx(myfilestr)
     Ierr=Ierr*mon0/mon*frnuc
     I=I*mon0/mon*frnuc
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
        
     myfilestr=os.path.join(mydirectory,'fpx78505.bt7')
     qz,I,Ierr,mon=read_fpx(myfilestr)
     Ierr=Ierr*mon0/mon*frnuc
     I=I*mon0/mon*frnuc
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
     #ax.set_title('Corrected')
-    ax.legend(numpoints=1)
+    ax.legend(numpoints=1,loc=2)
     plt.xlabel(r'$ \theta $')
     ax.xaxis.set_major_locator(MaxNLocator(4))
+    ax.text(.96,.90,'(c)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+        
     #plt.ylabel('Intensity (arb. units)')
     
     #fig3.subplots_adjust(hspace=0.3)
@@ -162,15 +168,15 @@ def film111():
         myfilestr=os.path.join(mydirectory,'hh0_sf_vu78635.bt7')
         qz,I,Ierr,mon0=read_data(myfilestr)
         ax=fig5.add_subplot(1,2,1)
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
         
         myfilestr=os.path.join(mydirectory,'hh0_nsf_vu78634.bt7')
         qz,I,Ierr,mon=read_data(myfilestr)
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
         ax.set_title('horizontal')
-        ax.legend(numpoints=1)
+        ax.legend(numpoints=1,loc=2)
         plt.xlabel('L')
         plt.ylabel('Intensity (arb. units)')
         
@@ -181,15 +187,15 @@ def film111():
         qz,I,Ierr,mon=read_data(myfilestr)
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
         
         myfilestr=os.path.join(mydirectory,'hh0_nsf_vu78633.bt7')
         qz,I,Ierr,mon=read_data(myfilestr)
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
         ax.set_title('vertical')
-        ax.legend(numpoints=1)
+        ax.legend(numpoints=1,loc=2)
         plt.xlabel('L')
         #plt.ylabel('Intensity (arb. units)')
     
@@ -209,15 +215,15 @@ def film111():
         qz,I,Ierr,mon0=read_fpx(myfilestr)
         #Ierr=Ierr*mon0/mon
         #I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
            
         myfilestr=os.path.join(mydirectory,'fpx78624.bt7')
         qz,I,Ierr,mon=read_fpx(myfilestr)
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
         #ax.set_title('Magnetic')
-        ax.legend(numpoints=1)
+        ax.legend(numpoints=1,loc=2)
         ax.xaxis.set_major_locator(MaxNLocator(4))
         plt.xlabel(r'$ \theta$')
         plt.xlim(95,140)
@@ -234,7 +240,7 @@ def film111():
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
         Inuc_sf=I
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
         #ax.set_title('Nuclear')
         plt.xlabel(r'$ \theta $')
         #plt.ylabel('Intensity (arb. units)')
@@ -245,8 +251,10 @@ def film111():
         I=I*mon0/mon
         Inuc_nsf=I
         frnuc=Inuc_nsf/Inuc_sf
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
-        ax.legend(numpoints=1)
+        ax.text(.96,.90,'(b)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+        
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.legend(numpoints=1,loc=2)
         plt.xlim(95,140)
         plt.xlabel(r'$ \theta $')
         
@@ -261,13 +269,14 @@ def film111():
         qz,I,Ierr,mon=read_fpx(myfilestr)
         Ierr=Ierr*mon0/mon*frnuc
         I=I*mon0/mon*frnuc
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.text(.96,.90,'(c)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
            
         myfilestr=os.path.join(mydirectory,'fpx78626.bt7')
         qz,I,Ierr,mon=read_fpx(myfilestr)
         Ierr=Ierr*mon0/mon*frnuc
         I=I*mon0/mon*frnuc
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
         #ax.set_title('Corrected')
         #ax.legend()
         plt.xlabel(r'$ \theta $')
