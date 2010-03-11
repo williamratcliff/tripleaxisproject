@@ -666,17 +666,61 @@ if __name__=='__main__':
                         width="30%", # width = 30% of parent_bbox
                         height="30%", # height : 1 inch
                         loc=1)
-        ax2.errorbar(tth[0],counts[0],yerr=counts_err[0],fmt='s',color='red')
+        if 1:
+            res=N.loadtxt(r'c:\srfeas\caxis.txt')
+            T=res[:,0]
+            th=res[:,1]
+            th_err=res[:,2]
+            wavelength=2.35916
+            dspacing=4
+            c=dspacing*wavelength/N.sin(N.radians(th/2))/2
+            cerr=((dspacing*wavelength/2)*th_err/2)*N.abs(1./N.sin(N.radians(th/2))*1./N.tan(N.radians(th/2)))
+            if 0:
+                ax2.errorbar(T,c,yerr=cerr,fmt='s',color='black')
+            if 1:
+                ax2.errorbar(T,th,yerr=th_err,fmt='s',color='black')      
+            ax2.xaxis.set_major_locator(MaxNLocator(5))
+            #ax2.yaxis.set_major_locator(MaxNLocator(4))
+            pylab.xlabel(r'T (K)',fontsize=10)
+            if 0:
+                pylab.ylabel(r'c $(\AA)$', fontsize=10)
+            if 1:
+                pylab.ylabel(r'$2\theta$',fontsize=10)
+                
+            pylab.xlim((193,251))
+            if 0:
+                pylab.ylim((12.2,12.40))
+            
+        if 0:
+            ax2.errorbar(tth[0],counts[0],yerr=counts_err[0],fmt='s',color='black',label='250 K')
+            ax2.xaxis.set_major_locator(MaxNLocator(4))
+            #ax2.plot(tth[-1],counts[-1],'o',color='blue')
+            #pylab.text(.6,.7,'T=250 K',fontsize=10,transform=ax2.transAxes)
+            pylab.xlabel(r'$2\theta$',fontsize=10)
+            ax2.errorbar(tth[34],counts[34],yerr=counts_err[34],fmt='o',color='red',label='200 K')
+            pylab.ylabel('Intensity (arb. units)', fontsize=10)
+            #ax2.legend(numpoints=1)
+            
+            
+            pylab.xlim((43.55,46.5))
+    if 0:
+        ax2 = inset_axes(ax,
+                        width="30%", # width = 30% of parent_bbox
+                        height="30%", # height : 1 inch
+                        loc=4)
+        ax2.errorbar(tth[34],counts[34],yerr=counts_err[34],fmt='s',color='red')
         ax2.xaxis.set_major_locator(MaxNLocator(4))
         #ax2.plot(tth[-1],counts[-1],'o',color='blue')
-        pylab.text(.6,.7,'T=250 K',fontsize=10,transform=ax2.transAxes)
+        pylab.text(.6,.7,'T=200 K',fontsize=10,transform=ax2.transAxes)
         pylab.xlabel(r'$2\theta$',fontsize=10)
         pylab.ylabel('Intensity (arb. units)', fontsize=10)
         
         
         pylab.xlim((43.55,46.5))
+        
+    if 1:
         #print 'T',T[0],T[-1]
-        pylab.savefig(r'c:\srfeas\formfactor_paper\srfe2_fig3.png')
+        pylab.savefig(r'c:\srfeas\formfactor_paper\srfe2_fig3t.eps')
         pylab.show()
         #pylab.savefig(r'c:\srfeas\formfactor_paper\srfe2_fig3.png')
         
