@@ -186,11 +186,11 @@ def calc_struct(p,qx,qy):
     deltax2=qx-x2_center
     deltay2=qy-y2_center
     delta2=N.array([deltax2,deltay2])
-    matprod1=quadform(pmat,delta1)[0,0]
-    matprod2=quadform(pmat,delta2)[0,0]   
+    matprod1=quadform(pmat,delta1)
+    matprod2=quadform(pmat,delta2)  
     #print matprod1
     Icalc=I1*exp(-matprod1)+I2*exp(-matprod2)
-    return Icalc
+    return N.diagonal(Icalc)
     
 
 def cost_func(p,qx,qy,I,Ierr):
