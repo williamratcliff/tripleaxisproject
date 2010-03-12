@@ -333,7 +333,7 @@ if __name__ == '__main__':
         h_args=(y,yerr,X,Y)
         p1,jmin=anneal(max_wrap,p0,args=h_args,\
                       schedule=myschedule,lower=lowerm,upper=upperm,\
-                      maxeval=100, maxaccept=None,dwell=20,maxiter=20,feps=1e-1,full_output = 0)
+                      maxeval=100, maxaccept=None,dwell=200,maxiter=200,feps=1e-2,full_output = 0)
     
     dof=len(y)-len(p1)
     fake_dof=len(y)
