@@ -317,13 +317,7 @@ if __name__ == '__main__':
           'qy':Y}
     
 
-    if 0:
-        print 'linearizing'
-        m = mpfit(myfunctlin, p0, parinfo=parinfo,functkw=fa) 
-        print 'status = ', m.status
-        print 'params = ', m.params
-        p1=m.params
-        covariance=m.covar
+    
     if 1:
         print 'annealing'
         myschedule='fast'
@@ -342,6 +336,14 @@ if __name__ == '__main__':
     ycalc=calc_struct(p1,X,Y)
     print 'chimin',chimin
     print 'p1',p1    
+    
+    if 1:
+        print 'linearizing'
+        m = mpfit(myfunctlin, p1, parinfo=parinfo,functkw=fa) 
+        print 'status = ', m.status
+        print 'params = ', m.params
+        p1=m.params
+        covariance=m.covar
     if 0:
         covariance=covariance*chimin #assume our model is good    
         scale=N.abs(p1[0])
