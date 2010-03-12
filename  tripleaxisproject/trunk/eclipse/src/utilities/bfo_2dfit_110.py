@@ -322,12 +322,12 @@ if __name__ == '__main__':
         print 'annealing'
         myschedule='fast'
         #myschedule='simple'
-        lowerm=[0,-1e5,0,   .49,.475,.49,.475,100,100]
+        lowerm=[1e3,-1e5,1e3,   .49,.475,.49,.475,100,100]
         upperm=[1e5,1e5,1e5,.51,.485,.51,.485,300,300]
         h_args=(y,yerr,X,Y)
         p1,jmin=anneal(max_wrap,p0,args=h_args,\
                       schedule=myschedule,lower=lowerm,upper=upperm,\
-                      maxeval=100, maxaccept=None,dwell=200,maxiter=200,feps=1e-2,full_output = 0)
+                      maxeval=1000, maxaccept=None,dwell=200,maxiter=200,feps=1e-2,full_output = 0)
     
     dof=len(y)-len(p1)
     fake_dof=len(y)
