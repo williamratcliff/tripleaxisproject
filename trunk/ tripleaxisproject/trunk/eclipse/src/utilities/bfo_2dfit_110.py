@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as N
 import  pylab
 import scipy.sandbox.delaunay as D
@@ -42,8 +43,8 @@ def plot_data(xa,ya,za,fig,nfig,colorflag=False,convolveflag=False):
     
     pmin=zima.min()
     pmax=zima.max()
-    pmin=0
-    pmax=700
+    #pmin=0
+    #pmax=700
     #pc.set_clim(0.0,660.0)
     pc.set_clim(pmin,pmax)
 
@@ -150,7 +151,7 @@ def readmeshfiles(mydirectory,myfilebase,myend,eflag='hhl'):
     Qz=N.array([])
     
     Counts=N.array([])
-    mon0=240000.0
+    mon0=80000.0
     for currfile in flist:
         print currfile
         mydata=mydatareader.readbuffer(currfile)
@@ -164,7 +165,7 @@ def readmeshfiles(mydirectory,myfilebase,myend,eflag='hhl'):
         return xa,ya,za,Qx,Qz,Counts
     elif eflag=='hkk':
         xa,ya,za=prep_data2(Qy,Qx,Counts)
-        return xa,ya,za,Qy,Qz,Counts
+        return xa,ya,za,Qx,Qy,Counts
     elif eflag=='hkh':
         xa,ya,za=prep_data2(Qx,Qy,Counts)
     return xa,ya,za
@@ -174,12 +175,13 @@ def quadform(pmat,x):
     return matprod
     
 
-def calc_struct(p,qx,qy):
-    pfirst=p[0:4]
+def calc_struct2(p,qx,qy):
+    #pfirst=p[0:4]
+    pfirst=N.array([p[0],p[1],p[1],p[2]])
     #x1_center,y1_center,x2_center,y2_center,I1,I2,width1,width2
-    x1_center,y1_center,x2_center,y2_center,I1,I2=p[4::]
+    x1_center,y1_center,x2_center,y2_center,I1,I2=p[3::]
     pmat=N.reshape(pfirst,(2,2))
-    pmat=pmat/N.linalg.det(pmat)
+    #pmat=pmat/N.linalg.det(pmat)
     deltax1=qx-x1_center
     deltay1=qy-y1_center
     delta1=N.array([deltax1,deltay1])
@@ -189,8 +191,38 @@ def calc_struct(p,qx,qy):
     matprod1=quadform(pmat,delta1)
     matprod2=quadform(pmat,delta2)  
     #print matprod1
-    Icalc=I1*exp(-matprod1)+I2*exp(-matprod2)
+    Icalc=I1*N.exp(-matprod1/2)+I2*N.exp(-matprod2/2)
+    eigs=N.linalg.eigvals(pmat)
+    area=N.pi*N.sqrt(N.absolute(1/eigs[0]/eigs[1]))
+    Icalc=Icalc/area
     return N.diagonal(Icalc)
+
+def calc_struct(p,qx,qy):
+    #pfirst=p[0:4]
+    pfirst=N.array([N.absolute(p[0]),p[1],p[1],N.absolute(p[2])])
+    #x1_center,y1_center,x2_center,y2_center,I1,I2,width1,width2
+    x1_center,y1_center,x2_center,y2_center,I1,I2=N.absolute(p[3::])
+    pmat=N.reshape(pfirst,(2,2))
+    Iout=[]
+    #pmat=pmat/N.linalg.det(pmat)
+    for i in range(len(qx)): 
+        deltax1=qx[i]-x1_center
+        deltay1=qy[i]-y1_center
+        delta1=N.array([deltax1,deltay1])
+        deltax2=qx[i]-x2_center
+        deltay2=qy[i]-y2_center
+        delta2=N.array([deltax2,deltay2])
+        matprod1=quadform(pmat,delta1)
+        matprod2=quadform(pmat,delta2)  
+        Icalc=I1*N.exp(-matprod1/2)+I2*N.exp(-matprod2/2)
+        eigs=N.linalg.eigvals(pmat)
+        area=N.pi*N.sqrt(N.absolute(1/eigs[0]/eigs[1]))
+        #if matprod1<-1e-3:
+        #    print 'less'
+        #Icalc=Icalc/area
+        Iout.append(Icalc)
+    #print len(Icalc)
+    return N.array(Iout)
     
 
 def cost_func(p,qx,qy,I,Ierr):
@@ -212,6 +244,11 @@ def myfunctlin(p, fjac=None,y=None,err=None,qx=None, qy=None):
     return [status, cost_func(p,qx,qy,y,err)]
 
 
+def max_wrap(p,y,err,qx,qy):
+    chimin=(cost_func(p,qx,qy,y,err)).sum()
+    dof=len(y)-len(p)
+    chimin=chimin/dof if dof>0 else chimin/fake_dof
+    return chimin
 
 if __name__ == '__main__':
     Nu = 10000
@@ -225,8 +262,23 @@ if __name__ == '__main__':
     print 'matplotlib'
 
     #p0=N.array([1,N.radians(60)],'Float64')
-    I1=100; I2=100; x1_center=.5; y1_center=.5; x2_center=x1_center+.005; y2_center=y1_center
-    p0=N.array([1,0,0,1,x1_center,y1_center,x2_center,y2_center,I1,I2],'Float64')
+    I1=234; I2=270; x1_center=.5; y1_center=.475; x2_center=x1_center; y2_center=.4835
+    wid2=1e5
+    wid1=2e3
+    area=1#pi*N.sqrt(1.0/wid1/wid2)
+    area=N.pi*N.sqrt(N.absolute(1/wid1/wid2))
+    #I1=I1/area
+    #I2=I2/area
+    p0=N.array([wid1,0,wid2,x1_center,y1_center,x2_center,y2_center,I1,I2],'Float64')
+    ycalc=calc_struct(p0,X,Y)
+    if 0:
+        xa,ya,za=prep_data2(Y,X,ycalc)
+        fig=pylab.figure(figsize=(8,8))
+        ax,g=plot_data(xa,ya,za,fig,1,colorflag=True)
+        ax,g=plot_data(xc,yc,zc,fig,2,colorflag=True)
+        pylab.show()
+        sys.exit()
+    
     y=Z
     yerr=N.sqrt(Z)
     
@@ -237,22 +289,51 @@ if __name__ == '__main__':
         parinfo.append(copy.deepcopy(parbase))
     for i in range(len(p0)): 
         parinfo[i]['value']=p0[i]
-    parinfo[1]['fixed']=0 #fix slope
+    #parinfo[1]['fixed']=0 #fix slope
+    if 0:
+        parinfo[3]['fixed']=1 #fix slope
+        parinfo[4]['fixed']=1 #fix slope
+        parinfo[4]['fixed']=1 #fix slope
+        parinfo[6]['fixed']=1 #fix slope
+    #parinfo[3]['fixed']=1
+    #parinfo[5]['fixed']=1
     if 0:
         parinfo[1]['limited']=[1,1]
         parinfo[1]['limits']=[0,pi*2]
+    if 1:
+        #for i in range(5,8,2):
+        for i in range(3,9,1):
+            parinfo[i]['limited']=[1,1]
+        #parinfo[3]['limits']=[.49,.51]
+        #parinfo[5]['limits']=[.49,.51]
+        parinfo[4]['limits']=[.475,.485]
+        parinfo[6]['limits']=[.475,.485]
+        parinfo[3]['limits']=[.49,.51]
+        parinfo[5]['limits']=[.49,.51]
+        parinfo[7]['limits']=[100,300]
+        parinfo[8]['limits']=[100,300]
     fa = {'y':y, 'err':yerr,
           'qx':X,
           'qy':Y}
     
 
-    
-    print 'linearizing'
-    m = mpfit(myfunctlin, p0, parinfo=parinfo,functkw=fa) 
-    print 'status = ', m.status
-    print 'params = ', m.params
-    p1=m.params
-    covariance=m.covar
+    if 0:
+        print 'linearizing'
+        m = mpfit(myfunctlin, p0, parinfo=parinfo,functkw=fa) 
+        print 'status = ', m.status
+        print 'params = ', m.params
+        p1=m.params
+        covariance=m.covar
+    if 1:
+        print 'annealing'
+        myschedule='fast'
+        #myschedule='simple'
+        lowerm=[0,-1e5,0,   .49,.475,.49,.475,100,100]
+        upperm=[1e5,1e5,1e5,.51,.485,.51,.485,300,300]
+        h_args=(y,yerr,X,Y)
+        p1,jmin=anneal(max_wrap,p0,args=h_args,\
+                      schedule=myschedule,lower=lowerm,upper=upperm,\
+                      maxeval=100, maxaccept=None,dwell=20,maxiter=20,feps=1e-1,full_output = 0)
     
     dof=len(y)-len(p1)
     fake_dof=len(y)
@@ -260,18 +341,19 @@ if __name__ == '__main__':
     chimin=chimin/dof if dof>0 else chimin/fake_dof
     ycalc=calc_struct(p1,X,Y)
     print 'chimin',chimin
-    print 'p1',p1
-    covariance=covariance*chimin #assume our model is good       
-    scale=N.abs(p1[0])
-    scale_sig=N.sqrt(covariance.diagonal()[0])
-    angle=p1[1]
-    angle_sig=N.sqrt(covariance.diagonal()[1])
-    print 'scale',scale,'scale_sig',scale_sig
-    print 'angle',N.degrees(angle),'angle_sig',angle_sig,N.degrees(angle_sig)%360
+    print 'p1',p1    
+    if 0:
+        covariance=covariance*chimin #assume our model is good    
+        scale=N.abs(p1[0])
+        scale_sig=N.sqrt(covariance.diagonal()[0])
+        angle=p1[1]
+        angle_sig=N.sqrt(covariance.diagonal()[1])
+        print 'scale',scale,'scale_sig',scale_sig
+        print 'angle',N.degrees(angle),'angle_sig',angle_sig,N.degrees(angle_sig)%360
+        
     
     
-    
-    sys.exit()
+    #sys.exit()
     if 1:
 
         fig=pylab.figure(figsize=(8,8))
@@ -296,6 +378,15 @@ if __name__ == '__main__':
         ax.xaxis.set_major_locator(MaxNLocator(4))
         ax.text(.96,.90,'(a)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         #g.ax.ticks=N.arange(0,100,20)
+    if 1:
+        xa,ya,za=prep_data2(Y,X,ycalc)
+        ax,g=plot_data(xa,ya,za,fig,2,colorflag=True)
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel(xlabel)
+        #ax.xaxis.set_major_formatter(NullFormatter())
+        #ax.set_ylim(ylim); ax.set_xlim(xlim)
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.text(.96,.90,'(b)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
 
-    if 0:
+    if 1:
         pylab.show()
