@@ -205,7 +205,7 @@ if __name__ == '__main__':
         print 'linearizing'
         m = mpfit(myfunctlin, p1, parinfo=parinfo,functkw=fa) 
         print 'status = ', m.status        print 'params = ', m.params
-        p1=m.params        print 'delta', N.sqrt(2*(p1[3]-p1[5])**2+(p1[4]-p1[6])**2)        dof=len(y)-len(p1)        fake_dof=len(y)        chimin=(cost_func(p1,X,Y,y,yerr)**2).sum()        chimin=chimin/dof if dof>0 else chimin/fake_dof        print 'chimin',chimin        covariance=m.covar        covariance=covariance*chimin #assume our model is good            x1_sig=(covariance.diagonal()[3])        x2_sig=(covariance.diagonal()[4])        delta_sig=N.sqrt(x1_sig+x2_sig)        print 'delta_sig',delta_sig
+        p1=m.params        print 'delta', N.sqrt(2*(p1[3]-p1[5])**2+(p1[4]-p1[6])**2)/2        dof=len(y)-len(p1)        fake_dof=len(y)        chimin=(cost_func(p1,X,Y,y,yerr)**2).sum()        chimin=chimin/dof if dof>0 else chimin/fake_dof        print 'chimin',chimin        covariance=m.covar        covariance=covariance*chimin #assume our model is good            x1_sig=(covariance.diagonal()[3])        x2_sig=(covariance.diagonal()[4])        delta_sig=N.sqrt(2*x1_sig+x2_sig)/2        print 'delta_sig',delta_sig
         ycalc=calc_struct(p1,X,Y)
     if 1:
         fig=pylab.figure(figsize=(8,8))
