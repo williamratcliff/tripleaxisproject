@@ -84,6 +84,7 @@ def readfiles(filestrlist):
   hkl='('+str(h)+' '+str(k)+' '+str(l)+')' 
   Q=np.array([h,k,l],'float64')
   print 'hkl',hkl
+  print 'file', filename
   if len(Ilist)==0:
    mon0=mydata.metadata['count_info']['monitor']
         
