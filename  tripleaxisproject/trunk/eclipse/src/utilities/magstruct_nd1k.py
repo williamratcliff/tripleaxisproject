@@ -356,6 +356,9 @@ def correct_data(mydata,qscan=None):
  
 if __name__=="__main__":
  print "main"
+ gamma=1.913;r0=2.818;Amagn=(gamma*r0/2)**2;   # in fm (to account that nuclear scattering lenghts are also given in fm)
+ Anuclear=.0978;
+ A=Anuclear*Amagn
  if 1:
   mydirectory=r'c:\srfeas\20081212'
   myfilebase='mag35'
@@ -393,13 +396,15 @@ if __name__=="__main__":
   print modqlist
   y=np.array(y,'float64')
   yerr=np.array(yerr,'float64')
-  pfit=np.array([0.7383 ,  -0.0026],'float64')  
+  pfit=np.array([0.8 ,  -0.0026],'float64')  
   #correction=np.ones(Qs.shape[0])
   corrections=np.array(corrections)
   Qlist=np.array(Qlist)
   fm=calcstructure(pfit,Qlist,corrections)
   print 'fm',fm
-  
+  #scale by nuclear factor
+  y=y/A
+  yerr=yerr/A
   parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
   parinfo=[]
   for i in range(len(pfit)):
@@ -408,6 +413,9 @@ if __name__=="__main__":
       parinfo[i]['value']=pfit[i]
   fa = {'x':Qlist, 'y':y, 'err':yerr, 'correction':corrections}
   m = mpfit(myfunctlin, pfit, parinfo=parinfo,functkw=fa) 
+  
+  
+  
   print 'status = ', m.status
   print 'params = ', m.params
   p1=m.params
