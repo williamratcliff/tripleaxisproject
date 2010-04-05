@@ -425,7 +425,7 @@ if __name__=="__main__":
    fitdict=fit_peak(plotdict)
    y.append(fitdict['area'])
    yerr.append(fitdict['area_err'])
-   if 0:
+   if 1:
     ax=fig.add_subplot(3,4,i+1)
     ax.errorbar(plotdict['data']['x'],plotdict['data']['y'],plotdict['data']['yerr'],marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
     ax.plot(fitdict['x'],fitdict['y'])
