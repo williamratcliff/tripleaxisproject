@@ -87,6 +87,7 @@ def readfiles(filestrlist):
   print 'file', filename
   if len(Ilist)==0:
    mon0=mydata.metadata['count_info']['monitor']
+   mon0=82500
         
   mon=mydata.metadata['count_info']['monitor']
   I_orig=np.array(mydata.data['counts'],'Float64')
@@ -416,6 +417,7 @@ if __name__=="__main__":
   for i in range(len(Qlist)):
    print hkllist[i]
    plotdict={}
+   print 'file',flist[i]
    plotdict['data']={}
    plotdict['data']['x']=thlist[i]
    plotdict['data']['y']=Ilist[i]
