@@ -141,11 +141,12 @@ def findwidths(x,y,npeaks,xpeaks,indices):
 #             % go down the right side of the peak
             incrementr = incrementr+1;
             no_widthr = 0;
-            elevation = y[N.floor(indices[i])+incrementr];
-            if (N.floor(indices[i])+incrementr > ny):
+            #elevation = y[N.floor(indices[i])+incrementr];
+            if (N.floor(indices[i])+incrementr >= ny):
                 no_widthr = 1;
                 #print 'nowidthr'
                 break;
+            elevation = y[N.floor(indices[i])+incrementr];
 
 
         incrementr=incrementr-1  #error on the side of making it too narrow!
@@ -161,11 +162,11 @@ def findwidths(x,y,npeaks,xpeaks,indices):
 #             % go down the right side of the peak
             incrementl = incrementl-1;
             no_widthl = 0;
-            elevation = y[N.floor(indices[i])+incrementl];
-            if (N.floor(indices[i])+incrementl< 0):
+            #elevation = y[N.floor(indices[i])+incrementl];
+            if (N.floor(indices[i])+incrementl<= 0):
                 no_widthl = 1;
                 break;
-
+            elevation = y[N.floor(indices[i])+incrementl];
 
 #               %goto, no_width_found
 
@@ -184,7 +185,7 @@ def findwidths(x,y,npeaks,xpeaks,indices):
 #     #%     no_width_found:
         if no_width==1:
             #print 'no width found'
-            width = 2.0*(x[ny]-xpeaks[i]);
+            width = 2.0*(x[ny-1]-xpeaks[i]);
         else:
             width = 2.0*(x[N.floor(indices[i])+increment]-xpeaks[i]);             
         if i == 0:
@@ -287,7 +288,7 @@ def cost_func(p,x,y,err):
     ycalc=gen_function(p,x)
     dof=len(y)-len(p)
     fake_dof=len(y)
-    return (y-ycalc)/err#/N.sqrt(fake_dof)
+    return (y-ycalc)/(err+1)#/N.sqrt(fake_dof)
 
 def myfunctlin(p, fjac=None, x=None, y=None, err=None):
     # Parameter values are passed in "p"
