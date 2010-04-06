@@ -492,7 +492,7 @@ if __name__=="__main__":
    upperm=np.array([1.0,2.0,pi,pi,pi,pi,2*pi,2*pi,2*pi,2*pi])
    pout,jmin=anneal(chisq_an,pfit,args=myargs,\
                  schedule=myschedule,lower=lowerm,upper=upperm,\
-                 maxeval=100, maxaccept=None,dwell=200,maxiter=120,feps=1e-1,full_output = 0)
+                 maxeval=1000, maxaccept=None,dwell=2000,maxiter=120,feps=1e-2,full_output = 0)
   
    print 'annealed',pout
    pfit=pout
