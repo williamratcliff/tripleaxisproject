@@ -13,6 +13,7 @@ import rescalculator.rescalc as rescalc
 import utilities.findpeak4 as findpeak
 from spinwaves.utilities.mpfit.mpfit import mpfit 
 import pylab
+from utilities.anneal import anneal
 
 
 from enthought.mayavi import mlab
@@ -56,6 +57,10 @@ def magstruct(pfit,Qm,Int,Interr,correction):
  chisq=(Ifit-Int)/Interr;
  #[th1 phi2 th2]; 
  return chisq
+
+def chisq_an(pfit,Qm,Int,Interr,correction):
+ chisq=magstruct(pfit,Qm,Int,Interr,correction)
+ return (chisq**2).sum()
 
 def myfunctlin(p, fjac=None, x=None, y=None, err=None,correction=None):
     # Parameter values are passed in "p"
@@ -122,14 +127,33 @@ def gen_nd():
  r=np.vstack((r1,r2,r3,r4))
  return r
 
-def gen_nd_spins(s1th_in=-pi/2,s2th_in=0):
+def gen_nd_spins(s_in):
+ #s1th=np.radians(s1th_in)
+ #s2th=np.radians(s2th_in)
+ #define the spins of the atoms in the cell
+ #s1=np.array([cos(s1th), 0, sin(s1th)],'float64'); s1=s1/norm(s1);
+ #s2=np.array([cos(s2th), 0, sin(s2th)],'float64'); s2=s2/norm(s2);
+ #s4=np.array([-cos(s2th), 0, sin(s2th)],'float64'); s4=s4/norm(s4);
+ #s=np.vstack((s1,-s1,s1,s1))  #s1th_in=90: ++=--; -+=0=+-; -90:+-=0=-+; --=++= same as +90 for s1th
+ th1,th2,th3,th4,phi1,phi2,phi3,phi4=s_in
+ s1=np.array([sin(th1)*cos(phi1), sin(th1)*sin(phi1), cos(th1)],'float64')
+ s2=np.array([sin(th2)*cos(phi2), sin(th2)*sin(phi2), cos(th2)],'float64')
+ s3=np.array([sin(th3)*cos(phi3), sin(th3)*sin(phi3), cos(th3)],'float64')
+ s4=np.array([sin(th4)*cos(phi4), sin(th4)*sin(phi4), cos(th4)],'float64')
+ s=np.vstack((s1,s2,s3,s4))
+ 
+ 
+ return s
+
+def gen_nd_spins_orig(s1th_in=-90,s2th_in=0):
  s1th=np.radians(s1th_in)
  s2th=np.radians(s2th_in)
  #define the spins of the atoms in the cell
  s1=np.array([cos(s1th), 0, sin(s1th)],'float64'); s1=s1/norm(s1);
- s2=np.array([cos(s2th), 0, sin(s2th)],'float64'); s2=s2/norm(s2);
- s4=np.array([-cos(s2th), 0, sin(s2th)],'float64'); s4=s4/norm(s4);
- s=np.vstack((s1,s2,-s1,s4))
+ #s2=np.array([cos(s2th), 0, sin(s2th)],'float64'); s2=s2/norm(s2);
+ #s4=np.array([-cos(s2th), 0, sin(s2th)],'float64'); s4=s4/norm(s4);
+ s=np.vstack((s1,-s1,s1,s1))  #s1th_in=90: ++=--; -+=0=+-; -90:+-=0=-+; --=++= same as +90 for s1th
+ 
  return s
 
 def gen_fe_spins(th_in=0.0):
@@ -197,7 +221,10 @@ def calcstructure(pfit,Qs,correction):
  Fe3pt=gen_fe()
  momentsKFe3p=gen_fe_spins(th_in=0)*pfit[0] #fix Fe spins along the a-axis
  Nd3pt=gen_nd()
- momentsKNd3p=gen_nd_spins(s1th_in=pi/2,s2th_in=pfit[2])*pfit[1] #fix Fe spins along the a-axis
+ #momentsKNd3p=gen_nd_spins(s1th_in=-90.0,s2th_in=pfit[2])*pfit[1] #fix Fe spins along the a-axis
+ #momentsKNd3p=gen_nd_spins(s1th_in=pfit[2],s2th_in=pfit[3])*pfit[1] #fix Fe spins along the a-axis
+ #momentsKNd3p=gen_nd_spins()*pfit[1]
+ momentsKNd3p=gen_nd_spins(pfit[2:])*pfit[1]
  n,m=Qs.shape
  QA=copy.deepcopy(Qs)
  QA[:,0]=QA[:,0]*astar
@@ -227,7 +254,7 @@ def calcstructure(pfit,Qs,correction):
  F1Nd3p[:,2]=F1Nd3p[:,2]*magnfacNd3p;
  #fmt=np.zeros((n,1))
  
- F1=F1Fe3p+F1Fe3p;
+ F1=F1Fe3p+F1Nd3p;
  #find fperpendicular from F-F.q*q hat
  Fperp1=np.zeros(F1.shape,'float64')
  Fperp1[:,0]=F1[:,0]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,0]
@@ -399,7 +426,8 @@ if __name__=="__main__":
  print "main"
  gamma=1.913;r0=2.818;Amagn=(gamma*r0/2)**2;   # in fm (to account that nuclear scattering lenghts are also given in fm)
  Anuclear=.0978;
- A=Anuclear*Amagn
+ Anuclear=7.2663e-004;
+ A=Anuclear*Amagn*2
  if 1:
   mydirectory=r'C:\Ndfeas\jeff\Nd1111'
   myfilebase='magnd'
@@ -425,20 +453,25 @@ if __name__=="__main__":
    fitdict=fit_peak(plotdict)
    y.append(fitdict['area'])
    yerr.append(fitdict['area_err'])
-   if 1:
+   if 0:
     ax=fig.add_subplot(3,4,i+1)
     ax.errorbar(plotdict['data']['x'],plotdict['data']['y'],plotdict['data']['yerr'],marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
     ax.plot(fitdict['x'],fitdict['y'])
    correction,modq=correct_data(mydatalist[i])
    corrections.append(correction['th_correction'][0])
    modqlist.append(modq)
-  if 1:
+  if 0:
    pylab.show() 
   print corrections
   print modqlist
   y=np.array(y,'float64')
   yerr=np.array(yerr,'float64')
-  pfit=np.array([0.8 ,  -0.0026],'float64')  
+  pfit=np.array([0.56 ,1.52, -90,-42.0],'float64') 
+  pfit=np.array([0.56 ,1.52],'float64')
+  s_in=[0,90,40,40,90,90,90,90]
+  th1,th2,th3,th4,phi1,phi2,phi3,phi4=s_in
+  pfit=np.array([.56,1.52,th1,th2,th3,th4,phi1,phi2,phi3,phi4],'float64')
+  
   #correction=np.ones(Qs.shape[0])
   corrections=np.array(corrections)
   Qlist=np.array(Qlist)
@@ -447,6 +480,25 @@ if __name__=="__main__":
   #scale by nuclear factor
   y=y/A
   yerr=yerr/A
+  
+  if 1:
+   print 'annealing'
+   #myschedule='fast'
+   myschedule='simple'
+   lowerm=1e-4*N.ones(len(pfit))
+        #lowerm[0:3]=[-1,-1,-1]
+   #upperm=N.ones(len(pfit))
+   myargs=(Qlist,y,yerr,corrections)
+   upperm=np.array([1.0,2.0,pi,pi,pi,pi,2*pi,2*pi,2*pi,2*pi])
+   pout,jmin=anneal(chisq_an,pfit,args=myargs,\
+                 schedule=myschedule,lower=lowerm,upper=upperm,\
+                 maxeval=100, maxaccept=None,dwell=200,maxiter=120,feps=1e-1,full_output = 0)
+  
+   print 'annealed',pout
+   pfit=pout
+  
+  
+  
   parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
   parinfo=[]
   for i in range(len(pfit)):
@@ -458,11 +510,22 @@ if __name__=="__main__":
   
   
   
+  
   print 'status = ', m.status
   print 'params = ', m.params
   p1=m.params
   covariance=m.covar
-  print 'p',p1
+  print 'p',p1[0],p1[1],np.degrees(p1[2:])
+  th1,th2,th3,th4,phi1,phi2,phi3,phi4=p1[2:]
+  s1=np.array([sin(th1)*cos(phi1), sin(th1)*sin(phi1), cos(th1)],'float64')
+  s2=np.array([sin(th2)*cos(phi2), sin(th2)*sin(phi2), cos(th2)],'float64')
+  s3=np.array([sin(th3)*cos(phi3), sin(th3)*sin(phi3), cos(th3)],'float64')
+  s4=np.array([sin(th4)*cos(phi4), sin(th4)*sin(phi4), cos(th4)],'float64')
+  print 'spins'
+  print s1
+  print s2
+  print s3
+  print s4
   dof=len(y)-len(p1)
   fake_dof=len(y)
   chimin=(magstruct(p1,Qlist,y,yerr,corrections)**2).sum()
