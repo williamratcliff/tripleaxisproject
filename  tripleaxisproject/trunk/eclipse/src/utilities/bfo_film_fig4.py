@@ -175,7 +175,8 @@ def film111():
         plt.xlabel('L')
         plt.ylabel('Intensity (arb. units)')
         ax.text(.96,.90,'(a)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
-        
+        ax.text(.96,.80,r'P$\parallel$Q',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+    
         
         #vertical
         ax=fig5.add_subplot(1,3,2)
@@ -197,7 +198,8 @@ def film111():
         plt.xlabel('L')
         #plt.ylabel('Intensity (arb. units)')
         ax.text(.96,.90,'(b)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
-        
+        ax.text(.96,.80,r'$P \perp Q$',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+    
     
     
     
@@ -276,7 +278,7 @@ def film111():
         ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
         #ax.set_title('Corrected')
         ax.legend(numpoints=1,loc=2)
-        plt.xlabel(r'$ \theta $')
+        plt.xlabel(r'$ \theta $ (degrees)')
         #plt.ylabel('Intensity (arb. units)')
         #ax.set_yscale('log')
         ax.xaxis.set_major_locator(MaxNLocator(4))
@@ -288,7 +290,7 @@ def film111():
     
     
     
-    
+    plt.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure4.png')
     plt.show()
 
 
