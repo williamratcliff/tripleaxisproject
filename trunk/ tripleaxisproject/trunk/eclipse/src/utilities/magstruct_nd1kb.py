@@ -239,7 +239,7 @@ def calcstructure(pfit,Qs,correction):
  magnfacFe3p=sqrt(mgnfacFesquared(modq/4/pi));
  magnfacNd3p=sqrt(mgnfacNdsquared(modq/4/pi));
  #calculate structure factor
- F1Fe3p=np.zeros((n,3));
+ F1Fe3p=np.zeros((n,3),'complex64');
  expt=exp(I*2*pi*np.dot(Qs,Fe3pt.T))
  F1Fe3p=np.dot(expt,momentsKFe3p)
  F1Fe3p[:,0]=F1Fe3p[:,0]*magnfacFe3p;
@@ -256,7 +256,7 @@ def calcstructure(pfit,Qs,correction):
  
  F1=F1Fe3p+F1Nd3p;
  #find fperpendicular from F-F.q*q hat
- Fperp1=np.zeros(F1.shape,'float64')
+ Fperp1=np.zeros(F1.shape,'complex64')
  Fperp1[:,0]=F1[:,0]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,0]
  Fperp1[:,1]=F1[:,1]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,1]
  Fperp1[:,2]=F1[:,2]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,2]
@@ -264,7 +264,7 @@ def calcstructure(pfit,Qs,correction):
  fm1=(Fperp1[:,0]*conj(Fperp1[:,0])+Fperp1[:,1]*conj(Fperp1[:,1])+Fperp1[:,2]*conj(Fperp1[:,2]))      
  fmt=fm1;
  fm=fmt[0:n]*correction
- return fm
+ return np.real(fm)
 
 def gen_flist(mydirectory,myfilebase,myend,filenums):
  files=[]
