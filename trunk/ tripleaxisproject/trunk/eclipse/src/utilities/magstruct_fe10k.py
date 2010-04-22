@@ -392,7 +392,7 @@ def correct_data(mydata,qscan=None):
  
  EXP['hcol']=N.array([coll1,coll2,coll3,coll4],dtype='float64')
  #EXP['hcol']=N.array([40, 47, 40, 200],dtype='float64')
- EXP['hcol']=N.array([40, 47, 40, 2000],dtype='float64')
+ EXP['hcol']=N.array([40, 47, 40, 200],dtype='float64')
  
  EXP['vcol']=N.array([120, 120, 120, 240],dtype='float64')
 
@@ -430,12 +430,14 @@ if __name__=="__main__":
  Anuclear=.0978;
  Anuclear=7.2663e-004;
  Anuclear=.0032;
+ Anuclear=0.4568;
  A=Anuclear*Amagn*2
  if 1:
   mydirectory=r'C:\Ndfeas\jeff\Nd1111\Apr15_2010'
   myfilebase='magfb'
   myend='.bt9'
   filenums=[14,15]
+  #filenums=[14]
   flist=gen_flist(mydirectory,myfilebase,myend,filenums)
   print flist
   Qlist, thlist,Ilist, Ierrlist,hkllist,mydatalist=readfiles(flist)
@@ -473,7 +475,7 @@ if __name__=="__main__":
   pfit=np.array([0.56 ,1.52],'float64')
   s_in=[0,90,40,40,90,90,90,90]
   th1,th2,th3,th4,phi1,phi2,phi3,phi4=s_in
-  pfit=np.array([.35],'float64')
+  pfit=np.array([5.5],'float64')
   
   #correction=np.ones(Qs.shape[0])
   corrections=np.array(corrections)
@@ -538,6 +540,7 @@ if __name__=="__main__":
   covariance=covariance*chimin #assume our model is good
   print 'chimin',chimin
   fm=calcstructure(p1,Qlist,corrections)
+  print 'fm',fm
   if 1:
     ax=fig.add_subplot(1,1,1)
     ax.errorbar(modqlist,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
