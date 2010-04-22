@@ -4,6 +4,10 @@ import numpy as N
 import readncnr3 as readncnr
 import os,sys
 from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator
+from matplotlib import rcParams
+print rcParams['mathtext.fontset']
+print rcParams['mathtext.default']
+
 
 
 def read_data(myfilestr):
@@ -46,8 +50,8 @@ def film110():
     plt.ylabel('Intensity (arb. units)')
     ax.xaxis.set_major_locator(MaxNLocator(4))
     ax.text(.96,.90,'(a)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+    ax.text(.96,.80,r'P$\parallel$Q',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
         
-    
     #vertical
     ax=fig.add_subplot(1,3,2)
     myfilestr=os.path.join(mydirectory,'flipperoffvuline_vertical78502.bt7')
@@ -66,7 +70,8 @@ def film110():
     ax.xaxis.set_major_locator(MaxNLocator(4))
     plt.xlabel('L')
     ax.text(.96,.90,'(b)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
-        
+    ax.text(.96,.80,r'$P \perp Q$',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+       
     #plt.ylabel('Intensity (arb. units)')
     
     
@@ -142,7 +147,7 @@ def film110():
     ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
     #ax.set_title('Corrected')
     ax.legend(numpoints=1,loc=2)
-    plt.xlabel(r'$ \theta $')
+    plt.xlabel(r'$ \theta $ (degrees)')
     ax.xaxis.set_major_locator(MaxNLocator(4))
     ax.text(.96,.90,'(c)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
         
@@ -152,7 +157,7 @@ def film110():
     
     
     
-    
+    plt.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure2.png')
     plt.show()
 
     
@@ -225,7 +230,7 @@ def film111():
         #ax.set_title('Magnetic')
         ax.legend(numpoints=1,loc=2)
         ax.xaxis.set_major_locator(MaxNLocator(4))
-        plt.xlabel(r'$ \theta$')
+        plt.xlabel(r'$ \theta$ (degrees)')
         plt.xlim(95,140)
         plt.ylabel('Intensity (arb. units)')
         
@@ -242,7 +247,7 @@ def film111():
         Inuc_sf=I
         ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
         #ax.set_title('Nuclear')
-        plt.xlabel(r'$ \theta $')
+        plt.xlabel(r'$ \theta $ (degrees)')
         #plt.ylabel('Intensity (arb. units)')
         
         myfilestr=os.path.join(mydirectory,'fpx78626.bt7')
@@ -256,7 +261,7 @@ def film111():
         ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
         ax.legend(numpoints=1,loc=2)
         plt.xlim(95,140)
-        plt.xlabel(r'$ \theta $')
+        plt.xlabel(r'$ \theta $ (degrees)')
         
         #plt.ylabel('Intensity (arb. units)')
         
@@ -279,7 +284,7 @@ def film111():
         ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
         #ax.set_title('Corrected')
         #ax.legend()
-        plt.xlabel(r'$ \theta $')
+        plt.xlabel(r'$ \theta $ (degrees)')
         #plt.ylabel('Intensity (arb. units)')
         ax.set_yscale('log')
         plt.xlim(95,140)
