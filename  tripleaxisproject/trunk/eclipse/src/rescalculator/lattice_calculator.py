@@ -76,7 +76,7 @@ class Instrument(object):
                          'ge(220)':3.14131, \
                          'ge(311)':3.68351, \
                          'be(002)':3.50702, \
-                         '2axis':999,\
+                         '2axis':1e-4,\
                          'pg(110)':5.49806}
           return
      def get_tau(self,tau):
