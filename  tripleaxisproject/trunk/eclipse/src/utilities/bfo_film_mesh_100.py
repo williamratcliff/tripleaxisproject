@@ -6,7 +6,7 @@ import matplotlib.numerix.ma as ma
 from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator
 from scipy.signal.signaltools import convolve2d
 import scriptutil as SU
-import re
+import re,sys
 import readicp
 from matplotlib.ticker import FormatStrFormatter
 
@@ -30,14 +30,14 @@ def plot_data(xa,ya,za,fig,nfig,colorflag=False,convolveflag=False):
     zima = ma.masked_where(N.isnan(zout),zout)
 
 
-    ax=fig.add_subplot(2,2,nfig)
+    ax=fig.add_subplot(1,1,nfig)
     pc=ax.pcolormesh(xa,ya,zima,shading='interp',cmap=cmap)  # working good!
 #    pc=ax.imshow(zima,interpolation='bilinear',cmap=cmap)
     
     pmin=zima.min()
     pmax=zima.max()
     pmin=0
-    pmax=700
+    pmax=101
     #pc.set_clim(0.0,660.0)
     pc.set_clim(pmin,pmax)
 
@@ -45,7 +45,7 @@ def plot_data(xa,ya,za,fig,nfig,colorflag=False,convolveflag=False):
 
     if colorflag:
         #g=pylab.colorbar(pc,ticks=N.arange(0,675,100))
-        g=pylab.colorbar(pc,ticks=N.arange(pmin,pmax,100))
+        g=pylab.colorbar(pc,ticks=N.arange(pmin,pmax,20))
         print g
         #g.ticks=None
         #gax.yaxis.set_major_locator(MultipleLocator(40))
@@ -238,8 +238,8 @@ if __name__ == '__main__':
     if 1:
 
         fig=pylab.figure(figsize=(8,8))
-        ylim=(.47,.515)
-        xlim=(.465,.500)
+        ylim=(.48,.515)
+        xlim=(.48,.515)
         #ylabel='E (meV)'
         #xlabel=r'Q$ \ \ (\AA^{-1}$)'
         fig.subplots_adjust(wspace=0.5)
@@ -256,12 +256,13 @@ if __name__ == '__main__':
         ax.set_xlabel(xlabel)
         #ax.xaxis.set_major_formatter(NullFormatter())
         ax.set_ylim(ylim); ax.set_xlim(xlim)
-        ax.xaxis.set_major_locator(MaxNLocator(4))
-        ax.text(.96,.90,'(a)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
+        #ax.xaxis.set_major_locator(MaxNLocator(4))
+        #ax.text(.96,.90,'(a)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='white')
         #g.ax.ticks=N.arange(0,100,20)
+        pylab.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure_supplemental_100.png')
         pylab.show()
         sys.exit()
-        #plt.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure_supplemental_100.png')
+        #
         
     if 1:
         ylabel='(1 0 0)'
