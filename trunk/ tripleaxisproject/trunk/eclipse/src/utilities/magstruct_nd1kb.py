@@ -433,6 +433,7 @@ if __name__=="__main__":
   myfilebase='magnd'
   myend='.bt9'
   filenums=range(2,13)
+  filenums=[2,3,4,5,7,8,9,10,11,12]
   flist=gen_flist(mydirectory,myfilebase,myend,filenums)
   print flist
   Qlist, thlist,Ilist, Ierrlist,hkllist,mydatalist=readfiles(flist)
