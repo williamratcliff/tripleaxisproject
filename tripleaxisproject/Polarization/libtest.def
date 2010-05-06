@@ -1,3 +1,0 @@
-; dlltool --base-file C:\DOCUME~1\ylem\LOCALS~1\Temp/cca01344.base --output-exp test.exp --dllname test.dll --output-def libtest.def --no-export-all-symbols --add-stdcall-alias --exclude-symbol=DllMainCRTStartup@12 --def C:\DOCUME~1\ylem\LOCALS~1\Temp/cca01344.def --output-lib libtest.a
-EXPORTS
-	HelloWorld @ 1

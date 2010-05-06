@@ -1,8 +1,0 @@
-He3CELL: name        tEmpty tEmptySlope  Lcm Dcm Rcurv-cm nsL0-1.77A nsL0err
-        "unknown"      1.    0            10  10   50       2.	     0.00
-He3CELLpol: PHe  PHeErr hrs T      Terr  startTimesecs  startTimeString
-            1.0   0.0    0  100      0     0              ""
-He3exp: waveRelWidth angleVwidth angleHwidth usedRadius
-            0.0          0.0          0.0       0.0
-efficiency: transportEff terr    flipperEff    ferr
-            1            0            1         0 
