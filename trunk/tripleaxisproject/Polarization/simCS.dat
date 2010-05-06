@@ -1,6 +1,0 @@
-# This is for a SIM with Time constants for cells of 100 hours
-NPT: 20
-HrStep: 4
-EIseq: 14.7 0
-EFseq: 14.7 0
-0 0 1 1

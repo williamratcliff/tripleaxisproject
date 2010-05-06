@@ -1,8 +1,0 @@
-He3CELL: name        tEmpty-1.77A tEmptySlope Lcm Dcm Rcurv-cm nsL0-1.77A nsL0err
-         Zinfandel      0.86         0       10  10   50      2.26596	   0.0
-He3CELLpol: PHe  PHeErr   hr0 T      Terr   startSecs    startDateTime
-            0.704   0.035   0  40      0    1199901600  Wed Jan 9 13:00:00 EST 2008
-He3exp: wavelength waveRelWidth angleVwidth angleHwidth usedRadius
-           2.359     0.0          0.0          0.0       0.0
-efficiency: transportEff terr flipperEff ferr
-                0.97         0       1      0
