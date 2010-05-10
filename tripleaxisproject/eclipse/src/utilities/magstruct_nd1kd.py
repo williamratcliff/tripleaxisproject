@@ -222,7 +222,7 @@ def calcstructure(pfit,Qs,correction):
  #positions of magnetic atoms in unit cell
  #p=[momFe momNd s2th)
  Fe3pt=gen_fe()
- momentsKFe3p=gen_fe_spins(th_in=0)*pfit[0] #fix Fe spins along the a-axis
+ momentsKFe3p=gen_fe_spins(th_in=0)*pfit[-1] #fix Fe spins along the a-axis
  Nd3pt=gen_nd()
  #momentsKNd3p=gen_nd_spins(s1th_in=-90.0,s2th_in=pfit[2])*pfit[1] #fix Fe spins along the a-axis
  #momentsKNd3p=gen_nd_spins(s1th_in=pfit[2],s2th_in=pfit[3])*pfit[1] #fix Fe spins along the a-axis
@@ -257,8 +257,8 @@ def calcstructure(pfit,Qs,correction):
  F1Nd3p[:,2]=F1Nd3p[:,2]*magnfacNd3p;
  #fmt=np.zeros((n,1))
  
- #F1=F1Fe3p+F1Nd3p;
- F1=F1Nd3p;
+ F1=F1Fe3p+F1Nd3p;
+ #F1=F1Nd3p;
  #find fperpendicular from F-F.q*q hat
  Fperp1=np.zeros(F1.shape,'complex64')
  Fperp1[:,0]=F1[:,0]-(Qn[:,0]*F1[:,0]+Qn[:,1]*F1[:,1]+Qn[:,2]*F1[:,2])*Qn[:,0]
@@ -476,7 +476,7 @@ if __name__=="__main__":
   #s_in=[0,90,40,40,90,90,90,90]
   #th1,th2,th3,th4,phi1,phi2,phi3,phi4=s_in
   s_in=[0,90,90,90]
-  s_in=[1.1539,2.04,5.5985,3.8681]
+  s_in=[1.1539,2.04,5.5985,3.8681,.4]
   th1,th2,phi1,phi2=s_in
   #pfit=np.array([.56,1.52,th1,th2,th3,th4,phi1,phi2,phi3,phi4],'float64')
   pfit=np.array([1.3899,th1,th2,phi1,phi2],'float64')
