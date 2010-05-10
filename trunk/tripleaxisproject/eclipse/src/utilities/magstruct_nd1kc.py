@@ -476,9 +476,10 @@ if __name__=="__main__":
   #s_in=[0,90,40,40,90,90,90,90]
   #th1,th2,th3,th4,phi1,phi2,phi3,phi4=s_in
   s_in=[0,90,90,90]
+  s_in=[1.1539,2.04,5.5985,3.8681]
   th1,th2,phi1,phi2=s_in
   #pfit=np.array([.56,1.52,th1,th2,th3,th4,phi1,phi2,phi3,phi4],'float64')
-  pfit=np.array([1.52,th1,th2,phi1,phi2],'float64')
+  pfit=np.array([1.3899,th1,th2,phi1,phi2],'float64')
   
   #correction=np.ones(Qs.shape[0])
   corrections=np.array(corrections)
@@ -513,6 +514,22 @@ if __name__=="__main__":
       parinfo.append(copy.deepcopy(parbase))
   for i in range(len(pfit)): 
       parinfo[i]['value']=pfit[i]
+   
+  if 0:
+   parinfo[0]['limited']=[1,1]
+   parinfo[0]['limits']=[0,2]
+   
+   parinfo[1]['limited']=[1,1]
+   parinfo[1]['limits']=[0,pi]
+   
+   parinfo[2]['limited']=[1,1]
+   parinfo[2]['limits']=[0,pi]
+   
+   parinfo[3]['limited']=[1,1]
+   parinfo[3]['limits']=[0,2*pi]
+   
+   parinfo[4]['limited']=[1,1]
+   parinfo[4]['limits']=[0,2*pi]
   fa = {'x':Qlist, 'y':y, 'err':yerr, 'correction':corrections}
   m = mpfit(myfunctlin, pfit, parinfo=parinfo,functkw=fa) 
   
@@ -541,16 +558,25 @@ if __name__=="__main__":
   print s4
   dof=len(y)-len(p1)
   fake_dof=len(y)
+  dof=fake_dof
   chimin=(magstruct(p1,Qlist,y,yerr,corrections)**2).sum()
   #chimin=(findpeak.cost_func(p1,x,y,yerr)**2).sum()
   chimin=chimin/dof if dof>0 else chimin/fake_dof
   covariance=covariance*chimin #assume our model is good
   print 'chimin',chimin
   fm=calcstructure(p1,Qlist,corrections)
+  print 'vals',p1
+  print 'sigs',covariance.diagonal()
+  mydiag=covariance.diagonal()
+  print 'sigs degrees',  np.degrees(mydiag[1:])
   if 1:
     ax=fig.add_subplot(1,1,1)
     ax.errorbar(modqlist,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
     ax.plot(modqlist,fm,marker='o',linestyle='None',mfc='red')
+    xlabel=r'$|\vec{Q}|$'
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel('Intensity (arb. units)')
+    pylab.savefig(r'c:\ndfeas\nd1k.png')
     pylab.show()
   
   #area=N.array(N.abs(p1[2+2*npeaks::]))
