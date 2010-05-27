@@ -20,16 +20,16 @@ to something plottable
 
 
 class Lattice(object):
-        def __init__(self,a,b,c,alpha,beta,gamma):
+        def __init__(self,a=None,b=None,c=None,alpha=None,beta=None,gamma=None):
                 self.a=a
                 self.b=b
-                self=c=c
+                self.c=c
                 self.alpha=alpha #stored in radians
-                self=beta=beta
+                self.beta=beta
                 self.gamma=gamma
 
 class Orientation(object):
-        def __init__(self,orient1,orient2):
+        def __init__(self,orient1=None,orient2=None):
                 self.orient1=orient1
                 self.orient2=orient2
 
@@ -40,40 +40,47 @@ class Sample(object):
                 self.orientation=Orientation()
 
 class Meta_tag(object):
-        def __init__(self,name,isDistinct=False):
+        def __init__(self,name=None,value=None,isDistinct=False):
                 self.name=name
                 self.value=value
                 self.isDistinct=isDistinct
                 
                 
 class MetaData(object):
-        def __init__(self):
+        def __init__(self,comment=None,filename=None, instrument_name=None,
+                     epoch=None,experiment_name=None, experiment_id=None,
+                     experiment_participants=None,date=None, filebase=None,
+                     fileseq_number=None, scan_type=None, scanned_variables=None,
+                     fixed_motors=None, fixed_energy=None, fixed_eief=None,
+                     counting_standard=None, desired_detector=None
+                     ):
                 self.comment=Meta_tag('comment',comment)
                 self.filename=Meta_tag('filename',filename)
                 self.instrument_name=Meta_tag('instrument_name',instrument_name)
                 self.epoch=Meta_tag('epoch',epoch)
                 self.experiment_name=Meta_tag('experiment_name',experiment_name)
                 self.experiment_id=Meta_tag('experiment_id',experiment_id)
-                self.experiment_participants=Meta_tag('experiment_participants',self.experiment_participants)
+                self.experiment_participants=Meta_tag('experiment_participants',experiment_participants)
                 self.date=Meta_tag('date',date)
                 self.filebase=Meta_tag('filebase',filebase)
                 self.fileseq_number=Meta_tag('fileseq_number',filebase)
                 self.scan_type=Meta_tag('scan_type',scan_type) #EX MOTOR, VECTOR, etc.
                 self.scanned_variables=Meta_tag('scanned_variables',scanned_variables,isDistinct=True) #What the user wanted to scan
-                self.fixed_motor=Meta_tag('fixed_motors',fixed_motors) #which motors are fixed
+                self.fixed_motors=Meta_tag('fixed_motors',fixed_motors) #which motors are fixed
                 self.fixed_energy=Meta_tag('fixed_energy',fixed_energy,isDistinct=True)
                 self.fixed_eief=Meta_tag('fixed_eief',fixed_eief,isDistinct=True) #either ei or ef
                 self.counting_standard=Meta_tag('counting_standard',counting_standard,isDistinct=True) # this is either monitor or time
                 self.desired_detector=Meta_tag('desired_detector',desired_detector,isDistinct=True) #detector, sd, psddet, etc.
                 
 class IceMetaData(MetaData):
-        def __init__(self):
-                super(self).__init__()
+        def __init__(self, ice_version=None, ice_repository_info=None, experimental_details=None,
+                     experiment_comment=None, desired_npoints=None, user=None, ranges=None,scan_description=None):
+                super(IceMetaData,self).__init__()
                 self.ice_version=Meta_tag('ice_version',ice_version)
-                self.ice_repository_info=Meta_tag('ice_repository_info',ice_reposititory_info)
+                self.ice_repository_info=Meta_tag('ice_repository_info',ice_repository_info)
                 self.experiment_details=Meta_tag('experiment_details',experimental_details)
                 self.experiment_comment=Meta_tag('experiment_comment',experiment_comment)
-                self.desired_npoints=Meta_tag('npoints',npoints)
+                self.desired_npoints=Meta_tag('npoints',desired_npoints)
                 self.user=Meta_tag('user',user)
                 self.ranges=Meta_tag('ranges',ranges)
                 self.scan_description=Meta_tag('scan_description',scan_description)
@@ -281,6 +288,14 @@ class Component(object):
         def exp(val): return self.exp()
 
 
+def err_check(values,err):
+        if err==None:
+                measurement=uncertainty.Measurement(values, err)
+        else:
+                measurement=uncertainty.Measurement(values, err**2)
+        return measurement
+        
+        
 class Motor(Component):
         """This is the motor class.  A Motor must have a name, for example, 'a1'
         Furthermore, it is given a set of values and stderr for initialization.
@@ -294,7 +309,7 @@ class Motor(Component):
                      isInterpolatable=False):
                 self.name=name
                 self.units=units
-                self.measurement=uncertainty.Measurement(values, err**2)
+                self.measurement=err_check(values,err)
                 self.aliases=aliases
                 self.isDistinct=isDistinct
                 self.isInterpolatable=isInterpolatable
@@ -313,12 +328,12 @@ class SampleEnvironment(Component):
         """
 
 
-        def __init__(self,name,values=None,err=None,units='degrees',isDistinct=True, 
+        def __init__(self,name=None,values=None,err=None,units='degrees',isDistinct=True, 
                      window=eps,aliases=None,friends=None,spectator=False,
                      isInterpolatable=False):
                 self.name=name
                 self.units=units
-                self.measurement=uncertainty.Measurement(values, err**2)
+                self.measurement=err_check(values,err)
                 self.aliases=aliases
                 self.isDistinct=isDistinct
                 self.isInterpolatable=isInterpolatable
@@ -339,10 +354,10 @@ class Detector(Component):
 
 
         def __init__(self,name,dimension=None,values=None,err=None,units='counts', 
-                     aliases=None,friends=None, isInterpolatable=True):
+                     aliases=None,friends=None, isInterpolatable=True,isDistinct=None):
                 self.name=name
                 self.units=units
-                self.measurement=uncertainty.Measurement(values, err**2)
+                self.measurement=err_check(values,err)
                 self.aliases=aliases
                 self.isDistinct=isDistinct
                 self.isInterpolatable=isInterpolatable
@@ -371,7 +386,7 @@ class DetectorSet(object):
 
                           
 class Mosaic(object):
-        def __init__(self,horizontal, vertical=None):
+        def __init__(self,horizontal=None, vertical=None):
                 self.horizontal=horizontal
                 self.vertical=vertical
 
@@ -452,7 +467,9 @@ class Analyzer(object):
                      horizontal_focus=None,
                      blades=None,
                      mosaic=None,
-                     dspacing=None  #dspacing of the monochromator
+                     dspacing=None,  #dspacing of the monochromator
+                     focus_mode=None,
+                     detector_mode=None
                      ):
                 self.name=name
                 self.blades=blades
@@ -565,9 +582,10 @@ class PolarizedBeam(object):
 
 
 class Slits(object):
-        self.back_slit_height=Motor('back_slit_height',values=None,err=None,units='degrees',isDistinct=False
+        def __init__(self):
+                self.back_slit_height=Motor('back_slit_height',values=None,err=None,units='degrees',isDistinct=False
                                            , isInterpolatable=True) 
-        self.back_slit_width=Motor('back_slit_width',values=None,err=None,units='degrees',isDistinct=False
+                self.back_slit_width=Motor('back_slit_width',values=None,err=None,units='degrees',isDistinct=False
                                            , isInterpolatable=True) 
                 
 
@@ -612,24 +630,24 @@ class TripleAxis(object):
                 self.translate_monochromator(dataset)
         
         def translate_monochromator(self,dataset):
-                self.monochromator.focus_cu=dataset.focuscu
-                self.monochromator.focus_pg=dataset.focuspg
+                self.monochromator.focus_cu=dataset.data.focuscu
+                self.monochromator.focus_pg=dataset.data.focuspg
                 self.monochromator.horizontal_focus=dataset.metadata.monohorizfocus
                 self.monochromator.vertical_focus=dataset.metadata.monovertifocus
                 self.monochromator.translation=dataset.data.monotrans
                 self.monochromator.elevation=dataset.data.monoelev
                 self.monochromator.dspacing=dataset.metadata.monochromator_dspacing
                 monochromator_blades=Blades(title='monochromator',nblades=10)
-                monochromator_blades[0]=dataset.data.monoblade01
-                monochromator_blades[1]=dataset.data.monoblade02
-                monochromator_blades[2]=dataset.data.monoblade03
-                monochromator_blades[3]=dataset.data.monoblade04
-                monochromator_blades[4]=dataset.data.monoblade05
-                monochromator_blades[5]=dataset.data.monoblade06
-                monochromator_blades[6]=dataset.data.monoblade07
-                monochromator_blades[7]=dataset.data.monoblade08
-                monochromator_blades[8]=dataset.data.monoblade09
-                monochromator_blades[9]=dataset.data.monoblade10
+                monochromator_blades.blades[0]=dataset.data.monoblade01
+                monochromator_blades.blades[1]=dataset.data.monoblade02
+                monochromator_blades.blades[2]=dataset.data.monoblade03
+                monochromator_blades.blades[3]=dataset.data.monoblade04
+                monochromator_blades.blades[4]=dataset.data.monoblade05
+                monochromator_blades.blades[5]=dataset.data.monoblade06
+                monochromator_blades.blades[6]=dataset.data.monoblade07
+                monochromator_blades.blades[7]=dataset.data.monoblade08
+                monochromator_blades.blades[8]=dataset.data.monoblade09
+                monochromator_blades.blades[9]=dataset.data.monoblade10
                 self.monochromator.blades=monochromator_blades
                
                 
@@ -735,7 +753,7 @@ class TripleAxis(object):
                 
         def translate_sample(self,dataset):
                 self.sample.orientation =dataset.metadata.orientation
-                self.sample.mosaic=dataset.metadata.
+               #self.sample.mosaic=dataset.metadata.?
                 self.sample.lattice=dataset.metadata.lattice
                 
                 
@@ -753,7 +771,7 @@ class TripleAxis(object):
                 self.meta_data.fixed_devices=dataset.metadata.fixed_devices
                 self.meta_data.scanned_variables=dataset.metadata.varying
                 self.meta_data.ice_version=dataset.metadata.ice
-                self.meta_data.ice_repository_info=dataset.metadata.
+                #self.meta_data.ice_repository_info=dataset.metadata.?
                 self.meta_data.instrument_name=dataset.metadata.instrument
                 self.meta_data.filebase =dataset.metadata.filebase
                 self.meta_data.fileseq_number=dataset.metadata.fileseq_number
@@ -828,11 +846,13 @@ class TripleAxis(object):
 
 if __name__=="__main__":
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
+        print 'hi'
         mydatareader=readice.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
         print mydata.metadata.varying
         bt7=TripleAxis()
         bt7.translate(mydata)
+        print 'hi'
         
 
 
