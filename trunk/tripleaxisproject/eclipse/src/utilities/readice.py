@@ -335,8 +335,8 @@ class datareader(object):
                 self.myfilestr=myfilestr
                 self.lines=lines
                 myfile = open(myfilestr, 'r')
-                self.instrument=myfilestr.split('.')[1]
-                if self.instrument in ['bt7']:
+                self.instrument=os.path.splitext(myfilestr)[-1]
+                if self.instrument in ['.bt7']:
                         #instrument is bt7
                         self.readbt7(myfile)
                         #self.readbt7columns(myfile)
@@ -356,8 +356,7 @@ class datareader(object):
                                 self.metadata.filebase=match.group('base')
                                 self.metadata.fileseq_number=match.group('seq')
                         self.numpyize()
-                        mydata=DataSet(self.data,self.metadata,self.header)
-
+                        mydata=DataSet(self.data,self.metadata,self.header) 
                 return mydata
 
 
