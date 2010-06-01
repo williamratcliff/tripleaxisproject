@@ -30,7 +30,7 @@ class Lattice(object):
 
 class Orientation(object):
         def __init__(self,orient1=None,orient2=None):
-                self.orient1=orient1
+                self.orient1=orient1  #these are vectors
                 self.orient2=orient2
 
 class Sample(object):
