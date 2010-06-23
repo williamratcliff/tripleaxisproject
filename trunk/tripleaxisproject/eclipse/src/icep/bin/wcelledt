@@ -1,0 +1,1299 @@
+#!/usr/bin/wish
+# tk app to prep edit cellfiles
+
+# has db of cell fixed data
+
+set Cells { Zinfandel Sangiovese Beaujolis Chablis Syrah Mercurey }
+
+array set Zinfandel {
+    nsL0 1.2789 nsL0err 0.02 tEmpty 0.86 tEmptySlope 0
+    R 25 L 8.79 D 11.6 volcc  950 Pbar 1.92
+}
+array set Sangiovese {
+    nsL0 1.3358 nsL0err 0.01 tEmpty 0.86 tEmptySlope 0
+    R 25 L 10.12 D 11.0 volcc  950 Pbar 1.73
+}
+array set Beaujolis {
+    nsL0 1.17 nsL0err 0 tEmpty 0.86 tEmptySlope 0
+    R 25 L 11.7 D 10.5 volcc 1010 Pbar 1.34
+}
+array set Chablis {
+    nsL0 1.162 nsL0err 0.01 tEmpty 0.86 tEmptySlope 0
+    R 25 L 9.39 D 10.5 volcc 1010 Pbar 1.34
+}
+array set Syrah {
+    nsL0 1.0221 nsL0err 0.01 tEmpty 0.86 tEmptySlope 0
+    R 25 L 9.53 D 10.5 volcc 1010 Pbar 1.34
+}
+array set Mercurey {
+    nsL0 1.0362 nsL0err 0.01 tEmpty 0.86 tEmptySlope 0
+    R 25 L 11.7 D 7.85 volcc 1010 Pbar 1.34
+}
+
+# create array of entries to edit cell info
+# cellName  installTimeDate  iPol iPolErr fPol fPolErr Tc  TcErr expt trans
+
+# expt has hcol vcol mosa dsp beamAreacm smplGFdir
+# trans has transeff transErr flipeff flipErr
+
+# for H V trans may differ, requ diff cell entry
+
+
+proc arrayClear {aname} {
+    upvar #0 $aname v
+    foreach nam [array names v] {
+	unset v($nam)
+    }
+}
+proc arraySet {aname lst} {
+    arrayClear $aname
+    upvar #0 $aname v
+    array set v $lst
+}
+set warnStack {}
+set msgfont ""
+array set dialog {}
+proc Dialog_Warn {string} {
+    global warn warnStack msgfont
+
+    if { [llength [after info]] > 0 } {
+	after idle [list Dialog_Warn $string]
+	return
+    }
+
+    set f .warn
+    if [Dialog_Create $f "Warning"] {
+	message $f.msg -text $string -fg red -padx 10
+	set b [frame $f.buttons]
+	pack $f.msg $f.buttons -side top -fill both
+	button $b.ok -text OK -command {set warn(ok) 1}
+	pack $b.ok
+	set msgfont [$f.msg cget -font]
+    } else {
+	if { [string match .warn [grab current]] } {
+	    lappend warnStack $string
+	    return
+	}
+    }
+
+    set lines [split $string \n]
+
+    set pixwid 0
+    foreach line $lines {
+	set ll [font measure $msgfont $line]
+	if { $ll > $pixwid } { set pixwid $ll }
+    }
+    set pixwid [expr 10 + $pixwid]
+
+    $f.msg configure -text $string -width $pixwid
+    set warn(ok) 0
+    Dialog_Wait $f warn ""
+    Dialog_Dismiss $f
+}
+# following are a proper set of dialog procedures
+
+proc Dialog_Create {top title args} {
+    global dialog
+    if [winfo exists $top] {
+	switch -- [wm state $top] {
+	    normal { raise $top }
+	    withdrawn -
+	    iconified {
+		wm deiconify $top
+		catch {wm geometry $top $dialog(geo,$top)}
+	    }
+	}
+	return 0
+    } else {
+	eval {toplevel $top} $args
+	wm title $top $title
+	return 1
+    }
+}
+proc Dialog_Wait {top varName {focus {}} } {
+    global pausing $varName
+    if { ![winfo exists $top] } { return }
+    set varname $varName\(ok\)
+    eval set var $$varname
+    bind $top <Destroy> [list set $varname $var]
+    raise $top
+    update idletasks
+    if {[string length $focus] == 0} { set focus $top }
+    set old [focus -displayof $top]
+    focus $focus
+    # getting hung up on tkwait visibility
+    tkwait visibility $top
+    grab $top
+
+    # continually raise the dialog window (some wm's may allow hiding it)
+
+    set ntry 0
+    set pausing 0
+    set var 0
+    set i 0
+    while { 1 } {
+	set id [after 20 "setPausing $varname 1"]
+	tkwait variable $varname
+	# after 20 if varname not set by user then after event happens
+	# which sets pausing 1 and varname 1
+	eval set var $$varname
+	if { ! $pausing } {
+	    after cancel $id
+	    break
+	}
+	incr i
+	if { $i > 100 } { raise $top; set i 0 }
+	set pausing 0
+	#incr ntry
+    }
+    catch {grab release $top}
+    focus $old
+}
+proc Dialog_Dismiss {top} {
+    global dialog warnStack
+    if { [string match .warn $top] && [llength $warnStack] > 0 } {
+	set string [lindex $warnStack 0]
+	set warnStack [lreplace $warnStack 0 0]
+	Dialog_Warn $string
+	return
+    }
+    catch {
+	set dialog(geo,$top) [winfo geometry $top]
+	wm withdraw $top
+    }
+}
+proc setPausing {varname value} {
+    upvar $varname vname
+    global pausing
+    set pausing 1
+    set vname $value
+}
+array set entrystring {}
+proc Dialog_Entry {msg varName args} {
+    #global $varName
+    #if { ![info exists $varName] } { uplevel #0 "set $varName {}" }
+    upvar #0 $varName var
+    global entrystring
+    set f .entrystring
+    set entrystring(value) $var
+    if [Dialog_Create $f "Entry"] {
+	message $f.msg -text $msg -aspect 1000
+	set b [frame $f.buttons]
+	button $b.cancel -text CANCEL -command {set entrystring(ok) 0}
+	button $b.ok -text OK -command {set entrystring(ok) 1}
+	pack $b.cancel $b.ok -side left -expand 1
+	entry $f.ent -relief sunken -bd 2 -textvariable entrystring(value)
+	if { [llength $args] > 0 } { $f.ent configure -width $args }
+	pack $f.msg $b $f.ent -side top -fill x
+	bind $f.ent <Return> {set entrystring(ok) 1}
+    } else {
+	$f.msg configure -text $msg
+	if { [llength $args] > 0 } { $f.ent configure -width $args }
+    }
+    set entrystring(ok) 0
+    Dialog_Wait $f entrystring ""
+    if { $entrystring(ok) } { set var $entrystring(value) }
+    Dialog_Dismiss $f
+    return $entrystring(ok)
+}
+array set query {}
+proc Dialog_Query {msg} {
+    global query
+    set f .query
+    if [Dialog_Create $f "?"] {
+	message $f.msg -text $msg -aspect 1000
+	set b [frame $f.buttons]
+	button $b.yes -text YES -command {set query(ok) 1}
+	button $b.no -text NO -command {set query(ok) 0}
+	pack $b.yes $b.no -side left -expand 1
+	pack $f.msg $b -side top -fill x
+    } else {
+	$f.msg configure -text $msg
+    }
+    set query(ok) 0
+    Dialog_Wait $f query ""
+    Dialog_Dismiss $f
+    return $query(ok)
+}
+
+proc checkid {irow typ} {
+    global celldata transdata exptdata exptmed
+    if { $typ == 2 } {
+	set id $celldata(10,$irow)
+	if { [string length [string trim $id]] < 1 } { return }
+	set n [countEntries transdata]
+	for {set i 1} {$i <= $n} {incr i} {
+	    if { [string match $id $transdata(0,$i)] } { return }
+	}
+	# create a new trans with this label
+	incr n
+	if { $n >= $transdata(nrows) } { addEntryTableRows .tf.d.e 1 transdata }
+	set transdata(0,$n) $id
+	set transdata(1,$n) 1.
+	set transdata(2,$n) 0.
+	set transdata(3,$n) 1.
+	set transdata(4,$n) 0.
+    } elseif { $typ == 3 } {
+	set id $celldata(11,$irow)
+	if { [string length [string trim $id]] < 1 } { return }
+	set n [countEntries exptdata]
+	for {set i 1} {$i <= $n} {incr i} {
+	    if { [string match $id $exptdata(0,$i)] } { return }
+	}
+	# create new deflt expt
+	incr n
+	if { $n >= $exptdata(nrows) } { addEntryTableRows .ef.d.e 1 exptdata }
+	for {set i 0; set j 1} {$i < [llength $exptmed]} {incr i; incr j} {
+	    set exptdata($j,$irow) [lindex $exptmed $i]
+	}
+    }    
+
+}
+
+# this will do init build of entry table into frame f
+proc entryTable {f title colLbls nRows aname} {
+    upvar #0 $aname a
+    global titlefont titlecolor lblfont lblcolor
+    # f is the toplevel or frame in which to build the table
+
+
+    set m [frame $f.m]
+    set t [label $m.t -text $title -font $titlefont -fg $titlecolor]
+    set d [frame $f.d]
+    set ncol [llength $colLbls]
+    set a(mbar) $m
+    set a(nrows) $nRows
+    set a(ncol) $ncol
+    set a(lbls) $colLbls
+    set a(frame) $d
+    for {set j 1} {$j <= $nRows} {incr j} {
+	for {set i 0} {$i < $ncol} {incr i} {
+	    set lbl [lindex $colLbls $i]
+	    if { $j == 1 } {
+		label $d.l$i -text $lbl -font $lblfont -fg $lblcolor
+		grid $d.l$i -row 0 -column $i
+	    }
+	    set aelem $aname\($i,$j\)
+	    set a($i,$j) ""
+	    entry $d.e$i-$j -textvariable $aelem
+	    if { $i == 1 } {
+		bind $d.e$i-$j <Tab> "parseTimeDateRow $j"
+		bind $d.e$i-$j <Return> "parseTimeDateRow $j"
+	    } elseif { $i == 10 } {
+		bind $d.e$i-$j <Tab> "checkid $j 2"
+		bind $d.e$i-$j <Return> "checkid $j 2"
+	    } elseif { $i == 11 } {
+		bind $d.e$i-$j <Tab> "checkid $j 3"
+		bind $d.e$i-$j <Return> "checkid $j 3"
+	    }
+	    grid $d.e$i-$j -row $j -column $i
+	}
+    }
+    for {set i 0} {$i < $ncol} {incr i} {
+	entryTableColwid $aname $i,1 w
+    }
+    grid $m
+    grid $t -row 0 -column 0 -sticky e
+    grid $d
+}
+
+set timedatefmt "%R %a %b %d %Y"
+set datefmt "%a %b %d %Y"
+set timefmt "%R"
+set utcfmt "%s"
+
+proc parseTimeDate {dts} {
+    global timedatefmt
+    # to make portable to non-UNIX environ
+    # replace date command with tcl clock scan
+    #return [exec date --date=$dts $datetimefmt]
+    #puts "parseTimeDate: dts=$dts"
+    if [catch [list clock scan $dts] isecs] {
+	Dialog_Warn $isecs
+	return
+    }
+    return [clock format $isecs -format $timedatefmt]
+}
+proc parseTimeDateRow {irow} {
+    global celldata
+    set celldata(1,$irow) [parseTimeDate $celldata(1,$irow)]
+}
+
+# this will add rows to entryTable
+proc addEntryTableRows {d nRows aname} {
+    upvar #0 $aname a
+    set nrows $a(nrows)
+    set Nrows [expr $nrows + $nRows]
+    set a(nrows) $Nrows
+    set ncol $a(ncol)
+    for {set j [expr $nrows + 1]} {$j <= $Nrows} {incr j} {
+	for {set i 0} {$i < $ncol} {incr i} {
+	    set aelem $aname\($i,$j\)
+	    set $aelem ""
+	    if { ! [winfo exists $d$i-1] } {
+		set wid 12
+		if { [info exists $aname(lbls)] } {
+		    eval set lbls $$aname(lbls)
+		    set wid [string length [lindex $lbls $i]]
+		}
+	    } else {
+		set wid [$d$i-1 cget -width]
+
+	    }
+	    if { ! [winfo exists $d$i-$j] } {
+		entry $d$i-$j -textvariable $aelem -width $wid
+	    } else {
+		$d$i-$j configure -width $wid
+	    }
+	    if { $i == 1 } {
+		bind $d$i-$j <Tab> "parseTimeDateRow $j"
+		bind $d$i-$j <Return> "parseTimeDateRow $j"
+	    } elseif { $i == 10 } {
+		bind $d$i-$j <Tab> "checkid $j 2"
+		bind $d$i-$j <Return> "checkid $j 2"
+	    } elseif { $i == 11 } {
+		bind $d$i-$j <Tab> "checkid $j 3"
+		bind $d$i-$j <Return> "checkid $j 3"
+	    }
+
+	    grid $d$i-$j -row $j -column $i
+	}
+    }
+}
+
+proc entryTableColwid {aname elem op} {
+    # the entry widgets are $ef.e$icol-$row 1-nRows
+    # the data are in a($icol,$jrow)
+    upvar #0 $aname a
+    if { [scan $elem {%d,%d} icol irow] < 2 } { return }
+    set clbls $a(lbls)
+    set clbl [lindex $clbls $icol]
+    set wid [string length $clbl]
+    set nrows $a(nrows) ;
+    set fr $a(frame)
+    for {set j 1} {$j <= $nrows} {incr j} {
+	if [info exists a($icol,$j)] {
+	    set sw [string length $a($icol,$j)]
+	    if { $sw > $wid } { set wid $sw } 
+	}
+    }
+    for {set j 1} {$j <= $nrows} {incr j} {
+	$fr.e$icol-$j configure -width $wid
+    }
+}
+
+proc clearEntries {anam} {
+    global $anam
+    set els [array names $anam]
+    foreach el $els {
+	if { [scan $el {%d,%d} i j] == 2 } {
+	    eval set $anam\($el\) {" "}
+	}
+    }
+}
+proc countEntries {anam} {
+    upvar #0 $anam a
+    set n 0
+    for {set ii 1} {$ii <= $a(nrows)} {incr ii} {
+	if { [string length [string trim $a(0,$ii)]] < 1 } {
+	    break
+	}
+	incr n
+    }
+    return $n
+}
+
+# cellfile variable names
+set cfvnames {
+    name PorA date tim
+    startSecs
+    Energy lambda Pi Pierr
+    T Terr
+    beamArea
+    nsL0E nsL0Eerr
+    teff terr feff ferr
+    tEmpty tEmptySlope
+    Pbar L D R
+    volcc nsL0 nsL0err nsLE nsLEerr
+    rnam Hmos Vmos dsp Hcols Hcol2 VcolsDeg Vcol2Deg
+    omRad
+    hsigsq vsigsq xsigsq
+    curvCor angcor Tf VGF
+}
+set cfdeflt {
+    "" P "" ""
+    0
+    14.7 2.351 0.7 0.1
+    100 10
+    10
+    1 0.1
+    1 0 1 0
+    0.83 0.
+    2 10 12 30
+    900 1 0.01 1 0.01
+    coarse 40 40 3.35416 40 40 2 3
+    0.1
+    0.1 0.1 0.1
+    1 1 0 0
+}
+foreach cfn $cfvnames cfv $cfdeflt { set cellinfo($cfn) $cfv }
+
+set dbchk {nsL0 nsL0err R L tEmpty tEmptySlope}
+set req [concat $dbchk name PorA date tim Pi Pierr T Terr teff terr feff ferr]
+# the cell array cell(1) .. cell(ncells)
+array set cell {}
+set ncell 0
+set ntrans 0
+set nexpt 0
+proc importCellFile {apnd fil} {
+    global cfvnames cell Cells ctLbls
+    global dbchk overrideDB
+    global ncell ntrans nexpt celldata transdata exptdata
+    global cf tf ef
+
+    if [catch "open $fil r" f] {
+	Dialog_Warn "failed to import $fil cellfile"
+	return
+    }
+
+    # if not apnd clear entries for any previous celldata transdata or exptdata
+    if { ! $apnd } {
+	clearEntries celldata
+	clearEntries transdata
+	clearEntries exptdata
+	set ncell 0
+    }
+    set ncellstart $ncell
+
+    while { [gets $f line] >= 0 } {
+	if { [string match \#* $line] || [string length $line] < 1 } {
+	    continue
+	}
+	# set deflts
+	set curvCor 1.
+	set angcor 1.
+	set t1 0.
+	set t2 0.
+	set hsigsq 0.
+	set vsigsq 0.
+	set xsigsq 0.
+	set tEmptySlope 0.
+	set Tf 0.
+	set tf 0
+	set L 10.
+	set R 25.
+	set beamArea 8.
+	set Hmos 40.
+	set Vmos 40.
+	set Hcols 40.
+	set Hcol2 40.
+	set VcolsDeg 2.
+	set Vcol2Deg 2.
+	set VGF 1
+
+	set nscan [scan $line "%s %s %s %s \
+%g %g %g %g %g %g %g %g %g %g %g %g %g \
+%g %g %g %g %g %g %g %g %g %g %g %g %s \
+%g %g %g %g %g %g %g %g %g %g %g %g %g %g %s" \
+		       name PorA date tim \
+		       startSecs \
+		       Energy lambda Pi Pierr \
+		       T Terr \
+		       beamArea \
+		       nsL0E nsL0Eerr \
+		       teff terr feff ferr \
+		       tEmpty tEmptySlope \
+		       Pbar L D R \
+		       volcc nsL0 nsL0err nsLE nsLEerr \
+		       rnam Hmos Vmos dsp Hcols Hcol2 VcolsDeg Vcol2Deg \
+		       omRad \
+		       hsigsq vsigsq xsigsq \
+		       curvCor angcor Tf VGF]
+	if { $nscan < 27 } {
+	    Dialog_Warn "not enough data at cellfile $ncell in $fil"
+	    continue
+	}
+	incr ncell
+	if { $ncell > $celldata(nrows) } {
+	    addEntryTableRows $cf.d.e 1 celldata
+	}
+	set cell($ncell) {}
+	foreach vnam $cfvnames {
+	    eval set val $$vnam
+	    lappend cell($ncell)  $vnam $val
+	}
+    }
+    close $f
+
+    set dboverridemsg "db override is set so imported values will be used."
+    set dbimportmsg "db values will be used."
+
+    # now import the data into the gui
+    for {set i [expr $ncellstart + 1]} {$i <= $ncell} {incr i} {
+	array set cellinfo $cell($i)
+	# is the cellname in our database
+	if { [lsearch $Cells $cellinfo(name)] < 0 } {
+	    Dialog_Warn "cant import unknown cell $cellinfo(name)"
+	    continue
+	}
+	set cellname $cellinfo(name)
+	set celldata(0,$i) $cellname
+
+	# join together the start date and time and parse with date cmnd
+	set dt $cellinfo(tim)
+	append dt " $cellinfo(date)"
+	set celldata(1,$i) [parseTimeDate $dt]
+
+	set celldata(2,$i) $cellinfo(PorA)
+
+	set Pi $cellinfo(Pi)
+	set Pierr $cellinfo(Pierr)
+	set T $cellinfo(T)
+	set Tf $cellinfo(Tf)
+	set Terr $cellinfo(Terr)
+
+	set celldata(3,$i) $Pi
+	set celldata(4,$i) $Pierr
+
+	# now if Tf > 0 a two point Pi Pf was used
+	# if the Terr < 0 it is actually Pferr
+	# easiest case is Tf <= 0 then use Tc TcErr to calc fPol fPolErr
+	set celldata(7,$i) $Tf
+	set celldata(8,$i) $T
+	if { $Tf <= 0. } {
+	    set celldata(9,$i) $Terr
+	} else {
+	    # compute the final polarization and error at Tf
+	    set Pf [expr $Pi*exp(-$Tf/$T)]
+	    if { $Terr < 0. } {
+		# then Terr is actually Pferr
+		set Pferr [expr abs($Terr)]
+		set a [expr $Pierr/$Pi]
+		set b [expr $Pferr/$Pf]
+		set c [expr log($Pi/$Pf)]
+		set Terr [expr ($T/$c)*sqrt($a*$a + $b*$b)]
+	    } else {
+		# calc Pferr from Terr Pierr
+		set a [expr log($Pi/$Pf)*($Terr/$T)]
+		set b [expr $Pierr/$Pi]
+		set c [expr $a*$a - $b*$b]
+		set Pferr 0.
+		if { $c > 0. } { set Pferr [expr $Pf*sqrt($c)] }
+	    }
+	    set celldata(9,$i) $Terr
+	    set celldata(5,$i) $Pf
+	    set celldata(6,$i) $Pferr
+	}
+
+	# this finishes the basic He3-polarization stuff
+	# now check imported cell specs nsL R L tEmpty slope against dbase
+	set dbaname $cellname
+	global $dbaname
+
+
+	set warnmsg ""
+	foreach dbc $dbchk {
+	    eval set dbval $$dbaname\($dbc\)
+	    set rval $cellinfo($dbc)
+	    if { [expr abs($rval-$dbval)] > 0.00001 } {
+		append warnmsg "imported cell $cellname value for $dbc = $rval differs from db value = $dbval.\n"
+		if { ! $overrideDB } {
+		    set cellinfo($dbc) $dbval
+		}
+	    }
+	}
+
+	if { [string length $warnmsg] > 0 } {
+	    if { $overrideDB } {
+		append warnmsg $dboverridemsg
+	    } else {
+		append warnmsg $dbimportmsg
+		set cell($i) [array get cellinfo]
+	    }
+	    Dialog_Warn $warnmsg
+	}
+
+	# next compare the transport specs for this cell to any previous ones
+	# and if a new spec is required, add it to the transport gui
+	# giving it a name like trans#
+	# transport data in the gui are stored in transdata($col,$row)
+	# to make the gui easy to build
+	set tchk(1) $cellinfo(teff)
+	set tchk(2) $cellinfo(terr)
+	set tchk(3) $cellinfo(feff)
+	set tchk(4) $cellinfo(ferr)
+
+
+	set ntrans [countEntries transdata]
+	set newt 1
+	set match 0
+	if { $ntrans > 0 } {
+	    # check them all trying to find a match
+	    for {set ii 1} {$ii <= $ntrans} {incr ii} {
+		set newt 0
+		for {set j 1} {$j <= 4} {incr j} {
+		    if { [expr abs($tchk($j) - $transdata($j,$ii))] > 0.0001 } {
+			set newt 1
+			break
+		    } 
+		}
+		if { $newt == 0 } { set match $ii ; break }
+	    }
+	}
+
+	if { $newt } {
+	    if { $ntrans == $transdata(nrows) } {addEntryTableRows $tf.d.e 1 transdata}
+	    incr ntrans
+	    set tname trans$ntrans
+	    set transdata(0,$ntrans) $tname
+	    set celldata(10,$i) $tname
+	    for {set j 1} {$j <= 4} {incr j} {
+		set transdata($j,$ntrans) $tchk($j)
+	    }
+	} else {
+	    set celldata(10,$i) $transdata(0,$match)
+	}
+
+	# same for experiment
+	set echk(1) $cellinfo(Hcols)
+	set echk(2) $cellinfo(Hcol2)
+	set echk(3) $cellinfo(VcolsDeg)
+	set echk(4) $cellinfo(Vcol2Deg)
+	set echk(5) $cellinfo(Hmos)
+	set echk(6) $cellinfo(dsp)
+	set echk(7) $cellinfo(beamArea)
+	set echk(8) $cellinfo(VGF)
+
+	set nexpt [countEntries exptdata]
+
+	set match 0
+	set newt 1
+	if { $nexpt > 0 } {
+	    # check them all trying to find a match
+	    for {set ii 1} {$ii <= $nexpt} {incr ii} {
+		set newt 0
+		for {set j 1} {$j <= 8} {incr j} {
+		    if { [expr abs($echk($j) - $exptdata($j,$ii))] > 0.0001 } {
+			set newt 1
+			break
+		    } 
+		}
+		if { $newt == 0 } { set match $ii ; break }
+	    }
+	}
+
+	if { $newt } {
+	    if { $nexpt == $exptdata(nrows) } {addEntryTableRows $ef.d.e 1 exptdata}
+	    incr nexpt
+	    set ename expt$nexpt
+	    set exptdata(0,$nexpt) $ename
+	    set celldata(11,$i) $ename
+	    for {set j 1} {$j <= 8} {incr j} {
+		set exptdata($j,$nexpt) $echk($j)
+	    }
+	} else {
+	    set celldata(11,$i) $exptdata(0,$match)
+	}
+    }
+}
+
+
+set cfvexpt   {Hcols Hcol2 VcolsDeg Vcol2Deg Hmos dsp     beamArea VGF}
+set exptmed   {50    50    2        2        40   3.35416 6        1}
+set exptopen  {90   100    2        2        40   3.35416 6        1}
+set exptfine  {10    20    2        2        40   3.35416 6        1}
+
+proc setExptFocus {exptlst} {
+    global cfvexpt exptdata
+    set w [focus]
+    if { [scan $w {.ef.d.e%d-%d} icol irow] != 2 } {
+	Dialog_Warn "focus is not in one of the expt entries"
+	return
+    }
+    for {set i 0; set j 1} {$i < [llength $exptlst]} {incr i; incr j} {
+	set exptdata($j,$irow) [lindex $exptlst $i]
+    }
+}
+array set frames {
+    1 .cf.d.e
+    2 .tf.d.e
+    3 .ef.d.e
+}
+array set frametype {
+    1 He3-cells
+    2 transport
+    3 experiment
+}
+array set framearrays {
+    1 celldata
+    2 transdata
+    3 exptdata
+}
+
+proc delFocus {typ} {
+    global cell ncell celldata transdata exptdata
+    global frames frametype
+    if { $ncell < 1 } { return }
+    set w [focus]
+    set f $frames($typ)
+    if { [scan $w "$f%d-%d" icol irow] != 2 } {
+	Dialog_Warn "focus is not in one of the $frametype($typ) entries"
+	return
+    }
+    if { $typ == 1 } {
+	set n 11
+    } elseif { $typ == 2 } {
+	set n 4
+    } elseif { $typ == 3 } {
+	set n 8
+    }
+    for {set i 0} {$i <= $n} {incr i} {
+	$f$i-$irow delete 0 end
+    }
+    # move the remaining cells up one
+    if { $typ == 1 } {
+	for {set i $irow; set j [expr $i + 1]} {$i < $ncell} {incr i; incr j} {
+	    set cell($i) $cell($j)
+	    for {set k 0} {$k <= 11} {incr k} {
+		set celldata($k,$i) $celldata($k,$j)
+	    }
+	}
+    } elseif { $typ == 2 } {
+	for {set i $irow; set j [expr $i + 1]} {$i < $transdata(nrows)} {incr i; incr j} {
+	    for {set k 0} {$k <= 4} {incr k} {
+		set transdata($k,$i) $transdata($k,$j)
+	    }
+	}
+    } elseif { $typ == 3 } {
+	for {set i $irow; set j [expr $i + 1]} {$i < $exptdata(nrows)} {incr i; incr j} {
+	    for {set k 0} {$k <= 8} {incr k} {
+		set transdata($k,$i) $transdata($k,$j)
+	    }
+	}
+    }
+    # delete the last one
+    for {set i 0} {$i <= $n} {incr i} {
+	$f$i-$ncell delete 0 end
+    }
+    # decr ncell
+    incr ncell -1
+}
+proc addRow {typ} {
+    global frames framearrays
+    addEntryTableRows $frames($typ) 1 $framearrays($typ)
+}
+
+proc sortCells {} {
+    global cell ncell celldata utcfmt
+    # make sure startSecs is defined for each cell
+    for {set i 1} {$i <= $ncell} {incr i} {
+	array set cellinfo $cell($i)
+	if [catch [list clock scan $celldata(1,$i)] isecs] {
+	    Dialog_Warn $isecs
+	    return
+	}
+	set cellinfo(startSecs) [clock format $isecs -format $utcfmt]
+	#[exec date --date=$celldata(1,$i) $utcfmt]
+	set cell($i) [array get cellinfo]
+	set secs($i) $cellinfo(startSecs)
+    }
+    for {set i 1} {$i < $ncell} {incr i} {
+	set isecs $secs($i)
+	set imin $i
+	for {set j [expr $i + 1]} {$j <= $ncell} {incr j} {
+	    if { $secs($j) < $isecs } {
+		set isecs $secs($j)
+		set imin $j
+	    }
+	}
+	if { $imin == $i } { continue }
+	# swap i with imin both celldata and cell(index)
+	set temp $secs($i)
+	set secs($i) $secs($imin)
+	set secs($imin) $temp
+	set temp $cell($i)
+	set cell($i) $cell($imin)
+	set cell($imin) $temp
+	for {set k 0} {$k <= 11} {incr k} {
+	    set temp $celldata($k,$i)
+	    set celldata($k,$i) $celldata($k,$imin)
+	    set celldata($k,$imin) $temp
+	}
+    }	
+}
+
+proc checkTransName {name} {
+    global transdata ncell
+    for {set i 1} {$i <= $ncell} {incr i} {
+	if { [string match $name $transdata(0,$i)] } { return $i }
+    }
+    return 0
+}
+proc checkExptName {name} {
+    global exptdata ncell
+    for {set i 1} {$i <= $ncell} {incr i} {
+	if { [string match $name $exptdata(0,$i)] } { return $i }
+    }
+    return 0
+}
+
+set dbchk {nsL0 nsL0err R L tEmpty tEmptySlope}
+
+set reqcell {name datetim PorA  Pi Pierr T Terr trans expt}
+set reqcellC {0    1       2    3  4     8  9   10    11}
+set reqtrans  {name teff terr feff ferr}
+set reqtransC {0    1    2    3    4}
+
+set exportname ""
+proc exportAS {} {
+    global exportname
+    if { ! [Dialog_Entry "save cellfile as:" exportname] } { return }
+    exportCellFile $exportname
+}
+
+proc exportCellFile {fil} {
+    global cfvnames cfvexpt dbchk exptmed
+    global reqcellC reqtransC
+    global cell ncell
+    global datefmt timefmt utcfmt
+    global celldata transdata exptdata cellinfo
+
+    # sanity check for blanks in required columns
+    set okcells {}
+    set badcells {}
+    for {set i 1} {$i <= $ncell} {incr i} {
+	lappend okcells $i
+	if { [string length [string trim $celldata(7,$i)]] < 1 } {
+	    set celldata(7,$i) 0.
+	}
+    }
+    foreach c $reqcellC {
+	for {set i 0} {$i < [llength $okcells]} {incr i} {
+	    set cel [lindex $okcells $i]
+	    if {[string length [string trim $celldata($c,$cel)]] < 1} {
+		set okcells [lreplace $okcells $i $i]
+		lappend badcells $cel
+	    }
+	}
+    }
+    for {set i 0} {$i < [llength $okcells]} {incr i} {
+	set cel [lindex $okcells $i]
+	set it [checkTransName $celldata(10,$cel)]
+	if { $it < 1 } {
+	    set okcells [lreplace $okcells $i $i]
+	    lappend badcells $cel
+	    continue
+	}
+	foreach c $reqtransC {
+	    if {[string length [string trim $transdata($c,$it)]] < 1} {
+		set okcells [lreplace $okcells $i $i]
+		lappend badcells $cel
+		break
+	    }
+	}
+    }
+
+
+    # data checks
+    # trans is required, missing expt go to defaults
+    for {set i 0} {$i < [llength $okcells]} {incr i} {
+	set c [lindex $okcells $i]
+	set PorA $celldata(2,$c)
+	set Pi $celldata(3,$c)
+	set Pierr $celldata(4,$c)
+	set Pf $celldata(5,$c)
+	set Pferr $celldata(6,$c)
+	set Tf $celldata(7,$c)
+	set Tc $celldata(8,$c)
+	set Tcerr $celldata(9,$c)
+	set trans $celldata(10,$c)
+	set expt $celldata(11,$c)
+	if {[scan $celldata(2,$c) {%[pPaA]} res] < 1 || \
+	    $Pi < 0. || $Pi > 1. || $Pierr < 0. || \
+		([string length [string trim $Pf]] > 0 \
+		     && ($Pf < 0. || $Pf > 1.)) || \
+		([string length [string trim $Pferr]] > 0 && $Pferr < 0.) || \
+		$Tf < 0. || $Tc < 0. || \
+		[string length [string trim $trans]] < 1 || \
+		[checkTransName $trans] < 1} {
+	    #puts "celldata error  removing cell $c"
+	    set okcells [lreplace $okcells $i $i]
+	    lappend badcells $c
+	    continue
+	}
+	set it [checkTransName $trans]
+	set teff $transdata(1,$it)
+	set terr $transdata(2,$it)
+	set feff $transdata(3,$it)
+	set ferr $transdata(4,$it)
+	if { $teff < 0. || $teff > 1. || $terr < 0. || \
+		 $feff < 0. || $feff > 1. || $ferr < 0. } {
+	    #puts "transdata $it error  removing cell $c"
+	    set okcells [lreplace $okcells $i $i]
+	    lappend badcells $c
+	    continue
+	}
+    }
+
+
+    if { [llength $okcells] < 1 } {
+	Dialog_Warn "Failed cellfile export. All cells were missing required data."
+	return
+    }
+    if { [llength $badcells] > 0 } {
+	Dialog_Warn "The following cells are missing required data and will be omitted:\n$badcells"
+    }
+
+    # first get the celldata exptdata transdata 
+    # for each cell in turn into cellinfo(cfvnames)
+
+    for {set ii 0} {$ii < [llength $okcells]} {incr ii} {
+	set i [lindex $okcells $ii]
+	# start with the values in cell(i)
+	array set cellinfo $cell($i)
+
+	set name $celldata(0,$i)
+	upvar #0 $name cellnam
+	if { ! [info exists cellnam] } {
+	    Dialog_Warn "Cell $name is not a valid cellname."
+	    continue
+	}
+
+	set cellinfo(name) $name
+	if [catch [list clock scan $celldata(1,$i)] isecs] {
+	    Dialog_Warn $isecs
+	    return
+	}
+	set cellinfo(date) [clock format $isecs -format $datefmt]
+	set cellinfo(tim) [clock format $isecs -format $timefmt]
+	set cellinfo(startSecs) [clock format $isecs -format $utcfmt]
+	#set cellinfo(date) [exec date --date=$celldata(1,$i) $datefmt]
+	#set cellinfo(tim) [exec date --date=$celldata(1,$i) $timefmt]
+	#set cellinfo(startSecs) [exec date --date=$celldata(1,$i) $utcfmt]
+	set cellinfo(PorA) $celldata(2,$i)
+	set cellinfo(Pi) $celldata(3,$i)
+	set cellinfo(Pierr) $celldata(4,$i)
+	set cellinfo(Tf) $celldata(7,$i)
+	set cellinfo(T) $celldata(8,$i)
+	set cellinfo(Terr) $celldata(9,$i)
+	set it [checkTransName $celldata(10,$i)]
+	set cellinfo(teff) $transdata(1,$it)
+	set cellinfo(terr) $transdata(2,$it)
+	set cellinfo(feff) $transdata(3,$it)
+	set cellinfo(ferr) $transdata(4,$it)
+	foreach vnam $cfvexpt val $exptmed { set cellinfo($vnam) $val }
+	set ie [checkExptName $celldata(11,$i)]
+	if { $ie > 0 } {
+	    for {set k 0;set j 1} {$k < [llength $cfvexpt]} {incr k;incr j} {
+		set vnam [lindex $cfvexpt $k]
+		if { [string length [string trim $exptdata($j,$ie)]] > 0 } {
+		    set cellinfo($vnam) $exptdata($j,$ie)
+		}
+	    }
+	}
+	# now just put cellinfo back into cell(i)
+	#puts "export: cell $i:\n[array get cellinfo]"
+	set cell($i) [array get cellinfo]
+    }
+    # first collect the data string widths from the okcells
+    foreach vnam $cfvnames {
+	set wid 0
+	for {set ii 0} {$ii < [llength $okcells]} {incr ii} {
+	    set i [lindex $okcells $ii]
+	    array set cellinfo $cell($i)
+	    if { [set sl [string length $cellinfo($vnam)]] > $wid } { set wid $sl }
+	}
+	if { [set sl [string length $vnam]] > $wid } { set wid $sl }
+	set width($vnam) [expr $wid + 1]
+    }
+    # now write
+    if [catch "open $fil w" fid] {
+	Dialog_Warn "failed to open $fil for cellfile export"
+	return
+    }
+
+    puts -nonewline $fid "#cellFile "
+    for {set i 0} {$i < [llength $cfvnames]} {incr i} {
+	set vnam [lindex $cfvnames $i]
+	set wid $width($vnam)
+	puts -nonewline $fid [format "%${wid}s" $vnam]
+    }
+    puts $fid ""
+    for {set ii 0} {$ii < [llength $okcells]} {incr ii} {
+	array set cellinfo $cell([lindex $okcells $ii])
+	puts -nonewline $fid "          "
+	for {set i 0} {$i < [llength $cfvnames]} {incr i} {
+	    set vnam [lindex $cfvnames $i]
+	    set wid $width($vnam)
+	    puts -nonewline $fid [format "%${wid}s" $cellinfo($vnam)]
+	}
+	puts $fid ""	
+    }
+    close $fid
+}
+
+proc dirCellFiles {} {
+    # return list of cellfiles in current directory
+    global Cells
+    set flst [glob -nocomplain *]
+    set cellfiles {}
+    foreach fil $flst {
+	if { [file isdirectory $fil] || ![file readable $fil] } { continue }
+	if [catch "open $fil r" f] { continue }
+	if { [gets $f line] < 0 } { close $f ; continue }
+	if { [string match #cellName* $line] } {
+	    lappend cellfiles $fil
+	} else {
+	    foreach cel $Cells {
+		if [string match $cel* $line] {
+		    lappend cellfiles $fil
+		    break
+		}
+	    }
+	}
+	close $f
+    }
+    return $cellfiles
+}
+array set cellall {}
+proc setCellSelRow {c} {
+    global celldata cell ncell
+    set w [focus]
+    if { [scan $w {.cf.d.e%d-%d} icol irow] < 2 } {
+	Dialog_Warn "Focus is not in one of the He3 Cell Log rows"
+	return
+    }
+    set celldata(0,$irow) $c
+    global $c
+    set aname $c
+    # make sure the db basic cell values are in cell(irow)
+    arrayClear cellall
+    if { [info exists cell($irow)] } { array set cellall $cell($irow) }
+    array set cellall [array get $c]
+    array set cellall "name $c"
+    set cell($irow) [array get cellall]
+    #puts [array get cellall]
+    if { $irow > $ncell } { set ncell $irow }
+}
+
+set titlefont [list Helvetica 20 bold]
+set lblfont [list Helvetica 12]
+set titlecolor red
+set lblcolor blue
+
+set mn .
+set mnlbl "He3 Cell Log"
+wm title $mn $mnlbl
+wm iconname $mn "He3 Log"
+array set celldata {}
+array set transdata {}
+array set exptdata {}
+
+
+# need 3 frames
+# top cells
+# middle transport
+# bot expt conditions
+
+set cf [frame .cf -bd 2 -relief raised]
+set tf [frame .tf -bd 2 -relief raised]
+set ef [frame .ef -bd 2 -relief raised]
+grid $cf -columnspan 2 -sticky ew
+grid $tf $ef -sticky ew
+
+set ctLbls {
+cellName installTimeDate PorA
+iPol iPolErr fPol fPolErr Tf(hr) Tc(hr) TcErr(hr) trans expt
+}
+
+
+entryTable $cf "He3 cells" $ctLbls 4 celldata
+set m $celldata(mbar)
+
+set mcells $m.cells
+menubutton $mcells -text "select cell current row" -menu $mcells.menu \
+    -bg #00aa00 -relief raised -activebackground #ffaa00
+set m1 [menu $mcells.menu -tearoff 1]
+foreach cel $Cells {
+    $m1 add radio -label $cel -variable curcell -value $cel \
+	    -command "setCellSelRow $cel"
+}
+
+
+
+
+set dircellfiles [dirCellFiles]
+
+
+# make a menubutton to import a cellfile form the dircellfiles
+#set mimport $m.imp
+#menubutton $mimport -text "import cellfile" -menu $mimport.menu \
+#    -bg #00aa00 -relief raised -activebackground #ffaa00
+#set m2 [menu $mimport.menu -tearoff 1]
+#foreach celf $dircellfiles {
+#    $m2 add radio -label $celf -variable curcellf -value $celf \
+#	    -command "importCellFile $celf"
+#}
+#grid $mimport -sticky e -row 0 -column 2 -padx 15
+
+#set bexport $m.exp
+#button $bexport -text "export cellfile AS" -command exportAS \
+#    -bg green -relief raised -activebackground #ffaa00
+#grid $bexport -sticky e -row 0 -column 3 -padx 15
+
+
+set film $m.file
+menubutton $film -text File -menu $film.menu \
+    -bg #00aa00 -relief raised -activebackground #ffaa00
+set mf [menu $film.menu -tearoff 1]
+
+$mf add cascade -label "import cellfile" -menu $mf.imp
+set mi [menu $mf.imp]
+foreach celf $dircellfiles {
+    $mi add radio -label $celf -variable curcellf -value $celf \
+	    -command "importCellFile 0 $celf"
+}
+$mf add cascade -label "import append cellfile" -menu $mf.impa
+set ma [menu $mf.impa]
+foreach celf $dircellfiles {
+    $ma add radio -label $celf -variable curcellf -value $celf \
+	    -command "importCellFile 1 $celf"
+}
+$mf add separator
+
+$mf add command -label "export cellfile AS" -command exportAS
+
+
+set edit $m.edit
+menubutton $edit -text Edit -menu $edit.menu \
+    -bg #00aa00 -relief raised -activebackground #ffaa00
+set m3 [menu $edit.menu -tearoff 1]
+$m3 add command -label "Sort cells by installTimeDate" -command sortCells
+$m3 add separator
+$m3 add command -label "Delete selected cell" -command "delFocus 1"
+$m3 add command -label "Delete selected trans" -command "delFocus 2"
+$m3 add command -label "Delete selected expt" -command "delFocus 3"
+$m3 add separator
+$m3 add command -label "Add He3-cell row" -command "addRow 1"
+$m3 add command -label "Add transport row" -command "addRow 2"
+$m3 add command -label "Add experiment row" -command "addRow 3"
+$m3 add separator
+$m3 add check -label "Import file over-rides cellDB" -variable overrideDB
+$m3 add separator
+$m3 add cascade -label "Set selected expt to stnd" -menu $m3.sub
+set m4 [menu $m3.sub -tearoff 0]
+$m4 add command -label "open resolution" -command "setExptFocus [list $exptopen]" 
+$m4 add command -label "med resolution" -command "setExptFocus [list $exptmed]" 
+$m4 add command -label "fine resolution" -command "setExptFocus [list $exptfine]" 
+grid $edit -sticky e -row 0 -column 4 -padx 15
+
+# expt has hcols hcol2 vcols vcol2 hmos dsp beamAreacm smplGFdir
+# trans has transeff transErr flipeff flipErr
+
+grid $film -row 0 -column 1 -padx 15
+grid $edit -row 0 -column 2 -padx 15
+grid $mcells -sticky e -row 0 -column 3 -padx 15
+
+set exLbls {
+    name
+    hcols' hcol2' vcolsd vcol2d hmos' dsp(A)
+    smplA(cm^2) VGF
+}
+entryTable $ef "experiment" $exLbls 4 exptdata
+
+set transLbls {
+    name
+    trans transErr flip flipErr
+}
+entryTable $tf "transport" $transLbls 4 transdata
+
+trace add variable celldata {write} entryTableColwid
+trace add variable transdata {write} entryTableColwid
+trace add variable exptdata {write} entryTableColwid
+
+set overrideDB 0
+
+
+# create a toplevel help message window that
+# displays help text when mouse moves over label
+set help [toplevel .help]
+set helpmsg [message $help.msg -aspect 500]
+pack $helpmsg
+wm title $help help
+wm withdraw $help
+
+
+proc showHelp {w} {
+    global help helpmsg helptext
+    # locate the w top left using winfo geometry
+    set wgeo [winfo geometry $w]
+    scan $wgeo {%dx%d+%d%d} L H wx wy
+    set wd [winfo parent $w]
+    set dgeo [winfo geometry $wd]
+    scan $dgeo {%dx%d+%d%d} dL dH dx dy
+    set wf [winfo parent $wd]
+    set fgeo [winfo geometry $wf]
+    scan $fgeo {%dx%d+%d%d} fL fH fx fy
+    set mgeo [winfo geometry .]
+    scan $mgeo {%dx%d+%d%d} mL mH mx my
+    # mx,y + fx,y + dx,y + wx,y locates the top left = tlx,y
+    # and w LxH
+    # place the help msg at tlx,y + 3H just below the label
+    # make sure it outside the label widget or the <Enter>
+    # binding keeps firing
+    set tlx [expr $mx + $fx + $dx + $wx]
+    set tly [expr $my + $fy + $dy + $wy + 3*$H]
+    wm geometry $help [format "%+d%+d" $tlx $tly]
+    $helpmsg configure -text $helptext($w)
+    wm deiconify $help
+}
+
+proc withdrawHelp {} {
+    global help
+    wm withdraw $help
+}
+
+array set helptext {
+    .cf.d.l0 "cellName shoule be from DB. Dont edit"
+    .cf.d.l1 "installTimeDate is just date-time of init polarization"
+    .cf.d.l2 "P for polarizer, A for analyzer"
+    .cf.d.l3 "initial He3 polarization\n 0 <= iPol <= 1"
+    .cf.d.l4 "initial He3 polarization error"
+    .cf.d.l5 "final He3 polarization.\nUse for two time polarization msrment\nwith Tf(hr) as the final time"
+    .cf.d.l6 "final He3 polarization error"
+    .cf.d.l7 "final He3 pol msrment time\n> 0 for 2 pt msrment"
+    .cf.d.l8 "He3 decay time constant in hours"
+    .cf.d.l9 "He3 decay time constant error in hours"
+    .cf.d.l10 "identifier for transport parameters"
+    .cf.d.l11 "identifier for experiment resolution parameters. Expt corrections are on order of 1%"
+    .tf.d.l0 "identifier for transport parameters"
+    .tf.d.l1 "transport efficiency for P or A beam side\n0 <= trans <= 1"
+    .tf.d.l2 "transport efficiency uncertainty >= 0"
+    .tf.d.l3 "flipper efficiency for P or A beam side\n0 <= flip <= 1"
+    .tf.d.l4 "flipper efficiency uncertainty >= 0"
+    .ef.d.l0 "identifier for experiment resolution parameters"
+    .ef.d.l1 "horiz collimation(minutes) nearest sample on P or A beam side"
+    .ef.d.l2 "horiz collimation(minutes) farthest from sample on P or A beam side"
+    .ef.d.l3 "vert collimation(degrees) nearest sample on P or A beam side"
+    .ef.d.l4 "vert collimation(degrees) farthest from sample on P or A beam side"
+    .ef.d.l5 "crystal mosaic(minutes) for monochoromator (P side) or analyzer (A side)"
+    .ef.d.l6 "crystal d-spacing(Angstroms) for monochoromator (P side) or analyzer (A side) "
+    .ef.d.l7 "sample area in the beam. Same number for P or A"
+    .ef.d.l8 "VGF=1 for vert sample guide field, else horiz sample guide field"
+}
+# create bindings for Enter/Leave the labels .cf.d.l# .tf.d.l# ef.d.l#
+for {set i 0} {$i <= 11} {incr i} {
+    set w .cf.d.l$i
+    bind $w <Enter> "showHelp $w"
+    bind $w <Leave> withdrawHelp
+}
+for {set i 0} {$i <= 4} {incr i} {
+    set w .tf.d.l$i
+    bind $w <Enter> "showHelp $w"
+    bind $w <Leave> withdrawHelp
+}
+for {set i 0} {$i <= 8} {incr i} {
+    set w .ef.d.l$i
+    bind $w <Enter> "showHelp $w"
+    bind $w <Leave> withdrawHelp
+}

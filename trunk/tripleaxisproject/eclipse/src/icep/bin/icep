@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+rlwrap -c jython -J-classpath /home/NCNRWIN/bt7/vmdisk/jice.jar /home/NCNRWIN/bt7/vmdisk/icp_example2.py
