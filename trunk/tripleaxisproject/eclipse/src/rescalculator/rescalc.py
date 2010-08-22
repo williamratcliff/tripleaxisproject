@@ -648,7 +648,8 @@ class rescalculator:
                mat_diag=vmt*matm*vm
                a1.append(1.0/N.sqrt(mat_diag[0,0]))
                b1.append(1.0/N.sqrt(mat_diag[1,1]))
-               thetar=N.arccos(vm[0,0])
+               #thetar=N.arccos(vm[0,0])#*N.sign(vm[0,0])
+               thetar=-N.arctan2(vm[0,1],vm[0,0])
                theta.append(math.degrees(thetar))
 
           mat_sec=N.copy(sec)
@@ -662,7 +663,8 @@ class rescalculator:
                mat_diag_sec=vmt_sec*matm_sec*vm_sec
                a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0]))
                b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
-               thetar_sec=N.arccos(vm_sec[0,0])
+               #thetar_sec=N.arccos(vm_sec[0,0])*N.sign(vm_sec[0,0])
+               thetar_sec=-N.arctan2(vm_sec[0,1],vm_sec[0,0])
                theta_sec.append(math.degrees(thetar_sec))
                x0y0=N.array([qx[i],qy[i]])
                e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
@@ -752,8 +754,9 @@ class rescalculator:
                mat_diag=vmt*matm*vm
                a1.append(1.0/N.sqrt(mat_diag[0,0]))
                b1.append(1.0/N.sqrt(mat_diag[1,1]))
-               thetar=N.arccos(vm[0,0])
-               theta.append(-math.degrees(thetar))
+               #thetar=N.arccos(vm[0,0])*N.sign(vm[0,0])
+               thetar=-N.arctan2(vm[0,1],vm[0,0])
+               theta.append(math.degrees(thetar))
           mat_sec=N.copy(sec)
           #print 'proj ', proj
           (a,b,c)=N.shape(sec)
@@ -765,8 +768,9 @@ class rescalculator:
                mat_diag_sec=vmt_sec*matm_sec*vm_sec
                a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0]))
                b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
-               thetar_sec=N.arccos(vm_sec[0,0])
-               theta_sec.append(-math.degrees(thetar_sec))
+               #thetar_sec=N.arccos(vm_sec[0,0])*N.sign(vm_sec[0,0])
+               thetar_sec=-N.arctan2(vm_sec[0,1],vm_sec[0,0])
+               theta_sec.append(math.degrees(thetar_sec))
                x0y0=N.array([qx[i],qw[i]])
                e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
                e_sec.append(Ellipse(x0y0,width=2*a1_sec[i],height=2*b1_sec[i],angle=theta_sec[i]))
@@ -849,7 +853,8 @@ class rescalculator:
                mat_diag=vmt*matm*vm
                a1.append(1.0/N.sqrt(mat_diag[0,0]))
                b1.append(1.0/N.sqrt(mat_diag[1,1]))
-               thetar=N.arccos(vm[0,0])
+               #thetar=N.arccos(vm[0,0])*N.sign(vm[0,0])
+               thetar=-N.arctan2(vm[0,1],vm[0,0])
                theta.append(math.degrees(thetar))
           #print 'proj ', proj
           (a,b,c)=N.shape(sec)
@@ -862,7 +867,8 @@ class rescalculator:
                mat_diag_sec=vmt_sec*matm_sec*vm_sec
                a1_sec.append(1.0/N.sqrt(mat_diag_sec[0,0]))
                b1_sec.append(1.0/N.sqrt(mat_diag_sec[1,1]))
-               thetar_sec=N.arccos(vm_sec[0,0])
+               #thetar_sec=N.arccos(vm_sec[0,0])*N.sign(vm_sec[0,0])
+               thetar_sec=-N.arctan2(vm_sec[0,1],vm_sec[0,0])
                theta_sec.append(math.degrees(thetar_sec))
                x0y0=N.array([qy[i],qw[i]])
                e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
@@ -1118,7 +1124,7 @@ class rescalculator:
                mat_diag=vmt*matm*vm
           a1=1.0/N.sqrt(mat_diag[0,0])
           b1=1.0/N.sqrt(mat_diag[1,1])
-          thetar=N.arccos(vm[0,0])
+          thetar=N.arccos(vm[0,0])*N.sign(vm[0,0])
           theta=math.degrees(thetar)
           XWidth=2*self.fproject(RMS,0)
           YWidth=2*self.fproject(RMS,1)
@@ -1293,7 +1299,7 @@ def get_tokenized_line(myfile,returnline=['']):
 
 if __name__=="__main__":
      
-     if 1:
+     if 0:
           if 1:
                print 'trying'
                try:
@@ -1445,7 +1451,7 @@ if __name__=="__main__":
 
 
      if 1:
-          a=N.array([6., 6.],'d')
+          a=N.array([6, 6.],'d')
           b=N.array([7., 7.],'d')
           c=N.array([8.,8],'d')
           alpha=N.array([pi/2,pi/2],'d')
@@ -1457,7 +1463,7 @@ if __name__=="__main__":
           orientation=lattice_calculator.Orientation(orient1,orient2)
           mylattice=lattice_calculator.Lattice(a=a,b=b,c=c,alpha=alpha,beta=beta,gamma=gamma,\
                                                orientation=orientation)
-          H=N.array([1.5,1.5],'d');K=N.array([0,0.0],'d');L=N.array([5.0,5.0],'d');W=N.array([0,0],'d')
+          H=N.array([1,1],'d');K=N.array([0,0.0],'d');L=N.array([5.0,5.0],'d');W=N.array([2,2],'d')
           EXP={}
           EXP['ana']={}
           EXP['ana']['tau']='pg(002)'
