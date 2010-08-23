@@ -227,7 +227,7 @@ def calcstructure(pfit,Qs,correction):
  #momentsKNd3p=gen_nd_spins(s1th_in=-90.0,s2th_in=pfit[2])*pfit[1] #fix Fe spins along the a-axis
  #momentsKNd3p=gen_nd_spins(s1th_in=pfit[2],s2th_in=pfit[3])*pfit[1] #fix Fe spins along the a-axis
  #momentsKNd3p=gen_nd_spins()*pfit[1]
- momentsKNd3p=gen_nd_spins(pfit[1:])*pfit[0]
+ momentsKNd3p=gen_nd_spins(pfit[1:-1])*pfit[0]
  n,m=Qs.shape
  QA=copy.deepcopy(Qs)
  QA[:,0]=QA[:,0]*astar
@@ -476,10 +476,10 @@ if __name__=="__main__":
   #s_in=[0,90,40,40,90,90,90,90]
   #th1,th2,th3,th4,phi1,phi2,phi3,phi4=s_in
   s_in=[0,90,90,90]
-  s_in=[1.1539,2.04,5.5985,3.8681,.4]
+  s_in=[1.1539,2.04,5.5985,3.8681]
   th1,th2,phi1,phi2=s_in
   #pfit=np.array([.56,1.52,th1,th2,th3,th4,phi1,phi2,phi3,phi4],'float64')
-  pfit=np.array([1.3899,th1,th2,phi1,phi2],'float64')
+  pfit=np.array([1.3899,th1,th2,phi1,phi2,.4],'float64')
   
   #correction=np.ones(Qs.shape[0])
   corrections=np.array(corrections)
@@ -541,10 +541,10 @@ if __name__=="__main__":
   p1=m.params
   covariance=m.covar
   #print 'p',p1[0],p1[1],np.degrees(p1[2:])
-  print 'p',p1[0],np.degrees(p1[1:])
+  print 'p',p1[0],np.degrees(p1[1:-1]),p1[-1]
   #th1,th2,th3,th4,phi1,phi2,phi3,phi4=p1[2:]
   #th1,th2,th3,th4,phi1,phi2,phi3,phi4=p1[2:]
-  th1,th2,phi1,phi2=p1[1:]
+  th1,th2,phi1,phi2=p1[1:-1]
   s1=np.array([sin(th1)*cos(phi1), sin(th1)*sin(phi1), cos(th1)],'float64')
   s2=np.array([sin(th2)*cos(phi2), sin(th2)*sin(phi2), cos(th2)],'float64')
   s3=-s1;
@@ -568,7 +568,7 @@ if __name__=="__main__":
   print 'vals',p1
   print 'sigs',covariance.diagonal()
   mydiag=covariance.diagonal()
-  print 'sigs degrees',  np.degrees(mydiag[1:])
+  print 'sigs degrees',  np.degrees(mydiag[1:-1])
   if 1:
     ax=fig.add_subplot(1,1,1)
     ax.errorbar(modqlist,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')

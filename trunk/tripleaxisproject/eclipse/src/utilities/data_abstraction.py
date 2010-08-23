@@ -457,6 +457,12 @@ class Temperature(object):
                                                isInterpolatable=True)
                 
 
+class MagneticField(object):                
+        def __init__(self):
+                self.magnetic_field=SampleEnvironment('magnetic_field',values=None,err=None,units='Tesla',isDistinct=True,
+                                               isInterpolatable=True)
+
+  
         
                 
                 
@@ -698,31 +704,31 @@ class TripleAxis(object):
                 self.polarized_beam.ei_cancel=dataset.data.eicancel
          
         def translate_primary_motors(self,dataset):
-                self.primary_motors.sample_upper_tilt=dataset.smplutilt
-                self.primary_motors.sample_lower_tilt=dataset.smplltilt
-                self.primary_motors.sample_elevator=dataset.smplelev
-                self.primary_motors.sample_upper_translation=dataset.smplutrn
-                self.primary_motors.sample_lower_translation=dataset.smplltrn
-                self.primary_motors.a1=dataset.a1
-                self.primary_motors.a2=dataset.a2
-                self.primary_motors.a3=dataset.a3
-                self.primary_motors.a4=dataset.a4
-                self.primary_motors.a5=dataset.a5
-                self.primary_motors.a6=dataset.a6
-                self.primary_motors.dfm=dataset.dfm
-                self.primary_motors.analyzer_rotation=dataset.analyzerrotation
-                self.primary_motors.dfm_rotation=dataset.dfmrot
+                self.primary_motors.sample_upper_tilt=dataset.data.smplutilt
+                self.primary_motors.sample_lower_tilt=dataset.data.smplltilt
+                self.primary_motors.sample_elevator=dataset.data.smplelev
+                self.primary_motors.sample_upper_translation=dataset.data.smplutrn
+                self.primary_motors.sample_lower_translation=dataset.data.smplltrn
+                self.primary_motors.a1=dataset.data.a1
+                self.primary_motors.a2=dataset.data.a2
+                self.primary_motors.a3=dataset.data.a3
+                self.primary_motors.a4=dataset.data.a4
+                self.primary_motors.a5=dataset.data.a5
+                self.primary_motors.a6=dataset.data.a6
+                self.primary_motors.dfm=dataset.data.dfm
+                self.primary_motors.analyzer_rotation=dataset.data.analyzerrotation
+                self.primary_motors.dfm_rotation=dataset.data.dfmrot
                 
                 
         def translate_physical_motors(self,dataset):
-                self.physical_motors.h=dataset.h
-                self.physical_motors.k=dataset.k
-                self.physical_motors.l=dataset.l
-                self.physical_motors.hkl=dataset.hkl
-                self.physical_motors.qx=dataset.qx
-                self.physical_motors.qy=dataset.qy
-                self.physical_motors.qz=dataset.qz
-                self.physical_motors.e=dataset.e
+                self.physical_motors.h=dataset.data.h
+                self.physical_motors.k=dataset.data.k
+                self.physical_motors.l=dataset.data.l
+                self.physical_motors.hkl=dataset.data.hkl
+                self.physical_motors.qx=dataset.data.qx
+                self.physical_motors.qy=dataset.data.qy
+                self.physical_motors.qz=dataset.data.qz
+                self.physical_motors.e=dataset.data.e
                 
         def translate_filters(self,dataset):
                 self.filters.filter_tilt=dataset.filtilt
