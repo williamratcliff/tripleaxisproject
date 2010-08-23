@@ -646,7 +646,7 @@ class datareader:
                 self.lines=lines
                 myfile = open(myfilestr, 'r')
                 self.instrument=myfilestr.split('.')[1]
-                if self.instrument in ['bt9','ng5']:
+                if self.instrument in ['bt9','ng5','bt2']:
                         # Determine FileType
                         self.determinefiletype(myfile)
                         if self.metadata['file_info']['scantype'].lower()=='i':

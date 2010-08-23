@@ -8,6 +8,7 @@ import pylab
 from utilities.anneal import anneal
 from numpy import sqrt,sin,cos
 import scipy.integrate
+import readncnr3 as readncnr
 
 a=3.84; b=3.879; wavelength=2.35
 
@@ -87,16 +88,29 @@ def readfiles(flist,mon0=None):
     return tth,T,Counts,Counts_err,mon0
 
 if __name__=="__main__":
-    C=100
+    C=10
     #h=.526; k=1.0
     h=0.5; k=0.5; 
     L=50.0
     p=N.array([C,L,h,k],'Float64')
     th=N.arange(22,32,.2)/2
     y=Ihk(th,p)
-    print 'yfinal',y
-    if 1:
+    #print 'yfinal',y
+    if 0:
         pylab.plot(th*2,y,'s')
         pylab.show()
-    file1=r'c:\ZnMn2O4\bt2\t90k.bt2';
-    file2=r'c:\ZnMn2O4\bt2\t40k.bt2';
+    file1=r'e:\ZnMn2O4\bt2\t90k.bt2';
+    file2=r'e:\ZnMn2O4\bt2\t40k.bt2';
+    files=[file1,file2]
+    data1=N.loadtxt(file1)
+    data2=N.loadtxt(file2)
+    tth1=data1[:,0]
+    tth2=data2[:,0]
+    I1=data1[:,1]
+    I2=data2[:,1]
+    if 0:
+        pylab.plot(tth1,I1,'s')
+        pylab.plot(tth2,I2,'s')
+        pylab.show()
+    
+    dI=I2-I1

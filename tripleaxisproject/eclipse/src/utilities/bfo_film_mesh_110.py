@@ -1,9 +1,10 @@
 import numpy as N
 import  pylab
-import scipy.sandbox.delaunay as D
+#import scipy.sandbox.delaunay as D
+import matplotlib.delaunay as D
 #import numpy.core.ma as ma
 import matplotlib.numerix.ma as ma
-from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator
+from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator, NullLocator
 from scipy.signal.signaltools import convolve2d
 import scriptutil as SU
 import re
@@ -213,6 +214,39 @@ def plotcartoon(fig):
     ax.text(-3.0,-6.8,s,fontsize=20)
 
 
+    #0.5 0.5 0.5
+    x1=N.array([0.0])
+    y1=N.array([0.0])
+    ax.plot(x1,y1,'bs',markersize=10,markerfacecolor='red')
+    
+    #projections
+    x1=N.array([2.0])
+    y1=N.array([0.0])
+    ax.plot(x1,y1,'b^',markersize=10,markerfacecolor='black')
+    x1=N.array([-2.0])
+    y1=N.array([0.0])
+    ax.plot(x1,y1,'b^',markersize=10,markerfacecolor='black')
+    
+    #distance
+    s=r'$\delta$'
+    pylab.annotate('',xytext=(2.05,-2.5),xy=(4,-2.5),arrowprops=dict(arrowstyle='-[',shrinkB=2))    
+    pylab.annotate('',xytext=(1.95,-2.5),xy=(0,-2.5),arrowprops=dict(arrowstyle='-['))
+    ax.text(2.15,-2.2,s,fontsize=20)
+    
+    #solid line
+    x1=N.array([-10.0,10.0])
+    y1=N.array([0.0,0.0])
+    ax.plot(x1,y1,'-k',linewidth=3.0)
+    
+    #dashed lines indicating projection
+    x1=N.array([-2.0,-2])
+    y1=N.array([-4,4.0])
+    ax.plot(x1,y1,'--k',linewidth=3.0)
+    x1=N.array([2.0,2])
+    y1=N.array([-4,4.0])
+    ax.plot(x1,y1,'--k',linewidth=3.0)
+    
+    
     ax.axis([-8.0,8.0,-8,8])
     ax.yaxis.set_major_formatter(NullFormatter())
     ax.xaxis.set_major_formatter(NullFormatter())
@@ -220,6 +254,12 @@ def plotcartoon(fig):
 
     ax.set_xlabel('[1 1 0]')
     ax.set_ylabel('[0 0 1]')
+    ax.yaxis.set_major_formatter(NullFormatter())
+    ax.xaxis.set_major_formatter(NullFormatter())
+    ax.yaxis.set_minor_formatter(NullFormatter())
+    ax.xaxis.set_minor_formatter(NullFormatter())
+    ax.xaxis.set_major_locator(NullLocator())
+    ax.yaxis.set_major_locator(NullLocator())
 
 
 
@@ -352,4 +392,5 @@ if __name__ == '__main__':
         pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
         print 'saved'
     if 1:
+        pylab.savefig(r'C:\BiFeO3film\bifeo3_film_paper\bfo110_meshnew.png')
         pylab.show()
