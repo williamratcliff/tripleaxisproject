@@ -165,13 +165,13 @@ def film111():
         myfilestr=os.path.join(mydirectory,'hh0_sf_vu78635.bt7')
         qz,I,Ierr,mon0=read_data(myfilestr)
         ax=fig5.add_subplot(2,2,2)
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='SF')
         
         myfilestr=os.path.join(mydirectory,'hh0_nsf_vu78634.bt7')
         qz,I,Ierr,mon=read_data(myfilestr)
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='NSF')
         #ax.set_title('horizontal')
         ax.legend(numpoints=1,loc=2)
         ax.xaxis.set_major_locator(MaxNLocator(4))
@@ -184,6 +184,12 @@ def film111():
         plt.ylabel('Intensity (arb. units)')
         ax.text(.96,.90,'(b)',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
         ax.text(.96,.80,r'P$\parallel$Q',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
+        ax2.yaxis.set_major_formatter(NullFormatter())
+        #ax.xaxis.set_major_formatter(NullFormatter())
+        ax2.yaxis.set_minor_formatter(NullFormatter())
+        #ax.xaxis.set_minor_formatter(NullFormatter())
+        #ax.xaxis.set_major_locator(NullLocator())
+        ax2.yaxis.set_major_locator(NullLocator())
     
         
         #vertical
@@ -193,13 +199,13 @@ def film111():
         qz,I,Ierr,mon=read_data(myfilestr)
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='SF')
         
         myfilestr=os.path.join(mydirectory,'hh0_nsf_vu78633.bt7')
         qz,I,Ierr,mon=read_data(myfilestr)
         Ierr=Ierr*mon0/mon
         I=I*mon0/mon
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='NSF')
         #ax.set_title('vertical')
         ax.legend(numpoints=1,loc=2)
         ax.xaxis.set_major_locator(MaxNLocator(4))
@@ -279,14 +285,14 @@ def film111():
         I=I*mon0/mon*frnuc
         offset=105
         qz=qz-offset
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='SF')
            
         myfilestr=os.path.join(mydirectory,'fpx78624.bt7')
         qz,I,Ierr,mon=read_fpx(myfilestr)
         qz=qz-offset
         Ierr=Ierr*mon0/mon*frnuc
         I=I*mon0/mon*frnuc
-        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
+        ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='NSF')
         #ax.set_title('Corrected')
         ax.legend(numpoints=1,loc=2)
         plt.xlabel(r'$ \theta $ (degrees)')
