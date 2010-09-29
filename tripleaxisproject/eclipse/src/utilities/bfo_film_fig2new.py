@@ -41,13 +41,13 @@ def film110():
     myfilestr=os.path.join(mydirectory,'flipperoffvuline_horizonal78500.bt7')
     qz,I,Ierr,mon0=read_data(myfilestr)
     ax=fig.add_subplot(2,2,2)
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='SF')
     
     myfilestr=os.path.join(mydirectory,'flipperonvuline_horizonal78499.bt7')
     qz,I,Ierr,mon=read_data(myfilestr)
     Ierr=Ierr*mon0/mon
     I=I*mon0/mon
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='NSF')
     #ax.set_title('horizontal')
     ax.legend(numpoints=1,loc=2)
     plt.xlabel('L')
@@ -66,13 +66,13 @@ def film110():
     qz,I,Ierr,mon=read_data(myfilestr)
     Ierr=Ierr*mon0/mon
     I=I*mon0/mon
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='SF')
     
     myfilestr=os.path.join(mydirectory,'flipperonvuline_vertical78501.bt7')
     qz,I,Ierr,mon=read_data(myfilestr)
     Ierr=Ierr*mon0/mon
     I=I*mon0/mon
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='NSF')
     #ax.set_title('vertical')
     ax.legend(numpoints=1,loc=2)
     ax.xaxis.set_major_locator(MaxNLocator(4))
@@ -82,7 +82,12 @@ def film110():
     ax.text(.96,.80,r'$P \perp Q$',fontsize=18,horizontalalignment='right',verticalalignment='top',transform=ax.transAxes,color='black')
        
     #plt.ylabel('Intensity (arb. units)')
-    
+    ax2.yaxis.set_major_formatter(NullFormatter())
+    #ax.xaxis.set_major_formatter(NullFormatter())
+    ax2.yaxis.set_minor_formatter(NullFormatter())
+    #ax.xaxis.set_minor_formatter(NullFormatter())
+    #ax.xaxis.set_major_locator(NullLocator())
+    ax2.yaxis.set_major_locator(NullLocator())
     
     
     
@@ -149,14 +154,14 @@ def film110():
     I=I*mon0/mon*frnuc
     offset=105
     qz=qz-offset
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='sf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='red',mfc='red',mec='red',ecolor=None,label='SF')
        
     myfilestr=os.path.join(mydirectory,'fpx78505.bt7')
     qz,I,Ierr,mon=read_fpx(myfilestr)
     qz=qz-offset
     Ierr=Ierr*mon0/mon*frnuc
     I=I*mon0/mon*frnuc
-    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='nsf')
+    ax.errorbar(qz,I,Ierr,marker='s',linestyle='solid',color='black',mfc='black',mec='black',ecolor=None,label='NSF')
     #ax.set_title('Corrected')
     ax.legend(numpoints=1,loc=2)
     plt.xlabel(r'$ \theta $ (degrees)')
