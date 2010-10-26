@@ -95,17 +95,43 @@ def test_den():
     fig=mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
     x,y,z=gen_as()   
     #view along z-axis
-    #pts_as=mlab.points3d(x,y,z-.125,color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+    #pts_as=mlab.points3d(x,y,z-.125,color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.1)    
+    if 0:
+        #112 like points
+        pts1=mlab.points3d([1,1,-1,1,0],[1,1,-1,1,0],[1,0,-1,-2,1],color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.1) #111,110,11-2
+        pts2=mlab.points3d([1],[-2],[1],color=(0,1,0),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+        #pts3=mlab.points3d([-2,2],[1,-1],[1,-1],color=(0,0,1),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+        pts3=mlab.points3d([-2],[1],[1],color=(0,0,1),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+    if 1:
+        x=[]
+        y=[]
+        z=[]
+        ath=0.0
+        for alph in np.arange(0,1.2,.12):
+            th=np.deg2rad(alph*(-np.cos(np.deg2rad(0.0))))
+            ph=np.deg2rad(alph*(-np.cos(np.deg2rad(0.0))))
+            print 'th',np.rad2deg(th),'ph',np.rad2deg(ph)
+            x.append(np.cos(th)*np.sin(ph))
+            y.append(np.sin(th)*np.sin(ph))
+            z.append(np.cos(ph))
+        print 'x2 ',x    
+        print 'y2 ',y
+        print 'z2 ',z
+        pts3=mlab.points3d(x,y,z,color=(0,0,1),colormap='gist_rainbow',figure=fig,scale_factor=.1)
+
+        
+        
     x,y,z=gen_fe()  
     print 'x',x
     print 'y',y
     print 'z',z
     #pts_fe=mlab.points3d(x,y,z-.125,color=(0,1,0),colormap='gist_rainbow',figure=fig,scale_factor=.02)
+    
     x,y,z=gen_sr()  
     #pts_sr=mlab.points3d(x,y,z-.125,color=(0,0,1),colormap='gist_rainbow',figure=fig)
     
    
-    if 1:
+    if 0:
         #112
         vec=np.array([1,1,-2],'Float64')
         genvec(vec,fig,color=(1,0,0))   
@@ -162,7 +188,7 @@ def test_den():
         vec=np.array([0,0,1],'Float64')
         genvec(vec,fig,color=(0,0,0)) 
         
-    if 1:
+    if 0:
         #110 scattering plane variations normal to 111
         vec=np.array([1,-1,0],'Float64')
         genvec(vec,fig, color=(0,1,0)) 
