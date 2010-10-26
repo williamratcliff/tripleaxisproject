@@ -196,13 +196,8 @@ def plotcartoon(fig):
     s=r'$\bar{\delta} \bar{\delta} 2\delta$'
     ax.text(-7.7,2.5,s,fontsize=20)
 
-    # -2 1 1
-    x1=N.array([-2])
-    y1=N.array([-1.5*4])
-    ax.plot(x1,y1,'bo',markersize=5,markerfacecolor='white')
-    s=r'$2\bar{\delta} \delta \delta$'
-    ax.text(0.7,6.6,s,fontsize=20)
-
+   
+   ###################
 
     # 1 -2 1
     x1=N.array([-2])
@@ -219,12 +214,20 @@ def plotcartoon(fig):
     s=r'$\bar{\delta} 2\delta \bar{\delta}$'
     ax.text(0.7,-7.9,s,fontsize=20)
 
-
+    #########
     # 2 -1 -1
     x1=N.array([2])
     y1=N.array([1.5*4])
-    ax.plot(x1,y1,'bo',markersize=5,markerfacecolor='gray')
+    ax.plot(x1,y1,'bo',markersize=5,markerfacecolor='white')
     s=r'$2\delta \bar{\delta} \bar{\delta}$'
+    ax.text(0.7,6.6,s,fontsize=20)
+    
+     # -2 1 1
+    x1=N.array([-2])
+    y1=N.array([-1.5*4])
+    ax.plot(x1,y1,'bo',markersize=5,markerfacecolor='gray')
+    s=r'$2\bar{\delta} \delta \delta$'
+    
     ax.text(-3.3,-7.9,s,fontsize=20)
 
 
@@ -234,31 +237,42 @@ def plotcartoon(fig):
     ax.plot(x1,y1,'bs',markersize=10,markerfacecolor='red')
     
     #projections
-    x1=N.array([2.0])
-    y1=N.array([0.0])
-    ax.plot(x1,y1,'b^',markersize=10,markerfacecolor='black')
     x1=N.array([-2.0])
-    y1=N.array([0.0])
+    y1=N.array([4.0])
+    ax.plot(x1,y1,'b^',markersize=10,markerfacecolor='black')
+    #x1=N.array([2.0])
+    #y1=N.array([-4.0])
+    #ax.plot(x1,y1,'b^',markersize=10,markerfacecolor='black')
+    
+    
+    #x1=N.array([-2.0])
+    #y1=N.array([-4.0])
+    ax.plot(x1,y1,'b^',markersize=10,markerfacecolor='black')
+    x1=N.array([2.0])
+    y1=N.array([-4.0])
     ax.plot(x1,y1,'b^',markersize=10,markerfacecolor='black')
     
     #distance
     s=r'$\delta$'
-    pylab.annotate('',xytext=(2.05,-2.5),xy=(4,-2.5),arrowprops=dict(arrowstyle='-[',shrinkB=2))    
-    pylab.annotate('',xytext=(1.95,-2.5),xy=(0,-2.5),arrowprops=dict(arrowstyle='-['))
-    ax.text(2.15,-2.2,s,fontsize=20)
+    #pylab.annotate('',xytext=(2.05,-2.5),xy=(4,-2.5),arrowprops=dict(arrowstyle='-[',shrinkB=2))    
+    #pylab.annotate('',xytext=(1.95,-2.5),xy=(0,-2.5),arrowprops=dict(arrowstyle='-['))
+    ##pylab.annotate('',xytext=(1.95,-2.5),xy=(0,0),arrowprops=dict(arrowstyle='-['))
+    pylab.annotate('',xytext=(2,-1),xy=(0,0),arrowprops=dict(arrowstyle='-['))
+    pylab.annotate('',xytext=(2,-1),xy=(4,-2),arrowprops=dict(arrowstyle='-[',shrinkB=2)) 
+    ax.text(2.15,-1.2,s,fontsize=20)
     
     #solid line
-    x1=N.array([-10.0,10.0])
-    y1=N.array([0.0,0.0])
-    ax.plot(x1,y1,'-k',linewidth=3.0)
+    #x1=N.array([-10.0,10.0])
+    #y1=N.array([0.0,0.0])
+    #ax.plot(x1,y1,'-k',linewidth=3.0)
     
     #dashed lines indicating projection
     x1=N.array([-2.0,-2])
-    y1=N.array([-6,6.0])
-    ax.plot(x1,y1,'--k',linewidth=3.0)
+    y1=N.array([-5.5,5.5])
+    ax.plot(x1,y1,'--k',linewidth=2.0)
     x1=N.array([2.0,2])
-    y1=N.array([-6,6.0])
-    ax.plot(x1,y1,'--k',linewidth=3.0)
+    y1=N.array([-5.5,5.5])
+    ax.plot(x1,y1,'--k',linewidth=2.0)
     
     
     ax.axis([-8.5,8.5,-8.5,8.5])
