@@ -80,10 +80,10 @@ def readfiles(ppfile):
     myname="BFORV"+str(ppfile)
     myfilestr=os.path.join(myfiledir,myname)
     myfilestr=myfilestr+myend
-    return myfilestr
-    #result=readsansfile(myfilestr)
-    #print result
-    #return result
+    #return myfilestr
+    result=readsansfile(myfilestr)
+    print result
+    return result
     
 def read_driver(myfilestr):
     fixfile(myfilestr)
@@ -100,13 +100,13 @@ def read_driver(myfilestr):
             resdict={}
             if currline[0]!='*':
                 resdict['off_off']=currline[0]
-            if currline[0]!='*':
+            if currline[1]!='*':
                 resdict['on_off']=currline[1]
-            if currline[0]!='*':
+            if currline[2]!='*':
                 resdict['off_on']=currline[2]
-            if currline[0]!='*':
+            if currline[3]!='*':
                 resdict['off_off']=currline[3]
-            results.append[resdict]        
+            results.append(resdict)     
         except:
             print 'done'
             myFlag=False
@@ -122,6 +122,18 @@ def read_driver(myfilestr):
 if __name__=="__main__":
     myfiledir=r"c:\bfosans"
     myname="Pnki_BFORV_Scans.txt"
+    myname="Ppki_BFORW_Scans.txt" # big endian??
+    myname="p2.txt"
     myfilestr=os.path.join(myfiledir,myname)
-    read_driver(myfilestr)
-    
+    results=read_driver(myfilestr)
+    keys=['off_off','off_on','on_off','on_on']
+    i=0
+    res={}
+    for key in keys:
+        try:
+            fp=results[i][key]
+            res[key]=readfiles(fp)
+            print 'read'
+        except:
+            print key, 'does not exist for',i
+    print res
