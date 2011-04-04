@@ -327,7 +327,8 @@ def film111():
         ax.yaxis.set_major_locator(NullLocator())
     
     
-    plt.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure4new')
+    plt.savefig(r'C:\BiFeO3film\finalfigure6.eps')
+    #plt.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure4new')
     plt.show()
 
 

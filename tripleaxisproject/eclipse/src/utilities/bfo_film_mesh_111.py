@@ -1,6 +1,7 @@
 import numpy as N
 import  pylab
-import scipy.sandbox.delaunay as D
+#import scipy.sandbox.delaunay as D
+import matplotlib.delaunay as D
 #import numpy.core.ma as ma
 import matplotlib.numerix.ma as ma
 from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator
@@ -347,9 +348,10 @@ if __name__ == '__main__':
             print im
             im.set_clim(0.0,660.0)
         #pylab.show()
-    if 0:
+    if 1:
         print 'saving'
-        pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
+        #pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
+        pylab.savefig(r'c:\bifeo3film\finalfigure5.eps')
         print 'saved'
     if 1:
         pylab.show()

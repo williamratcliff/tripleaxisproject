@@ -431,9 +431,10 @@ if __name__ == '__main__':
             print im
             im.set_clim(0.0,660.0)
         #pylab.show()
-    if 0:
+    if 1:
         print 'saving'
-        pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
+        #pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
+        pylab.savefig(r'c:\bifeo3film\finalfigure2.eps')
         print 'saved'
     if 1:
         pylab.savefig(r'C:\BiFeO3film\bifeo3_film_paper\bfo110_meshnew2.png')

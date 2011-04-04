@@ -11,7 +11,7 @@ from simple_combine import simple_combine
 import scipy.optimize
 import rescalculator.rescalc as rescalc
 import utilities.findpeak4 as findpeak
-from spinwaves.utilities.mpfit.mpfit import mpfit 
+from mpfit import mpfit 
 import pylab
 
 
@@ -387,7 +387,7 @@ if __name__=="__main__":
    correction,modq=correct_data(mydatalist[i])
    corrections.append(correction['th_correction'][0])
    modqlist.append(modq)
-  if 1:
+  if 0:
    pylab.show() 
   print corrections
   print modqlist
