@@ -10,7 +10,7 @@ import scipy.interpolate as interpolate
 pi=N.pi
 from numpy.random import randn
 import scipy, scipy.optimize
-from spinwaves.utilities.mpfit.mpfit import mpfit
+from mpfit import mpfit
 
 
 def findpeak(x,y,npeaks,order=4,kernel=11):

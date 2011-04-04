@@ -191,8 +191,8 @@ def film110():
     ax.xaxis.set_minor_formatter(NullFormatter())
     ax.xaxis.set_major_locator(NullLocator())
     ax.yaxis.set_major_locator(NullLocator())
-    
-    plt.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure2new.png')
+    plt.savefig(r'C:\BiFeO3film\finalfigure4.eps')
+    #plt.savefig(r'C:\BiFeO3film\bifeo3_film_paper\figure2new.png')
     plt.show()
 
     
