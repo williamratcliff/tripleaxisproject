@@ -1,4 +1,4 @@
-from __future__ import division
+
 import numpy as N
 import rescalculator.lattice_calculator as lattice_calculator
 pi=N.pi
@@ -89,7 +89,7 @@ def calcd(H,K,L):
                         beta=newinput['beta'],gamma=newinput['gamma'],orientation=orientation\
                         )
     alphastar=lattice.alphastar
-    print 'alphastar',alphastar
+    print('alphastar',alphastar)
     EXP={}
     EXP['ana']={}
     EXP['ana']['tau']='pg(002)'
@@ -107,9 +107,9 @@ def calcd(H,K,L):
     EXP['method']=0
     setup=[EXP]
     qx,qy,qz,Q=lattice.R2S(H,K,L)
-    print 'Q',Q
+    print('Q',Q)
     d=2*pi/Q
-    print 'd',d
+    print('d',d)
     return d
     
  
@@ -203,14 +203,14 @@ def rhomb2hex(h,k,l):
 def setup(Hpc,Kpc,Lpc):
     Hh,Kh,Lh=pseudocubic2hex(Hpc,Kpc,Lpc)
     if 0:
-        print 'hex'
+        print('hex')
         for i in range(len(Hh)):
-            print Hh[i],Kh[i],Lh[i]
+            print(Hh[i],Kh[i],Lh[i])
     Hr,Kr,Lr=hex2rhomb(Hh,Kh,Lh)    
     if 0:
-        print 'rhomb'
+        print('rhomb')
         for i in range(len(Hr)):
-            print Hr[i],Kr[i],Lr[i]
+            print(Hr[i],Kr[i],Lr[i])
     d=calcd(Hh,Kh,Lh)
     astar,alphastar,lattice=calcstar()
     #print astar,N.degrees(alphastar)
@@ -348,9 +348,9 @@ if __name__=="__main__":
         #y[-3:]=y[-3:]/(2*d[-3:]/lam) #these were w-2th scans, so they need the factor
         #yerr[-3:]=yerr[-3:]/(2*d[-3:]/lam)
     if 1:
-        print 'data'
+        print('data')
         for i in range(len(Hpc)):
-            print Hpc[i],Kpc[i],Lpc[i],q[i],y[i],yerr[i]
+            print(Hpc[i],Kpc[i],Lpc[i],q[i],y[i],yerr[i])
         
         #Hpc=N.array([.5,.5,.5,.5,.5],'float64')
         #Kpc=N.array([.5,-1.5,2.5,-1.5,1.5],'float64')
@@ -393,7 +393,7 @@ if __name__=="__main__":
     lowerm=[0,0]
     upperm=[100,pi/2]
     if 0:
-        print 'annealing'
+        print('annealing')
         p0,jmin=anneal(chisq_an,p0,args=(Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,yerr),\
                           schedule='simple',lower=lowerm,upper=upperm,\
                           maxeval=None, maxaccept=None,dwell=50,maxiter=600,T0=None)
@@ -401,15 +401,15 @@ if __name__=="__main__":
         fake_dof=len(y)
         chimin=(cost_func(p0,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,yerr)**2).sum()
         chimin=chimin/dof if dof>0 else chimin/fake_dof 
-        print 'p0_anneal',p0[0],N.degrees(p0[1])
-        print 'chi_anneal', chimin
+        print('p0_anneal',p0[0],N.degrees(p0[1]))
+        print('chi_anneal', chimin)
     
     
     
-    print 'linearizing'
+    print('linearizing')
     m = mpfit(myfunctlin, p0, parinfo=parinfo,functkw=fa) 
-    print 'status = ', m.status
-    print 'params = ', m.params
+    print('status = ', m.status)
+    print('params = ', m.params)
     p1=m.params
     covariance=m.covar
     
@@ -418,20 +418,20 @@ if __name__=="__main__":
     chimin=(cost_func(p1,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh,y,yerr)**2).sum()
     chimin=chimin/dof if dof>0 else chimin/fake_dof
     ycalc=calc_struct(p1,Hr,Kr,Lr,d,q,alphastar,astar,lattice,Hh,Kh,Lh)
-    print 'chimin',chimin
-    print 'p1',p1
+    print('chimin',chimin)
+    print('p1',p1)
     covariance=covariance*chimin #assume our model is good       
     scale=N.abs(p1[0])
     scale_sig=N.sqrt(covariance.diagonal()[0])
     angle=p1[1]
     angle_sig=N.sqrt(covariance.diagonal()[1])
-    print 'scale',scale,'scale_sig',scale_sig
-    print 'angle',N.degrees(angle),'angle_sig',angle_sig,N.degrees(angle_sig)%360
+    print('scale',scale,'scale_sig',scale_sig)
+    print('angle',N.degrees(angle),'angle_sig',angle_sig,N.degrees(angle_sig)%360)
     
     if 1:
-        print 'data'
+        print('data')
         for i in range(len(Hpc)):
-            print Hpc[i],Kpc[i],Lpc[i],q[i],y[i],yerr[i],ycalc[i]
+            print(Hpc[i],Kpc[i],Lpc[i],q[i],y[i],yerr[i],ycalc[i])
     
     pylab.errorbar(q,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
     pylab.plot(q,ycalc,marker='s',linestyle='None',mfc='red')       

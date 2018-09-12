@@ -1,12 +1,12 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as N
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import os,sys
 from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator
 from matplotlib import rcParams
-print rcParams['mathtext.fontset']
-print rcParams['mathtext.default']
+print(rcParams['mathtext.fontset'])
+print(rcParams['mathtext.default'])
 
 
 

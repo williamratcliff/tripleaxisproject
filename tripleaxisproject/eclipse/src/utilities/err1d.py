@@ -9,7 +9,7 @@ integers, so be sure to create them with floating point inputs.
 """
 
 
-from __future__ import division  # Get true division
+  # Get true division
 import numpy
 
 def div(X,varX, Y,varY):

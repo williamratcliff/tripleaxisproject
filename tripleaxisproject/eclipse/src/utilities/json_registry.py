@@ -1,6 +1,6 @@
 import numpy as N
-import uncertainty
-import readice
+from . import uncertainty
+from . import readice
 import copy
 eps=1e-8
 
@@ -605,7 +605,7 @@ class DetectorSet(object):
         def __iter__(self):
                 for key,value in self.__dict__:
                         return value
-        def next(self):
+        def __next__(self):
                 for key, value in self.__dict__:
                         yield value
 
@@ -852,13 +852,13 @@ class TripleAxis(object):
 
 if __name__=="__main__":
         myfilestr=r'c:\bifeo3xtal\jan8_2008\9175\mesh53439.bt7'
-        print 'hi'
+        print('hi')
         mydatareader=readice.datareader()
         mydata=mydatareader.readbuffer(myfilestr)
-        print mydata.metadata.varying
+        print(mydata.metadata.varying)
         bt7=TripleAxis()
         bt7.translate(mydata)
-        print 'hi'
+        print('hi')
         
 
 

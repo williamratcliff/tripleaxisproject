@@ -204,7 +204,7 @@ class scanparser:
             #print toks
             #print 'toks',toks[0]
             if toks[0].lower().strip()!='scan':
-                raise BadScanError,'Not a Valid Scan'
+                raise BadScanError('Not a Valid Scan')
             toks=toks[1:]
             for tok in toks:
                 field=tok.split('=')
@@ -223,7 +223,7 @@ class scanparser:
                             scan_description[key]=value
             return self.scan_description
         except BadScanError:
-            print 'Not a Valid Scan'
+            print('Not a Valid Scan')
             self.scan_description={}
             return self.scan_description
 
@@ -242,12 +242,12 @@ class scanparser:
             for range_string in scanstr_parsed['range_strings']:
                 ranges,oranges=self.parse_range(range_string)
                 #print 'ranges',ranges
-                for key,value in ranges.iteritems():
+                for key,value in ranges.items():
                     self.ranges[key]=value
                     #print 'key',key,'value',value
                     if abs(value['step'])>threshold:
                         self.varying.append(key)
-                for key,value in oranges.iteritems():
+                for key,value in oranges.items():
                     self.oranges[key]=value
             return self.varying
   
@@ -261,7 +261,7 @@ class scanparser:
             #print 'aliased'
             if key in w_alias and not (value==None):
                 rangetype='e'
-                if not (self.oranges.has_key('e')):
+                if not ('e' in self.oranges):
                         self.oranges['e']={}   
                 if key=='w_i' and not (value==None):
                     self.oranges['e']['start']=value
@@ -273,7 +273,7 @@ class scanparser:
                     self.oranges['e']['center']=value  #I don't know what order keys will come in, so I'll have to sort it out afterwards
             if (key in h_alias) or (key in k_alias) or (key in l_alias):
                 rangetype='Q'
-                if not (self.oranges.has_key('qx')) and not (value==None):
+                if not ('qx' in self.oranges) and not (value==None):
                     self.oranges['qx']={} 
                 if key=='h_i'and not (value==None):
                     self.oranges['qx']['start']=value
@@ -284,7 +284,7 @@ class scanparser:
                 if key=='h_c' and not (value==None):
                     self.oranges['qx']['center']=value 
                     
-                if not (self.oranges.has_key('qy')) and not (value==None):
+                if not ('qy' in self.oranges) and not (value==None):
                     self.oranges['qy']={} 
                 if key=='k_i' and not (value==None):
                     self.oranges['qy']['start']=value
@@ -295,7 +295,7 @@ class scanparser:
                 if key=='k_c' and not (value==None):
                     self.oranges['qy']['center']=value
                     
-                if not (self.oranges.has_key('qz')) and not (value==None):
+                if not ('qz' in self.oranges) and not (value==None):
                     self.oranges['qz']={} 
                 if key=='l_i' and not (value==None):
                     self.oranges['qz']['start']=value
@@ -313,7 +313,7 @@ class scanparser:
             #print keyparts
             #if len(keyparts)==2:
             component=keyparts[1]
-            if not (self.oranges.has_key(devname)) and not (value==None):
+            if not (devname in self.oranges) and not (value==None):
                 #print 'new_orange',key
                 self.oranges[devname]={}
             
@@ -334,8 +334,8 @@ class scanparser:
             elif deletekey in aliased_scan_parameter:
                 if deletekey in w_alias:
                     rangetype='e'
-                    if not (self.oranges.has_key('e')):
-                            raise BadScanError,'Trying to delete a parameter that doesn not exist in original scan!' #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
+                    if not ('e' in self.oranges):
+                            raise BadScanError('Trying to delete a parameter that doesn not exist in original scan!') #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
                     if deletekey=='w_i':
                         del(self.oranges['e']['start'])
                     if deletekey=='w_f':
@@ -346,8 +346,8 @@ class scanparser:
                         del(self.oranges['e']['center'])  #I don't know what order keys will come in, so I'll have to sort it out afterwards
                 if (deletekey in h_alias) or (deletekey in k_alias) or (deletekey in l_alias):
                     rangetype='Q'
-                    if not (self.oranges.has_key('qx')):
-                        raise BadScanError,'Trying to delete a parameter that doesn not exist in original scan!' #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
+                    if not ('qx' in self.oranges):
+                        raise BadScanError('Trying to delete a parameter that doesn not exist in original scan!') #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
                     if deletekey=='h_i':
                         del(self.oranges['qx']['start'])
                     if deletekey=='h_f':
@@ -357,8 +357,8 @@ class scanparser:
                     if deletekey=='h_c':
                         del(self.oranges['qx']['center']) 
                         
-                    if not (self.oranges.has_key('qy')):
-                        raise BadScanError,'Trying to delete a parameter that doesn not exist in original scan!' #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
+                    if not ('qy' in self.oranges):
+                        raise BadScanError('Trying to delete a parameter that doesn not exist in original scan!') #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
                     if deletekey=='k_i':
                         del(self.oranges['qy']['start'])
                     if deletekey=='k_f':
@@ -368,8 +368,8 @@ class scanparser:
                     if deletekey=='k_c':
                         del(self.oranges['qy']['center'])
                         
-                    if not (self.oranges.has_key('qz')):
-                        raise BadScanError,'Trying to delete a parameter that doesn not exist in original scan!' #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
+                    if not ('qz' in self.oranges):
+                        raise BadScanError('Trying to delete a parameter that doesn not exist in original scan!') #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
                     if deletekey=='l_i':
                         del(self.oranges['qz']['start'])
                     if deletekey=='l_f':
@@ -380,8 +380,8 @@ class scanparser:
                         del(self.oranges['qz']['center']) 
             else: 
                 #a nonaliased range
-                if not (self.oranges.has_key(deletekey)):
-                                raise BadScanError,'Trying to delete a parameter that doesn not exist in original scan!' #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
+                if not (deletekey in self.oranges):
+                                raise BadScanError('Trying to delete a parameter that doesn not exist in original scan!') #  If this isn't here, then there is no parameter to delete!!!! self.oranges['e']={}   
                 keyparts=deletekey.split('_')
                 devname=keyparts[0]
                 component=keyparts[1]
@@ -397,7 +397,7 @@ class scanparser:
                     
         
     def scanop(self,newobj):
-        for key,value in newobj.__dict__.iteritems():
+        for key,value in newobj.__dict__.items():
             if key=='scans':
                 pass
             elif key=='delete' and not value==None:
@@ -413,31 +413,31 @@ class scanparser:
         the server and trying to run it as a dry run.  If the dryrun succeeds, then we will replace the original scan, otherwise,
         we will fail...
         """
-        for key,value in self.oranges.iteritems():
-            if len(value.keys())==4:                
-                raise BadScanError,'%s range has too many parameters.  Scan is ill defined'%(key,) 
-            elif len(value.keys())==2 and not self.scan_description.has_key('npts'):
-                raise BadScanError,'%s range is missing the npts parameter.  Scan is ill defined' %(key,)
+        for key,value in self.oranges.items():
+            if len(list(value.keys()))==4:                
+                raise BadScanError('%s range has too many parameters.  Scan is ill defined'%(key,)) 
+            elif len(list(value.keys()))==2 and 'npts' not in self.scan_description:
+                raise BadScanError('%s range is missing the npts parameter.  Scan is ill defined' %(key,))
             else:
-                if len(value.keys())==2:
-                    if value.has_key('start') and value.has_key('step'):
+                if len(list(value.keys()))==2:
+                    if 'start' in value and 'step' in value:
                         self.oranges[key]['type']='i'
-                    elif value.has_key('center') and value.has_key('step'):
+                    elif 'center' in value and 'step' in value:
                         self.oranges[key]['type']=''
-                    elif value.has_key('start') and  value.has_key('stop'):
+                    elif 'start' in value and  'stop' in value:
                         self.oranges[key]['type']='s'
                     else:
-                        raise BadScanError,'%s range is bad (note:  There is no center final scan).  Scan is ill defined' %(key,)
-                elif len(value.keys())==3:
-                    raise BadScanError,'%s range has too many parameters.  Scan is ill defined'%(key,) 
-        if self.oranges.has_key('qx'):
-            if self.oranges['qx'].has_key('type') and self.oranges['qy'].has_key('type') and self.oranges['qz'].has_key('type'):
+                        raise BadScanError('%s range is bad (note:  There is no center final scan).  Scan is ill defined' %(key,))
+                elif len(list(value.keys()))==3:
+                    raise BadScanError('%s range has too many parameters.  Scan is ill defined'%(key,)) 
+        if 'qx' in self.oranges:
+            if 'type' in self.oranges['qx'] and 'type' in self.oranges['qy'] and 'type' in self.oranges['qz']:
                 if not (self.oranges['qx']['type']==self.oranges['qy']['type'] and
                 self.oranges['qx']['type']==self.oranges['qz']['type'] and
                 self.oranges['qy']['type']==self.oranges['qz']['type']):
-                    raise BadScanError,'qx,qy,and qz are different types of scans!  Scan is ill defined'
+                    raise BadScanError('qx,qy,and qz are different types of scans!  Scan is ill defined')
             else:
-                raise BadScanError,'qx,qy,and qz are different types of scans!  Scan is ill defined'
+                raise BadScanError('qx,qy,and qz are different types of scans!  Scan is ill defined')
 
 #simple_scans_parameter=['title','type','ef', 'ei','efixed','counts','counttype','detectortype','prefac','npts','timeout','holdpoint','holdscan','comment',
 #                        'filename']        
@@ -445,7 +445,7 @@ class scanparser:
                     
     def generate_new_description(self):
         s='Scan'
-        for key,value in self.scan_description.iteritems():
+        for key,value in self.scan_description.items():
             if not key in ignore_list and not value==None:
                 #print 'key',key,value
                 if key in ['npts','fixed','subid']:
@@ -457,7 +457,7 @@ class scanparser:
                         s='%s:%s=%3.5f'%(s,key,float(value))
                     except:
                         s='%s:%s=%s'%(s,key,str(value))                    
-        for key,value in self.oranges.iteritems():
+        for key,value in self.oranges.items():
             if not key in ['qx','qy','qz']:
                 s='%s:Range=%s='%(s,key.upper())
                 if value['type']=='s':
@@ -466,7 +466,7 @@ class scanparser:
                     s='%s%4.5f %4.5f i'%(s,float(value['start']), float(value['step']))
                 if value['type']=='':
                     s='%s%4.5f %4.5f'%(s,float(value['center']), float(value['step']))
-        if self.oranges.has_key('qx'):
+        if 'qx' in self.oranges:
             if self.oranges['qx']['type']=='s':
                 s='%s:RANGE=Q=%3.5f~%3.5f~%3.5f %3.5f~%3.5f~%3.5f s'%(s,float(self.oranges['qx']['start']),float(self.oranges['qy']['start']),float(self.oranges['qz']['start']),
                                                                    float(self.oranges['qx']['stop']),float(self.oranges['qy']['stop']),float(self.oranges['qz']['stop']))
@@ -497,7 +497,7 @@ def driver(original_scan,parseobj):
     
     #if hasattr(parseob,'ei') and hasattr(parseob,'ef'):
     if parseobj.ei==True and parseobj.ef==True:
-        raise BadScanError,'Not a Valid Scan.  Cannot fix both ei and ef.'
+        raise BadScanError('Not a Valid Scan.  Cannot fix both ei and ef.')
     elif parseobj.ei==True:
         parsobj.fixed=0
         #print 'ei tested'
@@ -507,14 +507,14 @@ def driver(original_scan,parseobj):
     delattr(parseobj,'ei')
     #print 'deleted ei'
     delattr(parseobj,'ef')
-    for key,value in parseobj.__dict__.iteritems():
+    for key,value in parseobj.__dict__.items():
         if not value==None:
             try:
                 parseobj.__dict__[key]=value[0]
             except:
                 pass
             #print key,parseobj.__dict__[key]
-    print 'original_scan\n', original_scan
+    print('original_scan\n', original_scan)
     myparser=scanparser(original_scan)
     #print 'instantiated', myparser.__dict__.keys()
     scanstr_parsed=myparser.parse_scan()
@@ -564,10 +564,10 @@ if  __name__=='__main__':
     if 1:
         parseobj=Parseobj()
         s=driver(scanstr,parseobj)
-        print 's',s
+        print('s',s)
     if 0:
         myparser=scanparser(scanstr)
         #scanstr_parsed=myparser.parse_scan()
         #print myparser.parse_range(scanstr_parsed['range_strings'][0])
-        print myparser.get_varying()
-        print myparser.ranges
+        print(myparser.get_varying())
+        print(myparser.ranges)

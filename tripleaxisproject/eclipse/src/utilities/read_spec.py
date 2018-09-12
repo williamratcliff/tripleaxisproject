@@ -65,12 +65,12 @@ def prep_data2(xt,yt,zorigt):
     y=yt[:,zorigt>0.0]
     z=zorigt[:,zorigt>0.0]
 #    zorig=ma.array(zorigt)
-    print 'reached'
+    print('reached')
     threshold=0.0;
 #    print zorigt < threshold
 #    print N.isnan(zorigt)
 #    z = ma.masked_where(zorigt < threshold , zorigt)
-    print 'where masked ', z.shape
+    print('where masked ', z.shape)
 #should be commented out--just for testing
 ##    x = pylab.randn(Nu)/aspect
 ##    y = pylab.randn(Nu)
@@ -108,7 +108,7 @@ def get_tokenized_line(myfile,returnline=[''],delimiter=None):
 
 def read_specfile(filename,data,fields):
     myfile=open(filename,'r')
-    print 'inner', filename
+    print('inner', filename)
     #column_headers=myfile.readline()
     i=0
     #get scan number
@@ -121,7 +121,7 @@ def read_specfile(filename,data,fields):
         if tokenized[0]=="#l":
             break
     if data=={}:
-        print 'empty',filename
+        print('empty',filename)
         fields=tokenized[1:]
         #print 'fields',fields
         for field in fields:
@@ -158,10 +158,10 @@ if __name__=="__main__":
     for i in range(start,stop):
         myfilebasen=myfilebase+str(i)
         myfilestr=os.path.join(mydirectory,myfilebasen)
-        print 'outer',myfilestr
+        print('outer',myfilestr)
         data,fields=read_specfile(myfilestr,data,fields)
         #print 'data',data['h']
-    print 'done'
+    print('done')
     #print data
     if 0:
         pylab.plot(data['h'],data['cyber8c'],'s')

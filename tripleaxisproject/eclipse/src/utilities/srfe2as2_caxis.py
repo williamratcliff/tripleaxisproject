@@ -1,8 +1,8 @@
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import numpy as N
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import simple_combine
+from . import simple_combine
 import copy
 import os
 import pylab
@@ -11,9 +11,9 @@ from matplotlib.mlab import griddata
 import matplotlib.ticker as ticker
 import sys
 from numpy import ma
-from mpfit import mpfit
+from .mpfit import mpfit
 from scipy.optimize import curve_fit
-from findpeak3 import findpeak
+from .findpeak3 import findpeak
 from openopt import NLP
 import scipy.optimize
 import scipy.odr
@@ -120,16 +120,16 @@ def grid(x,y,z):
     #interp = tri.nn_interpolator(z)
     #print 'interpolator reached'
     #zi = interp(xi,yi)
-    print 'xi',xi.shape
-    print yi.shape
+    print('xi',xi.shape)
+    print(yi.shape)
     zm=ma.masked_where(z<3000,z)
     x=copy.deepcopy(x[:,z<500.0])
     y=copy.deepcopy(y[:,z<500.0])
     z=copy.deepcopy(z[:,z<500.0])
     zi = griddata(x,y,z,xi,yi)
-    print 'zi',zi.shape
-    print xi
-    print yi
+    print('zi',zi.shape)
+    print(xi)
+    print(yi)
     return xi,yi,zi
 
     
@@ -184,7 +184,7 @@ def readfiles(flist,mon0=None):
 
 
 def regrid(x,y,z):
-    print len(x)
+    print(len(x))
     currmax=x[0].max()
     currmin=x[0].min()
     for currx in x:
@@ -192,9 +192,9 @@ def regrid(x,y,z):
         currmin=min([currx.min(),currmin])
     
     step=N.abs(x[0][0]-x[0][1])
-    print currmin, currmax,step
+    print(currmin, currmax,step)
     proto_x=N.arange(currmin,currmax+step,step)
-    print 'proto', proto_x
+    print('proto', proto_x)
     for i in range(len(x)):
         currx=x[i]
         curry=y[i]
@@ -228,7 +228,7 @@ def regrid(x,y,z):
 
 
 def regrid2(x,y,z):
-    print len(x)
+    print(len(x))
     currmax=x[0].max()
     currmin=x[0].min()
     for currx in x:
@@ -236,9 +236,9 @@ def regrid2(x,y,z):
         currmin=min([currx.min(),currmin])
     
     step=N.abs(x[0][0]-x[0][1])
-    print currmin, currmax,step
+    print(currmin, currmax,step)
     proto_x=N.arange(currmin,currmax+step,step)
-    print 'proto', proto_x
+    print('proto', proto_x)
     for i in range(len(x)):
         currx=x[i]
         curry=y[i]
@@ -282,12 +282,12 @@ def fitpeak(x,y,yerr):
     minval=x.min()
     diff=y.max()-y.min()-y.mean()
     sig=y.std()
-    print 'diff',diff,'std',sig
+    print('diff',diff,'std',sig)
     if diff-1*sig>0:
         #the difference between the high and low point and
         #the mean is greater than 3 sigma so we have a signal
         p0=findpeak(x,y,2)
-        print 'p0',p0
+        print('p0',p0)
         #Area center width Bak area2 center2 width2
         center1=p0[0]
         width1=p0[1]
@@ -296,7 +296,7 @@ def fitpeak(x,y,yerr):
         sigma=width/2/N.sqrt(2*N.log(2))
         ymax=maxval-minval
         area=ymax*(N.sqrt(2*pi)*sigma)
-        print 'ymax',ymax
+        print('ymax',ymax)
         pin=[area,center1,width1,0,area,center2,width2]
 
 
@@ -327,14 +327,14 @@ def fitpeak(x,y,yerr):
     #r=p.solve('scipy_cobyla')
         #r=p.solve('scipy_lbfgsb')
             #r = p.solve('algencan')
-            print 'ralg'
+            print('ralg')
             r = p.solve('ralg')
-            print 'done'
+            print('done')
             pfit=r.xf
-            print 'pfit openopt',pfit
-            print 'r dict', r.__dict__
+            print('pfit openopt',pfit)
+            print('r dict', r.__dict__)
         if 1: 
-            print 'mpfit'
+            print('mpfit')
             p0=pfit
             parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
             parinfo=[]
@@ -347,7 +347,7 @@ def fitpeak(x,y,yerr):
             #parinfo[2]['fixed']=1
             m = mpfit(myfunct_res, p0, parinfo=parinfo,functkw=fa)
             if (m.status <= 0): 
-                print 'error message = ', m.errmsg
+                print('error message = ', m.errmsg)
             params=m.params
             pfit=params
             perror=m.perror
@@ -374,7 +374,7 @@ def fitpeak(x,y,yerr):
     else:
         #fix center
         #fix width
-        print 'no peak'
+        print('no peak')
         #Area center width Bak
         area=0
         center=x[len(x)/2]
@@ -392,7 +392,7 @@ def fitpeak(x,y,yerr):
         parinfo[2]['fixed']=1
         m = mpfit(myfunct_res, p0, parinfo=parinfo,functkw=fa)
         if (m.status <= 0): 
-            print 'error message = ', m.errmsg
+            print('error message = ', m.errmsg)
         params=m.params
         pfit=params
         perror=m.perror
@@ -406,8 +406,8 @@ def fitpeak(x,y,yerr):
             pylab.plot(x,ycalc)
             pylab.show()
 
-    print 'final answer'
-    print 'perror', 'perror'
+    print('final answer')
+    print('perror', 'perror')
     #If the fit is unweighted (i.e. no errors were given, or the weights
     #	were uniformly set to unity), then .perror will probably not represent
     #the true parameter uncertainties.
@@ -421,15 +421,15 @@ def fitpeak(x,y,yerr):
     #	   # scaled uncertainties
     #	   pcerror = mpfit.perror * sqrt(mpfit.fnorm / dof)
 
-    print 'params', pfit
-    print 'chisqr', chisqr  #note that chisqr already is scaled by dof
+    print('params', pfit)
+    print('chisqr', chisqr)  #note that chisqr already is scaled by dof
     pcerror=perror*N.sqrt(m.fnorm / m.dof)#chisqr
-    print 'pcerror', pcerror
+    print('pcerror', pcerror)
 
     integrated_intensity=N.abs(pfit[0])
     integrated_intensity_err=N.abs(pcerror[0])    
     ycalc=gauss(pfit,x)
-    print 'perror',perror
+    print('perror',perror)
     if 1:
         pylab.figure()
         pylab.errorbar(x,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
@@ -508,12 +508,12 @@ def prep_data2(xt,yt,zorigt,interpolate_on=True):
     y=yt[:,zorigt>0.0]
     z=zorigt[:,zorigt>0.0]
 #    zorig=ma.array(zorigt)
-    print 'reached'
+    print('reached')
     threshold=0.0;
 #    print zorigt < threshold
 #    print N.isnan(zorigt)
 #    z = ma.masked_where(zorigt < threshold , zorigt)
-    print 'where masked ', z.shape
+    print('where masked ', z.shape)
 #should be commented out--just for testing
 ##    x = pylab.randn(Nu)/aspect
 ##    y = pylab.randn(Nu)
@@ -521,21 +521,21 @@ def prep_data2(xt,yt,zorigt,interpolate_on=True):
 ##    print x.shape
 ##    print y.shape
     # Grid
-    print x.min()
-    print x.max()
-    print y.min()
-    print y.max()
-    print x.shape
+    print(x.min())
+    print(x.max())
+    print(y.min())
+    print(y.max())
+    print(x.shape)
     xmesh_step=0.02
     ymesh_step=0.5
     xi,yi=N.mgrid[x.min():x.max():xmesh_step,y.min():y.max():ymesh_step]
     #blah
     # triangulate data
     tri = D.Triangulation(N.copy(x),N.copy(y))
-    print 'before interpolator'
+    print('before interpolator')
     # interpolate data
     interp = tri.nn_interpolator(z)
-    print 'interpolator reached'
+    print('interpolator reached')
     zi = interp(xi,yi)
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
@@ -549,7 +549,7 @@ def prep_data2(xt,yt,zorigt,interpolate_on=True):
         zi=N.reshape(z,(15,31))
         #print zi2-zi
         #blah
-        print "interpolation off"
+        print("interpolation off")
     return xi,yi,zi    
 
 def prep_data3(xt,yt,zt):
@@ -563,9 +563,9 @@ def prep_data3(xt,yt,zt):
     zt=N.array(zt).flatten()
     xi = N.linspace(xt.min(),xt.max(),2*len(xt)/45)
     yi = N.linspace(yt.min(),yt.max(),2*len(yt)/45)
-    print 'gridding'
+    print('gridding')
     zi = griddata(xt,yt,zt,xi,yi)
-    print 'gridded'
+    print('gridded')
     return xi,yi,zi
 
 
@@ -579,12 +579,12 @@ if __name__=='__main__':
         myfilebase='split0'
         myend='bt9'
         myfilebaseglob=myfilebase+'*.'+myend
-        filerange1=range(1,10)
+        filerange1=list(range(1,10))
         #filerange1.append(7)
         #filerange1.append(8)
         #filerange1.append(9)
-        filerange2=range(10,46)
-        filerange3=range(45,52)
+        filerange2=list(range(10,46))
+        filerange3=list(range(45,52))
         #mydirectory=r'C:\srfeas\SrFeAsNi\Ni0p08\2009-04-diffraction'
         #file_range=(35,51)
         #myfilebase='SrFeA0'
@@ -592,11 +592,11 @@ if __name__=='__main__':
         
         for i in filerange1:
             currfile=os.path.join(mydirectory,myfilebase+str(0)+str(i)+r"."+myend)
-            print 'currfile',currfile
+            print('currfile',currfile)
             flist.append(currfile)
         for i in filerange2:
             currfile=os.path.join(mydirectory,myfilebase+str(i)+r"."+myend)
-            print 'currfile',currfile
+            print('currfile',currfile)
             flist.append(currfile) 
             
     
@@ -731,11 +731,11 @@ if __name__=='__main__':
         myfilebase='split0'
         myend='bt9'
         myfilebaseglob=myfilebase+'*.'+myend
-        filerange1=range(1,5)
+        filerange1=list(range(1,5))
         filerange1.append(7)
         filerange1.append(8)
         filerange1.append(9)
-        filerange2=range(45,52)
+        filerange2=list(range(45,52))
         #mydirectory=r'C:\srfeas\SrFeAsNi\Ni0p08\2009-04-diffraction'
         #file_range=(35,51)
         #myfilebase='SrFeA0'
@@ -747,7 +747,7 @@ if __name__=='__main__':
         #    flist.append(currfile)
         for i in filerange2:
             currfile=os.path.join(mydirectory,myfilebase+str(i)+r"."+myend)
-            print 'currfile',currfile
+            print('currfile',currfile)
             flist.append(currfile) 
             
     

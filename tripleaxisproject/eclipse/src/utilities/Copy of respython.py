@@ -272,7 +272,7 @@ class lattice:
         try:
 #            print N.where(mody<=eps)[0].size
             if N.where(mody<=eps)[0].size>0:
-                print 'ValueError'
+                print('ValueError')
                 raise ValueError
             y[0, :]=y[0, :]/mody; # Second unit basis vector
             y[1, :]=y[1, :]/mody;
@@ -306,7 +306,7 @@ class lattice:
             self.y=y
             self.z=z    
         except ValueError:
-            print 'ORIENTATION VECTORS ARE COLLINEAR x,y,z not set'    
+            print('ORIENTATION VECTORS ARE COLLINEAR x,y,z not set')    
         return
     
     def S2R(self, qx, qy, qz):
@@ -900,8 +900,8 @@ class TestLattice(unittest.TestCase):
         EXP['method']=0
         setup=[EXP]  
         R0,RMS=mylattice.ResMatS(H,K,L,W,setup)
-        print 'RMS'
-        print RMS.transpose()[0]
+        print('RMS')
+        print(RMS.transpose()[0])
 #        mylattice.StandardSystem()
 ##    x1=N.array([1.0, 1.0], 'd'); y1=N.array([1.0, 1.0], 'd'); z1=N.array([1.0, 1.0], 'd'); x2=x1; y2=y1; z2=z1;
 ##    print 'scalar ', mylattice.scalar(x1,y1,z1,x2,y2,z2,'lattice')

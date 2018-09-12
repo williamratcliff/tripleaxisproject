@@ -1,18 +1,18 @@
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import numpy as N
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-from simple_combine import simple_combine
+from .simple_combine import simple_combine
 import copy
 import pylab
-from findpeak3 import findpeak
+from .findpeak3 import findpeak
 from openopt import NLP
 import scipy.optimize
 import scipy.odr
 from scipy.optimize import curve_fit
 pi=N.pi
 import sys
-from mpfit import mpfit
+from .mpfit import mpfit
 import rescalculator.rescalc as rescalc
 
 class data_item(object):
@@ -233,7 +233,7 @@ class Qtree(object):
 
     def condense_node(self,index):
         qnode=self.qlist[index]
-        print qnode.q
+        print(qnode.q)
         #print qnode.th
 
         a3=[]
@@ -256,10 +256,10 @@ class Qtree(object):
         qnode.th_condensed['counts']=counts_out
         qnode.th_condensed['counts_err']=counts_err_out
 
-        print qnode.th_condensed['counts'].std()
-        print qnode.th_condensed['counts'].mean()
-        print qnode.th_condensed['counts'].max()
-        print qnode.th_condensed['counts'].min()
+        print(qnode.th_condensed['counts'].std())
+        print(qnode.th_condensed['counts'].mean())
+        print(qnode.th_condensed['counts'].max())
+        print(qnode.th_condensed['counts'].min())
         if 0:
             pylab.errorbar(a3_out,counts_out,counts_err_out,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
             pylab.show()       
@@ -272,12 +272,12 @@ class Qtree(object):
 
     def fit_node(self,index):
         qnode=self.qlist[index]
-        print qnode.q
+        print(qnode.q)
         th=qnode.th_condensed['a3']
         counts=qnode.th_condensed['counts']
         counts_err=qnode.th_condensed['counts_err']
-        print qnode.th_condensed['counts'].std()
-        print qnode.th_condensed['counts'].mean()
+        print(qnode.th_condensed['counts'].std())
+        print(qnode.th_condensed['counts'].mean())
         maxval=qnode.th_condensed['counts'].max()
         minval=qnode.th_condensed['counts'].min()
         diff=qnode.th_condensed['counts'].max()-qnode.th_condensed['counts'].min()\
@@ -288,14 +288,14 @@ class Qtree(object):
             #the difference between the high and low point and
             #the mean is greater than 3 sigma so we have a signal
             p0=findpeak(th,counts,1)
-            print 'p0',p0
+            print('p0',p0)
             #Area center width Bak
             center=p0[0]
             width=p0[1]
             sigma=width/2/N.sqrt(2*N.log(2))
             Imax=maxval-minval
             area=Imax*(N.sqrt(2*pi)*sigma)
-            print 'Imax',Imax
+            print('Imax',Imax)
             pin=[area,center,width,0]
 
 
@@ -326,23 +326,23 @@ class Qtree(object):
         #r=p.solve('scipy_cobyla')
             #r=p.solve('scipy_lbfgsb')
                 #r = p.solve('algencan')
-                print 'ralg'
+                print('ralg')
                 r = p.solve('ralg')
-                print 'done'
+                print('done')
                 pfit=r.xf
-                print 'pfit openopt',pfit
-                print 'r dict', r.__dict__
+                print('pfit openopt',pfit)
+                print('r dict', r.__dict__)
 
             if 0:
-                print 'curvefit'
-                print sys.executable
+                print('curvefit')
+                print(sys.executable)
                 pfit,popt=curve_fit(gauss2, th, counts, p0=pfit, sigma=counts_err)
-                print 'p,popt', pfit,popt
+                print('p,popt', pfit,popt)
                 perror=N.sqrt(N.diag(popt))
-                print 'perror',perror
+                print('perror',perror)
                 chisqr=chisq(pfit,th,counts,counts_err)
                 dof=len(th)-len(pfit)
-                print 'chisq',chisqr
+                print('chisq',chisqr)
             if 0:
                 oparam=scipy.odr.Model(gauss)
                 mydatao=scipy.odr.RealData(th,counts,sx=None,sy=counts_err)
@@ -351,7 +351,7 @@ class Qtree(object):
                 myoutput.pprint()
                 pfit=myoutput.beta
             if 1: 
-                print 'mpfit'
+                print('mpfit')
                 p0=pfit
                 parbase={'value':0., 'fixed':0, 'limited':[0,0], 'limits':[0.,0.]}
                 parinfo=[]
@@ -364,7 +364,7 @@ class Qtree(object):
                 #parinfo[2]['fixed']=1
                 m = mpfit(myfunct_res, p0, parinfo=parinfo,functkw=fa)
                 if (m.status <= 0): 
-                    print 'error message = ', m.errmsg
+                    print('error message = ', m.errmsg)
                 params=m.params
                 pfit=params
                 perror=m.perror
@@ -390,7 +390,7 @@ class Qtree(object):
         else:
             #fix center
             #fix width
-            print 'no peak'
+            print('no peak')
             #Area center width Bak
             area=0
             center=th[len(th)/2]
@@ -408,7 +408,7 @@ class Qtree(object):
             parinfo[2]['fixed']=1
             m = mpfit(myfunct_res, p0, parinfo=parinfo,functkw=fa)
             if (m.status <= 0): 
-                print 'error message = ', m.errmsg
+                print('error message = ', m.errmsg)
             params=m.params
             pfit=params
             perror=m.perror
@@ -422,8 +422,8 @@ class Qtree(object):
                 pylab.plot(th,Icalc)
                 pylab.show()
 
-        print 'final answer'
-        print 'perror', 'perror'
+        print('final answer')
+        print('perror', 'perror')
         #If the fit is unweighted (i.e. no errors were given, or the weights
         #	were uniformly set to unity), then .perror will probably not represent
         #the true parameter uncertainties.
@@ -437,15 +437,15 @@ class Qtree(object):
         #	   # scaled uncertainties
         #	   pcerror = mpfit.perror * sqrt(mpfit.fnorm / dof)
 
-        print 'params', pfit
-        print 'chisqr', chisqr  #note that chisqr already is scaled by dof
+        print('params', pfit)
+        print('chisqr', chisqr)  #note that chisqr already is scaled by dof
         pcerror=perror*N.sqrt(m.fnorm / m.dof)#chisqr
-        print 'pcerror', pcerror
+        print('pcerror', pcerror)
 
         self.qlist[index].th_integrated_intensity=N.abs(pfit[0])
         self.qlist[index].th_integrated_intensity_err=N.abs(pcerror[0])    
         Icalc=gauss(pfit,th)
-        print 'perror',perror
+        print('perror',perror)
         if 0:
             pylab.figure()
             pylab.errorbar(th,counts,counts_err,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
@@ -547,7 +547,7 @@ def readfiles(flist,tol=1e-4):
     count=0
     myfirstdata=mydatareader.readbuffer(flist[0])
     mon0=myfirstdata.metadata['count_info']['monitor']
-    print 'mon0',mon0
+    print('mon0',mon0)
     qtree=Qtree()
     Qtree.mon0=mon0
     #flist=flist[0:12]
@@ -562,7 +562,7 @@ def readfiles(flist,tol=1e-4):
         #print 'q in loop', qtree.qlist[0].q
 
     for qnode in qtree.qlist:
-        print qnode.q['h_center'],qnode.q['k_center'],qnode.q['l_center'],len(qnode.th),qnode.th
+        print(qnode.q['h_center'],qnode.q['k_center'],qnode.q['l_center'],len(qnode.th),qnode.th)
 
     #print qtree.qlist
     return qtree
@@ -597,7 +597,7 @@ if __name__=='__main__':
 #    print mydata.metadata['file_info']['filebase']
 #    print mydata.metadata['file_info']['filename']
 #    print mydata.metadata['file_info']['fileseq_number']
-    print mydata.data.keys()
+    print(list(mydata.data.keys()))
     myfilebase='magsc'
     myend='bt9'
     mydirectory=r'c:\ce2rhin8\mar10_2009'
@@ -616,13 +616,13 @@ if __name__=='__main__':
     Q=[]
     correction=[]
     for qnode in qlist:
-        print qnode.q['h_center'], qnode.q['k_center'],qnode.q['l_center'],qnode.th_integrated_intensity, qnode.th_integrated_intensity_err,qnode.th_correction
+        print(qnode.q['h_center'], qnode.q['k_center'],qnode.q['l_center'],qnode.th_integrated_intensity, qnode.th_integrated_intensity_err,qnode.th_correction)
         correction.append(qnode.th_correction)
         I.append(qnode.th_integrated_intensity/qnode.th_correction)
         Ierr.append(qnode.th_integrated_intensity_err/qnode.th_correction)
         Q.append(qnode.Q)
-    print 'Q',Q
-    print 'Correction',correction
+    print('Q',Q)
+    print('Correction',correction)
     if 1:
         pylab.errorbar(Q,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
 

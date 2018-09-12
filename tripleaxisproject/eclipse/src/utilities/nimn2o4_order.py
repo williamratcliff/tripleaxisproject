@@ -5,9 +5,9 @@ import  pylab
 #import matplotlib.numerix.ma as ma
 #from matplotlib.ticker import NullFormatter, MultipleLocator
 #from scipy.signal.signaltools import convolve2d
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 #from matplotlib.ticker import FormatStrFormatter
 #from matplotlib.ticker import MaxNLocator
 #import linegen
@@ -17,7 +17,7 @@ import readncnr3 as readncnr
 
 def readmeshfiles(mydirectory,myfilebase,myend):
     myfilebaseglob=myfilebase+'*.'+myend
-    print myfilebaseglob
+    print(myfilebaseglob)
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     #SU.printr(flist)
     mydatareader=readncnr.datareader()

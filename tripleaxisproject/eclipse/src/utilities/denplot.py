@@ -92,22 +92,22 @@ def test_den():
     #view along z-axis
     pts_as=mlab.points3d(x,y,z-.125,color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.1)
     x,y,z=gen_fe()  
-    print 'x',x
-    print 'y',y
-    print 'z',z
+    print('x',x)
+    print('y',y)
+    print('z',z)
     pts_fe=mlab.points3d(x,y,z-.125,color=(0,1,0),colormap='gist_rainbow',figure=fig,scale_factor=.02)
     x,y,z=gen_sr()  
     pts_sr=mlab.points3d(x,y,z-.125,color=(0,0,1),colormap='gist_rainbow',figure=fig)
     outline=mlab.outline(figure=fig,extent=[0,1,0,1,-1,0])
     mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
-    print 'shape',P.shape
+    print('shape',P.shape)
     P = P[:,:, np.newaxis]
-    print 'after',P.shape
+    print('after',P.shape)
     src = mlab.pipeline.scalar_field(P)
     #src = mlab.pipeline.array2d_source(P)
     surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.4)
     #surf.transform.GetTransform().RotateX(90)
-    print 'done'
+    print('done')
 
 
 if __name__=='__main__':

@@ -17,7 +17,7 @@ def readheader(myfile):
                 columndict[tokenized[i]]=[]
                 columndict['columnlist'].append(tokenized[i])
             myFlag=False
-    print columndict['columnlist']
+    print(columndict['columnlist'])
     return columndict
 
 
@@ -46,7 +46,7 @@ def outputresult(columns,fields):
         lineStr=''
         for j in range(len(fields)):
             lineStr=lineStr+columns[fields[j]][i]+' '
-        print lineStr
+        print(lineStr)
     return
 
 def saveresult(columns,fields,outputfile):
@@ -78,8 +78,8 @@ if __name__=="__main__":
             myfilestr=mydirectory+myfilehead+myfiles[i]+myend
             columns=readbt7file(myfilestr)
             alldata.append(columns)
-        print alldata[0].keys()
-        print (alldata[0])['TDC5']
+        print(list(alldata[0].keys()))
+        print((alldata[0])['TDC5'])
     if 1:
         argv = sys.argv
         if argv==None:
@@ -88,18 +88,18 @@ if __name__=="__main__":
             argv[3]='A4'
             argv[4]='TDC5'
  	if argv!=None:
-		print argv
+		print(argv)
 		inmyfilestr=argv[1]
 		outmyfilestr=argv[2]
 		fields=argv[3:len(argv)]
 		columns=readbt7file(inmyfilestr)
-		print fields
+		print(fields)
 		# to really do error checking, you need to check all the fields
-		if columns.has_key(fields[0]):
+		if fields[0] in columns:
                     outputresult(columns,fields)
                     saveresult(columns,fields,outmyfilestr)
                 else:
-                    print 'bad field entered'
+                    print('bad field entered')
 		
 
 

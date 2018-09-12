@@ -1,14 +1,15 @@
-from __future__ import division
+
 import numpy as N
-import rescalculator.lattice_calculator as lattice_calculator
+#import rescalculator.lattice_calculator as lattice_calculator
 pi=N.pi
-from spinwaves.utilities.mpfit.mpfit import mpfit
+#from spinwaves.utilities.mpfit.mpfit import mpfit
+from .mpfit import mpfit
 import sys,os,copy
 import pylab
-from utilities.anneal import anneal
+from .anneal import anneal
 from numpy import sqrt,sin,cos
 import scipy.integrate
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 
 a=3.84; b=3.879; wavelength=2.35
 
@@ -99,18 +100,24 @@ if __name__=="__main__":
     if 0:
         pylab.plot(th*2,y,'s')
         pylab.show()
-    file1=r'e:\ZnMn2O4\bt2\t90k.bt2';
-    file2=r'e:\ZnMn2O4\bt2\t40k.bt2';
+    file1=r'K:\backup\ZnMn2O4\bt2\t90k.bt2';
+    file2=r'K:\backup\ZnMn2O4\bt2\t40k.bt2';
     files=[file1,file2]
     data1=N.loadtxt(file1)
     data2=N.loadtxt(file2)
-    tth1=data1[:,0]
-    tth2=data2[:,0]
-    I1=data1[:,1]
-    I2=data2[:,1]
-    if 0:
-        pylab.plot(tth1,I1,'s')
-        pylab.plot(tth2,I2,'s')
+    
+    tthrange=N.where(data1[:,0]<55)
+    tthrange=N.where(data1[:,0]<32) #primary peak
+    tth1=data1[tthrange,0].flatten()
+    tth2=data2[tthrange,0].flatten()
+    I1=data1[tthrange,1].flatten()
+    I2=data2[tthrange,1].flatten()
+    dI=I2-I1
+    dI_err=N.sqrt(I1+I2)
+    if 1:
+        #pylab.plot(tth1,I1,'s')
+        #pylab.plot(tth2,I2,'s')
+        pylab.errorbar(tth1,dI,yerr=dI_err,fmt='s')
         pylab.show()
     
-    dI=I2-I1
+    

@@ -273,7 +273,7 @@ class lattice:
         try:
 #            print N.where(mody<=eps)[0].size
             if N.where(mody<=eps)[0].size>0:
-                print 'ValueError'
+                print('ValueError')
                 raise ValueError
             y[0, :]=y[0, :]/mody; # Second unit basis vector
             y[1, :]=y[1, :]/mody;
@@ -307,7 +307,7 @@ class lattice:
             self.y=y
             self.z=z    
         except ValueError:
-            print 'ORIENTATION VECTORS ARE COLLINEAR x,y,z not set'    
+            print('ORIENTATION VECTORS ARE COLLINEAR x,y,z not set')    
         return
     
     def S2R(self, qx, qy, qz):
@@ -895,10 +895,10 @@ class lattice:
         b1=1.0/N.sqrt(mat_diag[1,1])
         thetar=N.arccos(vm[0,0])
         theta=math.degrees(thetar)
-        print a1
-        print b1
-        print theta
-        print mat_diag
+        print(a1)
+        print(b1)
+        print(theta)
+        print(mat_diag)
         x0y0=N.array([1.0,0.0])
         e=Ellipse(x0y0,width=2*a1,height=2*b1,angle=theta)
         fig=pylab.figure()
@@ -1071,8 +1071,8 @@ if __name__=="__main__":
         setup=[EXP]  
         R0,RMS=mylattice.ResMatS(H,K,L,W,setup)
         mylattice.ResPlot(H, K, L, W, setup)
-        print 'RMS'
-        print RMS.transpose()[0]
+        print('RMS')
+        print(RMS.transpose()[0])
 #        mylattice.StandardSystem()
 ##    x1=N.array([1.0, 1.0], 'd'); y1=N.array([1.0, 1.0], 'd'); z1=N.array([1.0, 1.0], 'd'); x2=x1; y2=y1; z2=z1;
 ##    print 'scalar ', mylattice.scalar(x1,y1,z1,x2,y2,z2,'lattice')

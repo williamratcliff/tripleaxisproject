@@ -1,15 +1,15 @@
 import numpy as N
 import pylab
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr2 as readncnr
-import simple_combine
+from . import readncnr2 as readncnr
+from . import simple_combine
 #import scipy
 from scipy.optimize import leastsq
 import copy
 import scipy.odr
 #import scipy.optimize.anneal as anneal
-import anneal
+from . import anneal
 pi=N.pi
 
 def coth(x):

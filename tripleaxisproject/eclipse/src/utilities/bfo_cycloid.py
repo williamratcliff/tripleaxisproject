@@ -1,4 +1,4 @@
-from __future__ import division
+
 import numpy
 from enthought.mayavi import mlab
 
@@ -40,7 +40,7 @@ def amplitude(x,y,z):
 def test_quiver3d():
     fig=mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
     x, y, z = numpy.mgrid[-2:3, -2:3, -2:3]  
-    print 'almost'
+    print('almost')
     #mlab.quiver3d(x, y, z,f, line_width=3, scale_factor=1,figure=fig)
     
     d=0.2
@@ -54,7 +54,7 @@ def test_quiver3d():
     mlab.quiver3d(x, y, z,func, line_width=3, scale_factor=1,figure=fig)
     outline=mlab.outline(figure=fig,extent=[-1,1,-1,1,-1,1])
     mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
-    print 'done'
+    print('done')
     
 
 
@@ -68,5 +68,5 @@ if __name__=="__main__":
         y=-d*numpy.arange(0,100)
         z=numpy.zeros(len(x))
         u,v,w=spiral(x,y,z)
-        print u,v,w
+        print(u,v,w)
     

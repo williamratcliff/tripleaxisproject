@@ -1,14 +1,14 @@
 import numpy as N
 import pylab
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr2 as readncnr
-import simple_combine
+from . import readncnr2 as readncnr
+from . import simple_combine
 #import scipy
 from scipy.optimize import leastsq  
 import copy
 import scipy.odr
-import meanfield
+from . import meanfield
 
 def read_order_files(mydirectory,myfilebase,myend):
     myfilebaseglob=myfilebase+'*.'+myend
@@ -60,7 +60,7 @@ def orderparameter(p,T):
 def chisq_calc(p,T,I,Ierr):
     Icalc=meanfield.orderparameter(p,T)
     dof=I.shape[0]-p.shape[0]
-    print 'dof',dof
+    print('dof',dof)
     chisq=(I-Icalc)*(I-Icalc)/dof/Ierr/Ierr
     return chisq
 
@@ -104,9 +104,9 @@ if __name__=='__main__':
     #pfit = leastsq(residuals, p0, args=(T[Trange],I[Trange],Ierr[Trange]))  
     
     mychi=chisq_calc(pfit,T[Trange],I[Trange],Ierr[Trange]).sum()
-    print 'pfit=',pfit
-    print 'chisq=',mychi
-    print 'done'
+    print('pfit=',pfit)
+    print('chisq=',mychi)
+    print('done')
     Icalc=meanfield.orderparameter(pfit,T)
     if 1:
         pylab.errorbar(T,I,Ierr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')

@@ -1,8 +1,8 @@
-from __future__ import division
+
 import copy
 import numpy as N
 pi=N.pi
-from mpfit import mpfit
+from .mpfit import mpfit
 import matplotlib
 import pylab
 
@@ -63,11 +63,11 @@ def prepfit(x,y,yerr,area=3.0,center=2.0,width=2.0,Bak=5.0):
     parinfo[2]['fixed']=0
     m = mpfit(myfunct_res, p0, parinfo=parinfo,functkw=fa)
     if (m.status <= 0): 
-        print 'error message = ', m.errmsg
+        print('error message = ', m.errmsg)
     params=m.params
     pfit=params
     perror=m.perror
-    print 'pfit',pfit
+    print('pfit',pfit)
     #chisqr=(myfunct_res(m.params, x=th, y=counts, err=counts_err)[1]**2).sum()
     chisqr=chisq(pfit,x,y,yerr)
     dof=m.dof

@@ -275,21 +275,21 @@ class datareader:
         # Determine FileType
         self.determinefiletype(myfile)
         if self.header['file_info']['scantype']=='I':
-            print "calling readibuffer"
+            print("calling readibuffer")
             self.readiheader(myfile)
         if self.header['file_info']['scantype']=='B':
-            print "calling readbbuffer"
+            print("calling readbbuffer")
             self.readbheader(myfile)
         if self.header['file_info']['scantype']=='Q':
-            print "calling readqbuffer"
+            print("calling readqbuffer")
             self.readqheader(myfile)
         
         #read columns
         self.readcolumns(myfile)
         myfile.close()
         mydata=Data(self.header,self.columndict)
-        print self.header
-        print self.columnlist        
+        print(self.header)
+        print(self.columnlist)        
         return mydata
 
 
@@ -444,7 +444,7 @@ if __name__=='__main__':
         myfilestr=r'c:\sqltest\\mnl1p004.ng5'
 
     mydirectory=r'c:\summerschool2007\\' 
-    myfilenumbers=range(4,33,1)
+    myfilenumbers=list(range(4,33,1))
     myend='.ng5'
     myfilehead='qCdCr'
     data=DataCollection()
@@ -462,12 +462,12 @@ if __name__=='__main__':
         for i in range(len(myfilenumbers)):
             myfilenum=num2string(myfilenumbers[i])
             myfilestr=mydirectory+myfilehead+myfilenum+myend
-            print myfilestr
+            print(myfilestr)
             data.add_datum(mydatareader.readibuffer(myfilestr))
         a3,a4,counts=data.extract_a3a4()
-        print a3.shape
-        print a4.shape
-        print counts.shape
+        print(a3.shape)
+        print(a4.shape)
+        print(counts.shape)
 
 
 

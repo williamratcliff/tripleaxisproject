@@ -314,7 +314,7 @@ def num2string(num):
 if __name__=='__main__':
     myfilestr=r'c:\summerschool2007\\qCdCr014.ng5'
     mydirectory=r'c:\summerschool2007\\' 
-    myfilenumbers=range(4,33,1)
+    myfilenumbers=list(range(4,33,1))
     myend='.ng5'
     myfilehead='qCdCr'
     data=DataCollection()
@@ -330,7 +330,7 @@ if __name__=='__main__':
         myfilenum=num2string(myfilenumbers[i])
 #        print myfilenum
         myfilestr=mydirectory+myfilehead+myfilenum+myend
-        print myfilestr
+        print(myfilestr)
         data.add_datum(mydatareader.readibuffer(myfilestr))
 #        header,datum=readibuff(myfilestr)
 #        headers.append(header)
@@ -341,9 +341,9 @@ if __name__=='__main__':
 #    a3=N.array(a3,'d')
 #    a4=N.array(a4,'d')
 #    counts=N.array(counts,'d')
-    print a3.shape
-    print a4.shape
-    print counts.shape
+    print(a3.shape)
+    print(a4.shape)
+    print(counts.shape)
 
     # Grid
 #    xi, yi = N.mgrid[-5:5:100j,-5:5:100j]

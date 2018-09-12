@@ -152,7 +152,7 @@ _nxtype_code=dict(
 # Other than 'char' for the string type, the python types correspond to
 # the numpy data types, and can be used directly to create numpy arrays.
 # Note: put this in a lambda to hide v,k from the local namespace
-_pytype_code=(lambda : dict([(v,k) for (k,v) in _nxtype_code.iteritems()]))()
+_pytype_code=(lambda : dict([(v,k) for (k,v) in _nxtype_code.items()]))()
 
 # Compression to use when creating data blocks
 _compression_code=dict(
@@ -188,8 +188,7 @@ def _libnexus():
     if 'NEXUSLIB' in os.environ:
         file = os.environ['NEXUSLIB']
         if not os.path.isfile(file):
-            raise OSError, \
-                "File %s from environment variable NEXUSLIB does exist"%(file)
+            raise OSError("File %s from environment variable NEXUSLIB does exist"%(file))
         files = [file]
     else:
         files = []
@@ -218,9 +217,8 @@ def _libnexus():
         try:
             return ctypes.cdll[file]
         except:
-            raise OSError, \
-                "NeXus library %s could not be loaded: %s"%(file,sys.exc_info()[0])
-    raise OSError, "Set NEXUSLIB or move NeXus to one of: %s"%(", ".join(files))
+            raise OSError("NeXus library %s could not be loaded: %s"%(file,sys.exc_info()[0]))
+    raise OSError("Set NEXUSLIB or move NeXus to one of: %s"%(", ".join(files)))
 
 
 
@@ -250,8 +248,8 @@ class NeXus(object):
         # Convert open mode from string to integer and check it is valid
         self.isopen = False
         if mode in _nxopen_mode: mode = _nxopen_mode[mode]
-        if mode not in _nxopen_mode.values():
-            raise ValueError, "Invalid open mode %s",str(mode)
+        if mode not in list(_nxopen_mode.values()):
+            raise ValueError("Invalid open mode %s").with_traceback(str(mode))
 
         self.filename, self.mode = filename, mode
         self.handle = c_void_p(None)
@@ -259,7 +257,7 @@ class NeXus(object):
         status = self.lib.nxiopen_(filename,mode,_ref(self.handle))
         if status == ERROR:
             op = 'open' if mode in [ACC_READ, ACC_RDWR] else 'create'
-            raise RuntimeError, "Could not %s %s"%(op,filename)
+            raise RuntimeError("Could not %s %s"%(op,filename))
         self.isopen = True
 
     def __del__(self):
@@ -284,7 +282,7 @@ class NeXus(object):
         mode = ACC_READ if self.mode==ACC_READ else ACC_RDWR
         status = self.lib.nxiopen_(self.filename,mode,_ref(self.handle))
         if status == ERROR:
-            raise RuntimeError, "Could not open %s"%(self.filename)
+            raise RuntimeError("Could not open %s"%(self.filename))
         self.path = []
 
     #lib.nxiclose_.restype = c_int
@@ -301,7 +299,7 @@ class NeXus(object):
             self.isopen = False
             status = self.lib.nxiclose_(_ref(self.handle))
             if status == ERROR:
-                raise RuntimeError, "Could not close NeXus file %s"%(self.filename)
+                raise RuntimeError("Could not close NeXus file %s"%(self.filename))
         self.path = []
     
     lib.nxiflush_.restype = c_int
@@ -316,7 +314,7 @@ class NeXus(object):
         """
         status = self.lib.nxiflush_(_ref(self.handle))
         if status == ERROR:
-            raise RuntimeError, "Could not flush NeXus file %s"%(self.filename)
+            raise RuntimeError("Could not flush NeXus file %s"%(self.filename))
 
     lib.nxisetnumberformat_.restype = c_int
     lib.nxisetnumberformat_.argtypes = [c_void_p, c_int, c_char_p]
@@ -332,8 +330,7 @@ class NeXus(object):
         type = _nxtype_code[type]
         status = self.lib.nxisetnumberformat_(self.handle,type,format)
         if status == ERROR:
-            raise RuntimeError,\
-                "Could not set %s to %s in %s"%(type,format,self.filename)
+            raise RuntimeError("Could not set %s to %s in %s"%(type,format,self.filename))
 
     # ==== Group ====
     lib.nximakegroup_.restype = c_int
@@ -348,8 +345,7 @@ class NeXus(object):
         """
         status = self.lib.nximakegroup_(self.handle, name, nxclass)
         if status == ERROR:
-            raise RuntimeError,\
-                "Could not create %s:%s in %s"%(nxclass,name,self._loc())
+            raise RuntimeError("Could not create %s:%s in %s"%(nxclass,name,self._loc()))
     
     lib.nxiopenpath_.restype = c_int
     lib.nxiopenpath_.argtypes = [c_void_p, c_char_p]
@@ -364,7 +360,7 @@ class NeXus(object):
         """
         status = self.lib.nxiopenpath_(self.handle, path)
         if status == ERROR:
-            raise ValueError, "Could not open %s in %s"%(path,self._loc())
+            raise ValueError("Could not open %s in %s"%(path,self._loc()))
         n,path,nxclass = self.getgroupinfo()
         self.path = path.split('/') if path != 'root' else []
         
@@ -383,7 +379,7 @@ class NeXus(object):
         """
         status = self.lib.nxiopengrouppath_(self.handle, path)
         if status == ERROR:
-            raise ValueError, "Could not open %s in %s"%(path,self.filename)
+            raise ValueError("Could not open %s in %s"%(path,self.filename))
         n,path,nxclass = self.getgroupinfo()
         self.path = path.split('/') if path != 'root' else []
         
@@ -401,8 +397,7 @@ class NeXus(object):
         #print "open group",nxclass,name
         status = self.lib.nxiopengroup_(self.handle, name, nxclass)
         if status == ERROR:
-            raise ValueError,\
-                "Could not open %s:%s in %s"%(nxclass,name,self._loc())
+            raise ValueError("Could not open %s:%s in %s"%(nxclass,name,self._loc()))
         self.path.append(name)
     
     lib.nxiclosegroup_.restype = c_int
@@ -419,7 +414,7 @@ class NeXus(object):
         status = self.lib.nxiclosegroup_(self.handle)
         group = self.path.pop()
         if status == ERROR:
-            raise RuntimeError, "Could not close %s:"%(group,self._loc())
+            raise RuntimeError("Could not close %s:"%(group,self._loc()))
 
     lib.nxigetinfo_.restype = c_int
     lib.nxigetinfo_.argtypes = [c_void_p, c_int_p, c_char_p, c_char_p]
@@ -439,7 +434,7 @@ class NeXus(object):
         n = c_int(0)
         status = self.lib.nxigetgroupinfo_(self.handle,_ref(n),path,nxclass)
         if status == ERROR:
-            raise ValueError, "Could not get group info: %s"%(self._loc())
+            raise ValueError("Could not get group info: %s"%(self._loc()))
         #print "group info",nxclass.value,name.value,n.value
         return n.value,path.value,nxclass.value
     
@@ -455,8 +450,7 @@ class NeXus(object):
         """
         status = self.lib.nxiinitgroupdir_(self.handle)
         if status == ERROR:
-            raise RuntimeError, \
-                "Could not reset group scan: %s"%(self._loc())
+            raise RuntimeError("Could not reset group scan: %s"%(self._loc()))
     
     lib.nxigetnextentry_.restype = c_int
     lib.nxigetnextentry_.argtypes = [c_void_p, c_char_p, c_char_p, c_int_p]
@@ -477,8 +471,7 @@ class NeXus(object):
         storage = c_int(0)
         status = self.lib.nxigetnextentry_(self.handle,name,nxclass,_ref(storage))
         if status == ERROR or status ==EOD:
-            raise RuntimeError, \
-                "Could not get next entry: %s"%(self._loc())
+            raise RuntimeError("Could not get next entry: %s"%(self._loc()))
         ## Note: ignoring storage --- it is useless without dimensions
         #if nxclass == 'SDS':
         #    dtype = _pytype_code(storage.value)
@@ -551,7 +544,7 @@ class NeXus(object):
         status = self.lib.nxigetinfo_(self.handle, _ref(rank), shape.ctypes.data,
                                      _ref(storage))
         if status == ERROR:
-            raise RuntimeError, "Could not get data info: %s"%(self._loc())
+            raise RuntimeError("Could not get data info: %s"%(self._loc()))
         shape = shape[:rank.value]+0
         dtype = _pytype_code[storage.value]
         #print "data info",shape,dtype
@@ -570,7 +563,7 @@ class NeXus(object):
         #print "opening data",name
         status = self.lib.nxiopendata_(self.handle, name)
         if status == ERROR:
-            raise ValueError, "Could not open data %s: %s"%(name, self._loc())
+            raise ValueError("Could not open data %s: %s"%(name, self._loc()))
         self.path.append(name)
     
     lib.nxiclosedata_.restype = c_int
@@ -588,8 +581,7 @@ class NeXus(object):
         status = self.lib.nxiclosedata_(self.handle)
         name = self.path.pop()
         if status == ERROR:
-            raise RuntimeError,\
-                "Could not close data %s: %s"%(name,self._loc())
+            raise RuntimeError("Could not close data %s: %s"%(name,self._loc()))
     
     lib.nximakedata_.restype = c_int
     lib.nximakedata_.argtypes  = [c_void_p, c_char_p, c_int, c_int, c_int_p]
@@ -615,7 +607,7 @@ class NeXus(object):
         status = self.lib.nximakedata_(self.handle,name,storage,len(shape),
                                   shape.ctypes.data_as(c_int_p))
         if status == ERROR:
-            raise ValueError, "Could not create data %s: %s"%(name,self._loc())
+            raise ValueError("Could not create data %s: %s"%(name,self._loc()))
     
     lib.nxicompmakedata_.restype = c_int
     lib.nxicompmakedata_.argtypes  = [c_void_p, c_char_p, c_int, c_int, c_int_p,
@@ -650,8 +642,7 @@ class NeXus(object):
                                       _compression_code[mode],
                                       chunks.ctypes.data_as(c_int_p))
         if status == ERROR:
-            raise ValueError, \
-                "Could not create compressed data %s: %s"%(name,self._loc())
+            raise ValueError("Could not create compressed data %s: %s"%(name,self._loc()))
     
     lib.nxigetdata_.restype = c_int
     lib.nxigetdata_.argtypes = [c_void_p, c_void_p]
@@ -670,7 +661,7 @@ class NeXus(object):
         datafn,pdata,size = self._poutput(dtype,shape)
         status = self.lib.nxigetdata_(self.handle,pdata)
         if status == ERROR:
-            raise ValueError, "Could not read data: %s"%(self._loc())
+            raise ValueError("Could not read data: %s"%(self._loc()))
         #print "data",ret()
         return datafn()
     
@@ -697,7 +688,7 @@ class NeXus(object):
                                       slab_shape.ctypes.data_as(c_int_p))
         #print "slab",offset,size,data
         if status == ERROR:
-            raise ValueError, "Could not read slab: %s"%(self._loc())
+            raise ValueError("Could not read slab: %s"%(self._loc()))
         return datafn()
      
     lib.nxiputdata_.restype = c_int
@@ -714,7 +705,7 @@ class NeXus(object):
         data,pdata = self._pinput(data,dtype,shape)
         status = self.lib.nxiputdata_(self.handle,pdata)
         if status == ERROR:
-            raise ValueError, "Could not write data: %s"%(self._loc())
+            raise ValueError("Could not write data: %s"%(self._loc()))
         
     lib.nxiputslab_.restype = c_int
     lib.nxiputslab_.argtypes = [c_void_p, c_void_p, c_int_p, c_int_p]
@@ -738,7 +729,7 @@ class NeXus(object):
                                       slab_offset.ctypes.data_as(c_int_p),
                                       slab_shape.ctypes.data_as(c_int_p))
         if status == ERROR:
-            raise ValueError, "Could not write slab: %s"%(self._loc())
+            raise ValueError("Could not write slab: %s"%(self._loc()))
         
         
     
@@ -755,8 +746,7 @@ class NeXus(object):
         """
         status = self.lib.nxiinitattrdir_(self.handle)
         if status == ERROR:
-            raise RuntimeError, \
-                "Could not reset attribute list: %s"%(self._loc())
+            raise RuntimeError("Could not reset attribute list: %s"%(self._loc()))
         
     lib.nxigetattrinfo_.restype = c_int
     lib.nxigetattrinfo_.argtypes = [c_void_p, c_int_p]
@@ -773,7 +763,7 @@ class NeXus(object):
         n = c_int(0)
         status = self.lib.nxigetattrinfo_(self.handle,_ref(n))
         if status == ERROR:
-            raise RuntimeError, "Could not get attr info: %s"%(self._loc())
+            raise RuntimeError("Could not get attr info: %s"%(self._loc()))
         #print "num attrs",n.value
         return n.value
     
@@ -801,7 +791,7 @@ class NeXus(object):
         storage = c_int(0)
         status = self.lib.nxigetnextattr_(self.handle,name,_ref(length),_ref(storage))
         if status == ERROR or status == EOD:
-            raise RuntimeError, "Could not get next attr: %s"%(self._loc())
+            raise RuntimeError("Could not get next attr: %s"%(self._loc()))
         dtype = _pytype_code[storage.value]
         #print "next attr",name.value,length.value,dtype
         return name.value, length.value, dtype
@@ -824,7 +814,7 @@ class NeXus(object):
         size = c_int(size)
         status = self.lib.nxigetattr_(self.handle,name,pdata,_ref(size),_ref(storage))
         if status == ERROR:
-            raise ValueError, "Could not read attr %s: %s" % (name,self._loc())
+            raise ValueError("Could not read attr %s: %s" % (name,self._loc()))
         #print "attr",name,datafn(),size
         return datafn()
 
@@ -856,7 +846,7 @@ class NeXus(object):
             # Set value to type
             dtype = str(dtype)
             if dtype == 'char' and not _is_string_like(value):
-                raise TypeError, "Expected string for 'char' attribute value"
+                raise TypeError("Expected string for 'char' attribute value")
             if dtype != 'char':
                 value = numpy.array(value,dtype=dtype)
 
@@ -866,7 +856,7 @@ class NeXus(object):
             data = value
         elif numpy.prod(value.shape) != 1:
             # NAPI silently ignores attribute arrays
-            raise TypeError, "Attribute value must be scalar or string"
+            raise TypeError("Attribute value must be scalar or string")
         else:
             length = 1
             data = value.ctypes.data
@@ -875,7 +865,7 @@ class NeXus(object):
         storage = c_int(_nxtype_code[dtype])
         status = self.lib.nxiputattr_(self.handle,name,data,length,storage)
         if status == ERROR:
-            raise ValueError, "Could not write attr %s: %s"%(name,self._loc())
+            raise ValueError("Could not write attr %s: %s"%(name,self._loc()))
     
     def attrs(self):
         """
@@ -911,7 +901,7 @@ class NeXus(object):
         ID = _NXlink()
         status = self.lib.nxigetgroupid_(self.handle,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not link to group: %s"%(self._loc())
+            raise RuntimeError("Could not link to group: %s"%(self._loc()))
         return ID
     
     lib.nxigetdataid_.restype = c_int
@@ -927,7 +917,7 @@ class NeXus(object):
         ID = _NXlink()
         status = self.lib.nxigetdataid_(self.handle,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not link to data: %s"%(self._loc())
+            raise RuntimeError("Could not link to data: %s"%(self._loc()))
         return ID
     
     lib.nximakelink_.restype = c_int
@@ -943,7 +933,7 @@ class NeXus(object):
         """
         status = self.lib.nximakelink_(self.handle,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not make link: %s"%(self._loc())
+            raise RuntimeError("Could not make link: %s"%(self._loc()))
     
     lib.nximakenamedlink_.restype = c_int
     lib.nximakenamedlink_.argtypes = [c_void_p, c_char_p, c_NXlink_p]
@@ -958,7 +948,7 @@ class NeXus(object):
         """
         status = self.lib.nximakenamedlink_(self.handle,name,_ref(ID))
         if status == ERROR:
-            raise RuntimeError, "Could not make link %s: %s"%(name,self._loc())
+            raise RuntimeError("Could not make link %s: %s"%(name,self._loc()))
     
     lib.nxisameid_.restype = c_int
     lib.nxisameid_.argtypes = [c_void_p, c_NXlink_p, c_NXlink_p]
@@ -989,7 +979,7 @@ class NeXus(object):
         """
         status = self.lib.nxiopensourcegroup_(self.handle)
         if status == ERROR:
-            raise RuntimeError, "Could not open source group: %s"%(self._loc())
+            raise RuntimeError("Could not open source group: %s"%(self._loc()))
 
     def link(self):
         """
@@ -1031,8 +1021,7 @@ class NeXus(object):
         filename = ctypes.create_string_buffer(maxnamelen)
         status = self.lib.nxiinquirefile_(self.handle,filename,maxnamelen)
         if status == ERROR:
-            raise RuntimeError,\
-                "Could not determine filename: %s"%(self._loc())
+            raise RuntimeError("Could not determine filename: %s"%(self._loc()))
         return filename.value
 
     lib.nxilinkexternal_.restype = c_int
@@ -1047,8 +1036,7 @@ class NeXus(object):
         """
         status = self.lib.nxilinkexternal_(self.handle,name,nxclass,url)
         if status == ERROR:
-            raise RuntimeError,\
-                "Could not link %s to %s: %s"%(name,url,self._loc())
+            raise RuntimeError("Could not link %s to %s: %s"%(name,url,self._loc()))
 
 
 
@@ -1114,7 +1102,7 @@ class NeXus(object):
         if dtype == "char":
             # Character data - pad with zeros to the right length
             if not _is_string_like(data):
-                raise ValueError,"Expected character data: %s"%(self._loc())
+                raise ValueError("Expected character data: %s"%(self._loc()))
             if len(data) < shape[0]:
                 data += '\000'*(shape[0]-len(data))
         else:
@@ -1127,11 +1115,9 @@ class NeXus(object):
             input_shape = numpy.array([i for i in data.shape if i != 1])
             target_shape = numpy.array([i for i in shape if i != 1])
             if len(input_shape) != len(target_shape) or any(input_shape != target_shape):
-                raise ValueError,\
-                    "Shape mismatch %s!=%s: %s"%(data.shape,shape,self.filename)
+                raise ValueError("Shape mismatch %s!=%s: %s"%(data.shape,shape,self.filename))
             if str(data.dtype) != dtype:
-                raise ValueError,\
-                    "Type mismatch %s!=%s: %s"%(dtype,data.dtype,self._loc())
+                raise ValueError("Type mismatch %s!=%s: %s"%(dtype,data.dtype,self._loc()))
     
         if dtype == 'char':
             # String: hand it over as usual for strings.  Assumes the string

@@ -1,6 +1,6 @@
 import sqlite3
 import numpy as N
-import readicp
+from . import readicp
 mydatbstr=r'c:\sqltest\test.dat'
 mydatbstr=r':memory:'
 
@@ -31,21 +31,21 @@ if __name__=="__main__":
     mydict={}
     mydict['myarr']=g
 
-    for k,v in mydict.iteritems():
-        print k,v
+    for k,v in mydict.items():
+        print(k,v)
         s='create table '+k
         s=s+'(%sid integer primary key'%(k)
-        print s
+        print(s)
         if isinstance(v,N.ndarray):
-            print 'true'
+            print('true')
             for i in N.arange(v.shape[0]):
-                print v[i]
+                print(v[i])
 
     #qbuffer
     myfilestr=r'c:\sqltest\\mnl1p004.ng5'
     mydatareader=readicp.datareader()
     mydata=mydatareader.readbuffer(myfilestr)
-    print mydata.header['filename']
+    print(mydata.header['filename'])
     
     #create our database
     #conn=sqlite3.connect(':memory:')
@@ -54,34 +54,34 @@ if __name__=="__main__":
     #create a table with our list of files
     s='create table catalog(file_id integer primary key, file_name varchar(12),sample_id integer)'
     sqlexecute(conn,s)
-    print 'created catalog table'
+    print('created catalog table')
 
 
     s='create table fields'
     s=s+'(field_id integer primary key, file_id integer, field_name varchar(20))'
     sqlexecute(conn,s)
-    print 'created fields table'
+    print('created fields table')
 
     s='create table measurement'
     s=s+'(measurement_id integer primary key, file_id integer, field_id integer'
     s=s+',point_num integer, value float, error float)'
-    print s
+    print(s)
     sqlexecute(conn,s)
-    print 'measurement table created'
+    print('measurement table created')
     
     
     
     s='insert into catalog VALUES(NULL,?,NULL)'
     splacevalues=(mydata.header['filename'],)
     file_id=sqlexecute(conn,s,splacevalues)
-    print 'catalog instantiated'
+    print('catalog instantiated')
     #print 'file_id ',file_id
 
-    for tablename, tablevalues in mydata.data.iteritems():
+    for tablename, tablevalues in mydata.data.items():
         s='insert into fields VALUES(NULL,?,?)'
         sparams=(file_id, tablename)
         field_id=sqlexecute(conn,s,sparams)
-        print 'inserted %s into field table'%(tablename,)
+        print('inserted %s into field table'%(tablename,))
         #print 'field_id ',field_id
         #print 'type ',type(tablevalues)
         if isinstance(tablevalues,list):
@@ -103,18 +103,18 @@ if __name__=="__main__":
 
    
     s='select file_id,file_name from catalog'
-    print s
+    print(s)
     rows=sqlselect(conn,s)
-    print rows
+    print(rows)
     s='select field_id from fields where field_name=?'
     sparam=('Temp',)
-    print s,sparam
+    print(s,sparam)
     field_id=sqlselect(conn,s,sparam)
-    print 'field_id= ',field_id
+    print('field_id= ',field_id)
     s='select measurement.file_id,point_num,value,error from measurement where field_id=? order by point_num'
     sparam=field_id[0]
-    print s
+    print(s)
     mypoints=sqlselect(conn,s,sparam)
-    print 'selected'    
-    print mypoints
-    print "done"
+    print('selected')    
+    print(mypoints)
+    print("done")

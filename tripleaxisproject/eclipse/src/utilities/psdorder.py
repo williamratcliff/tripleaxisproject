@@ -1,9 +1,9 @@
 import numpy as N
 import pylab
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr2 as readncnr
-import simple_combine
+from . import readncnr2 as readncnr
+from . import simple_combine
 #import scipy
 from scipy.optimize import leastsq
 import copy
@@ -262,8 +262,8 @@ if __name__=='__main__':
         myoutput.pprint()
         pfit=myoutput.beta
         #pfit = leastsq(residuals, p0, args=(T[Trange],I[Trange],Ierr[Trange]))
-        print 'pfit=',pfit
-        print 'chisq=',chisq_calc(pfit,T[Trange],I[Trange],Ierr[Trange]).sum()
+        print('pfit=',pfit)
+        print('chisq=',chisq_calc(pfit,T[Trange],I[Trange],Ierr[Trange]).sum())
         Icalc=orderparameter(pfit,T)
         if 1:
             pylab.errorbar(T,I,Ierr,marker='s',linestyle='None',mfc='blue',mec='blue',ecolor=None)

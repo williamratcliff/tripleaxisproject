@@ -1,9 +1,9 @@
 import numpy as N
 import pylab
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr2 as readncnr
-import simple_combine
+from . import readncnr2 as readncnr
+from . import simple_combine
 #import scipy
 from scipy.optimize import leastsq
 import copy
@@ -36,7 +36,7 @@ if __name__=='__main__':
         #print (ch_a4-ch_a4[mypsd.center])
         ch_boundary=(ch_a4-ch_a4[mypsd.center])+0.5*N.concatenate((N.array([0]),N.diff(ch_a4)))
         ch_boundary[0]=(ch_a4[0]-ch_a4[mypsd.center])-0.5*(ch_a4[1]-ch_a4[0])
-        print ch_boundary
+        print(ch_boundary)
 
         pylab.plot(N.arange(ch_eff.size),ch_eff,'ro')
         pylab.show()

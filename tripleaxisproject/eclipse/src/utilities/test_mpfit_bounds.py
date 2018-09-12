@@ -69,7 +69,7 @@ if __name__=="__main__":
             parinfo[4]['limited']=[1,1]
             parinfo[4]['limits']=[400,499]
             m = mpfit(myfunctlin, p0, parinfo=parinfo,functkw=fa) 
-            print 'status = ', m.status
-            print 'params = ', m.params
+            print('status = ', m.status)
+            print('params = ', m.params)
             p1=m.params
             covariance=m.covar

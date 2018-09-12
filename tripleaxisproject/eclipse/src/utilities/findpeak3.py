@@ -1,6 +1,6 @@
 import numpy as N
 import pylab
-from sgolay import savitzky_golay as savitzky_golay
+from .sgolay import savitzky_golay as savitzky_golay
 import sys
 import scipy.interpolate as interpolate
 pi=N.pi
@@ -31,12 +31,12 @@ def findpeak(x,y,npeaks):
 #    yd2(n)=g(:,3)'*y(n - (F+1)/2 + 1: n + (F+1)/2 - 1)';
 #end
     step=abs(x[0]-x[1]) #assume that x is monotonic and uniform step sizes
-    print 'step',step
+    print('step',step)
     yd=savitzky_golay(y,deriv=1)/step
     yd2=savitzky_golay(y,deriv=2)/step**2
     n_crossings=0;
     ny = len(yd);
-    print 'y',y
+    print('y',y)
     value_sign = 2*(yd > 0) - 1;
     indices = 0;
 
@@ -52,10 +52,10 @@ def findpeak(x,y,npeaks):
 
     #print wh_cross_table
     #print yd_table
-    index_list=N.array(range(len(wh_cross_table)))
-    print N.array(wh_cross_table)*N.array(yd_table)
+    index_list=N.array(list(range(len(wh_cross_table))))
+    print(N.array(wh_cross_table)*N.array(yd_table))
     wh_cross=index_list[N.array(wh_cross_table)*N.array(yd_table)]
-    print 'wh_cross',wh_cross, 'y[wh_cross]',y[wh_cross]
+    print('wh_cross',wh_cross, 'y[wh_cross]',y[wh_cross])
     n_crossings=len(wh_cross);
 
 
@@ -64,7 +64,7 @@ def findpeak(x,y,npeaks):
 #    
     indices = 0.5*(2*wh_cross-1);
     indices=wh_cross
-    print 'indices',indices
+    print('indices',indices)
 #    
     no_width = 0;
 #    
@@ -73,15 +73,15 @@ def findpeak(x,y,npeaks):
 
 
         #ymax=interp1(ysupport,y,indices);
-        ysupport=range(len(y))
-        print 'ysupport',ysupport
+        ysupport=list(range(len(y)))
+        print('ysupport',ysupport)
         yinterpolater=interpolate.interp1d(ysupport,y,fill_value=0.0,kind='linear',copy=True,bounds_error=False)
         ymax=yinterpolater(indices)
-        print 'y_interpolated',ymax
+        print('y_interpolated',ymax)
 #     #%  ymax = interpolate(y,indices)
         ymin = N.min(ymax)
-        print 'ymin',ymin
-        print 'npeaks',npeaks
+        print('ymin',ymin)
+        print('npeaks',npeaks)
         for i in range(npeaks):
             this_max=N.max(ymax)
             max_index=N.nonzero(ymax==this_max)
@@ -93,11 +93,11 @@ def findpeak(x,y,npeaks):
             ymax[max_index] = ymin;
         indices = best_index;
 
-        print 'indices',indices
-        xsupport=range(len(x))
+        print('indices',indices)
+        xsupport=list(range(len(x)))
         xinterpolater=interpolate.interp1d(xsupport,x,fill_value=0.0,kind='linear',copy=True,bounds_error=False)        
         xpeaks=xinterpolater(indices)
-        print 'xpeaks',xpeaks
+        print('xpeaks',xpeaks)
 
         #xsupport=1:length(x);
         #xpeaks = interp1(xsupport,x,indices);
@@ -111,8 +111,8 @@ def findpeak(x,y,npeaks):
 #          % Descend down the peak until you get lower than the half height
             elevation = full_height;
             incrementr = 1;
-            print 'elevation', elevation
-            print 'half height',half_height
+            print('elevation', elevation)
+            print('half height',half_height)
             while elevation > half_height:
 #             % go down the right side of the peak
                 incrementr = incrementr+1;
@@ -120,14 +120,14 @@ def findpeak(x,y,npeaks):
                 elevation = y[N.floor(indices[i])+incrementr];
                 if (N.floor(indices[i])+incrementr > ny):
                     no_widthr = 1;
-                    print 'nowidthr'
+                    print('nowidthr')
                     break;
 
 
             incrementr=incrementr-1  #error on the side of making it too narrow!
-            print 'incrementr', incrementr
-            print 'elevationr',y[N.floor(indices[i])+incrementr]
-            print 'no_widthr',no_widthr
+            print('incrementr', incrementr)
+            print('elevationr',y[N.floor(indices[i])+incrementr])
+            print('no_widthr',no_widthr)
 #               %goto, no_width_found
 #          #%now go to the left side of the peak
 #          #% Descend down the peak until you get lower than the half height
@@ -146,20 +146,20 @@ def findpeak(x,y,npeaks):
 #               %goto, no_width_found
 
             incrementl=incrementl+1
-            print 'incrementl', incrementl
-            print 'elevationl',y[N.floor(indices[i])+incrementl]
-            print 'no_widthl',no_widthl
+            print('incrementl', incrementl)
+            print('elevationl',y[N.floor(indices[i])+incrementl])
+            print('no_widthl',no_widthl)
             no_width=N.min([no_widthl,no_widthr]);
             increment=N.min([N.abs(incrementl),incrementr]);
 
-            print 'delta',x[N.floor(indices[i])+increment]
-            print 'increment', increment
-            print 'no_width', no_width
+            print('delta',x[N.floor(indices[i])+increment])
+            print('increment', increment)
+            print('no_width', no_width)
 #            
 #    
 #     #%     no_width_found:
             if no_width==1:
-                print 'no width found'
+                print('no width found')
                 width = 2.0*(x[ny]-xpeaks[i]);
             else:
                 width = 2.0*(x[N.floor(indices[i])+increment]-xpeaks[i]);             
@@ -175,9 +175,9 @@ def findpeak(x,y,npeaks):
 #      #%b=length(fwhm);
 #      #%fwhm=fwhm(b);
 
-    print 'xpeaks',xpeaks
+    print('xpeaks',xpeaks)
     p=N.hstack((xpeaks[0:npeaks],N.abs(fwhm)))
-    print p
+    print(p)
 #      return p
     return p
 

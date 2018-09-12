@@ -1,6 +1,6 @@
 import numpy as N
 import math
-import readncnr
+from . import readncnr
 
 def autovectorized(f):
      """Function decorator to do vectorization only as necessary.
@@ -32,7 +32,7 @@ class polarization_correct:
         self.ef={}
         self.timestamp={}
         
-        for key,myfilestr in files.iteritems():
+        for key,myfilestr in files.items():
             mydatareader=readncnr.datareader()
             mydata[key]=mydatareader.readbuffer(myfilestr)
             self.counts[key]=N.array(mydata[key].data['Detector'])
@@ -59,15 +59,15 @@ class polarization_correct:
         for i in range(self.length):
             s=s+'%f %f '%(self.ei[i],self.ef[i])
             for key in keys:
-                if self.counts.has_key(key):
+                if key in self.counts:
                     s=s+'%f '%(self.counts[key][i],)
                     s=s+'%f '%(self.timestamp[key][i],)
                 else:
                     s=s+'* * '
             s=s+'\n'
-            print i
+            print(i)
         if outputfile==None:
-            print s
+            print(s)
         else:
             f.write(s)
         if outputfile!=None:

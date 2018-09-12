@@ -3,9 +3,9 @@ import numpy as N
 import datetime
 from time import mktime
 #import mx.DateTime
-import writebt7
+from . import writebt7
 import re
-import scanparser
+from . import scanparser
 import os
 from copy import deepcopy
 
@@ -80,7 +80,7 @@ def get_columnmetadatas_bt7(tokenized):
         columndict[field]=[]
         columnlist.append(field)
     #In old bt7 files, there was no timestamp, so add one for those, otherwise use the one in the file
-    if columndict.has_key('timestamp')==False:
+    if ('timestamp' in columndict)==False:
         timestamp_flag=False
         columnlist.append('timestamp')
         #print 'no timestamp'
@@ -213,7 +213,7 @@ def genfiles(myfile_nums, myfile_end='.dat',mydirectory=r'C:\hfir\HB3A\exp102\Da
         else:
             myfile_numstr=str(myfile_num)
         myfilestr=os.path.join(mydirectory,myfile_base+myfile_numstr+myfile_end)
-        print myfilestr
+        print(myfilestr)
         file_list.append(myfilestr)
     return file_list
 
@@ -226,8 +226,8 @@ if __name__=='__main__':
         
         #0014.dat
         myfile_num=84
-        file_list=genfiles(range(84,100))
-        print file_list
+        file_list=genfiles(list(range(84,100)))
+        print(file_list)
         #metadata={}
         #data=readfile(myfilestr,metadata)
         #print data.header

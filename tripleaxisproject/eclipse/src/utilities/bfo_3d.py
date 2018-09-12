@@ -98,9 +98,9 @@ def test_den():
     #view along z-axis
     pts_as=mlab.points3d(x,y,z,color=(1,0,0),colormap='gist_rainbow',figure=fig,scale_factor=.3)
     #x,y,z=gen_fe()  
-    print 'x',x,x.shape
-    print 'y',y,y.shape
-    print 'z',z,z.shape
+    print('x',x,x.shape)
+    print('y',y,y.shape)
+    print('z',z,z.shape)
     x,y,z=np.array([[0,1,1],
                     [0,-1,-1],
                     ],'float64').T
@@ -128,7 +128,7 @@ def test_den():
     #src = mlab.pipeline.array2d_source(P)
     #surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.4)
     #surf.transform.GetTransform().RotateX(90)
-    print 'done'
+    print('done')
 
 
 if __name__=='__main__':

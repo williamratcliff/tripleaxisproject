@@ -89,4 +89,4 @@ def dct2(x,m=None,n=None):
 if __name__=="__main__":
     x=numpy.arange(7)
     y=dct(x)
-    print y
+    print(y)

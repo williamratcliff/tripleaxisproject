@@ -5,9 +5,9 @@ import scipy.sandbox.delaunay as D
 import matplotlib.numerix.ma as ma
 from matplotlib.ticker import NullFormatter, MultipleLocator
 from scipy.signal.signaltools import convolve2d
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readicp
+from . import readicp
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
 import math
@@ -107,13 +107,13 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
      mat_sec=N.copy(sec)
      #print 'proj ', proj
      (a,b,c)=N.shape(sec)
-     print 'reached'
+     print('reached')
      for i in range(c):
          rsample='latticestar'
          ascale=myrescal.lattice_calculator.modvec(o1[0],o1[1],o1[2],rsample)[0]
          bscale=myrescal.lattice_calculator.modvec(o2[0],o2[1],o2[2],rsample)[0]
-         print 'ascale',ascale
-         print 'bscale',bscale
+         print('ascale',ascale)
+         print('bscale',bscale)
          ascale=1
          bscale=1
          matm_sec=N.matrix(mat_sec[:,:,i])
@@ -128,10 +128,10 @@ def ResPlot(H,K,L,W,EXP,myrescal,ax,fig):
          theta_sec.append(math.degrees(thetar_sec))
          #x0y0=N.array([H[i],K[i]])
          x0y0=N.array([qx[i],qy[i]])
-         print 'a1_sec',a1_sec
-         print 'b1_sec',b1_sec
-         print 'theta_sec',math.degrees(thetar_sec)
-         print 'x0y0',x0y0
+         print('a1_sec',a1_sec)
+         print('b1_sec',b1_sec)
+         print('theta_sec',math.degrees(thetar_sec))
+         print('x0y0',x0y0)
          #print i,'qx',qx[i]
          #print 'qy',qy[i]
          e.append(Ellipse(x0y0,width=2*a1[i],height=2*b1[i],angle=theta[i]))
@@ -235,7 +235,7 @@ def plot_data(xa,ya,za,fig,nfig,colorflag=False):
 
     if colorflag:
         g=pylab.colorbar(pc,ticks=N.arange(0,675,100))
-        print g
+        print(g)
         #g.ticks=None
         #gax.yaxis.set_major_locator(MultipleLocator(40))
         #g.ticks(N.array([0,20,40,60,80]))
@@ -252,12 +252,12 @@ def prep_data(filename):
     y=yt[:,zorigt>0.0]
     z=zorigt[:,zorigt>0.0]
 #    zorig=ma.array(zorigt)
-    print 'reached'
+    print('reached')
     threshold=0.0;
 #    print zorigt < threshold
 #    print N.isnan(zorigt)
 #    z = ma.masked_where(zorigt < threshold , zorigt)
-    print 'where masked ', z.shape
+    print('where masked ', z.shape)
 #should be commented out--just for testing
 ##    x = pylab.randn(Nu)/aspect
 ##    y = pylab.randn(Nu)
@@ -269,10 +269,10 @@ def prep_data(filename):
     xi,yi=N.mgrid[x.min():x.max():.05,y.min():y.max():.05]
     # triangulate data
     tri = D.Triangulation(x,y)
-    print 'before interpolator'
+    print('before interpolator')
     # interpolate data
     interp = tri.nn_interpolator(z)
-    print 'interpolator reached'
+    print('interpolator reached')
     zi = interp(xi,yi)
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
@@ -293,12 +293,12 @@ def prep_data2(xt,yt,zorigt):
     y=yt[:,zorigt>0.0]
     z=zorigt[:,zorigt>0.0]
 #    zorig=ma.array(zorigt)
-    print 'reached'
+    print('reached')
     threshold=0.0;
 #    print zorigt < threshold
 #    print N.isnan(zorigt)
 #    z = ma.masked_where(zorigt < threshold , zorigt)
-    print 'where masked ', z.shape
+    print('where masked ', z.shape)
 #should be commented out--just for testing
 ##    x = pylab.randn(Nu)/aspect
 ##    y = pylab.randn(Nu)
@@ -310,10 +310,10 @@ def prep_data2(xt,yt,zorigt):
     xi,yi=N.mgrid[x.min():x.max():.001,y.min():y.max():.001]
     # triangulate data
     tri = D.Triangulation(x,y)
-    print 'before interpolator'
+    print('before interpolator')
     # interpolate data
     interp = tri.nn_interpolator(z)
-    print 'interpolator reached'
+    print('interpolator reached')
     zi = interp(xi,yi)
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
@@ -324,7 +324,7 @@ def prep_data2(xt,yt,zorigt):
 
 def readmeshfiles(mydirectory,myfilebase,myend):
     myfilebaseglob=myfilebase+'*.'+myend
-    print myfilebaseglob
+    print(myfilebaseglob)
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     #SU.printr(flist)
     mydatareader=readicp.datareader()
@@ -335,16 +335,16 @@ def readmeshfiles(mydirectory,myfilebase,myend):
     a=N.array([3.943],'d')
     b=N.array([2.779],'d')
     for currfile in flist:
-        print currfile
+        print(currfile)
         mydata=mydatareader.readbuffer(currfile)
         Qx=N.concatenate((Qx,N.array(mydata.data['Qx'])*2*pi/a[0]))
         Qy=N.concatenate((Qy,N.array(mydata.data['Qy'])*2*pi/b[0]))
         Qz=N.concatenate((Qz,N.array(mydata.data['Qz'])))
         Counts=N.concatenate((Counts,N.array(mydata.data['Counts'])))
     xa,ya,za=prep_data2(Qx,Qy,Counts);
-    print 'xa',xa.min(),xa.max()
-    print 'qx',Qx.min(),Qx.max()
-    print 
+    print('xa',xa.min(),xa.max())
+    print('qx',Qx.min(),Qx.max())
+    print() 
     return xa,ya,za
 
 
@@ -375,7 +375,7 @@ if __name__ == '__main__':
         xi,yi,zi=readmeshfiles(mydirectory,'imesh',myend) #-1.3
     if 0:
         xj,yj,zj=readmeshfiles(mydirectory,'jmesh',myend) #0
-    print 'matplotlib'
+    print('matplotlib')
 
     if 1:
 
@@ -449,15 +449,15 @@ if __name__ == '__main__':
 
 
     if 1:
-        print 'gca ', fig.gca()
+        print('gca ', fig.gca())
         for im in fig.gca().get_images():
-            print im
+            print(im)
             im.set_clim(0.0,660.0)
         #pylab.show()
     if 0:
-        print 'saving'
+        print('saving')
         pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
-        print 'saved'
+        print('saved')
 
 
     if 1:
@@ -522,14 +522,14 @@ if __name__ == '__main__':
         myrescal.__init__(mylattice)
         Q=myrescal.lattice_calculator.modvec(H,K,L,'latticestar')
         R0,RM=myrescal.ResMat(Q,W,setup)
-        print 'RM '
-        print RM.transpose()
-        print 'R0 ',R0
+        print('RM ')
+        print(RM.transpose())
+        print('R0 ',R0)
         #exit()
         R0,RMS=myrescal.ResMatS(H,K,L,W,setup)
         widths=myrescal.CalcWidths(H,K,L,W,setup)
-        print 'YBwidth',widths['YBWidth']
-        print 'XBwidth',widths['XBWidth']
+        print('YBwidth',widths['YBWidth'])
+        print('XBwidth',widths['XBWidth'])
         ResPlot(H, K, L, W, setup,myrescal,ax,fig)
 
 

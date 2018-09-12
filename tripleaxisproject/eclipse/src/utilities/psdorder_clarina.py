@@ -1,9 +1,9 @@
 import numpy as N
 import pylab
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr2 as readncnr
-import simple_combine
+from . import readncnr2 as readncnr
+from . import simple_combine
 #import scipy
 from scipy.optimize import leastsq
 import copy
@@ -127,8 +127,8 @@ def read_order_files(flist):
     #    I[],Ierr=simple_combine.monitor_normalize(I[],Ierr,monlist)
     I=N.hstack(I)
     Ierr=N.hstack(Ierr)
-    print I.shape
-    print Ierr.shape
+    print(I.shape)
+    print(Ierr.shape)
     H=N.hstack(H)
     monlist=N.hstack(monlist)
     a4list=N.hstack(a4list)
@@ -172,7 +172,7 @@ def residuals(p,x,I,Ierr):
 def get_background_file():
         myfilestr=mydirectory+'\\'+'LaOFeAs56416.stitched'
         flist=[myfilestr]
-        print flist
+        print(flist)
         a4,I,Ierr=read_stitched(myfilestr)
         Tstitched=170
         mon_stitched=80000
@@ -190,7 +190,7 @@ def get_background_file():
 def get_highT_file():
         myfilestr=mydirectory+'\\'+'LaOFeAs56413.stitched'
         flist=[myfilestr]
-        print flist
+        print(flist)
         a4,I,Ierr=read_stitched(myfilestr)
         I_int=[]
         I_err=[]
@@ -246,7 +246,7 @@ def output(a4,I,Ierr,outputfile=None):
             s=s+'%2.3f %2.3f %2.3f'%(a4[i],I[i],Ierr[i])
             s=s+'\n'
         if outputfile==None:
-            print s
+            print(s)
         else:
             f.write(s)
         if outputfile!=None:
@@ -262,8 +262,8 @@ def averagesum(peak1):
         a4range=N.intersect1d(N.where(a4>a4min)[0],N.where(a4<a4max)[0])
         l=min(a4range)
         r=max(a4range)
-        print a4range
-        print 'l=',l,' r=',r
+        print(a4range)
+        print('l=',l,' r=',r)
         #a4,I,Ierr,Tstitched,mon_stitched=get_highT_file()
         #a4range=N.intersect1d(N.where(a4>a4min)[0],N.where(a4<a4max)[0])
         #I=I*monlist[0]/mon_stitched
@@ -287,20 +287,20 @@ def averagesum(peak1):
         #exit()
         l=min(a4range)
         r=max(a4range)
-        print 'a4range ',a4range
+        print('a4range ',a4range)
         I=N.zeros(peak1.I[l,:].shape)
         Ierr=N.zeros(peak1.I[l,:].shape)
         for i in range(l,r):
             I=I+peak1.I[i,:]
             Ierr=Ierr+peak1.Ierr[i,:]**2
-        print 'a4size ',a4range.size
+        print('a4size ',a4range.size)
         I=I/(r-l-1)
         Ierr=N.sqrt(Ierr)/(r-l-1)
-        print N.average(peak1.I[l:r,:],axis=0)
-        print 'peak1'
-        print peak1.I[l:r,95]
-        print 'H',H[95]
-        print H.size
+        print(N.average(peak1.I[l:r,:],axis=0))
+        print('peak1')
+        print(peak1.I[l:r,95])
+        print('H',H[95])
+        print(H.size)
         #exit()
         H_ave=[]
         I_ave=[]
@@ -309,7 +309,7 @@ def averagesum(peak1):
         #print 'H ', H
         if ave >1:
             for i in range(0,H.size-ave,ave):
-                print i
+                print(i)
                 Ierr_ave.append(N.sqrt((Ierr[i:i+ave-1]**2).sum())/ave)
                 I_ave.append(N.average(I[i:i+ave-1]))
                 H_ave.append(N.average(H[i:i+ave-1]))
@@ -333,7 +333,7 @@ def averagesum(peak1):
         #print 'I0 ',I[0]
         #p0=[copy.deepcopy(I[0]),117.0,.33333,copy.deepcopy(I[-1])]
         p0=[copy.deepcopy(I[0]),120.0,copy.deepcopy(I[-1])]
-        print 'p0 ',p0
+        print('p0 ',p0)
         tmin=75
         tmax=200.0
 
@@ -350,8 +350,8 @@ def averagesum(peak1):
         #myoutput.pprint()
         pfit=myoutput.beta
         #pfit = leastsq(residuals, p0, args=(T[Trange],I[Trange],Ierr[Trange]))
-        print 'pfit=',pfit
-        print 'perror= ',myoutput.sd_beta
+        print('pfit=',pfit)
+        print('perror= ',myoutput.sd_beta)
         #print 'chisq=',chisq_calc(pfit,T[Trange],I[Trange],Ierr[Trange]).sum()
         Icalc=orderparameter(pfit,T)
         if 1:
@@ -387,7 +387,7 @@ if __name__=='__main__':
         flist=[]
         rlist=[56421,56420,56419]
         for myfileseq in rlist:#range(56419,56421,1):
-            print myfileseq
+            print(myfileseq)
             myfilestr=mydirectory+'\\'+myfilebase+str(myfileseq)+'.'+myend
             flist.append(myfilestr)
 
@@ -396,9 +396,9 @@ if __name__=='__main__':
         #myfilestr=mydirectory+'\\'+'LaOFeAs56416.bt7'
         #flist.append(myfilestr)
 
-        print flist
+        print(flist)
         H,I,Ierr,monlist,a4=read_order_files(flist)
-        print H.shape
+        print(H.shape)
         #order is file, field
         peak1=peak()
         peak1.H=H
@@ -419,24 +419,24 @@ if __name__=='__main__':
         a4range=N.intersect1d(N.where(a4>a4min)[0],N.where(a4<a4max)[0])
         l=min(a4range)
         r=max(a4range)
-        print 'a4range ',a4range
+        print('a4range ',a4range)
         I_sum=0.0
         Ierr_sum=0.0
         #for i in range(l,r):
         #    I_sum=I_sum+I[i]
         #    Ierr_sum=Ierr+Ierr[i]**2
         #Ierr_sum=N.sqrt(Ierr_sum)
-        print 'l=',l,' r=',r
-        print 'I_sum=',N.average(I[l:r])*monlist[0]/mon_stitched
-        print 'I_err=',N.sqrt(N.average(Ierr[l:r]**2))*monlist[0]/mon_stitched
-        print monlist[0]
+        print('l=',l,' r=',r)
+        print('I_sum=',N.average(I[l:r])*monlist[0]/mon_stitched)
+        print('I_err=',N.sqrt(N.average(Ierr[l:r]**2))*monlist[0]/mon_stitched)
+        print(monlist[0])
         exit()
         I=I*monlist[0]/mon_stitched
         Ierr=Ierr*monlist[0]/mon_stitched
         pylab.errorbar(a4,I,Ierr,linestyle='None',marker='s',mfc='blue')
         pylab.show()
-        print monlist
-        print mon_stitched
+        print(monlist)
+        print(mon_stitched)
         exit()
         l=17
         r=23
@@ -454,7 +454,7 @@ if __name__=='__main__':
         I_ave=[]
         Ierr_ave=[]
         ave=5
-        print 'H ',H.shape
+        print('H ',H.shape)
         #print 'H ', H
         if ave >1:
             for i in range(0,H.size-ave,ave):
@@ -470,10 +470,10 @@ if __name__=='__main__':
         Ierr=N.array(Ierr_ave)[:,a4range]
         a4=a4[a4range]
         H=N.array(H_ave)
-        print I.shape
+        print(I.shape)
         if 1:
             for i in range(H.size/2,H.size):
-                print 'T= ',H[i]
+                print('T= ',H[i])
                 pylab.errorbar(a4,I[i,:],Ierr[i,:],linestyle='None',marker='s',mfc='blue')
             #pylab.errorbar(a4,I[30,:],Ierr[0,:],linestyle='None',marker='s',mfc='blue')
             #pylab.ylim((40,150))
@@ -500,8 +500,8 @@ if __name__=='__main__':
         #myoutput.pprint()
         pfit=myoutput.beta
         #pfit = leastsq(residuals, p0, args=(T[Trange],I[Trange],Ierr[Trange]))
-        print 'pfit=',pfit
-        print 'perror= ',myoutput.sd_beta
+        print('pfit=',pfit)
+        print('perror= ',myoutput.sd_beta)
         #print 'chisq=',chisq_calc(pfit,T[Trange],I[Trange],Ierr[Trange]).sum()
         Icalc=orderparameter(pfit,T)
         if 0:

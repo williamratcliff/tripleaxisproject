@@ -5,13 +5,13 @@ import scipy.sandbox.delaunay as D
 import matplotlib.numerix.ma as ma
 from matplotlib.ticker import NullFormatter, MultipleLocator
 from scipy.signal.signaltools import convolve2d
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr
+from . import readncnr
 from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import MaxNLocator
-import linegen
-import locator
+from . import linegen
+from . import locator
 ctop=350.0
 cstep=50
 xmesh_step=2e-3
@@ -45,7 +45,7 @@ def plot_data(xa,ya,za,fig,nfig,colorflag=False):
 
     if colorflag:
         g=pylab.colorbar(pc,ticks=N.arange(0,ctop,cstep))
-        print g
+        print(g)
         #g.ticks=None
         #gax.yaxis.set_major_locator(MultipleLocator(40))
         #g.ticks(N.array([0,20,40,60,80]))
@@ -62,12 +62,12 @@ def prep_data(filename):
     y=yt[:,zorigt>0.0]
     z=zorigt[:,zorigt>0.0]
 #    zorig=ma.array(zorigt)
-    print 'reached'
+    print('reached')
     threshold=0.0;
 #    print zorigt < threshold
 #    print N.isnan(zorigt)
 #    z = ma.masked_where(zorigt < threshold , zorigt)
-    print 'where masked ', z.shape
+    print('where masked ', z.shape)
 #should be commented out--just for testing
 ##    x = pylab.randn(Nu)/aspect
 ##    y = pylab.randn(Nu)
@@ -79,10 +79,10 @@ def prep_data(filename):
     xi,yi=N.mgrid[x.min():x.max():.05,y.min():y.max():.05]
     # triangulate data
     tri = D.Triangulation(x,y)
-    print 'before interpolator'
+    print('before interpolator')
     # interpolate data
     interp = tri.nn_interpolator(z)
-    print 'interpolator reached'
+    print('interpolator reached')
     zi = interp(xi,yi)
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
@@ -108,12 +108,12 @@ def prep_data2(xt,yt,zorigt):
     y=yt[:,zorigt>0.0]
     z=zorigt[:,zorigt>0.0]
 #    zorig=ma.array(zorigt)
-    print 'reached'
+    print('reached')
     threshold=0.0;
 #    print zorigt < threshold
 #    print N.isnan(zorigt)
 #    z = ma.masked_where(zorigt < threshold , zorigt)
-    print 'where masked ', z.shape
+    print('where masked ', z.shape)
 #should be commented out--just for testing
 ##    x = pylab.randn(Nu)/aspect
 ##    y = pylab.randn(Nu)
@@ -121,19 +121,19 @@ def prep_data2(xt,yt,zorigt):
 ##    print x.shape
 ##    print y.shape
     # Grid
-    print x.min()
-    print x.max()
-    print y.min()
-    print y.max()
-    print x.shape
+    print(x.min())
+    print(x.max())
+    print(y.min())
+    print(y.max())
+    print(x.shape)
     xi,yi=N.mgrid[x.min():x.max():xmesh_step,y.min():y.max():ymesh_step]
     #blah
     # triangulate data
     tri = D.Triangulation(N.copy(x),N.copy(y))
-    print 'before interpolator'
+    print('before interpolator')
     # interpolate data
     interp = tri.nn_interpolator(z)
-    print 'interpolator reached'
+    print('interpolator reached')
     zi = interp(xi,yi)
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
@@ -147,14 +147,14 @@ def prep_data2(xt,yt,zorigt):
         zi=N.reshape(z,(15,31))
         #print zi2-zi
         #blah
-        print "interpolation off"
+        print("interpolation off")
     return xi,yi,zi    
 
 
 
 def readmeshfiles(mydirectory,myfilebase,myend):
     myfilebaseglob=myfilebase+'*.'+myend
-    print myfilebaseglob
+    print(myfilebaseglob)
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     #SU.printr(flist)
     mydatareader=readncnr.datareader()
@@ -163,7 +163,7 @@ def readmeshfiles(mydirectory,myfilebase,myend):
     Qz=N.array([])
     Counts=N.array([])
     for currfile in flist:
-        print currfile
+        print(currfile)
         mydata=mydatareader.readbuffer(currfile)
         Qx=N.concatenate((Qx,N.array(mydata.data['Qx'])))
         Qy=N.concatenate((Qy,N.array(mydata.data['Qy'])))
@@ -180,7 +180,7 @@ def readmeshfiles(mydirectory,myfilebase,myend):
 
 def readmeshfiles_direct(mydirectory,myfilebase,myend):
     myfilebaseglob=myfilebase+'*.'+myend
-    print myfilebaseglob
+    print(myfilebaseglob)
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     #SU.printr(flist)
     mydatareader=readncnr.datareader()
@@ -189,7 +189,7 @@ def readmeshfiles_direct(mydirectory,myfilebase,myend):
     Qz=N.array([])
     Counts=N.array([])
     for currfile in flist:
-        print currfile
+        print(currfile)
         mydata=mydatareader.readbuffer(currfile)
         Qx=N.concatenate((Qx,N.array(mydata.data['Qx'])))
         Qy=N.concatenate((Qy,N.array(mydata.data['Qy'])))
@@ -250,7 +250,7 @@ if __name__ == '__main__':
 
         myline=linegen.line_interp(point1,point2,divisions=50)
         xout,yout,zout=myline.interp(xt2,yt2,zorigt2)
-        print myline.slope
+        print(myline.slope)
         line_x=myline.line_x; line_y=myline.line_y 
         pylab.plot(line_x,line_y,'red',linewidth=3.0)
         ax.set_ylim(ylim); ax.set_xlim(xlim)  
@@ -262,9 +262,9 @@ if __name__ == '__main__':
         xout,yout,zout=myline.interp(xt,yt,zorigt)
         
     if 1:    
-        print 'gca ', fig.gca()
+        print('gca ', fig.gca())
         for im in fig.gca().get_images():
-            print im
+            print(im)
             im.set_clim(0.0,400.0)
         #pylab.show()
         
@@ -278,6 +278,6 @@ if __name__ == '__main__':
     if 0:
         pylab.show()  
     if 0:
-        print 'saving'
+        print('saving')
         pylab.savefig(r'c:\sqltest\demo.pdf',dpi=150)
-        print 'saved'
+        print('saved')

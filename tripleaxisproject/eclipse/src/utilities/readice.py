@@ -3,9 +3,9 @@ import numpy as N
 import datetime,time
 from time import mktime
 #import mx.DateTime
-import writebt7
+from . import writebt7
 import re
-import scanparser
+from . import scanparser
 import os
 
 
@@ -325,7 +325,7 @@ class datareader(object):
                 return
 
         def numpyize(self):
-                for field in self.data.__dict__.keys():
+                for field in list(self.data.__dict__.keys()):
                         if type(self.data[field][0])==type(float):
                                 self.data[field]=N.array(self.data[field],'Float64')
                         else:
@@ -388,11 +388,11 @@ if __name__=='__main__':
                 #myoutfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7.out'
                 #mywriter=writebt7.datawriter()
                 #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
-                print mydata.data.timestamp
+                print(mydata.data.timestamp)
                 #print mydata.data['magfield']
                 #print mydata.data.keys()
-                print 'done'
-                print mydata.metadata.varying
+                print('done')
+                print(mydata.metadata.varying)
                 #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
                 #print N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])
                 #print len(mydata.data['timestamp'])

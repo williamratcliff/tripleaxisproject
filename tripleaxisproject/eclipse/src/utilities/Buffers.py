@@ -209,14 +209,14 @@ class ScanDescription:
     def getMoving(self):
         # List of all moving devices. Remove those that are constant
         # First dimension
-        l1 = self.angleList.keys()
+        l1 = list(self.angleList.keys())
         toremove = []
         for k in l1:
             if len(self.angleList[k])==1: toremove.append(k)
         for k in toremove: l1.remove(k)
         
         # Second dimension
-        l2 = self.secondDev.keys()        
+        l2 = list(self.secondDev.keys())        
         toremove = []
         for k in l2:
             if len(self.secondDev[k])==1: toremove.append(k)
@@ -260,7 +260,7 @@ class ScanDescription:
                 
             #Increment Scan, Find Peak scan, Bragg Buffer
             elif self.type==5 or self.type==6 or self.type==9:
-                keys   = self.angleList.keys()
+                keys   = list(self.angleList.keys())
                 ntot   = len(keys)
                 npts = MAX_LIST_LEN
                 if ntot > 0:
@@ -276,7 +276,7 @@ class ScanDescription:
         if self.numPoints2>0: 
             npts2=self.numPoints2
         else:
-            keys   = self.secondDev.keys()
+            keys   = list(self.secondDev.keys())
             ntot   = len(keys)
             npts2 = MAX_LIST_LEN
             if ntot > 0:
@@ -314,7 +314,7 @@ class ScanDescription:
         self.setPropertyDevices = []
         
         if self.inScan==1:
-            print "Cannot change scan while running"
+            print("Cannot change scan while running")
             return "Cannot change scan while running"
 
         # Split the description
@@ -334,10 +334,10 @@ class ScanDescription:
                 # 'Add' flag
                 if sublist[0]=="Add":
                     AddFlag = 1
-                    print "Appending lists of points"
+                    print("Appending lists of points")
                 elif sublist[0]=="Replace":
                     AddFlag = 0
-                    print "Replacing lists of points"
+                    print("Replacing lists of points")
                 # Scan type
                 elif sublist[0]=="Type":
                     if   sublist[1]=="ScanEnergy":   self.type=ScanEnergy
@@ -351,7 +351,7 @@ class ScanDescription:
                         try:
                             self.type=int(sublist[1])
                         except ValueError:
-                            print "ScanDescription: 'Type' not an integer"
+                            print("ScanDescription: 'Type' not an integer")
                             Logger("Error", "ScanDescription: 'Type' not an integer")
                             nError = nError + 1
                             continue
@@ -360,19 +360,19 @@ class ScanDescription:
                     try:
                         self.fixedType=int(sublist[1])
                     except ValueError:
-                        print "ScanDescription: 'Fixed' not an integer"
+                        print("ScanDescription: 'Fixed' not an integer")
                         Logger("Error", "ScanDescription: 'Fixed' not an integer")
                         nError = nError + 1
                         continue
                     if not self.fixedType==0 and not self.fixedType==1:
-                        print "Bad fixed energy type %s: setting to E_init" % self.fixedType
+                        print("Bad fixed energy type %s: setting to E_init" % self.fixedType)
                         self.fixedType=0
                 # Fixed energy value
                 elif sublist[0]=="FixedE":
                     try:
                         self.fixedE=float(sublist[1])
                     except ValueError:
-                        print "ScanDescription: 'FixedE' not a float"
+                        print("ScanDescription: 'FixedE' not a float")
                         Logger("Error", "ScanDescription: 'FixedE' not a float")
                         nError = nError + 1
                         continue
@@ -381,7 +381,7 @@ class ScanDescription:
                     try:
                         self.prefac=float(sublist[1])
                     except ValueError:
-                        print "ScanDescription: 'Prefac' not a float"
+                        print("ScanDescription: 'Prefac' not a float")
                         Logger("Error", "ScanDescription: 'Prefac' not an integer")
                         nError = nError + 1
                         continue
@@ -403,7 +403,7 @@ class ScanDescription:
                             for icountitem in range(len(countItems)):
                                 self.counts.append(float(countItems[icountitem]))
                         except:
-                            print "ScanDescription: 'Counts' not an integer"
+                            print("ScanDescription: 'Counts' not an integer")
                             Logger("Error", "ScanDescription: 'Counts' not an integer")
                             nError = nError + 1
                             continue
@@ -412,7 +412,7 @@ class ScanDescription:
                     try:
                         self.presetChannel=int(sublist[1])
                     except ValueError:
-                        print "ScanDescription: 'PresetChannel' not an integer"
+                        print("ScanDescription: 'PresetChannel' not an integer")
                         Logger("Error", "ScanDescription: 'PresetChannel' not an integer")
                         nError = nError + 1
                         continue
@@ -422,7 +422,7 @@ class ScanDescription:
                         self.timeoutDevice=sublist[1]
                         self.timeout=int(sublist[2])
                     except ValueError:
-                        print "ScanDescription: 'Timeout' not an integer"
+                        print("ScanDescription: 'Timeout' not an integer")
                         Logger("Error", "ScanDescription: 'Timeout' not an integer")
                         nError = nError + 1
                         continue
@@ -431,7 +431,7 @@ class ScanDescription:
                     self.title=string.join(sublist[1:])
                 # Angle list
                 elif sublist[0]=="Angle" or sublist[0]=="Dev":
-                    if not AddFlag==1 or not self.angleList.has_key(sublist[1]):
+                    if not AddFlag==1 or sublist[1] not in self.angleList:
                         self.angleList[sublist[1]] = []
                     l = string.split(sublist[2])
                     for i in l:
@@ -442,7 +442,7 @@ class ScanDescription:
                             nError = nError + 1
                 # Angle list
                 elif sublist[0]=="Angle2" or sublist[0]=="Dev2":
-                    if not AddFlag==1 or not self.secondDev.has_key(sublist[1]):
+                    if not AddFlag==1 or sublist[1] not in self.secondDev:
                         self.secondDev[sublist[1]] = []
                     l = string.split(sublist[2])
                     for i in l:
@@ -501,7 +501,7 @@ class ScanDescription:
                     try:
                         self.holdScan=float(sublist[1])
                     except ValueError:
-                        print "ScanDescription: 'HoldScan' not a float"
+                        print("ScanDescription: 'HoldScan' not a float")
                         Logger("Error", "ScanDescription: 'HoldScan' not a float")
                         nError = nError + 1
                         continue
@@ -510,7 +510,7 @@ class ScanDescription:
                     try:
                         self.holdPoint=float(sublist[1])
                     except ValueError:
-                        print "ScanDescription: 'HoldPoint' not a float"
+                        print("ScanDescription: 'HoldPoint' not a float")
                         Logger("Error", "ScanDescription: 'HoldPoint' not a float")
                         nError = nError + 1
                         continue
@@ -526,7 +526,7 @@ class ScanDescription:
                     try:
                         l = string.split(sublist[2])
                         self.scanRange[sublist[1]]=[l[0], l[1]]
-                        print "Range %s: %s %s" % (sublist[1], l[0], l[1])
+                        print("Range %s: %s %s" % (sublist[1], l[0], l[1]))
                         if len(l)>2 and l[2].upper()=="S":
                             self.scanRange[sublist[1]].append("S")
                         elif len(l)>2 and l[2].upper()=="I":
@@ -577,7 +577,7 @@ class ScanDescription:
                 self.toInstrStates()
             except:
                 raise "Error", "Scan [%s]: State description incomplete\n  %s" % \
-                    (self.title,sys.exc_value)
+                    (self.title,sys.exc_info()[1])
                 
             if nError>0:
                 return "%i scan description error(s): Check error log" % nError
@@ -617,7 +617,7 @@ class ScanDescription:
             for i in range(len(labels)):
                 self.constDevicesList[labels[i].upper()]=values[i]
             
-        keys = self.angleList.keys()
+        keys = list(self.angleList.keys())
         ntot = len(keys)
         if ntot > 0:
             for i in range(ntot):
@@ -632,7 +632,7 @@ class ScanDescription:
                         del self.constDevicesList[keys[i].upper()]
                     
         # Sort them first
-        motorNames = self.constDevicesList.keys()
+        motorNames = list(self.constDevicesList.keys())
         motorNames.sort()
         const=''
         for dev in motorNames:
@@ -673,9 +673,9 @@ class ScanDescription:
         devList = {}
         
         if BUFFERDEBUG==1:
-                print self.angleList
-                print "E:", self.eList
-                print "Q:",  self.qList
+                print(self.angleList)
+                print("E:", self.eList)
+                print("Q:",  self.qList)
         
         # The following condition is to ensure that the old scan description
         # will be executed the same way they were. With the old descriptions
@@ -765,12 +765,12 @@ class ScanDescription:
         if len(devList)>0:
             cmdstr = "Move"
             # Get the keynames and sort them
-            keys = devList.keys()
+            keys = list(devList.keys())
             keys.sort()
             for dev in keys:
                 cmdstr += " %s %s" % (dev, devList[dev])
             
-        if BUFFERDEBUG==1: print cmdstr
+        if BUFFERDEBUG==1: print(cmdstr)
         if len(cmdstr.lstrip().rstrip())>0: return [cmdstr]
         return []
 
@@ -790,11 +790,11 @@ class ScanDescription:
         if self.numPoints>0 and len(self.scanRange)>0: 
             self.angleList={}
             # Compute list of points
-            devlist=self.scanRange.keys()
+            devlist=list(self.scanRange.keys())
             for dev in devlist:
-                    if self.angleList.has_key(dev): del self.angleList[dev]
+                    if dev in self.angleList: del self.angleList[dev]
                     if dev=="Q": 
-                        if self.angleList.has_key(dev): del self.angleList[dev]
+                        if dev in self.angleList: del self.angleList[dev]
                         self.qList=[]
                         if len(self.scanRange[dev])>=3 and self.scanRange[dev][2]=="S":
                             qtmp = string.split(self.scanRange[dev][0], '~')
@@ -846,7 +846,7 @@ class ScanDescription:
                             start=center-delta*(self.numPoints-1)/2
                         if dev=="E": self.eList=[]
                         else:
-                            if not self.angleList.has_key(dev):
+                            if dev not in self.angleList:
                                 self.angleList[dev] = []
                         if math.fabs(delta)>0:
                             for j in range(self.numPoints):
@@ -864,7 +864,7 @@ class ScanDescription:
         # Second scan dimension
         if self.numPoints2>0 and len(self.scanRange2)>0: 
             self.secondDev={}
-            devlist=self.scanRange2.keys()
+            devlist=list(self.scanRange2.keys())
             for dev in devlist:
                 if len(self.scanRange2[dev])>=3 and self.scanRange2[dev][2]=="S":
                     start=float(self.scanRange2[dev][0])
@@ -878,7 +878,7 @@ class ScanDescription:
                     delta=float(self.scanRange2[dev][1])
                     center=float(self.scanRange2[dev][0])
                     start=center-delta*self.numPoints2/2
-                if not self.secondDev.has_key(dev):
+                if dev not in self.secondDev:
                     self.secondDev[dev] = []
                 for j in range(self.numPoints2):
                     angle = start+delta*j
@@ -972,7 +972,7 @@ class ParseScan(ContentHandler):
                     if not self.currentTag==self.tag:
                         self.scanDescr = self.scanDescr+":"+str(self.currentTag)+"="+str(ch)
                 elif self.tag=="ScanDescr":
-                    if self.scanAttr.has_key("name"):
+                    if "name" in self.scanAttr:
                         self.scanList[self.scanAttr["name"]] = str(ch)
                     else:
                         self.scanList[str(self.nScan)] = str(ch)
@@ -987,18 +987,18 @@ if __name__ == "__main__":
     import InstrumentDescription
     instrument       = InstrumentDescription.InstrumentDescription()
     if instrument.decode("input.xml")<0:
-        print "No instrument description loaded"
+        print("No instrument description loaded")
     list=sys.argv[1:]
     b=ScanDescription(geo=instrument.geometry)
     if len(list)>0:
         desc=string.join(list)
         b.decode(desc)
     else:
-        print "---"
-        print b.decode("Scan:Title=Goo goo 2:Type=2:Field=12.3:Temp=55.5 56.5:Fixed=0:FixedE=14.7:E=2:Q=0.275~0~0 0.325~0~0 0.375~0~0 0.425~0~0:Counts=100:CountType=Timer:Angle=A1=34 35 36:Angle=A2=44 45 46")
+        print("---")
+        print(b.decode("Scan:Title=Goo goo 2:Type=2:Field=12.3:Temp=55.5 56.5:Fixed=0:FixedE=14.7:E=2:Q=0.275~0~0 0.325~0~0 0.375~0~0 0.425~0~0:Counts=100:CountType=Timer:Angle=A1=34 35 36:Angle=A2=44 45 46"))
     if b:
-        print b
-        print b.getDescription()
+        print(b)
+        print(b.getDescription())
         
 #
 # $Log$

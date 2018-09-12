@@ -1,8 +1,8 @@
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import numpy as N
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import simple_combine
+from . import simple_combine
 import copy
 import os
 import pylab
@@ -105,9 +105,9 @@ def grid(x,y,z):
     ymesh_step=.02
     xrange=N.linspace(x.min(),x.max(),37)
     yrange=N.linspace(y.min(),y.max(),68-43)
-    print xrange
-    print yrange
-    print x
+    print(xrange)
+    print(yrange)
+    print(x)
     xi,yi=N.mgrid[x.min():x.max():xmesh_step,y.min():y.max():ymesh_step]
     #blah
     # triangulate data
@@ -117,8 +117,8 @@ def grid(x,y,z):
     #interp = tri.nn_interpolator(z)
     #print 'interpolator reached'
     #zi = interp(xi,yi)
-    print xi.shape
-    print yi.shape
+    print(xi.shape)
+    print(yi.shape)
     zi = griddata(x,y,z,xi,yi)
     return xi,yi,zi
 
@@ -168,7 +168,7 @@ def findpeaks(qx,qz,q,counts):
         if num_counted>0:
             counts_out.append(qsum/num_counted)
         else:
-            print 'qsum',qsum
+            print('qsum',qsum)
             counts_out.append(0)
             
     return qlist,counts_out
@@ -193,7 +193,7 @@ if __name__=='__main__':
     #SU.printr(flist)
     qx,qz,counts=readfiles(flist)
     x,y,z=grid(qx,qz,counts)
-    print qx.shape, qz.shape, counts.shape
+    print(qx.shape, qz.shape, counts.shape)
     q=N.sqrt(qx**2+qz**2)
     qout,counts_out=findpeaks(qx,qz,q,counts)
     if 0:
@@ -224,7 +224,7 @@ if __name__=='__main__':
             h=1;k=0;l=0
             
         r=N.sqrt((2*pi/a*h)**2+(2*pi/c*l)**2)
-        print 'r',r
+        print('r',r)
         delta=.02
         axes.add_patch(Ring(center=(0,0),r1=r-delta, r2=r+delta,theta1=40,theta2=65,
                         fill=True,fc='pink',ec='darkblue',alpha=0.3))
@@ -232,7 +232,7 @@ if __name__=='__main__':
         h=1.0;k=0.0;l=1.0
             
         r=N.sqrt((2*pi/a*h)**2+(2*pi/c*l)**2)
-        print 'r',r
+        print('r',r)
         delta=.02
         axes.add_patch(Ring(center=(0,0),r1=r-delta, r2=r+delta,theta1=40,theta2=65,
                         fill=True,fc='pink',ec='darkblue',alpha=0.3))
@@ -246,7 +246,7 @@ if __name__=='__main__':
             h=0;k=1;l=1
             
             r=N.sqrt((2*pi/a*h)**2+(2*pi/b*k)**2+(2*pi/c*l)**2)
-            print 'r',r
+            print('r',r)
             delta=.02
             axes.add_patch(Ring(center=(0,0),r1=r-delta, r2=r+delta,theta1=40,theta2=65,
                         fill=True,fc='grey',ec='darkblue',alpha=0.3))      
@@ -261,7 +261,7 @@ if __name__=='__main__':
             #h=2;k=2;l=2
             
             r=N.sqrt((2*pi/a*h)**2+(2*pi/b*k)**2+(2*pi/c*l)**2)
-            print 'r',r
+            print('r',r)
             delta=.02
             axes.add_patch(Ring(center=(0,0),r1=r-delta, r2=r+delta,theta1=40,theta2=65,
                         fill=True,fc='grey',ec='darkblue',alpha=0.3))      
@@ -274,7 +274,7 @@ if __name__=='__main__':
             #h=2;k=2;l=2
             
             r=N.sqrt((2*pi/a*h)**2+(2*pi/b*k)**2+(2*pi/c*l)**2)
-            print 'r',r
+            print('r',r)
             delta=.02
             axes.add_patch(Ring(center=(0,0),r1=r-delta, r2=r+delta,theta1=40,theta2=65,
                         fill=True,fc='orange',ec='darkblue',alpha=0.5))      
@@ -291,7 +291,7 @@ if __name__=='__main__':
             #h=2;k=2;l=2
             h=0.0; k=0.0; l=4.0
             r=N.sqrt((2*pi/a*h)**2+(2*pi/b*k)**2+(2*pi/c*l)**2)
-            print 'r',r
+            print('r',r)
             delta=.02
             axes.add_patch(Ring(center=(0,0),r1=r-delta, r2=r+delta,theta1=40,theta2=65,
                         fill=True,fc='purple',ec='darkblue',alpha=0.3))      

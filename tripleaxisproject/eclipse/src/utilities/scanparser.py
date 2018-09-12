@@ -124,7 +124,7 @@ class scanparser:
         toks=scanstr.split(':')
         try:
             if toks[0].lower()!='scan':
-                raise BadScanError,'Not a Valid Scan'
+                raise BadScanError('Not a Valid Scan')
             toks=toks[1:]
             for tok in toks:
                 field=tok.split('=')
@@ -143,7 +143,7 @@ class scanparser:
                             scan_description[key]=value
             return self.scan_description
         except BadScanError:
-            print 'Not a Valid Scan'
+            print('Not a Valid Scan')
             self.scan_description={}
             return self.scan_description
 
@@ -159,7 +159,7 @@ class scanparser:
             for range_string in scanstr_parsed['range_strings']:
                 ranges=self.parse_range(range_string)
                 #print 'ranges',ranges
-                for key,value in ranges.iteritems():
+                for key,value in ranges.items():
                     self.ranges[key]=value
                     #print 'key',key,'value',value
                     if N.absolute(value['step'])>threshold:
@@ -201,5 +201,5 @@ if  __name__=='__main__':
     myparser=scanparser(scanstr)
     #scanstr_parsed=myparser.parse_scan()
     #print myparser.parse_range(scanstr_parsed['range_strings'][0])
-    print myparser.get_varying()
-    print myparser.ranges
+    print(myparser.get_varying())
+    print(myparser.ranges)

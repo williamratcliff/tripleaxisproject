@@ -3,11 +3,11 @@ from numpy import pi,cos, sqrt, sin,exp,conj
 from numpy.linalg import norm
 I=np.complex(0,1)
 import copy,sys,os
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import numpy as N
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-from simple_combine import simple_combine
+from .simple_combine import simple_combine
 import scipy.optimize
 import rescalculator.rescalc as rescalc
 import utilities.findpeak4 as findpeak
@@ -88,8 +88,8 @@ def readfiles(filestrlist):
   l=mydata.metadata['q_center']['l_center']
   hkl='('+str(h)+' '+str(k)+' '+str(l)+')' 
   Q=np.array([h,k,l],'float64')
-  print 'hkl',hkl
-  print 'file', filename
+  print('hkl',hkl)
+  print('file', filename)
   if len(Ilist)==0:
    mon0=mydata.metadata['count_info']['monitor']
    mon0=82500
@@ -189,7 +189,7 @@ def draw_struct():
     mlab.quiver3d(x, y, z,u,v,w, line_width=3, scale_factor=.3,figure=fig)
     outline=mlab.outline(figure=fig,extent=[0,1,0,1,0,1])
     mlab.orientation_axes(figure=fig,xlabel='a',ylabel='b',zlabel='c')
-    print 'done'
+    print('done')
 
     
 def mgnfacFesquared(x):
@@ -297,7 +297,7 @@ def fit_peak(plotdict):
   pb=N.concatenate((results['xpeaks'], fwhm, results['heights']*N.sqrt(2*pi*sigma**2)))
   pb=N.array(pb).flatten()
   p0=N.concatenate((p0,pb)).flatten()
-  print 'p0',p0
+  print('p0',p0)
   #
   fresults= scipy.optimize.leastsq(findpeak.cost_func, p0, args=(x,y,yerr),full_output=1)
   p1=fresults[0]
@@ -312,8 +312,8 @@ def fit_peak(plotdict):
   parinfo[1]['fixed']=1 #fix slope
   fa = {'x':x, 'y':y, 'err':yerr}
   m = mpfit(findpeak.myfunctlin, p0, parinfo=parinfo,functkw=fa) 
-  print 'status = ', m.status
-  print 'params = ', m.params
+  print('status = ', m.status)
+  print('params = ', m.params)
   p1=m.params
   covariance=m.covar
   
@@ -338,9 +338,9 @@ def fit_peak(plotdict):
   fitdict['area']=area.sum()
   fitdict['chi']=chimin
   fitdict['area_err']=N.sqrt(area_sig.sum())
-  print 'area',fitdict['area']
+  print('area',fitdict['area'])
   #next add the fit results
-  print 'chi',chimin
+  print('chi',chimin)
   return fitdict
 
 
@@ -427,7 +427,7 @@ def correct_data(mydata,qscan=None):
  
  
 if __name__=="__main__":
- print "main"
+ print("main")
  gamma=1.913;r0=2.818;Amagn=(gamma*r0/2)**2;   # in fm (to account that nuclear scattering lenghts are also given in fm)
  Anuclear=.0978;
  Anuclear=7.2663e-004;
@@ -436,21 +436,21 @@ if __name__=="__main__":
   mydirectory=r'C:\Ndfeas\jeff\Nd1111'
   myfilebase='magnd'
   myend='.bt9'
-  filenums=range(2,13)
+  filenums=list(range(2,13))
   filenums=[2,3,4,5,7,8,9,10,11,12]
   flist=gen_flist(mydirectory,myfilebase,myend,filenums)
-  print flist
+  print(flist)
   Qlist, thlist,Ilist, Ierrlist,hkllist,mydatalist=readfiles(flist)
-  print Qlist
+  print(Qlist)
   fig=pylab.figure(figsize=(8,8))
   modqlist=[]
   corrections=[]
   y=[]
   yerr=[]
   for i in range(len(Qlist)):
-   print hkllist[i]
+   print(hkllist[i])
    plotdict={}
-   print 'file',flist[i]
+   print('file',flist[i])
    plotdict['data']={}
    plotdict['data']['x']=thlist[i]
    plotdict['data']['y']=Ilist[i]
@@ -467,8 +467,8 @@ if __name__=="__main__":
    modqlist.append(modq)
   if 0:
    pylab.show() 
-  print corrections
-  print modqlist
+  print(corrections)
+  print(modqlist)
   y=np.array(y,'float64')
   yerr=np.array(yerr,'float64')
   pfit=np.array([0.56 ,1.52, -90,-42.0],'float64') 
@@ -485,13 +485,13 @@ if __name__=="__main__":
   corrections=np.array(corrections)
   Qlist=np.array(Qlist)
   fm=calcstructure(pfit,Qlist,corrections)
-  print 'fm',fm
+  print('fm',fm)
   #scale by nuclear factor
   y=y/A
   yerr=yerr/A
   
   if 0:
-   print 'annealing'
+   print('annealing')
    #myschedule='fast'
    myschedule='simple'
    lowerm=1e-4*N.ones(len(pfit))
@@ -503,7 +503,7 @@ if __name__=="__main__":
                  schedule=myschedule,lower=lowerm,upper=upperm,\
                  maxeval=1000, maxaccept=None,dwell=2000,maxiter=120,feps=1e-2,full_output = 0)
   
-   print 'annealed',pout
+   print('annealed',pout)
    pfit=pout
   
   
@@ -536,12 +536,12 @@ if __name__=="__main__":
   
   
   
-  print 'status = ', m.status
-  print 'params = ', m.params
+  print('status = ', m.status)
+  print('params = ', m.params)
   p1=m.params
   covariance=m.covar
   #print 'p',p1[0],p1[1],np.degrees(p1[2:])
-  print 'p',p1[0],np.degrees(p1[1:-1]),p1[-1]
+  print('p',p1[0],np.degrees(p1[1:-1]),p1[-1])
   #th1,th2,th3,th4,phi1,phi2,phi3,phi4=p1[2:]
   #th1,th2,th3,th4,phi1,phi2,phi3,phi4=p1[2:]
   th1,th2,phi1,phi2=p1[1:-1]
@@ -551,11 +551,11 @@ if __name__=="__main__":
   s4=-s2;
   #s3=np.array([sin(th3)*cos(phi3), sin(th3)*sin(phi3), cos(th3)],'float64')
   #s4=np.array([sin(th4)*cos(phi4), sin(th4)*sin(phi4), cos(th4)],'float64')
-  print 'spins'
-  print s1
-  print s2
-  print s3
-  print s4
+  print('spins')
+  print(s1)
+  print(s2)
+  print(s3)
+  print(s4)
   dof=len(y)-len(p1)
   fake_dof=len(y)
   dof=fake_dof
@@ -563,12 +563,12 @@ if __name__=="__main__":
   #chimin=(findpeak.cost_func(p1,x,y,yerr)**2).sum()
   chimin=chimin/dof if dof>0 else chimin/fake_dof
   covariance=covariance*chimin #assume our model is good
-  print 'chimin',chimin
+  print('chimin',chimin)
   fm=calcstructure(p1,Qlist,corrections)
-  print 'vals',p1
-  print 'sigs',covariance.diagonal()
+  print('vals',p1)
+  print('sigs',covariance.diagonal())
   mydiag=covariance.diagonal()
-  print 'sigs degrees',  np.degrees(mydiag[1:-1])
+  print('sigs degrees',  np.degrees(mydiag[1:-1]))
   if 1:
     ax=fig.add_subplot(1,1,1)
     ax.errorbar(modqlist,y,yerr,marker='s',linestyle='None',mfc='black',mec='black',ecolor='black')
@@ -603,7 +603,7 @@ if __name__=="__main__":
   pfit=np.array([1.0],'float64')  
   correction=np.ones(Qs.shape[0])
   fm=calcstructure(pfit,Qs,correction)
-  print 'fm',fm
+  print('fm',fm)
  if 0:
   r=gen_fe()
   draw_struct()

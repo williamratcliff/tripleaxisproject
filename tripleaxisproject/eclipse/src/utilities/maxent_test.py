@@ -1,6 +1,6 @@
-from __future__ import division
+
 import numpy as N
-import dct
+from . import dct
 import pylab
 from openopt import NLP
 
@@ -47,7 +47,7 @@ def plotdensity(h,k,l,fq,xstep=0.01,zstep=0.01):
             P[xia,zia]=fsum
                 #fprintf(fid,'%3.5g  %3.5g  %3.5g  \n',xi,zi,P(zi,xi));
     #print P
-    print P.shape
+    print(P.shape)
     P_fou=dct.dct2(P)
     if 0:
         pylab.pcolor(X,Z,P_fou)
@@ -199,11 +199,11 @@ def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     #fsum_down=N.zeros(h.shape)
     #fmodel=N.zeros(h.shape)
     gradient=N.zeros(2*M)
-    pos=range(M)
-    posm=range(M,2*M)
+    pos=list(range(M))
+    posm=list(range(M,2*M))
     #print 'pos',pos
     #print 'posm',posm
-    hrows=range(2*M)
+    hrows=list(range(2*M))
     hcols=hrows
     gradient[pos]=N.log(A)-N.log(p[0:M])
     gradient[posm]=N.log(A)-N.log(p[M+1:2*M])
@@ -215,7 +215,7 @@ def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list):
 def S_hessian(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     global xstep
     global zstep
-    print 'hessian'
+    print('hessian')
     M=int(len(p)/2)
     Mx=1.0/xstep
     Mz=1.0/zstep
@@ -225,11 +225,11 @@ def S_hessian(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     #fsum_down=N.zeros(h.shape)
     #fmodel=N.zeros(h.shape)
     hessian=N.zeros(2*M)
-    pos=range(M)
-    posm=range(M,2*M)
+    pos=list(range(M))
+    posm=list(range(M,2*M))
     #print 'pos',pos
     #print 'posm',posm
-    hrows=range(2*M)
+    hrows=list(range(2*M))
     hcols=hrows
     hessian[pos]=-1./p[0:M]
     hessian[posm]=-1/p[M+1:2*M]
@@ -295,12 +295,12 @@ def chisq_hessian(p,fqerr,v,coslist,flist):
     
     xn=len(x)
     zn=len(z)
-    print 'sizes'
-    print 'cosk',len(coslist[0])
-    print 'flist', len(flist)
-    print 'fqerr', len(fqerr)
-    print 'v',len(v)
-    print 'p',len(p)
+    print('sizes')
+    print('cosk',len(coslist[0]))
+    print('flist', len(flist))
+    print('fqerr', len(fqerr))
+    print('v',len(v))
+    print('p',len(p))
     for i in range(vlen):
         for j in range(vlen):
             tot=0
@@ -308,9 +308,9 @@ def chisq_hessian(p,fqerr,v,coslist,flist):
             for cosk in coslist:
                 tot=tot+cosk[i]*cosk[j]*flist[i]*flist[j]/fqerr[al]**2
                 al=al+1;
-            print 'tot',tot,v[j]
+            print('tot',tot,v[j])
             vout[i]=vout[i]+v[j]*tot
-            print 'vout',i,j,vout[i]
+            print('vout',i,j,vout[i])
     vout=2*vout/M**2
     return vout
 
@@ -346,7 +346,7 @@ if __name__=="__main__":
     Mx=1.0/xstep
     Mz=1.0/zstep
     M=Mx*Mz
-    print 'M', M,Mx,Mz
+    print('M', M,Mx,Mz)
     p0=N.ones(M*2)
     #print 'len pu',len(pu)
     #print 'len pd',len(pd)
@@ -448,13 +448,13 @@ if __name__=="__main__":
     p.iprint = 1
     #p.df_iter = 50
     p.maxTime = 4000
-    print 'solving'
+    print('solving')
     r = p.solve('algencan')
-    print 'done'
+    print('done')
     pout=r.xf
-    print 'solution:', pout
+    print('solution:', pout)
 
-    print len(pout)
+    print(len(pout))
     
     P_up,P_down=transform_p(pout,Mx,Mz,M)
     P=P_up-P_down
@@ -465,13 +465,13 @@ if __name__=="__main__":
     
     if 0:
         chi=chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1)
-        print 'chi',chi
+        print('chi',chi)
         grad=chisq_grad(p,h,k,l,fq,fqerr)
-        print 'gradient',grad
+        print('gradient',grad)
         sgrad_rows,sgrad_cols,s_grad=S_grad(p,h,k,l,fq,fqerr,A=1)
-        print 'S_grad', s_grad
+        print('S_grad', s_grad)
         srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr)
-        print 'S_hessian',s_hess
+        print('S_hessian',s_hess)
     if 1:
         pylab.pcolor(X,Z,P)
         pylab.show()
@@ -481,7 +481,7 @@ if __name__=="__main__":
     if 0:
         for i in range(len(h)):
             fsum[i]=fourier_p(h[i],k[i],l[i],P)
-            print h[i],k[i],l[i],fq[i],fsum[i],fq[i]/fsum[i]
+            print(h[i],k[i],l[i],fq[i],fsum[i],fq[i]/fsum[i])
     
     if 0:
         q=N.sqrt(h**2+l**2)  #Note, 107 is off by a factor of 2!
@@ -493,6 +493,6 @@ if __name__=="__main__":
         myfilestr=r'c:\structfactors_density.dat'
         x,y,z=N.loadtxt(myfilestr).T
         bob=N.loadtxt(myfilestr).T
-        print bob.shape
+        print(bob.shape)
         pylab.pcolormesh(x,y,z)
         pylab.show()

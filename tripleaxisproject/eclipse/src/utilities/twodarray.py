@@ -32,7 +32,7 @@ pt.Z=zdata.ctypes.data_as(c_void_pp)
 foo = N.ctypeslib.load_library('pb.dll', '.')
 foo.correct(pt.Y,pt.Z)
 s=''
-print zdata
+print(zdata)
 
 #x = N.array([[10,20,30], [40,50,60], [80,90,100]], 'f4')
 #f4ptr = POINTER(c_float)

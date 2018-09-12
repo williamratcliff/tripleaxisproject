@@ -15,7 +15,7 @@ def savitzky_golay(data, kernel = 11, order = 4,deriv=0):
     try:
             kernel = abs(int(kernel))
             order = abs(int(order))
-    except ValueError, msg:
+    except ValueError as msg:
         raise ValueError("kernel and order have to be of type int (floats will be converted).")
     if kernel % 2 != 1 or kernel < 1:
         raise TypeError("kernel size must be a positive odd number, was: %d" % kernel)
@@ -23,7 +23,7 @@ def savitzky_golay(data, kernel = 11, order = 4,deriv=0):
         raise TypeError("kernel is to small for the polynomals\nshould be > order + 2")
 
     # a second order polynomal has 3 coefficients
-    order_range = range(order+1)
+    order_range = list(range(order+1))
     half_window = (kernel -1) // 2
     b = numpy.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
     # since we don't want the derivative, else choose [1] or [2], respectively
@@ -33,8 +33,8 @@ def savitzky_golay(data, kernel = 11, order = 4,deriv=0):
     half_window = (window_size-1) // 2
 
     # precompute the offset values for better performance
-    offsets = range(-half_window, half_window+1)
-    offset_data = zip(offsets, m)
+    offsets = list(range(-half_window, half_window+1))
+    offset_data = list(zip(offsets, m))
 
     smooth_data = list()
 
@@ -73,8 +73,8 @@ if __name__=='__main__':
     y=x**2
     yd1=savitzky_golay(y,deriv=1)/.1
     yd2=savitzky_golay(y,deriv=2)/(.1)**2
-    print yd1.shape
-    print y.shape
+    print(yd1.shape)
+    print(y.shape)
     #pylab.plot(x,y)
     #pylab.plot(x,yd1)
     pylab.plot(x,yd2)

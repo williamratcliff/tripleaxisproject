@@ -19,8 +19,8 @@ if __name__=="__main__":
     chi=susceptibility(p,T,n=8)
     chi2=susceptibility(p,T,n=3)
     chi3=susceptibility(p,T,n=20000)
-    print chi
-    print 'J', p[0]/k
+    print(chi)
+    print('J', p[0]/k)
     if 1:
         pylab.plot(T,chi,marker='s')
         pylab.plot(T,chi2,marker='s')

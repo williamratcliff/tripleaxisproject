@@ -14,16 +14,16 @@ def fwhm2sigma(fwhm):
 
 def area2I(A,fwhm):
     sigma=fwhm2sigma(fwhm)
-    print 'sigma ',sigma
+    print('sigma ',sigma)
     I=A/(N.sqrt(2*pi)*sigma)
     return I
 
 def readfile(myfilestr):
     reader = csv.reader(open(myfilestr))
-    header = reader.next()
+    header = next(reader)
     data = array.array('f')
     for row in reader:
-        data.extend(map(float, row))
+        data.extend(list(map(float, row)))
     #print 'Data size', len(data)
     #myfile=open(myfilestr)
     #header = myfile.readline()
@@ -42,10 +42,10 @@ def spe_write(T,a4,I,outputfile=None):
     #nx ny
     myfile=open(outputfile,'wt')
     s='%5d %5d'%(len(T),a4.size)
-    print s
+    print(s)
     myfile.write(s+'\n')
     s='###T'
-    print s
+    print(s)
     myfile.write(s+'\n')
     s=''
     s='%10.4f'%(T[0],)
@@ -57,12 +57,12 @@ def spe_write(T,a4,I,outputfile=None):
         else:
             s=s+'%10.4f'%(T[i],)
         count=count+1
-    print s
+    print(s)
     if len(T)%8!=0:
         s=s+'\n'
     myfile.write(s)
     s='###a4'
-    print s
+    print(s)
     myfile.write(s+'\n')
     #a4 grid
     a4size=a4.size
@@ -78,7 +78,7 @@ def spe_write(T,a4,I,outputfile=None):
         #print count
             count=count+1
 
-    print s
+    print(s)
     if a4size%8!=0:
         s=s+'\n'
     myfile.write(s)
@@ -86,7 +86,7 @@ def spe_write(T,a4,I,outputfile=None):
     count=2
     for l in range(len(T)):
         s='###Intensity (arb. units)'
-        print s
+        print(s)
         myfile.write(s+'\n')
         s=''
         I_curr=I[l]
@@ -102,12 +102,12 @@ def spe_write(T,a4,I,outputfile=None):
             #print count
                 count=count+1
 
-        print s
+        print(s)
         if a4size%8!=0:
             s=s+'\n'
         myfile.write(s)
         s='###Errors'
-        print s
+        print(s)
         myfile.write(s+'\n')
         s=''
         I_curr=I[l]
@@ -123,12 +123,12 @@ def spe_write(T,a4,I,outputfile=None):
             #print count
                 count=count+1
 
-        print s
+        print(s)
         if a4size%8!=0:
             s=s+'\n'
         myfile.write(s)
 
-        print T
+        print(T)
 
 
 
@@ -139,7 +139,7 @@ def spe_write(T,a4,I,outputfile=None):
 
 if __name__=='__main__':
 
-    print area2I(87.82,.4537)
+    print(area2I(87.82,.4537))
     mydirectory=r'c:\\12436\superconductor'
     myend='csv'
     myfilebase='lafen015_220_'
@@ -155,7 +155,7 @@ if __name__=='__main__':
     T_idl=T
     for currT in T:
         myfilestr=mydirectory+'\\'+str(currT)+'K.'+myend
-        print myfilestr
+        print(myfilestr)
         data=readfile(myfilestr)
         if currT==4:
             data[:,1]=data[:,1]/3
@@ -164,7 +164,7 @@ if __name__=='__main__':
         if currT==60:
             data[:,1]=data[:,1]/6
             data[:,2]=data[:,2]/6
-            print 60
+            print(60)
         if currT==175:
             data[:,1]=data[:,1]*0.25
             data[:,2]=data[:,2]*0.25
@@ -187,8 +187,8 @@ if __name__=='__main__':
     I=N.array(I).flatten()
     Ierr=N.array(Ierr).flatten()
     T=N.array(Tlist).flatten()
-    print min(a4)
-    print max(a4)
+    print(min(a4))
+    print(max(a4))
     step=.05
 
     #print T

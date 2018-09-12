@@ -13,7 +13,7 @@ catalog_sender = Sender()
 # Define a message receiver
 class Receiver(wx.Button):
   def onHello(self,who=None): 
-    print 'hi to',self.GetLabel(),'from',who
+    print('hi to',self.GetLabel(),'from',who)
 
 # Create the app with buttons for sending and slots for receiving
 app = wx.App(redirect=False)

@@ -1,12 +1,12 @@
 import numpy as N
 import pylab
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr
+from . import readncnr
 
 def read_order_files(mydirectory,myfilebase,myend):
     myfilebaseglob=myfilebase+'*.'+myend
-    print myfilebaseglob
+    print(myfilebaseglob)
     flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     #SU.printr(flist)
     mydatareader=readncnr.datareader()
@@ -16,7 +16,7 @@ def read_order_files(mydirectory,myfilebase,myend):
     count=0
     mon0=5.0e4
     for currfile in flist:
-        print currfile
+        print(currfile)
         mydata=mydatareader.readbuffer(currfile)
         if count==0:
             #mon0=mydata.header['count_info']['monitor']

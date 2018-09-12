@@ -29,7 +29,7 @@ def plot_data(xa,ya,za,fig,nfig,colorflag=False):
 
     if colorflag:
         g=pylab.colorbar(pc,ticks=N.arange(0,100,20))
-        print g
+        print(g)
         #g.ticks=None
         #gax.yaxis.set_major_locator(MultipleLocator(40))
         #g.ticks(N.array([0,20,40,60,80]))
@@ -46,12 +46,12 @@ def prep_data(filename):
     y=yt[:,zorigt>0.0]
     z=zorigt[:,zorigt>0.0]
 #    zorig=ma.array(zorigt)
-    print 'reached'
+    print('reached')
     threshold=0.0;
 #    print zorigt < threshold
 #    print N.isnan(zorigt)
 #    z = ma.masked_where(zorigt < threshold , zorigt)
-    print 'where masked ', z.shape
+    print('where masked ', z.shape)
 #should be commented out--just for testing
 ##    x = pylab.randn(Nu)/aspect
 ##    y = pylab.randn(Nu)
@@ -63,10 +63,10 @@ def prep_data(filename):
     xi,yi=N.mgrid[x.min():x.max():.05,y.min():y.max():.05]
     # triangulate data
     tri = D.Triangulation(x,y)
-    print 'before interpolator'
+    print('before interpolator')
     # interpolate data
     interp = tri.nn_interpolator(z)
-    print 'interpolator reached'
+    print('interpolator reached')
     zi = interp(xi,yi)
     # or, all in one line
     #    zi = Triangulation(x,y).nn_interpolator(z)(xi,yi)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     xe,ye,ze=prep_data(r'c:\resolution_stuff\150K.iexy');
     xf,yf,zf=prep_data(r'c:\resolution_stuff\250K.iexy');
     
-    print 'matplotlib'
+    print('matplotlib')
 
 
 
@@ -132,11 +132,11 @@ if __name__ == '__main__':
     ax.yaxis.set_major_formatter(NullFormatter())
     
     
-    print 'gca ', fig.gca()
+    print('gca ', fig.gca())
     for im in fig.gca().get_images():
-        print im
+        print(im)
         im.set_clim(0.0,80.0)
 
-    print 'saving'
+    print('saving')
     pylab.savefig(r'c:\fig3b.pdf',dpi=150)
-    print 'saved'
+    print('saved')

@@ -23,22 +23,22 @@ written to use `self.stdout.write()`,
 mercurial repository at http://www.assembla.com/wiki/show/python-cmd2
 """
 import cmd, re, os, sys, optparse, subprocess, tempfile, pyparsing, doctest
-import unittest, string, datetime, urllib, glob
+import unittest, string, datetime, urllib.request, urllib.parse, urllib.error, glob
 from code import InteractiveConsole, InteractiveInterpreter, softspace
 from optparse import make_option
-import sequenceloader
+from . import sequenceloader
 __version__ = '0.5.5'
 
 class OptionParser(optparse.OptionParser):
     def exit(self, status=0, msg=None):
         self.values._exit = True
         if msg:
-            print msg
+            print(msg)
             
     def print_help(self, *args, **kwargs):
         # now, I need to call help of the calling function.  Hmm.
         try:
-            print self._func.__doc__
+            print(self._func.__doc__)
         except AttributeError:
             pass
         optparse.OptionParser.print_help(self, *args, **kwargs)
@@ -74,8 +74,8 @@ def options(option_list):
                 newArgs = remainingArgs(arg, newArgList)  # should it permit flags after args?
             except (optparse.OptionValueError, optparse.BadOptionError,
                     optparse.OptionError, optparse.AmbiguousOptionError,
-                    optparse.OptionConflictError), e:
-                print e
+                    optparse.OptionConflictError) as e:
+                print(e)
                 optionParser.print_help()
                 return
             if hasattr(opts, '_exit'):
@@ -131,7 +131,7 @@ if subprocess.mswindows:
             win32clipboard.CloseClipboard()        
     except ImportError:
         def getPasteBuffer(*args):
-            raise OSError, pastebufferr % ('pywin32', 'Download from http://sourceforge.net/projects/pywin32/')
+            raise OSError(pastebufferr % ('pywin32', 'Download from http://sourceforge.net/projects/pywin32/'))
         setPasteBuffer = getPasteBuffer
 else:
     can_clip = False
@@ -162,7 +162,7 @@ else:
             xclipproc.stdin.close()
     else:
         def getPasteBuffer(*args):
-            raise OSError, pastebufferr % ('xclip', 'On Debian/Ubuntu, install with "sudo apt-get install xclip"')
+            raise OSError(pastebufferr % ('xclip', 'On Debian/Ubuntu, install with "sudo apt-get install xclip"'))
         setPasteBuffer = getPasteBuffer
         writeToPasteBuffer = getPasteBuffer
           
@@ -240,14 +240,14 @@ class MyInteractiveConsole(InteractiveConsole):
         EmbeddedConsoleExit exceptions.
         """
         try:
-            exec code in self.locals
+            exec(code, self.locals)
         except (SystemExit, EmbeddedConsoleExit):
             raise
         except:
             self.showtraceback()
         else:
             if softspace(sys.stdout, 0):
-                print
+                print()
 
 class Cmd(cmd.Cmd):
     echo = False
@@ -276,7 +276,7 @@ class Cmd(cmd.Cmd):
         if msg[-1] != '\n':
             self.stdout.write('\n')
     def perror(self, errmsg, statement=None):
-        print str(errmsg)
+        print(str(errmsg))
     def pfeedback(self, msg):
         """For printing nonessential feedback.  Can be silenced with `quiet`.
            Inclusion in redirected output is controlled by `feedback_to_output`."""
@@ -284,7 +284,7 @@ class Cmd(cmd.Cmd):
             if self.feedback_to_output:
                 self.poutput(msg)
             else:
-                print msg
+                print(msg)
     editor = os.environ.get('EDITOR')
     _STOP_AND_EXIT = 2
     if not editor:
@@ -324,7 +324,7 @@ class Cmd(cmd.Cmd):
         self.history = History()
         self._init_parser()
         self.pystate = {}
-        self.shortcuts = sorted(self.shortcuts.items(), reverse=True)
+        self.shortcuts = sorted(list(self.shortcuts.items()), reverse=True)
         self.keywords = self.reserved_words + [fname[3:] for fname in dir(self) 
                                                if fname.startswith('do_')]        
     def do_shortcuts(self, args):
@@ -569,7 +569,7 @@ class Cmd(cmd.Cmd):
             p = ParsedString(result.clean)
             p.parsed = result
             p.parser = self.parsed
-        for (key, val) in kwargs.items():
+        for (key, val) in list(kwargs.items()):
             p.parsed[key] = val
         return p
               
@@ -612,14 +612,14 @@ class Cmd(cmd.Cmd):
                 statement = '%s\n%s' % (statement.parsed.raw, 
                                         self.pseudo_raw_input(self.continuation_prompt))                
                 statement = self.parsed(statement)
-        except Exception, e:
+        except Exception as e:
             self.perror(e)
             return 0
         if statement.parsed.command not in self.excludeFromHistory:
             self.history.append(statement.parsed.raw)
         try:
             (stop, statement) = self.postparsing_precmd(statement)
-        except Exception, e:
+        except Exception as e:
             self.perror(e)
             return 0
         if stop:
@@ -642,7 +642,7 @@ class Cmd(cmd.Cmd):
                     mode = 'a'
                 try:
                     self.stdout = open(os.path.expanduser(statement.parsed.outputTo), mode)                            
-                except OSError, e:
+                except OSError as e:
                     self.perror(e)
                     return self.postparsing_postcmd(stop=0) 
             else:
@@ -665,7 +665,7 @@ class Cmd(cmd.Cmd):
                 stop = func(statement) 
                 if self.timing:
                     self.pfeedback('Elapsed: %s' % str(datetime.datetime.now() - timestart))
-            except Exception, e:
+            except Exception as e:
                 self.perror(e, statement)
         finally:
             if statekeeper:
@@ -673,7 +673,7 @@ class Cmd(cmd.Cmd):
                     self.stdout.seek(0)
                     try:
                         writeToPasteBuffer(self.stdout.read())
-                    except Exception, e:
+                    except Exception as e:
                         self.perror(e)
                 elif statement.parsed.pipeTo:
                     for result in redirect.communicate():              
@@ -688,7 +688,7 @@ class Cmd(cmd.Cmd):
         
         if self.use_rawinput:
             try:
-                line = raw_input(prompt)
+                line = input(prompt)
             except EOFError:
                 line = 'EOF'
         else:
@@ -809,12 +809,12 @@ class Cmd(cmd.Cmd):
                         pass
             else:
                 self.do_show(paramName)
-        except (ValueError, AttributeError, NotSettableError), e:
+        except (ValueError, AttributeError, NotSettableError) as e:
             self.do_show(arg)
                 
     def do_pause(self, arg):
         'Displays the specified text then waits for the user to press RETURN.'
-        raw_input(arg + '\n')
+        input(arg + '\n')
         
     def do_shell(self, arg):
         'execute a command as if at the OS prompt.'
@@ -946,7 +946,7 @@ class Cmd(cmd.Cmd):
             f.write(saveme)
             f.close()
             self.pfeedback('Saved to %s' % (fname))
-        except Exception, e:
+        except Exception as e:
             self.perror('Error saving %s: %s' % (fname, str(e)))
             
     def read_file_or_url(self, fname):
@@ -955,12 +955,12 @@ class Cmd(cmd.Cmd):
         else:
             match = self.urlre.match(fname)
             if match:
-                target = urllib.urlopen(match.group(1))
+                target = urllib.request.urlopen(match.group(1))
             else:
                 fname = os.path.expanduser(fname)
                 try:
                     result = open(os.path.expanduser(fname), 'r')
-                except IOError, e:                    
+                except IOError as e:                    
                     result = open('%s.%s' % (os.path.expanduser(fname), 
                                              self.defaultExtension), 'r')
         return result
@@ -1003,7 +1003,7 @@ class Cmd(cmd.Cmd):
                 #target.write(r'\n')
                 target.close()
                 target=open('tmp','r')
-            except IOError, e:
+            except IOError as e:
                 self.perror('Problem accessing script from %s: \n%s' % (targetname, e))
                 return
             self.stdin = target
@@ -1097,7 +1097,7 @@ def cast(current, new):
     if typ == bool:
         try:
             return bool(int(new))
-        except ValueError, TypeError:
+        except ValueError as TypeError:
             pass
         try:
             new = new.lower()    
@@ -1112,7 +1112,7 @@ def cast(current, new):
             return typ(new)
         except:
             pass
-    print "Problem setting parameter (now %s) to %s; incorrect type?" % (current, new)
+    print("Problem setting parameter (now %s) to %s; incorrect type?" % (current, new))
     return current
         
 class Statekeeper(object):
@@ -1165,7 +1165,7 @@ class Cmd2TestCase(unittest.TestCase):
                 self.transcripts[fname] = iter(tfile.readlines())
                 tfile.close()
         if not len(self.transcripts):
-            raise StandardError, "No test files found - nothing to test."
+            raise Exception("No test files found - nothing to test.")
     def setUp(self):
         if self.CmdApp:
             self.outputTrap = OutputTrap()
@@ -1185,33 +1185,33 @@ class Cmd2TestCase(unittest.TestCase):
     def _test_transcript(self, fname, transcript):
         lineNum = 0
         try:
-            line = transcript.next()
+            line = next(transcript)
             while True:
                 while not line.startswith(self.cmdapp.prompt):
-                    line = transcript.next()
+                    line = next(transcript)
                 command = [line[len(self.cmdapp.prompt):]]
-                line = transcript.next()
+                line = next(transcript)
                 while line.startswith(self.cmdapp.continuation_prompt):
                     command.append(line[len(self.cmdapp.continuation_prompt):])
-                    line = transcript.next()
+                    line = next(transcript)
                 command = ''.join(command)
                 self.cmdapp.onecmd(command)
                 result = self.outputTrap.read().strip()
                 if line.startswith(self.cmdapp.prompt):
                     message = '\nFile %s, line %d\nCommand was:\n%s\nExpected: (nothing)\nGot:\n%s\n'%\
                         (fname, lineNum, command, result)     
-                    self.assert_(not(result.strip()), message)
+                    self.assertTrue(not(result.strip()), message)
                     continue
                 expected = []
                 while not line.startswith(self.cmdapp.prompt):
                     expected.append(line)
-                    line = transcript.next()
+                    line = next(transcript)
                 expected = ''.join(expected).strip()
                 message = '\nFile %s, line %d\nCommand was:\n%s\nExpected:\n%s\nGot:\n%s\n'%\
                     (fname, lineNum, command, expected, result)      
                 expected = self.expectationParser.transformString(expected)
                 expected = self.endStrippingRegex.sub('\s*\n', expected)
-                self.assert_(re.match(expected, result, re.MULTILINE | re.DOTALL), message)
+                self.assertTrue(re.match(expected, result, re.MULTILINE | re.DOTALL), message)
         except StopIteration:
             pass
     def tearDown(self):

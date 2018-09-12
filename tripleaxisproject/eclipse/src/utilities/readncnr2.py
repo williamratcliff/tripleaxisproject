@@ -3,7 +3,7 @@ import numpy as N
 import datetime
 from time import mktime
 #import mx.DateTime
-import writebt7
+from . import writebt7
 import re
 
 
@@ -397,7 +397,7 @@ class datareader:
             self.columndict[field]=[]
             self.columnlist.append(field)
         #In old bt7 files, there was no timestamp, so add one for those, otherwise use the one in the file
-        if self.columndict.has_key('timestamp')==False:
+        if ('timestamp' in self.columndict)==False:
             self.timestamp_flag=False
             self.columnlist.append('timestamp')
             #print 'no timestamp'
@@ -640,13 +640,13 @@ class datareader:
             # Determine FileType
             self.determinefiletype(myfile)
             if self.metadata['file_info']['scantype'].lower()=='i':
-                print "calling readibuffer"
+                print("calling readibuffer")
                 self.readimetadata(myfile)
             if self.metadata['file_info']['scantype'].lower()=='b':
-                print "calling readbbuffer"
+                print("calling readbbuffer")
                 self.readbmetadata(myfile)
             if self.metadata['file_info']['scantype'].lower()=='q':
-                print "calling readqbuffer"
+                print("calling readqbuffer")
                 self.readqmetadata(myfile)
 
             #read columns
@@ -808,10 +808,10 @@ if __name__=='__main__':
         myoutfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7.out'
         #mywriter=writebt7.datawriter()
         #mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata)
-        print mydata.data['timestamp']
+        print(mydata.data['timestamp'])
         #print mydata.data['magfield']
-        print mydata.data.keys()
-        print 'done'
+        print(list(mydata.data.keys()))
+        print('done')
         #mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
         #print N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])
         #print len(mydata.data['timestamp'])
@@ -829,10 +829,10 @@ if __name__=='__main__':
         mydata=mydatareader.readbuffer(myfilestr,lines=91)
 
     if 0:
-        print 'metadata'
-        print mydata.metadata['file_info']
+        print('metadata')
+        print(mydata.metadata['file_info'])
     if 0:
-        print 'additional metadata'
-        print mydata.additional_metadata
+        print('additional metadata')
+        print(mydata.additional_metadata)
 
 

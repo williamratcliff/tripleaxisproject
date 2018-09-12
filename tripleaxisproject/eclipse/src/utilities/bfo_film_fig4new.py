@@ -1,7 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as N
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import matplotlib.image as mpimg
 import os,sys
 from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator, NullLocator

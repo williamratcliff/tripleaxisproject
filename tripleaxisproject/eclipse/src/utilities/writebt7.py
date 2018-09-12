@@ -14,7 +14,7 @@ class datawriter:
         #print 'called with ',myoutfilestr,' self ',self.myoutfilestr
         count=1
         #mydata.additional_metadata['parsed_scandescription'] #TODO choose correct field based on this
-        for key in mydata.data.keys():
+        for key in list(mydata.data.keys()):
             if key=='detector_corrected':
                 detectorpos=count
                 #print 'detectorpos ',detectorpos
@@ -36,7 +36,7 @@ class datawriter:
 
             myoutfile.write(s.lower())
         s='#Columns '
-        for key in mydata.data.keys():
+        for key in list(mydata.data.keys()):
             s=s+key+' '
         s=s+'\n'
         myoutfile.write(s)

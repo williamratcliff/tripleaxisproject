@@ -32,13 +32,13 @@ def plot_as(ax,fig):
   zp=aspos[N.where(aspos[:,1]==0.5)[0],2]
   
   for x,z in zip(xn,zn):
-    print x,z
+    print(x,z)
     x1=N.array([x])
     y1=N.array([z])
     ax.plot(x1,y1,'bo',markersize=20,markerfacecolor='blue',markeredgecolor='blue')
     
   for x,z in zip(xp,zp):
-    print x,z
+    print(x,z)
     x1=N.array([x])
     y1=N.array([z])
     ax.plot(x1,y1,'ro',markersize=10,markerfacecolor='red',markeredgecolor='red')

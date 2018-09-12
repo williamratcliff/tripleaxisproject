@@ -121,7 +121,7 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
             else:
                 x_out.append(curr_x) #deal with the endpoint
                 y_out.append(curr_y/count)
-                print 'count',count
+                print('count',count)
                 yerr_out.append(N.sqrt(curr_yerrsq)/count) #normalize back to original monitor
                 count=1.0
 
@@ -129,9 +129,9 @@ def simple_combine(xlist,ylist,yerrlist,monlist,monitor=None,method=None,eps=Non
     if method=='interpolate':
         if step==None:
             step=min_step
-        print 'xmin ',xmin
-        print 'xmax ',xmax
-        print 'step ',step
+        print('xmin ',xmin)
+        print('xmax ',xmax)
+        print('step ',step)
         x_out=N.arange(xmin,xmax,step,'float64')
         y_out=N.zeros(x_out.shape,'float64')
         yerr_out=N.zeros(x_out.shape,'float64')
@@ -156,7 +156,7 @@ def print_arr(arrlist):
         s=''
         for j in range(len(arrlist)):
             s=s+'%3.2f'%(arrlist[j][i])+' '
-        print s
+        print(s)
     return
 
 if __name__=='__main__':
@@ -189,7 +189,7 @@ if __name__=='__main__':
         y1_interpolated=y1interpolater(x2)
         y1errinterpolater=interpolate.interp1d(x1,y1err*y1err,fill_value=0.0,kind='linear',copy=True)
         y1err_interpolated=N.sqrt(y1errinterpolater(x2))
-        print y1err_interpolated
+        print(y1err_interpolated)
         fig=pylab.figure(figsize=(8,8))
         fig.add_subplot(1,2,1)
         pylab.errorbar(x1,y1,y1err,marker='s',linestyle='None',mfc='blue')

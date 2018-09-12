@@ -2,7 +2,7 @@ import numpy as N
 import  pylab
 import datetime
 import mx.DateTime
-import writebt7
+from . import writebt7
 
 
 months={'jan':1,'feb':2,'mar':3,'apr':4,'may':5,'jun':6,'jul':7,'aug':8,'sep':9,'oct':10,'nov':11,'dec':12}
@@ -572,13 +572,13 @@ class datareader:
             # Determine FileType
             self.determinefiletype(myfile)
             if self.metadata['file_info']['scantype'].lower()=='i':
-                print "calling readibuffer"
+                print("calling readibuffer")
                 self.readimetadata(myfile)
             if self.metadata['file_info']['scantype'].lower()=='b':
-                print "calling readbbuffer"
+                print("calling readbbuffer")
                 self.readbmetadata(myfile)
             if self.metadata['file_info']['scantype'].lower()=='q':
-                print "calling readqbuffer"
+                print("calling readqbuffer")
                 self.readqmetadata(myfile)
             
             #read columns
@@ -749,9 +749,9 @@ if __name__=='__main__':
         myoutfilestr=r'c:\bifeo3xtal\jan8_2008\9175\meshbefieldneg1p3plusminus53470.bt7.out'
         mywriter=writebt7.datawriter()
         mywriter.write(myoutfilestr=myoutfilestr,mydata=mydata) 
-        print 'done'          
+        print('done')          
         mydataout=mydata=mydatareader.readbuffer(myoutfilestr,lines=91)
-        print N.array(mydata.data['qy'])-N.array(mydataout.data['qy']) 
+        print(N.array(mydata.data['qy'])-N.array(mydataout.data['qy'])) 
         #print len(mydata.data['timestamp'])
         #print mydata.data['Qy']
         #print mydata.data
@@ -764,14 +764,14 @@ if __name__=='__main__':
         myfilestr=r'c:\sqltest\\mnl1p004.ng5'
     if 0:
         mydirectory=r'c:\summerschool2007\\' 
-        myfilenumbers=range(4,33,1)
+        myfilenumbers=list(range(4,33,1))
         myend='.ng5'
         myfilehead='qCdCr'
         #myfilestr=mydirectory+'qCdCr006.ng5'
         data=DataCollection()
         mydatareader=datareader()
         mydata=mydatareader.readbuffer(myfilestr)
-        print mydata.metadata
+        print(mydata.metadata)
 #    print mydata.npts
 #    print mydata.monitor
 #    print mydata.gen_motor6_arr()
@@ -784,12 +784,12 @@ if __name__=='__main__':
         for i in range(len(myfilenumbers)):
             myfilenum=num2string(myfilenumbers[i])
             myfilestr=mydirectory+myfilehead+myfilenum+myend
-            print myfilestr
+            print(myfilestr)
             data.add_datum(mydatareader.readibuffer(myfilestr))
         a3,a4,counts=data.extract_a3a4()
-        print a3.shape
-        print a4.shape
-        print counts.shape
+        print(a3.shape)
+        print(a4.shape)
+        print(counts.shape)
 
 
 

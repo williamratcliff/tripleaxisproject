@@ -1,4 +1,4 @@
-from cmd3 import Cmd, make_option, options, Cmd2TestCase
+from .cmd3 import Cmd, make_option, options, Cmd2TestCase
 import unittest, optparse, sys,math
 import functools,inspect
 import argparse
@@ -29,7 +29,7 @@ from ice.gui.core import IceDialog
 from ice.gui.core import IceEditPanel
 from ice.gui.core import IceWindow
 from ice.swing import *
-import scanparser3 as scanparser
+from . import scanparser3 as scanparser
 
 import readline
 import sys
@@ -143,9 +143,9 @@ class GetErrs(BroadcastMessageListener):
 		comm.addMessageListener(self)
 	def actionPerformed(self,me):
 		data=me.getData()
-		print data
+		print(data)
 		if not  str(data).find('Stopped')==-1:
-			print 'exiting'
+			print('exiting')
 			sys.exit()
 		#if not str(data).find('Paused')==-1:
 		#	print 'instrument paused'  #for now exit
@@ -169,7 +169,7 @@ class Rate(QueuedCommand):
 		imq=self.getResponseMessageQueue()
 		cmq=imq.getMessagesForAbsCommandId(cid)
 		f=cmq.remove()
-		print "Rate ",f 
+		print("Rate ",f) 
 		self.rate=f
 		#Note, the rate command doesn't seem to actually print the bloody rate!!!
 
@@ -197,7 +197,7 @@ class setLowerLimit(ImmediateCommand):
 		#cmq = mq.getMessagesForAbsCommandId(cid)
 		#f = cmq.remove()
 		f = self.getResponse()
-		print f 
+		print(f) 
                 #f=str(f.split('\n')[1]).split(':')[1].strip().split()
                 #self.soft=f[0]
                 #self.hard=f[1]                
@@ -217,7 +217,7 @@ class setUpperLimit(ImmediateCommand):
 		#cmq = mq.getMessagesForAbsCommandId(cid)
 		#f = cmq.remove()
 		f = self.getResponse()
-		print f 
+		print(f) 
                 #f=str(f.split('\n')[1]).split(':')[1].strip().split()
                 #self.soft=f[0]
                 #self.hard=f[1]                
@@ -239,7 +239,7 @@ class GetHowlong(ImmediateCommand):
 		#cmq = mq.getMessagesForAbsCommandId(cid)
 		#f = cmq.remove()
 		f = self.getResponse()
-		print f 
+		print(f) 
 		self.howlong=f
 
 
@@ -584,18 +584,18 @@ class Devices(object):
 		"""activate a device"""
 		present_devices=self.present_devices
 		for device in devices:
-			print "activating", device
+			print("activating", device)
 		return        
 	def deactivate(self,devices):
 		"""Deactivate a device"""
 		present_devices=self.present_devices
 		for device in devices:
-			print "deactivating", device
+			print("deactivating", device)
 		return
 	    
 	def rate(self):
 		"""Determines the monitor rate"""
-		print 'calculating monitor rate'
+		print('calculating monitor rate')
 		mycommand=StackAddCommand("rate")
 		mycommand.run()
 		myid=mycommand.commandID
@@ -606,7 +606,7 @@ class Devices(object):
 		controller=self.controller
 		for device in devices:
 			DeviceFixCommand(device).run()
-			print "Fixing", device
+			print("Fixing", device)
 		    
 		    
 	def release(self,devices):
@@ -614,17 +614,17 @@ class Devices(object):
 		controller=self.controller
 		for device in devices:
 			DeviceFreeCommand(device).run()
-			print "Releasing", device
+			print("Releasing", device)
 		    
 	def move(self,devices,positions,moveflag=False):
 		"""Move devices to positions"""
 		present_devices=self.present_devices
-		print 'devices',devices
+		print('devices',devices)
 		for i in range(len(devices)):
 			if not moveflag:
-				print 'Moving',devices[i],'to',positions[i]
+				print('Moving',devices[i],'to',positions[i])
 			else:
-				print 'Moving',devices[i],'by',positions[i]
+				print('Moving',devices[i],'by',positions[i])
 			m=MoveCommand(devices[i],positions[i],moveflag)
 			m.run()  
 
@@ -633,7 +633,7 @@ class Devices(object):
 		"""Move devices by a relative increment"""
 		present_devices=self.present_devices
 		for i in range(len(devices)):
-			print 'Moving',device[i], 'by increment', increments[i]
+			print('Moving',device[i], 'by increment', increments[i])
 	    
 	def count(self,duration):
 		if duration>0:
@@ -658,12 +658,12 @@ class Devices(object):
 		present_devices=self.present_devices
 		if device in self.present_devices:
 			if device in self.counting_devices:
-				print 'cannot scan a counting device',device
+				print('cannot scan a counting device',device)
 			elif device in self.environmental_devices:
-				print 'scanning an environmental device',device
+				print('scanning an environmental device',device)
 			else:
-				print 'scanning device',device, scanrange
-				print 'move to center of fit?'
+				print('scanning device',device, scanrange)
+				print('move to center of fit?')
 	def run_scans(self,scanlist):
 		"""run scans in scanlist"""
 		present_scans=self.present_scans
@@ -671,10 +671,10 @@ class Devices(object):
 		#print 'present_scans', present_scans
 		#print 'matched_scans', matched_scans
 		for scan in matched_scans:
-			print 'running ',scan
+			print('running ',scan)
 			sc=ScanRunCommand(scan)
 			sc.run()
-			print scan,' finished'
+			print(scan,' finished')
 		#for scan in scanlist:
 		#    print 'running scan', scan
 		
@@ -686,7 +686,7 @@ class Devices(object):
 		#matched_sequences=sequencelist
 		#print 'sequencelist',sequencelist
 		for sequence in matched_sequences:
-			print 'running',sequence
+			print('running',sequence)
 			s=r"stack appendfile EXPT:%s"%(sequence,)
 			#print 's before',s
 			sc=SimpleImmediateCommand(s)
@@ -712,19 +712,19 @@ class Devices(object):
 		#print 'present_scans', present_scans
 		#print 'matched_scans', matched_scans
 		for scan in matched_scans:
-			print 'dry running ',scan
+			print('dry running ',scan)
 			getscandescription=GetScanDescription(scan)
 			getscandescription.run()
 			scan_description=getscandescription.scan_description
 			scanName=scan+'_tmp'
 			#print 'listing'
 			scanDesrToListCommand = ScanDescrToListCommand(scanName,scan_description)
-			print 'listed'
+			print('listed')
 			scanDesrToListCommand.run()
 			scandryrun = ScanDryRunCommand(scanName)
 			scandryrun.run()
 			self.deleteScanFromScanList(scanName)
-			print scan,' dry ran'   
+			print(scan,' dry ran')   
 		    
 		    #sc=ScanRunCommand(scan)
 		    #sc.run()
@@ -786,62 +786,62 @@ class Devices(object):
 		
 	def print_device_value(self,devicelist):
 		"""print the hardware and software values of devices in device list"""
-		print 'device      software     hardware'
+		print('device      software     hardware')
 		for device in devicelist:
 			realdevice=self.controller.getAllDevices(device)[0]
 			if (device not in self.counting_devices) and (device not in self.environmental_devices):
-				print '%s      %s     %s'%(device,realdevice.getCurrValue(),realdevice.getHardwareValue(),)
+				print('%s      %s     %s'%(device,realdevice.getCurrValue(),realdevice.getHardwareValue(),))
 			else:
-				print '%s      %s'%(device, realdevice.getCurrValue(),)
+				print('%s      %s'%(device, realdevice.getCurrValue(),))
 					    
 	def print_device_software_value(self,devicelist):
 		"""print the software values of devices in device list"""
 		
-		print 'device      software'
+		print('device      software')
 		for device in devicelist:
 			realdevice=self.controller.getAllDevices(device)[0]
 			if (device not in self.counting_devices):
-				print '%s      %s'%(device,realdevice.getCurrValue())
+				print('%s      %s'%(device,realdevice.getCurrValue()))
 			
 	def print_device_hardware_value(self,devicelist):
 		"""print the hardware values of devices in device list"""
-		print 'device      hardware'
+		print('device      hardware')
 		for device in devicelist:
 			realdevice=self.controller.getAllDevices(device)[0]
 			if (device not in self.counting_devices) and (device not in self.environmental_devices):
-				print '%s      %s'%(device,realdevice.getHardwareValue())
+				print('%s      %s'%(device,realdevice.getHardwareValue()))
 			#stderr.write('hardware value of',device,'is '+realdevice.getHardwareValue()+'\n')
 			
 	def print_device_zero_value(self,devicelist):
 		"""print the zero values of devices in device list"""
-		print 'device      zero'
+		print('device      zero')
 		for device in devicelist:
 			realdevice=self.controller.getAllDevices(device)[0]
 			if (device not in self.counting_devices) and (device not in self.environmental_devices):
 				zero=SimpleImmediateCommand('device getzero %s'%(device,))
 				zero.run()
-				print '%s      %s'%(device,zero.result)
+				print('%s      %s'%(device,zero.result))
 
 	def print_lower_limits(self,devicelist):
 		"""print the lower limit of devices"""
-		print 'device      lower limit'
+		print('device      lower limit')
 		for device in devicelist:
 			realdevice=self.controller.getAllDevices(device)[0]
 			if (device not in self.counting_devices):
-				print '%s      %s'%(device,realdevice.getLowerLimit())
+				print('%s      %s'%(device,realdevice.getLowerLimit()))
 	    		    
 	def print_upper_limits(self,devicelist):
 		"""print the upper limit of devices"""
-		print 'device      upper limit'
+		print('device      upper limit')
 		for device in devicelist:
 			realdevice=self.controller.getAllDevices(device)[0]
 			if (device not in self.counting_devices):
-				print '%s      %s'%(device,realdevice.getUpperLimit())
+				print('%s      %s'%(device,realdevice.getUpperLimit()))
 		    
 	def set_lower_limit(self,device,value):
 		"""set the lower limit for a device"""
 		#can this be done for an environmental device?
-		print 'setting lower limits'
+		print('setting lower limits')
 		lower=setLowerLimit(device,value)
 		lower.run()
 		#real_device=self.controller.GetAllDevices(device)
@@ -850,7 +850,7 @@ class Devices(object):
 		
 	def set_upper_limit(self,device,value):
 		"""set the upper limit for a device"""
-		print 'up', device,value
+		print('up', device,value)
 		upper=setUpperLimit(device,value)
 		upper.run()
 		#can this be done for an environmental device?
@@ -860,7 +860,7 @@ class Devices(object):
 		
 	def set_device_software(self,device,value):
 		"""set the software value of device to value"""
-		print 'setting',device
+		print('setting',device)
 		if (device not in self.counting_devices) and (device not in self.environmental_devices):
 			real_device=self.controller.getAllDevices(device)[0]
 			real_device.setCurrValue(value)
@@ -891,7 +891,7 @@ class Devices(object):
 			fpt.run()
 			#print 'ran', fpt.result
 			if not aptflag:
-				movetofit=raw_input('Move to Peak position [y/n]? ')
+				movetofit=input('Move to Peak position [y/n]? ')
 				if (movetofit==None) or (movetofit.lower() in ['n','no']):
 					#print 'movetofit',movetofit
 					return
@@ -908,7 +908,7 @@ class Devices(object):
 			fpt=SimpleImmediateCommand(s)
 			fpt.run()
 			lattice_constant=float(dspacing)*float(fpt.result.split(':')[-1])
-			print 'lattice constant',lattice_constant
+			print('lattice constant',lattice_constant)
 			#s="Lattice parameter [      3.29132]"
 			#s="AcceptFindPeak"
 			#"CorrectLattice 1 -a"
@@ -916,7 +916,7 @@ class Devices(object):
 			#print 'lattice th2th scan' #move to center of peak
 			#print 'reset lattice constant?' 
 		elif device.lower()=='a6':
-			print 'scanning a6 and a5'
+			print('scanning a6 and a5')
 			s="findpeak %s %s %s "%(device,scanrange,step)
 			durationf=float(duration)
 			if duration > 0:
@@ -926,7 +926,7 @@ class Devices(object):
 			fpt=SimpleQueuedCommand(s)
 			fpt.run()
 			if not aptflag:
-				movetofit=raw_input('Move to Peak position [y/n]? ')
+				movetofit=input('Move to Peak position [y/n]? ')
 				if (not movetofit==None) or (movetofit.lower() in ['n','no']):
 					return
 				else:
@@ -945,7 +945,7 @@ class Devices(object):
 		fpt=SimpleImmediateCommand(s)
 		fpt.run()
 		lattice_constant=float(dspacing)*float(fpt.result.split(':')[-1])
-		print 'lattice constant',lattice_constant
+		print('lattice constant',lattice_constant)
 		#assume lattice constant is 'a','b','c'
 		s="CorrectLattice %s -%s"%(str(dspacing),lattice_parameter)
 		fpt=SimpleQueuedCommand(s)
@@ -961,9 +961,9 @@ class Devices(object):
 		
 		#print 'doing scan'
 		if apflag==True and ((device in self.counting_devices) or (device in self.environmental_devices)):
-			print 'cannot redefine the zero for counting and environmental devices'
+			print('cannot redefine the zero for counting and environmental devices')
 			return
-		print 'device', self.get_device_value(device)
+		print('device', self.get_device_value(device))
 		original_position=float(self.get_device_value(device))
 		s="findpeak %s %s %s "%(device,scanrange,step)
 		durationf=float(duration)
@@ -974,7 +974,7 @@ class Devices(object):
 		fp=SimpleQueuedCommand(s)
 		fp.run()
 		if not apflag:
-				movetofit=raw_input('Move to Peak position [y/n]? ')
+				movetofit=input('Move to Peak position [y/n]? ')
 				if (movetofit==None) or (movetofit.lower() in ['n','no']):
 					return
 				else:
@@ -990,10 +990,10 @@ class Devices(object):
 		new_position=float(self.get_device_value(device))
 		#print 'old %3.5g new %3.5g tol %3.5g'%(original_position,new_position,tol)
 		if abs(original_position-new_position)>float(tol):
-			print 'redefining %s %3.5g to %3.4g '%(device,original_position,new_position)
+			print('redefining %s %3.5g to %3.4g '%(device,original_position,new_position))
 			self.set_device_software(device,str(new_position))
 		else:
-			print 'new position is within tolerance of old position'
+			print('new position is within tolerance of old position')
 	    
 	def scanIsPresent(self,scan):
 		"""Checks if scan is present"""
@@ -1075,13 +1075,13 @@ class Devices(object):
 			
 	def isScan(self, scan):
 		"""Checks to see if scan is a valid scan"""
-		print 'checking if ', scan, 'isvalid'
+		print('checking if ', scan, 'isvalid')
 		isvalid=False
 		return isvalid
 	    
 	def isSequence(self, sequence):
 		"""Checks to see if sequence is a valid sequence"""
-		print 'checking if ', sequence, 'isvalid'
+		print('checking if ', sequence, 'isvalid')
 		isvalid=False
 		return isvalid
 	    
@@ -1091,7 +1091,7 @@ class Devices(object):
 		present_scans=self.present_scans
 		matched_scans=copy.deepcopy(self.match(present_scans,scanlist))
 		#print 'present_scans', present_scans
-		print 'matched_scans', matched_scans
+		print('matched_scans', matched_scans)
 		for scan in matched_scans:
 			#print 'dry running ',scan
 			getscandescription=GetScanDescription(scan)
@@ -1103,7 +1103,7 @@ class Devices(object):
 			#print 'parseobj',myparseobj.__dict__['scanstr']
 			new_scan_description=scanparser.driver(scan_description,copy.deepcopy(myparseobj))
 			
-			print 'new_scan\n',new_scan_description
+			print('new_scan\n',new_scan_description)
 			scanName=scan+'_tmp'
 			#print 'listing'
 			scanDesrToListCommand = ScanDescrToListCommand(scanName,new_scan_description)
@@ -1111,9 +1111,9 @@ class Devices(object):
 			scanDesrToListCommand.run()
 			scandryrun = ScanDryRunCommand(scanName)
 			scandryrun.run()
-			print 'result',scandryrun.result
+			print('result',scandryrun.result)
 			if str(scandryrun.result).find('unknown scan') >=0:
-				print 'epic fail.  Your scan operation was unsuccessful.  Sorry...'
+				print('epic fail.  Your scan operation was unsuccessful.  Sorry...')
 				self.deleteScanFromScanList(scanName)
 			else:
 				self.deleteScanFromScanList(scanName)
@@ -1148,7 +1148,7 @@ class Devices(object):
 	    
 	def monitor_rate(self):
 		"""Prints the monitor rate"""
-		print 'calculating rate'
+		print('calculating rate')
 		myrate=Rate()
 		myrate.run()
 		#sys.stderr.write(myrate.rate)
@@ -1212,7 +1212,7 @@ class CmdLineApp(Cmd):
 			devices=Devices()
 			devices.count(duration)
 		except:
-			print 'the argument to count must be an integer!'
+			print('the argument to count must be an integer!')
 		   
 	    
 	    #args=arg.split()
@@ -1347,7 +1347,7 @@ class CmdLineApp(Cmd):
 		devices=Devices()
 		args=arg.split()
 		if len(args)<2:
-			print 'two few arguments'
+			print('two few arguments')
 			return
 		elif len(args)==2:
 			device1=args[0]
@@ -1356,7 +1356,7 @@ class CmdLineApp(Cmd):
 			elif device1.lower()=='a6':
 				device2='a5'
 			else:
-				print "Sorry, I am not yet smart enough to guess the 2nd device"
+				print("Sorry, I am not yet smart enough to guess the 2nd device")
 				return
 		else:
 			device1=args[0]
@@ -1378,7 +1378,7 @@ class CmdLineApp(Cmd):
 		devices=Devices()
 		fixed_devices=devices.fixed_devices
 		for device in fixed_devices:
-			print str(device), 'is fixed'
+			print(str(device), 'is fixed')
 		#TODO maybe find fixed devices by regex?
 	
 	def do_p(self,arg,opts=None):
@@ -1524,7 +1524,7 @@ class CmdLineApp(Cmd):
 		devices=Devices()
 		args=arg.split()
 		if len(args)==0:
-			print 'I need to know which scan to run!'
+			print('I need to know which scan to run!')
 		else:
 			devices.run_scans(args)
     
@@ -1539,7 +1539,7 @@ class CmdLineApp(Cmd):
 		devices=Devices()
 		args=arg.split()
 		if len(args)==0:
-			print 'I need to know which sequence to run!'
+			print('I need to know which sequence to run!')
 		else:
 			devices.run_sequence(args)
 	    
@@ -1551,7 +1551,7 @@ class CmdLineApp(Cmd):
 		devices=Devices()
 		args=arg.split()
 		if len(args)==0:
-			print 'I need to know which scan to dry run!'
+			print('I need to know which scan to dry run!')
 		else:
 			devices.dry_run_scans(args)
 	    
@@ -1563,7 +1563,7 @@ class CmdLineApp(Cmd):
 		devices=Devices()
 		args=arg.split()
 		if len(args)==0:
-			print 'I need to know which sequence to dry run!'
+			print('I need to know which sequence to dry run!')
 		else:
 			devices.dry_run_sequences(args)
 	    
@@ -1578,7 +1578,7 @@ class CmdLineApp(Cmd):
 		
 		devices=Devices()
 		if len(args)<4:
-			print "you have too few arguments"
+			print("you have too few arguments")
 			
 		device=args[0]
 		scanrange=args[1]
@@ -1601,7 +1601,7 @@ class CmdLineApp(Cmd):
 		
 		devices=Devices()
 		if len(args)<4:
-			print "you have too few arguments"
+			print("you have too few arguments")
 			
 		device=args[0]
 		scanrange=args[1]
@@ -1624,7 +1624,7 @@ class CmdLineApp(Cmd):
 		
 		devices=Devices()
 		if len(args)<1:
-			print "you have too few arguments"
+			print("you have too few arguments")
 			return
 			
 		lattice_parameter=args[0]
@@ -1738,7 +1738,7 @@ class CmdLineApp(Cmd):
 				#print 'queued'
 				command=SimpleQueuedCommand(arg)
 				command.run()
-			print command.result
+			print(command.result)
 		except:
 			pass
 		
@@ -1761,7 +1761,7 @@ class CmdLineApp(Cmd):
 		l=myargs.l
 		monitor=myargs.mon[0]
 		if h==None and k==None and l==None:
-			print 'you must choose a scan direction!'
+			print('you must choose a scan direction!')
 			return
 		if h==None:
 			h=[0,0,0]
@@ -1802,11 +1802,11 @@ class CmdLineApp(Cmd):
 		efixed=myargs.efixed
 		
 		if ei and ef:
-			print 'you should only have one fixed energy'
+			print('you should only have one fixed energy')
 			return
 		if not(omega==None):
 			if (not ei) and (not ef):
-				print 'if you give an energy transfer, I need to know whether ei or ef is fixed'
+				print('if you give an energy transfer, I need to know whether ei or ef is fixed')
 				return
 		if omega==None:
 			omega=[str(0.0)]
@@ -1974,7 +1974,7 @@ class CmdLineApp(Cmd):
 		"""
 		args=arg.split()
 		if len(args)<3:
-			print __doc__
+			print(__doc__)
 		else:
 			try:
 				q=float(args[0])
@@ -1992,7 +1992,7 @@ class CmdLineApp(Cmd):
 		"""
 		args=arg.split()
 		if len(args)<3:
-			print __doc__
+			print(__doc__)
 		else:
 			try:
 				tth=float(args[0])
@@ -2013,7 +2013,7 @@ class CmdLineApp(Cmd):
 		"""     
 		args=arg.split()
 		if len(args)<1:
-			print __doc__
+			print(__doc__)
 		else:
 			try:
 				wavelength=float(args[0])
@@ -2039,7 +2039,7 @@ class CmdLineApp(Cmd):
 		"""     
 		args=arg.split()
 		if len(args)<1:
-			print __doc__
+			print(__doc__)
 		else:
 			try:
 				energy=abs(float(args[0]))
@@ -2057,7 +2057,7 @@ class CmdLineApp(Cmd):
 		""" 
 		args=arg.split()
 		if len(args)<2:
-			print __doc__
+			print(__doc__)
 		else:
 			try:
 				wavelength=float(args[1])

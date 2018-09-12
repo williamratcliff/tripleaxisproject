@@ -26,7 +26,7 @@ try:
             z = N.empty(shape,'i')
             i,j = _reduction.str2imat(s,z)
             if i*j != z.size:
-                raise IOError,"Inconsistent dims at line %d"%linenum
+                raise IOError("Inconsistent dims at line %d"%linenum)
         else:
             # No existing block.  Worst case is 2 bytes per int.
             n = int(len(s)/2+1)
@@ -49,7 +49,7 @@ except:
         if i==1 or j==1:
             z = z.reshape(i*j)
         if shape != None and N.any(z.shape != shape):
-            raise IOError,"Inconsistent dims at line %d"%linenum
+            raise IOError("Inconsistent dims at line %d"%linenum)
         return z
 
 
@@ -176,7 +176,7 @@ class ICP(object):
 
         file = self.file
         tokens = get_quoted_tokens(file)
-        print 'tokens', tokens
+        print('tokens', tokens)
         self.filename=tokens[0]
         self.timestamp = datetime.datetime(2000,1,1)
         #could have just used time.strptime
@@ -382,7 +382,7 @@ class ICP(object):
         Generate vectors for each of the motors if a vector is not
         already stored in the file.
         """
-        for (M,R) in self.motor.__dict__.iteritems():
+        for (M,R) in self.motor.__dict__.items():
             if not hasattr(self.column,M):
                 if R.step != 0.:
                     vector = N.arange(R.start,R.step,R.stop)
@@ -412,7 +412,7 @@ class ICP(object):
             self.readrheader()
             self.readmotors()
         else:
-            raise ValueError, "Unknown scantype %s in ICP file"%scantype
+            raise ValueError("Unknown scantype %s in ICP file"%scantype)
         self.readcolumnheaders()
 
     def summary(self):
@@ -442,7 +442,7 @@ class ICP(object):
 
         self.file.close()
         filename=os.path.split(self.path)[-1]
-        print 'filename'
+        print('filename')
         self.filename=filename 
         #decide do we want this for the file as on the file system
         #or as in the datafile....
@@ -518,21 +518,21 @@ def demo():
     """
     import sys
     if len(sys.argv) < 2:
-        print "usage: python icpformat.py file*"
+        print("usage: python icpformat.py file*")
     for file in sys.argv[1:]:
         fields = read(file)
-        keys = fields.__dict__.keys()
+        keys = list(fields.__dict__.keys())
         keys.sort()
-        for k in keys: print k,getattr(fields,k)
+        for k in keys: print(k,getattr(fields,k))
 
 def demo2(myfilestr):
     """
     Read and print all command line arguments
     """
     fields = read(myfilestr)
-    keys = fields.__dict__.keys()
+    keys = list(fields.__dict__.keys())
     keys.sort()
-    for k in keys: print k,getattr(fields,k)
+    for k in keys: print(k,getattr(fields,k))
         
         
 def plot(filename):
@@ -560,7 +560,7 @@ def plot(filename):
 def plot_demo():
     import sys
     if len(sys.argv) != 2:
-        print "usage: python icpformat.py file"
+        print("usage: python icpformat.py file")
     else:
         plot(sys.argv[1])
 
@@ -568,6 +568,6 @@ if __name__=='__main__':
     myfilestr=r'C:\Ce2RhIn8\Mar10_2009\nucsc001.bt9'
     demo2(myfilestr)
     
-    print
+    print()
     #plot_demo()
     #demo()

@@ -28,7 +28,7 @@ if __name__=="__main__":
     data[:,0]=x
     data[:,1]=y
     
-    print data
+    print(data)
     mylocator=locator(x,y)
     xt=N.array([11,3])
     yt=N.array([8,5])

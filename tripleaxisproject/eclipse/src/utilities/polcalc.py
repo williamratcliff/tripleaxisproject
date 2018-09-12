@@ -1,4 +1,4 @@
-from __future__ import division
+
 import numpy as N
 import rescalculator.lattice_calculator as lattice_calculator
 pi=N.pi
@@ -53,7 +53,7 @@ def calcQ(H,K,L):
                         beta=newinput['beta'],gamma=newinput['gamma'],orientation=orientation\
                         )
     alphastar=lattice.alphastar
-    print 'alphastar',alphastar
+    print('alphastar',alphastar)
     EXP={}
     EXP['ana']={}
     EXP['ana']['tau']='pg(002)'
@@ -71,9 +71,9 @@ def calcQ(H,K,L):
     EXP['method']=0
     setup=[EXP]
     qx,qy,qz,Q=lattice.R2S(H,K,L)
-    print 'Q',Q
+    print('Q',Q)
     d=2*pi/Q
-    print 'd',d
+    print('d',d)
     return Q
     
  
@@ -119,14 +119,14 @@ def hex2rhomb(h,k,l):
 def setup(Hpc,Kpc,Lpc):
     Hh,Kh,Lh=pseudocubic2hex(Hpc,Kpc,Lpc)
     if 0:
-        print 'hex'
+        print('hex')
         for i in range(len(Hh)):
-            print Hh[i],Kh[i],Lh[i]
+            print(Hh[i],Kh[i],Lh[i])
     Hr,Kr,Lr=hex2rhomb(Hh,Kh,Lh)    
     if 0:
-        print 'rhomb'
+        print('rhomb')
         for i in range(len(Hr)):
-            print Hr[i],Kr[i],Lr[i]
+            print(Hr[i],Kr[i],Lr[i])
     Q=calcQ(Hh,Kh,Lh)
     astar,alphastar,lattice=calcstar()
     #print astar,N.degrees(alphastar)
@@ -204,7 +204,7 @@ if __name__=="__main__":
     Pv=genvec(N.array([1,-1,0],'Float64'))
     Ph=genvec(N.array([1,1, 1],'Float64'))
     res=calc_struct(M,Qc,Q,r,Ph)
-    print M.shape
+    print(M.shape)
     lam=2.35916
 
 

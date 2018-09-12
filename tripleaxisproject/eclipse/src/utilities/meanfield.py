@@ -5,9 +5,9 @@ import  pylab
 #import matplotlib.numerix.ma as ma
 #from matplotlib.ticker import NullFormatter, MultipleLocator
 #from scipy.signal.signaltools import convolve2d
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr2 as readncnr
+from . import readncnr2 as readncnr
 #from matplotlib.ticker import FormatStrFormatter
 #from matplotlib.ticker import MaxNLocator
 import scipy.optimize as optimize

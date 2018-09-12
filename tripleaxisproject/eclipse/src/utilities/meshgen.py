@@ -43,11 +43,11 @@ class scangen:
             
         def output(self):
             scanstr='Scan'
-            for key, value in self.scandes.iteritems():
+            for key, value in self.scandes.items():
                 if key!='Range':
                     scanstr=scanstr+':'+key+'='+str(value)
                 else:
-                    for rangetype,rangevalue in value.iteritems():
+                    for rangetype,rangevalue in value.items():
                         scanstr=scanstr+':Range='+rangetype+'='
                         arr=value[rangetype]['initial']
                         delimeter=''
@@ -76,7 +76,7 @@ class meshgen:
         field1=self.field1
         field2=self.field2
         step=((field2['final']-field2['initial'])/(field2['Npts']-1))[0]
-        print step
+        print(step)
         curr=field2['initial'][0]
 #        for curr in N.arange(field2['initial'][0],field2['final'][0]+step,step):
         for i in range(field2['Npts']):
@@ -92,7 +92,7 @@ class meshgen:
             scanstr=scanstr+'scan set '+myscan.output()
             scanstr=scanstr+'scan run\n'
             curr=curr+step
-            print curr
+            print(curr)
         return scanstr
 
 if __name__=="__main__":
@@ -116,7 +116,7 @@ if __name__=="__main__":
     field2['Npts']=11
     mymesh=meshgen(field1,field2)
     scanstr=mymesh.genscans()
-    print scanstr
+    print(scanstr)
     f=open('myseq.seq.txt','wt') #mode t to make sure output character is correct for os
     f.write(scanstr)
     f.close()

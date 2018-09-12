@@ -110,21 +110,21 @@ def test_den():
         for alph in np.arange(0,1.2,.12):
             th=np.deg2rad(alph*(-np.cos(np.deg2rad(0.0))))
             ph=np.deg2rad(alph*(-np.cos(np.deg2rad(0.0))))
-            print 'th',np.rad2deg(th),'ph',np.rad2deg(ph)
+            print('th',np.rad2deg(th),'ph',np.rad2deg(ph))
             x.append(np.cos(th)*np.sin(ph))
             y.append(np.sin(th)*np.sin(ph))
             z.append(np.cos(ph))
-        print 'x2 ',x    
-        print 'y2 ',y
-        print 'z2 ',z
+        print('x2 ',x)    
+        print('y2 ',y)
+        print('z2 ',z)
         pts3=mlab.points3d(x,y,z,color=(0,0,1),colormap='gist_rainbow',figure=fig,scale_factor=.1)
 
         
         
     x,y,z=gen_fe()  
-    print 'x',x
-    print 'y',y
-    print 'z',z
+    print('x',x)
+    print('y',y)
+    print('z',z)
     #pts_fe=mlab.points3d(x,y,z-.125,color=(0,1,0),colormap='gist_rainbow',figure=fig,scale_factor=.02)
     
     x,y,z=gen_sr()  
@@ -227,7 +227,7 @@ def test_den():
     #src = mlab.pipeline.array2d_source(P)
     #surf = mlab.pipeline.surface(src,figure=fig,extent=[0,1,0,1,-1,0],name='surf2',opacity=0.4)
     #surf.transform.GetTransform().RotateX(90)
-    print 'done'
+    print('done')
     if 0:
         mlab.view(45, 45,focalpoint=(2,2,2))
 

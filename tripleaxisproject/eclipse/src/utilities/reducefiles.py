@@ -2,7 +2,7 @@ import numpy as N
 import pylab
 from scipy import vectorize
 import math
-import mpfit
+from . import mpfit
 #import scipy.optimize.anneal as anneal
 
 def readheader(myfile):
@@ -162,9 +162,9 @@ def fitdata(a4,I,Ierr):
     pfit=N.array([I.max(), mid, (a4[a4.size-1]-a4[0])/4, I.min(), 0],'d')
     lowerm=[0,        -2*a4[0],        0,0,0]
     upperm=[10*I.max(),2*a4[a4.size-1],(a4[a4.size-1]-a4[0]),2*I.min(0)+1,1]
-    print lowerm
-    print upperm
-    print pfit
+    print(lowerm)
+    print(upperm)
+    print(pfit)
     for i in range(pfit.size):
 ##        parinfo.append({'value':0., 'fixed':0, 'limited':[1,1],\
 ##                        'limits':[lowerm[i], upperm[i]], 'step':0})
@@ -173,8 +173,8 @@ def fitdata(a4,I,Ierr):
 
     parinfo[4]['fixed']=1
     m = mpfit.mpfit(chisqrcalc, pfit, parinfo=parinfo,functkw=fa,quiet=1)
-    print 'status = ', m.status
-    if (m.status <= 0): print 'error message = ', m.errmsg    
+    print('status = ', m.status)
+    if (m.status <= 0): print('error message = ', m.errmsg)    
     p=N.array(m.params,'d')
 #    print 'p ', p
     dof=a4.size -p.size
@@ -206,7 +206,7 @@ def readfiles(mydirectory,myend,myfilehead,myfiles,reflections,ploton):
         hkl=reflections[i]
         hklstr=str(hkl[0])+str(hkl[1])+str(hkl[2])
         myfilestr=mydirectory+myfilehead+myfiles[i]+myend
-        print myfilestr,i
+        print(myfilestr,i)
         header,data=readibuff(myfilestr)        
         a4,I,Ierr=readfile(header,data)
         p,std=fitdata(a4,I,Ierr)        
@@ -225,7 +225,7 @@ def outputresult(summarylist):
         l=summarylist[i]
         lineStr=str(l['hkl'][0])+' '+str(l['hkl'][1])+' '+str(l['hkl'][2])
         lineStr=lineStr+' '+str(l['p'][1])+' '+str(l['p'][0])+' '+str(l['std'][0])
-        print lineStr
+        print(lineStr)
     return
 
 def saveresult(summarylist,outputfile):
@@ -356,7 +356,7 @@ if __name__=="__main__":
 #        print data
 #        a4out,Iout,Ierrout=addfiles(headers,data,[1,1,6])
         summarylist116=addfiles(headers,data,[1,1,6])
-        print summarylist116
+        print(summarylist116)
 #        print a4out
 #        print Iout
 #        print Ierrout

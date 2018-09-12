@@ -1,9 +1,9 @@
 import numpy as N
 import pylab
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-import readncnr2 as readncnr
-import simple_combine
+from . import readncnr2 as readncnr
+from . import simple_combine
 #import scipy
 from scipy.optimize import leastsq
 import copy
@@ -66,7 +66,7 @@ def get_highT_file():
         #myfilestr=mydirectory+'\\'+'LaOFeAs56416.stitched'
         myfilestr=mydirectory+'\\'+'170Kch4to44good.dat'
         flist=[myfilestr]
-        print flist
+        print(flist)
         a4,I,Ierr=read_stitched(myfilestr)
         Tstitched=170
         mon_stitched=80000
@@ -86,7 +86,7 @@ def get_lowT_file():
         #myfilestr=mydirectory+'\\'+'LaOFeAs56413.stitched'
         myfilestr=mydirectory+'\\'+'8Kch4to44good.dat'
         flist=[myfilestr]
-        print flist
+        print(flist)
         a4,I,Ierr=read_stitched(myfilestr)
         I_int=[]
         I_err=[]
@@ -105,7 +105,7 @@ def output(a4,I,Ierr,outputfile=None):
             s=s+'%2.3f %2.3f %2.3f'%(a4[i],I[i],Ierr[i])
             s=s+'\n'
         if outputfile==None:
-            print s
+            print(s)
         else:
             f.write(s)
         if outputfile!=None:
@@ -117,7 +117,7 @@ if __name__=='__main__':
     mydirectory=r'C:\12436\data'
     if len(sys.argv)>1:
         delta=float(sys.argv[1])
-    print 'delta= ',delta
+    print('delta= ',delta)
     a4_high,I_high,Ierr_high,Tstiched_high,mon_stiched_high=get_highT_file()
     a4_low,I_low,Ierr_low,Tstiched_low,mon_stiched_low=get_lowT_file()
     a4_high_max=max(a4_high)
@@ -133,7 +133,7 @@ if __name__=='__main__':
     Ierrlist=[Ierr_low,Ierr_high]
     monlist=[mon_stiched_low,mon_stiched_high]
     a4out,Iout,Ierrout=simple_combine.simple_combine(a4list,Ilist,Ierrlist,monlist,method='interpolate',step=0.1)
-    print 'done'
+    print('done')
     background=300.0
     Iout=Iout+background
     myfilestr=mydirectory+'\\'+'subtracted.txt'

@@ -1,4 +1,4 @@
-from __future__ import division
+
 import numpy as N
 import rescalculator.lattice_calculator as lattice_calculator
 pi=N.pi
@@ -54,7 +54,7 @@ def calcd(H,K,L):
                         beta=newinput['beta'],gamma=newinput['gamma'],orientation=orientation\
                         )
     alphastar=lattice.alphastar
-    print 'alphastar',alphastar
+    print('alphastar',alphastar)
     EXP={}
     EXP['ana']={}
     EXP['ana']['tau']='pg(002)'
@@ -72,22 +72,22 @@ def calcd(H,K,L):
     EXP['method']=0
     setup=[EXP]
     qx,qy,qz,Q=lattice.R2S(H,K,L)
-    print 'Q',Q
+    print('Q',Q)
     d=2*pi/Q
-    print 'd',d
+    print('d',d)
     return d
 
 def setup(Hpc,Kpc,Lpc):
     Hh,Kh,Lh=pseudocubic2hex(Hpc,Kpc,Lpc)
     if 0:
-        print 'hex'
+        print('hex')
         for i in range(len(Hh)):
-            print Hh[i],Kh[i],Lh[i]
+            print(Hh[i],Kh[i],Lh[i])
     Hr,Kr,Lr=hex2rhomb(Hh,Kh,Lh)    
     if 0:
-        print 'rhomb'
+        print('rhomb')
         for i in range(len(Hr)):
-            print Hr[i],Kr[i],Lr[i]
+            print(Hr[i],Kr[i],Lr[i])
     d=calcd(Hh,Kh,Lh)
     astar,alphastar,lattice=calcstar()
     #print astar,N.degrees(alphastar)
@@ -186,12 +186,12 @@ if __name__=="__main__":
     p0.ftol=1e-8
     p0.contol=1e-8
     r0 = p0.solve('nlp:ralg')
-    print N.degrees(r0.xf[0])
-    print r0.xf[1]
-    print firsteqn(r0.xf,v1,v2)
-    print 'testing'
-    print calcnew(r0.xf,v1)
-    print calcnew(r0.xf,v2)
-    print 'testing'
+    print(N.degrees(r0.xf[0]))
+    print(r0.xf[1])
+    print(firsteqn(r0.xf,v1,v2))
+    print('testing')
+    print(calcnew(r0.xf,v1))
+    print(calcnew(r0.xf,v2))
+    print('testing')
     #Hr,Kr,Lr,d,astar,alphastar,lattice,Hh,Kh,Lh=setup(Hpc,Kpc,Lpc)
     

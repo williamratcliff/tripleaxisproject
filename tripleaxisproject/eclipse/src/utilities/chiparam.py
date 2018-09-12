@@ -1,11 +1,11 @@
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import numpy as N
-import scriptutil as SU
+from . import scriptutil as SU
 import re
-from simple_combine import simple_combine
+from .simple_combine import simple_combine
 import copy
 import pylab
-from findpeak3 import findpeak
+from .findpeak3 import findpeak
 from openopt import NLP
 import scipy.optimize
 import scipy.odr
@@ -23,7 +23,7 @@ def readfiles(flist,tol=1e-4):
     count=0
     myfirstdata=mydatareader.readbuffer(flist[0])
     mon0=myfirstdata.metadata['count_info']['monitor']
-    print 'mon0',mon0
+    print('mon0',mon0)
 
     #flist=flist[0:12]
     datalist=[]
@@ -53,11 +53,11 @@ if __name__=='__main__':
         myfilebaseglob=myfilebase+str(i)+'.'+myend
         myfilestr=os.path.join(mydirectory,myfilebaseglob)
         flist.append(myfilestr)
-    print flist
+    print(flist)
     mydatareader=readncnr.datareader()
     mydata=mydatareader.readbuffer(myfilestr)
-    print mydata.data.keys()
-    print int(mydata.metadata['file_info']['fileseq_number'])
+    print(list(mydata.data.keys()))
+    print(int(mydata.metadata['file_info']['fileseq_number']))
     #print myfilebaseglob
     #flist = SU.ffind(mydirectory, shellglobs=(myfilebaseglob,))
     datalist=readfiles(flist)

@@ -1,14 +1,14 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as N
-import readncnr3 as readncnr
+from . import readncnr3 as readncnr
 import os,sys
 import matplotlib.image as mpimg
 from matplotlib.ticker import NullFormatter, MultipleLocator,MaxNLocator, NullLocator
 from matplotlib import rcParams
 from matplotlib.ticker import FormatStrFormatter
-print rcParams['mathtext.fontset']
-print rcParams['mathtext.default']
+print(rcParams['mathtext.fontset'])
+print(rcParams['mathtext.default'])
 
 params={'legend.fontsize':10}
 plt.rcParams.update(params)

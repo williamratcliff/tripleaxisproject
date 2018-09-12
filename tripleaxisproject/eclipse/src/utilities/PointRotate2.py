@@ -70,10 +70,10 @@ if __name__ == '__main__':
     p0=np.array([1,1,-2],'Float64')
     theta=np.radians(120)
     pout=PointRotate3D(p1, p2, p0, theta)
-    print pout
+    print(pout)
     theta=np.radians(120*2)
     pout=PointRotate3D(p1, p2, p0, theta)
-    print pout
+    print(pout)
     #theta=np.radians(90)
     #pout=PointRotate3D(p1, p2, p0, theta)
     #print pout

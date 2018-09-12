@@ -67,8 +67,8 @@ class datareader:
     def readiheader(self,myfile):
     #experiment info
         tokenized=get_tokenized_line(myfile)
-        print "tokenized"
-        print tokenized
+        print("tokenized")
+        print(tokenized)
         collimations=[] #in stream order
         collimations.append(float(tokenized[0]))
         collimations.append(float(tokenized[1]))
@@ -93,7 +93,7 @@ class datareader:
 
     def readqheader(self,myfile):
     #experiment info
-        print "qheader"
+        print("qheader")
         tokenized=get_tokenized_line(myfile)
         collimations=[] #in stream order
         collimations.append(float(tokenized[0]))
@@ -154,8 +154,8 @@ class datareader:
         self.header['hfield']=float(tokenized[6])
         #skip line describing fields
         linestr=myfile.readline()
-        print linestr
-        print "done"
+        print(linestr)
+        print("done")
         return
 
     def readbheader(self,myfile):
@@ -223,23 +223,23 @@ class datareader:
         myfile = open(myfilestr, 'r')
         # Determine FileType
         self.determinefiletype(myfile)
-        print self.header['scantype']
+        print(self.header['scantype'])
         if self.header['scantype']=='I':
-            print "calling readibuffer"
+            print("calling readibuffer")
             self.readiheader(myfile)
         if self.header['scantype']=='B':
-            print "calling readbbuffer"
+            print("calling readbbuffer")
             self.readbheader(myfile)
         if self.header['scantype']=='Q':
-            print "calling readqbuffer"
+            print("calling readqbuffer")
             self.readqheader(myfile)
         
         #read columns
         self.readcolumns(myfile)
         myfile.close()
         mydata=Data(self.header,self.columndict)
-        print self.header
-        print self.columndict['columnlist']        
+        print(self.header)
+        print(self.columndict['columnlist'])        
         return mydata
 
 
@@ -391,7 +391,7 @@ if __name__=='__main__':
         #ibuff
         myfilestr=r'c:\summerschool2007\\qCdCr014.ng5'
         mydirectory=r'c:\summerschool2007\\' 
-        myfilenumbers=range(4,33,1)
+        myfilenumbers=list(range(4,33,1))
         myend='.ng5'
         myfilehead='qCdCr'
     if 1:
@@ -403,8 +403,8 @@ if __name__=='__main__':
     data=DataCollection()
     mydatareader=datareader()
     mydata=mydatareader.readbuffer(myfilestr)
-    print mydata.npts
-    print mydata.monitor
+    print(mydata.npts)
+    print(mydata.monitor)
 #    print mydata.gen_motor6_arr()
 #    print mydata.gen_motor5_arr()
 #    print mydata.gen_motor4_arr()
@@ -415,12 +415,12 @@ if __name__=='__main__':
         for i in range(len(myfilenumbers)):
             myfilenum=num2string(myfilenumbers[i])
             myfilestr=mydirectory+myfilehead+myfilenum+myend
-            print myfilestr
+            print(myfilestr)
             data.add_datum(mydatareader.readibuffer(myfilestr))
         a3,a4,counts=data.extract_a3a4()
-        print a3.shape
-        print a4.shape
-        print counts.shape
+        print(a3.shape)
+        print(a4.shape)
+        print(counts.shape)
 
 
 

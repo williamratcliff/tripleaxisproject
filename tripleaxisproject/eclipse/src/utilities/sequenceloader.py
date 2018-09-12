@@ -71,7 +71,7 @@ class SequenceEndError(Exception):
     
 if __name__=="__main__":
     myfilestr=r'c:\dum'
-    print driver(myfilestr)
+    print(driver(myfilestr))
     
     
             

@@ -1,7 +1,7 @@
-from __future__ import division
+
 import numpy as N
 import sys
-import dct
+from . import dct
 import pylab
 from openopt import NLP
 import scipy.optimize
@@ -54,7 +54,7 @@ def plotdensity(h,k,l,fq):
                 #fprintf(fid,'%3.5g  %3.5g  %3.5g  \n',xi,zi,P(zi,xi));
     #print P
     P=P/aa/cc
-    print P.shape
+    print(P.shape)
     #P_fou=dct.dct2(P)
     if 0:
         pylab.pcolor(X,Z,P_fou)
@@ -215,11 +215,11 @@ def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
     #fsum_down=N.zeros(h.shape)
     #fmodel=N.zeros(h.shape)
     gradient=N.zeros(2*M)
-    pos=range(M)
-    posm=range(M,2*M)
+    pos=list(range(M))
+    posm=list(range(M,2*M))
     #print 'pos',pos
     #print 'posm',posm
-    hrows=range(2*M)
+    hrows=list(range(2*M))
     hcols=hrows
     gradient[pos]=N.log(A)-N.log(p[0:M])
     gradient[posm]=N.log(A)-N.log(p[M+1:2*M])
@@ -231,7 +231,7 @@ def S_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist):
 def S_hessian(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     global xstep
     global zstep
-    print 'hessian'
+    print('hessian')
     M=int(len(p)/2)
     Mx=N.ceil(aa/xstep)
     Mz=N.ceil(cc/zstep)
@@ -241,11 +241,11 @@ def S_hessian(p,h,k,l,fq,fqerr,x,z,cosmat_list):
     #fsum_down=N.zeros(h.shape)
     #fmodel=N.zeros(h.shape)
     hessian=N.zeros(2*M)
-    pos=range(M)
-    posm=range(M,2*M)
+    pos=list(range(M))
+    posm=list(range(M,2*M))
     #print 'pos',pos
     #print 'posm',posm
-    hrows=range(2*M)
+    hrows=list(range(2*M))
     hcols=hrows
     hessian[pos]=-1./p[0:M]
     hessian[posm]=-1/p[M+1:2*M]
@@ -311,12 +311,12 @@ def chisq_hessian(p,fqerr,v,coslist,flist):
     
     xn=len(x)
     zn=len(z)
-    print 'sizes'
-    print 'cosk',len(coslist[0])
-    print 'flist', len(flist)
-    print 'fqerr', len(fqerr)
-    print 'v',len(v)
-    print 'p',len(p)
+    print('sizes')
+    print('cosk',len(coslist[0]))
+    print('flist', len(flist))
+    print('fqerr', len(fqerr))
+    print('v',len(v))
+    print('p',len(p))
     for i in range(vlen):
         for j in range(vlen):
             tot=0
@@ -324,9 +324,9 @@ def chisq_hessian(p,fqerr,v,coslist,flist):
             for cosk in coslist:
                 tot=tot+cosk[i]*cosk[j]*flist[i]*flist[j]/fqerr[al]**2
                 al=al+1;
-            print 'tot',tot,v[j]
+            print('tot',tot,v[j])
             vout[i]=vout[i]+v[j]*tot
-            print 'vout',i,j,vout[i]
+            print('vout',i,j,vout[i])
     vout=2*vout/M**2
     return vout
 
@@ -349,7 +349,7 @@ def silly_iter(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist,lam=1.27,maxiter=1
     for i in range(maxiter):
         dchisqr=chisq_grad(p,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         p=p*N.exp(-lam*dchisqr)
-        print 'i',i,'dchi',dchisqr
+        print('i',i,'dchi',dchisqr)
         
     return p
 
@@ -462,7 +462,7 @@ if __name__=="__main__":
     Mx=N.ceil(aa/xstep)
     Mz=N.ceil(cc/zstep)
     M=Mx*Mz
-    print 'M', M,Mx,Mz
+    print('M', M,Mx,Mz)
     p0=N.ones(M*2)
     #print 'len pu',len(pu)
     #print 'len pd',len(pd)
@@ -488,7 +488,7 @@ if __name__=="__main__":
     if 1:
         p0=N.ones(M*2)/(M)
     if 1:
-        print len(p0)
+        print(len(p0))
         lowerm=1e-4*N.ones(len(p0))
         #lowerm[0:3]=[-1,-1,-1]
         upperm=N.ones(len(p0))
@@ -545,21 +545,21 @@ if __name__=="__main__":
             p.df = S_grad
             
         if 0:
-            print 'checking'
+            print('checking')
             p.checkdf()
              #p.checkdc()
-            print 'check equality constraints'
+            print('check equality constraints')
             p.checkdh()
-            print 'checking inequality'
+            print('checking inequality')
             p.checkdc()
             sys.exit()
-        print 'solving'
+        print('solving')
         if 1:    
             #r=p.solve('scipy_cobyla')
             #r=p.solve('scipy_lbfgsb')
             r = p.solve('algencan')
             #r = p.solve('ralg')
-            print 'done'
+            print('done')
             pout=r.xf
             
 
@@ -569,11 +569,11 @@ if __name__=="__main__":
                           bounds = None, m = 10, factr = 10000000.0, \
                           pgtol = 1.0000000000000001e-05, epsilon = 1e-08, iprint = -Const(1), maxfun = 15)
         if 0:
-            print 'fmin'
+            print('fmin')
             
             pout=scipy.optimize.optimize.fmin(max_wrap,p0,maxiter = 5, maxfun = 100,disp=1,args=h_args)
         if 0:
-            print 'annealing'
+            print('annealing')
             myschedule='fast'
             #myschedule='simple'
             pout,jmin=anneal(max_wrap,p0,args=h_args,\
@@ -582,7 +582,7 @@ if __name__=="__main__":
         
         if 0:    
             multipliers=pout[0:3]
-            print 'multipliers',multipliers
+            print('multipliers',multipliers)
             pout=pout[3::]
                 
     if 0:
@@ -594,7 +594,7 @@ if __name__=="__main__":
         fq_density=calc_model(P2,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
         X3,Z3,P3=plotdensity(h,k,l,fq)
         fq_density_python=calc_model(P3,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
-        print fq_density
+        print(fq_density)
         pylab.plot(fq,'ro')
         pylab.plot(fq_density,'bo')
         pylab.plot(fq_density_python,'yo')
@@ -696,17 +696,17 @@ if __name__=="__main__":
         p.iprint = 1
         #p.df_iter = 50
         p.maxTime = 4000
-        print 'solving'
+        print('solving')
         r = p.solve('algencan')
-        print 'done'
+        print('done')
         pout=r.xf
         #p.goal='max'
     if 0:
-        print 'solution:', pout
-        print 'chiq', chisq(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
-        print 'pos_sum',pos_sum(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist), 
-        print 'neg_sum', neg_sum(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist)
-        print 'elements',len(pout)
+        print('solution:', pout)
+        print('chiq', chisq(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist))
+        print('pos_sum',pos_sum(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist), end=' ') 
+        print('neg_sum', neg_sum(pout,h,k,l,fq,fqerr,x,z,cosmat_list,coslist,flist))
+        print('elements',len(pout))
     
         P_up,P_down=transform_p(pout,Mx,Mz,M)
         P=P_up-P_down
@@ -726,13 +726,13 @@ if __name__=="__main__":
     
     if 0:
         chi=chisq(p,h,k,l,fq,fqerr,x,z,cosmat_list,xstep=0.1,zstep=0.1)
-        print 'chi',chi
+        print('chi',chi)
         grad=chisq_grad(p,h,k,l,fq,fqerr)
-        print 'gradient',grad
+        print('gradient',grad)
         sgrad_rows,sgrad_cols,s_grad=S_grad(p,h,k,l,fq,fqerr,A=1)
-        print 'S_grad', s_grad
+        print('S_grad', s_grad)
         srows,scols,s_hess=S_hessian(p,h,k,l,fq,fqerr)
-        print 'S_hessian',s_hess
+        print('S_hessian',s_hess)
         
     if 1:
         fig=pylab.figure(figsize=(1.25*3,3*3))
@@ -827,7 +827,7 @@ if __name__=="__main__":
     if 0:
         for i in range(len(h)):
             fsum[i]=fourier_p(h[i],k[i],l[i],P)
-            print h[i],k[i],l[i],fq[i],fsum[i],fq[i]/fsum[i]
+            print(h[i],k[i],l[i],fq[i],fsum[i],fq[i]/fsum[i])
     
     if 0:
         q=N.sqrt(h**2+l**2)  #Note, 107 is off by a factor of 2!
@@ -839,6 +839,6 @@ if __name__=="__main__":
         myfilestr=r'c:\structfactors_density.dat'
         x,y,z=N.loadtxt(myfilestr).T
         bob=N.loadtxt(myfilestr).T
-        print bob.shape
+        print(bob.shape)
         pylab.pcolormesh(x,y,z)
         pylab.show()

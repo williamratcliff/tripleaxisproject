@@ -151,7 +151,7 @@ else:
 
         self.outdata={}
         for key in keys:
-            if self.counts.has_key(key):
+            if key in self.counts:
                 lastkey=key
                 self.outdata[key]=copy.deepcopy(self.mydata[key])
                 detectors=self.mydata[key].metadata['count_info']['AnalyzerDetectorDevicesOfInterest'.lower()]
@@ -214,7 +214,7 @@ else:
 
  
             for key in keys:
-                if self.counts.has_key(key):
+                if key in self.counts:
                     mon0=self.mon0
                     mon=self.mon[key]
                     #print 'mon0',mon0
@@ -380,7 +380,7 @@ else:
             self.corrected_counts=corrected_counts
 
             for key in keys:
-                if self.counts.has_key(key):
+                if key in self.counts:
                     #self.outdata[key]=copy.deepcopy(self.mydata[key])
                     ##self.mydata[key].data[self.mydata[key].metadata['signal']]
                     newfield=detector+'_corrected'
@@ -416,7 +416,7 @@ def fixfile(myfilestr):
     outstr = instr.replace( "\r\n", "\n" ).replace( "\r", "\n" ).replace( "\n", "\r\n" )
 
     if len(outstr) == len(instr):
-        print 'same length'
+        print('same length')
         return 
 
     outfile = open(myfilestr, "wb" )
@@ -437,7 +437,7 @@ def readsansfile(myfilestr):
             if count <17:
                 currline=get_tokenized_line(myfile,returnline)
                 header.append(returnline)
-                print len(currline), currline
+                print(len(currline), currline)
                 if count==0:
                     mytimestampstr=currline[1]+' '+currline[2]
                     mydatetime=datetime.strptime(mytimestampstr[1:-2], "%d-%b-%Y %H:%M:%S")
@@ -446,7 +446,7 @@ def readsansfile(myfilestr):
                     monitor=float(currline[1])          
             else:
                 currline=get_tokenized_line(myfile,returnline,splitchar=',')
-                print len(currline), currline
+                print(len(currline), currline)
                 if currline in ['',['']]:
                     myFlag=False
                 else:
@@ -454,7 +454,7 @@ def readsansfile(myfilestr):
                     data=np.concatenate((data,np.array(currline[:-1],'Float64')))
             count=count+1
         except:
-            print 'done'
+            print('done')
             myFlag=False        
     res={}
     res['header']=header
@@ -477,7 +477,7 @@ def readfiles(ppfile):
     myfilestr=myfilestr+myend
     #return myfilestr
     result=readsansfile(myfilestr)
-    print result
+    print(result)
     return result
     
 def read_driver(myfilestr):
@@ -503,7 +503,7 @@ def read_driver(myfilestr):
                 resdict['off_off']=currline[3]
             results.append(resdict)     
         except:
-            print 'done'
+            print('done')
             myFlag=False
         
     return results
@@ -528,7 +528,7 @@ if __name__=="__main__":
         try:
             fp=results[i][key]
             res[key]=readfiles(fp)
-            print 'read'
+            print('read')
         except:
-            print key, 'does not exist for',i
-    print res
+            print(key, 'does not exist for',i)
+    print(res)
